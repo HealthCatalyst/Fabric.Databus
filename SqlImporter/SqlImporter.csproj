@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+    <PackageReference Include="System.Net.Ping" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ElasticSearchJsonWriter\ElasticSearchJsonWriter.csproj" />
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.ProgressMonitor\ElasticSearchSqlFeeder.ProgressMonitor.csproj" />
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Schema\Fabric.Databus.Schema.csproj" />
+    <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
+    <ProjectReference Include="..\ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj" />
+  </ItemGroup>
+
+</Project>

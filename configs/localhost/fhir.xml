@@ -1,0 +1,148 @@
+<?xml version="1.0"?> 
+<Job>
+  <Config>
+    <ConnectionString>server=dockerhost;initial catalog=Shared;user=appuser;password={password}</ConnectionString>
+    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
+    <Url>http://localhost:9200</Url>
+    <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
+    <EntitiesPerBatch>100</EntitiesPerBatch>
+    <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
+    <LocalSaveFolder>c:\Catalyst\demodata\patientjson</LocalSaveFolder>
+    <DropAndReloadIndex>true</DropAndReloadIndex>
+    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
+    <CompressFiles>false</CompressFiles>
+    <UploadToElasticSearch>false</UploadToElasticSearch>
+    <Index>patients2</Index>
+    <Alias>patients</Alias>
+    <EntityType>patient</EntityType>
+    <TopLevelKeyColumn>EDWPatientID</TopLevelKeyColumn>
+  </Config>
+
+  <Data>
+    <DataModel>
+      {
+	      identifier: [
+	      ],
+	      name: [
+	      ],
+	      communication: [
+	      ],
+	      "us-core-race": {
+		      extension: []
+	      },
+	      condition: [{
+			      category: {},
+			      code: {}
+
+		      }
+	      ]
+      }
+    </DataModel>
+    <DataSource>
+      <Sql>
+        SELECT PatientID AS EDWPatientID
+        , CASE GenderCD
+        WHEN 'Female' THEN 'female'
+        WHEN 'Male' THEN 'male'
+        ELSE 'unknown'
+        END AS gender
+        ,BirthDTS as birthDate
+        FROM [Person].[SourcePatientBASE]
+      </Sql>
+    </DataSource>
+    <DataSource Path="identifier">
+      <Sql>
+        SELECT PatientID AS EDWPatientID, CONCAT(PatientID,'-','MR') as KeyLevel1, 'usual' as [use], 'http://www.healthcatalyst.com' as system, MRN as value, 'MR' as type FROM [Person].[SourcePatientBASE]
+        UNION
+        SELECT PatientID AS EDWPatientID, CONCAT(PatientID,'-','SB') as KeyLevel1, 'usual' as [use], 'http://www.healthcatalyst.com' as system, SSN as value, 'SB' as type FROM [Person].[SourcePatientBASE]
+        UNION
+        SELECT PatientID AS EDWPatientID, CONCAT(PatientID,'-','PI') as KeyLevel1, 'usual' as [use], 'http://www.healthcatalyst.com' as system, PatientID as value, 'PI' as type FROM [Person].[SourcePatientBASE]
+      </Sql>
+    </DataSource>
+    <DataSource Path="name">
+      <Sql>
+        SELECT PatientID AS EDWPatientID, PatientID as KeyLevel1, PatientLastNM as family, PatientFirstNM as given, PatientFullNM as text FROM [Person].[SourcePatientBASE]
+      </Sql>
+    </DataSource>
+    <!--<DataSource Path="name.given">
+      <Sql>
+        SELECT PatientID AS EDWPatientID, PatientID as KeyLevel1, CONCAT(PatientID,'-','First') as KeyLevel2, PatientFirstNM FROM [Person].[SourcePatientBASE]
+        UNION
+        SELECT PatientID AS EDWPatientID, CONCAT(PatientID,'-','SB') as KeyLevel1, 'EHR' as system, SSN as value, 'SB' as type FROM [Person].[SourcePatientBASE]
+      </Sql>
+    </DataSource>
+    -->
+    <DataSource Path="communication">
+      <Sql>
+        SELECT PatientID AS EDWPatientID, PatientID as KeyLevel1, LanguageDSC as language FROM [Person].[SourcePatientBASE]
+      </Sql>
+    </DataSource>
+    <DataSource Path="us-core-race" PropertyType="object">
+      <Sql>
+        SELECT PatientID AS EDWPatientID, PatientID as KeyLevel1, 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race' as url
+        FROM [Person].[SourcePatientBASE]
+      </Sql>
+    </DataSource>
+    <DataSource Path="us-core-race.extension">
+      <Sql>
+        SELECT PatientID AS EDWPatientID, PatientID as KeyLevel1, PatientID as KeyLevel2,
+        'ombCategory' as url
+        , CASE RaceDSC
+        WHEN 'Declined' THEN ''
+        WHEN 'American Indian or Alaskan Native' THEN '1002-5'
+        WHEN 'Other' THEN ''
+        WHEN 'Black or African American' THEN '2054-5'
+        WHEN 'Native Hawaiian or Other Pacific Islander' THEN '2076-8'
+        WHEN 'White or Caucasian' THEN '2106-3'
+        WHEN 'Two Races' THEN ''
+        WHEN 'Asian' THEN '2028-9'
+        ELSE ''
+        END AS valueCoding
+        FROM [Person].[SourcePatientBASE]
+      </Sql>
+    </DataSource>
+
+    <DataSource Path="condition">
+      <Sql>
+        SELECT PatientID AS EDWPatientID
+        , CONCAT(DiagnosisSourceID,'-',RowSourceDSC,'-',DiagnosisTypeDSC) as KeyLevel1
+        , 'active' as clinicalStatus
+        , 'confirmed' as verificationStatus
+
+        FROM [Clinical].[DiagnosisBASE]
+      </Sql>
+    </DataSource>
+    <DataSource Path="condition.category" type="object">
+      <Sql>
+        SELECT PatientID AS EDWPatientID
+        , CONCAT(DiagnosisSourceID,'-',RowSourceDSC,'-',DiagnosisTypeDSC) as KeyLevel1
+        , CONCAT(DiagnosisSourceID,'-',RowSourceDSC,'-',DiagnosisTypeDSC) as KeyLevel2
+        , CASE DiagnosisTypeDSC
+        WHEN 'ICD Problem List Code' THEN 'problem-list-item'
+        WHEN 'ICD Primary Diagnosis Code' THEN 'problem'
+        WHEN 'ICD Diagnosis Cod' THEN 'problem'
+        WHEN 'ICD Admit Diagnosis Code' THEN 'encounter-diagnosis'
+        ELSE 'health-concern'
+        END AS coding
+        , DiagnosisTypeDSC as text
+        FROM [Clinical].[DiagnosisBASE]
+      </Sql>
+    </DataSource>
+    <DataSource Path="condition.code" type="object">
+      <Sql>
+        SELECT PatientID AS EDWPatientID
+        , CONCAT(DiagnosisSourceID,'-',RowSourceDSC,'-',DiagnosisTypeDSC) as KeyLevel1
+        , CONCAT(DiagnosisSourceID,'-',RowSourceDSC,'-',DiagnosisTypeDSC) as KeyLevel2
+        , CASE CodeTypeCD
+        WHEN 'ICD9DX' THEN 'http://hl7.org/fhir/sid/icd-9-cm'
+        WHEN 'ICD10DX' THEN 'http://hl7.org/fhir/sid/icd-10-cm'
+        ELSE NULL
+        END AS system
+        , DiagnosisCD as code
+        , DiagnosisDSC as text
+        FROM [Clinical].[DiagnosisBASE]
+      </Sql>
+    </DataSource>    
+  </Data>
+</Job>

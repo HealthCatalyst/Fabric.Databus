@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="NLog" Version="5.0.0-beta06" />
+    <PackageReference Include="Serilog" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.ProgressMonitor\ElasticSearchSqlFeeder.ProgressMonitor.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj" />
+    <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

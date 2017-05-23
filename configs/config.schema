@@ -1,0 +1,185 @@
+{
+  "definitions": {
+    "QueryField": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "Source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "Destination": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "DestinationType": {
+          "type": "string",
+          "enum": [
+            "integer",
+            "keyword",
+            "text",
+            "date",
+            "geo_point"
+          ]
+        },
+        "Skip": {
+          "type": "boolean"
+        },
+        "Transform": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Zip3ToGeocode",
+            "Zip5ToGeocode"
+          ]
+        }
+      },
+      "required": [
+        "Source",
+        "Destination",
+        "DestinationType",
+        "Skip",
+        "Transform"
+      ]
+    },
+    "QueryLoad": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "Sql": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "PropertyPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "Fields": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/definitions/QueryField"
+          }
+        },
+        "SequenceNumber": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Sql",
+        "PropertyPath",
+        "Fields",
+        "SequenceNumber"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "Urls": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "Loads": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/definitions/QueryLoad"
+      }
+    },
+    "ConnectionString": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "EntitiesPerBatch": {
+      "type": "integer"
+    },
+    "MaximumEntitiesToLoad": {
+      "type": "integer"
+    },
+    "LocalSaveFolder": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "DropAndReloadIndex": {
+      "type": "boolean"
+    },
+    "WriteTemporaryFilesToDisk": {
+      "type": "boolean"
+    },
+    "EntitiesPerUploadFile": {
+      "type": "integer"
+    },
+    "Index": {
+      "type": "string"
+    },
+    "Alias": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "EntityType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "TopLevelKeyColumn": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "UploadToElasticSearch": {
+      "type": "boolean"
+    },
+    "CompressFiles": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "Urls",
+    "Loads",
+    "ConnectionString",
+    "EntitiesPerBatch",
+    "MaximumEntitiesToLoad",
+    "LocalSaveFolder",
+    "DropAndReloadIndex",
+    "WriteTemporaryFilesToDisk",
+    "EntitiesPerUploadFile",
+    "Index",
+    "Alias",
+    "EntityType",
+    "TopLevelKeyColumn",
+    "UploadToElasticSearch",
+    "CompressFiles"
+  ]
+}

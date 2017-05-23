@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="1">
+    <title>My Title</title>
+    <style type="text/css">
+        table {
+            width: 100%;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <!--https://github.com/NancyFx/Nancy/wiki/The-Super-Simple-View-Engine-->
+    <div>
+        <span>Id: @Model.Id</span>
+    </div>
+
+    @If.IsComplete
+    <div style="background-color: forestgreen; width: 100%; color: white;">Completed</div>
+    @EndIf
+    @IfNot.IsComplete
+    <div>Status: @Model.Status <span>...</span></div>
+    @EndIf
+
+    <table>
+        <thead>
+            <tr>
+                <td>StepNumber</td>
+                <td>LoggerName</td>
+                <!--<td>InQueueName</td>-->
+                <td>In Queue</td>
+                <td>Processed</td>
+                <!--<td>Out Queue Name</td>-->
+                <td>Out Queue</td>
+                <td>Time Processing</td>
+                <td>Time Blocked</td>
+                <td>QueueProcessorCount</td>
+                <td>Error</td>
+                <td>IsInQueueCompleted</td>
+            </tr>
+        </thead>
+        <tbody>
+            @Each.ProgressLogItems
+            <tr>
+                <td>@Current.StepNumber</td>
+                <td>@Current.LoggerName</td>
+                <!--<td>@Current.InQueueName</td>-->
+                <td>@Current.InQueueCount</td>
+                <td>@Current.TotalItemsProcessed</td>
+                <td>@Current.TotalItemsAddedToOutputQueue</td>
+                <!--<td>@Current.OutQueueName</td>-->
+                <td>@Current.TimeElapsedProcessingAsText</td>
+                <td>@Current.TimeElapsedBlockedAsText</td>
+                <td>@Current.QueueProcessorCount</td>
+                <td>@Current.ErrorText</td>
+                <td>
+                    @If.IsInQueueCompleted
+                    <div style="background-color: forestgreen; width: 100%; color: white;">Completed</div>
+                    @EndIf
+                </td>
+            </tr>
+            @EndEach
+        </tbody>
+    </table>
+
+    <hr />
+    <div>
+        @Model.ErrorText
+    </div>
+</body>
+</html>

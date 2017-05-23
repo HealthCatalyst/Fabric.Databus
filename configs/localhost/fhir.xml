@@ -1,7 +1,7 @@
 <?xml version="1.0"?> 
 <Job>
   <Config>
-    <ConnectionString>server=dockerhost;initial catalog=Shared;user=appuser;password={password}</ConnectionString>
+    <ConnectionString>server=dockerhost;initial catalog=Shared;user=appuser;password=MyLocalPassword</ConnectionString>
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <Url>http://localhost:9200</Url>
     <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
@@ -12,7 +12,7 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <UploadToElasticSearch>false</UploadToElasticSearch>
+    <UploadToElasticSearch>true</UploadToElasticSearch>
     <Index>patients2</Index>
     <Alias>patients</Alias>
     <EntityType>patient</EntityType>

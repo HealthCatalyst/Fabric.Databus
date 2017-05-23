@@ -37,7 +37,8 @@ namespace Fabric.Databus.API
             // implement our own json serializer for pretty printing
             //Singleton Lifetimes
             container.Register<JsonSerializer, CustomJsonSerializer>();
-            container.Register<IJobHistoryStore, ElasticSearchJobHistoryStore>();
+            //container.Register<IJobHistoryStore, ElasticSearchJobHistoryStore>();
+            container.Register<IJobHistoryStore, InMemoryJobHistoryStore>();
             container.Register<IConfigValidator, ConfigValidator>();
             container.Register<IJobStatusTrackerFactory, JobStatusTrackerFactory>();
 

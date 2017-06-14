@@ -31,5 +31,7 @@ namespace Fabric.Databus.Config
         public bool UploadToElasticSearch { get; set; } = true;
 
         public bool CompressFiles { get; set; }
+
+        public int SqlCommandTimeoutInSeconds { get; set; }
     }
 }

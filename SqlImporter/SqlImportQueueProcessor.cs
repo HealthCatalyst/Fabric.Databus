@@ -38,6 +38,10 @@ namespace SqlImporter
             {
                 conn.Open();
                 var cmd = conn.CreateCommand();
+
+                if (Config.SqlCommandTimeoutInSeconds != 0)
+                    cmd.CommandTimeout = Config.SqlCommandTimeoutInSeconds;
+
                 //cmd.CommandText = "SELECT TOP 10 * FROM [CatalystDevSubset].[dbo].[Patients]";
 
                 cmd.CommandText =

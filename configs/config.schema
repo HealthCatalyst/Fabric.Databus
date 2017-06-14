@@ -163,6 +163,9 @@
     },
     "CompressFiles": {
       "type": "boolean"
+    },
+    "SqlCommandTimeoutInSeconds": {
+      "type": "integer"
     }
   },
   "required": [

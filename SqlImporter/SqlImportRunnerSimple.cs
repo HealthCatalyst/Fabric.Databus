@@ -225,6 +225,9 @@ namespace SqlImporter
                 conn.Open();
                 var cmd = conn.CreateCommand();
 
+                if (job.Config.SqlCommandTimeoutInSeconds != 0)
+                    cmd.CommandTimeout = job.Config.SqlCommandTimeoutInSeconds;
+
                 if (config.MaximumEntitiesToLoad > 0)
                 {
                     cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT TOP {config.MaximumEntitiesToLoad} {config.TopLevelKeyColumn} from CTE;";

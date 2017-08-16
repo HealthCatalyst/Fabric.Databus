@@ -93,7 +93,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
 
         public IList<ProgressMonitorItem> GetSnapshotOfProgressItems()
         {
-            return _progressMonitorItems.ToList().Select(a => a.Value).ToList();
+            return _progressMonitorItems.ToArray().Select(a => a.Value).ToList();
         }
     }
 }

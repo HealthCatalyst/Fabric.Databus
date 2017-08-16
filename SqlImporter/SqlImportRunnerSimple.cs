@@ -230,11 +230,11 @@ namespace SqlImporter
 
                 if (config.MaximumEntitiesToLoad > 0)
                 {
-                    cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT TOP {config.MaximumEntitiesToLoad} {config.TopLevelKeyColumn} from CTE;";
+                    cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT TOP {config.MaximumEntitiesToLoad} {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;";
                 }
                 else
                 {
-                    cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT {config.TopLevelKeyColumn} from CTE;";
+                    cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;";
                 }
 
                 //Logger.Trace($"Start: {cmd.CommandText}");
@@ -244,7 +244,8 @@ namespace SqlImporter
 
                 while (reader.Read())
                 {
-                    list.Add(reader.GetString(0));
+                    var obj = reader.GetValue(0);
+                    list.Add(Convert.ToString(obj));
                 }
                 //Logger.Trace($"Finish: {cmd.CommandText}");
 

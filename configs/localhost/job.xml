@@ -2,53 +2,56 @@
 <Job>
   <Config>
     <ConnectionString>server=(local);initial catalog=Shared;user=appuser;password={password}</ConnectionString>
-    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <Url>http://localhost:9200</Url>
-    <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
-    <EntitiesPerBatch>100</EntitiesPerBatch>
+    <EntitiesPerBatch>1000</EntitiesPerBatch>
     <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
     <LocalSaveFolder>c:\Catalyst\demodata\patientjson</LocalSaveFolder>
     <DropAndReloadIndex>true</DropAndReloadIndex>
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <UploadToElasticSearch>false</UploadToElasticSearch>
-    <Index>patients2</Index>
-    <Alias>patients</Alias>
-    <EntityType>patient</EntityType>
-    <TopLevelKeyColumn>EDWPatientID</TopLevelKeyColumn>
+    <UploadToElasticSearch>true</UploadToElasticSearch>
+    <Index>facilityaccount_2017_08_15_1</Index>
+    <Alias>facilityaccounts_test</Alias>
+    <EntityType>FacilityAccount</EntityType>
+    <TopLevelKeyColumn>FacilityAccountID</TopLevelKeyColumn>
   </Config>
 
   <Data>
     <DataModel>
-        {
-		      diagnoses: [{
-				      primarydiagnoses: [
-				      ]
-			      }
-		      ],
-          facilityaccounts:[
-          ]
-	      }
-    </DataModel>    
+      {
+      }
+    </DataModel>
     <DataSource>
       <Sql>
-        SELECT PatientID AS EDWPatientID, * FROM [Person].[SourcePatientBASE]
-      </Sql>
-    </DataSource>
-    <DataSource Path="diagnoses">
-      <Sql>
-        SELECT *, CONCAT(DiagnosisSourceID,'-',RowSourceDSC,'-',DiagnosisTypeDSC) as KeyLevel1 FROM [Clinical].[DiagnosisBASE]
-      </Sql>
-    </DataSource>
-    <DataSource Path="facilityaccounts">
-      <Sql>
-        SELECT *, CONCAT(RowSourceDSC,'-',FacilityAccountID) as KeyLevel1 FROM [Clinical].[FacilityAccountBASE]
-      </Sql>
-    </DataSource>
-    <DataSource Path="race" PropertyType="object">
-      <Sql>
-        SELECT PatientID AS EDWPatientID, PatientID AS KeyLevel1, RaceDSC FROM [Person].[SourcePatientBASE]
+        SELECT
+        CustomerID
+        ,	CustomerNM
+        ,	FacilityAccountID
+        ,	AgeNBR
+        ,	DischargeDTS
+        ,	LengthOfStayDaysNBR
+        ,	IndexAdmissionFLG
+        ,	Readmit30FLG
+        ,	MaritalStatusNormDSC
+        ,	RaceNormDSC
+        ,	AdmitTypeNormDSC
+        ,	AdmitSourceDSC
+        ,	PrimaryPayorNM
+        ,	FinancialClassDSC
+        ,	DischargePhysicalDepartmentNM
+        ,	BillingLocationNM
+        ,	PrimaryDiagnosisCD
+        ,	PrimaryProcedureCD
+        ,	MSDRG
+        ,	ElectiveFLG 
+        ,	EmergencyDepartmentFLG
+        ,	GenderDSC
+        ,	DiedFLG
+        ,	ExpectedReadmission
+        ,	ExpectedMortality
+        ,	ExpectedLengthOfStay
+        FROM dbo.Elasticsearchtest
       </Sql>
     </DataSource>
   </Data>

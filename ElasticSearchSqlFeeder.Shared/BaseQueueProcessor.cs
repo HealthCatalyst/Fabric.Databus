@@ -98,7 +98,9 @@ namespace ElasticSearchSqlFeeder.Shared
                 }
                 catch (InvalidOperationException e)
                 {
-                    if (e.Source == "System.Collections.Concurrent") break;
+                    if (e.Source == "System.Collections.Concurrent"
+                        || e.Message?.Contains("The collection argument is empty")==true
+                        ) break;
                     throw;
                 }
                 catch (Exception e)

@@ -65,7 +65,8 @@ namespace Fabric.Databus.API
             return new LoggerConfiguration()
                 .MinimumLevel.ControlledBy(levelSwitch)
                 .Enrich.FromLogContext()
-                .WriteTo.Elasticsearch(sinkOptions).CreateLogger();
+                .WriteTo
+                .Elasticsearch(sinkOptions).CreateLogger();
         }
 
         private Uri CreateElasticSearchUri(ElasticSearchSettings elasticSearchConfig)

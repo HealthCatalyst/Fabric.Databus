@@ -164,5 +164,30 @@ namespace ElasticSearchSqlFeeder.Shared
             }
 
         }
+
+        public IList<Tuple<TKey, TValue>> RemoveItems(Func<KeyValuePair<TKey, TValue>, bool> fnKey)
+        {
+            lock (((ICollection)KeyHash).SyncRoot)
+            {
+                var itemsToRemove = KeyHash.Where(fnKey).Select(k => new Tuple<TKey, TValue>(k.Key, k.Value)).ToList();
+
+                if (itemsToRemove.Any())
+                {
+                    var firstOrDefault = itemsToRemove.FirstOrDefault();
+                    var lastOrDefault = itemsToRemove.LastOrDefault();
+                    if (firstOrDefault != null && lastOrDefault != null)
+                    {
+                        Logger.Trace($"Removing keys from dictionary: {firstOrDefault.Item1} to {lastOrDefault.Item1}");
+                    }
+
+                    var itemsToKeep = KeyHash.Where(a => !fnKey(a)).ToList();
+                    KeyHash.Clear();
+                    itemsToKeep.ForEach(k => KeyHash.Add(k.Key, k.Value));
+                }
+
+                return itemsToRemove;
+            }
+        }
+
     }
 }

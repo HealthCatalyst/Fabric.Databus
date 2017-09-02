@@ -1,4 +1,7 @@
-@echo off
+echo off
+
+version=1.1
+
 read -n 1 -p 'Are you sure you want to publish to dockerhub?'
 echo "(ok)"
 
@@ -13,7 +16,11 @@ dotnet publish --configuration Release --output obj/Docker/publish
 cp ./ca.crt obj/Docker/publish/
 
 docker build -t healthcatalyst/fabric.databus .
-docker push healthcatalyst/fabric.databus
+
+docker tag healthcatalyst/fabric.databus:latest healthcatalyst/fabric.databus:$version
+
+docker push healthcatalyst/fabric.databus:latest
+docker push healthcatalyst/fabric.databus:$version
 cd ..
 echo Press any key to exit
 read -n 1

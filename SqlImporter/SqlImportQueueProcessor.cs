@@ -18,11 +18,11 @@ namespace SqlImporter
         {
         }
 
-        private void ReadOneQueryFromDatabase(string queryId, DataSource load, int seed, string start, string end)
+        private void ReadOneQueryFromDatabase(string queryId, DataSource load, int seed, string start, string end, int workitemBatchNumber)
         {
             try
             {
-                InternalReadOneQueryFromDatabase(queryId, load, start, end);
+                InternalReadOneQueryFromDatabase(queryId, load, start, end, workitemBatchNumber);
             }
             catch (Exception e)
             {
@@ -30,7 +30,7 @@ namespace SqlImporter
             }
         }
 
-        private void InternalReadOneQueryFromDatabase(string queryId, DataSource load, string start, string end)
+        private void InternalReadOneQueryFromDatabase(string queryId, DataSource load, string start, string end, int batchNumber)
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
@@ -145,6 +145,7 @@ namespace SqlImporter
                 {
                     AddToOutputQueue(new ConvertDatabaseToJsonQueueItem
                     {
+                        BatchNumber = batchNumber,
                         QueryId = queryId,
                         JoinColumnValue = frame.Key,
                         Rows = frame.Value,
@@ -176,7 +177,7 @@ namespace SqlImporter
 
         protected override void Handle(SqlImportQueueItem workitem)
         {
-            ReadOneQueryFromDatabase(workitem.QueryId, workitem.DataSource, workitem.Seed, workitem.Start, workitem.End);
+            ReadOneQueryFromDatabase(workitem.QueryId, workitem.DataSource, workitem.Seed, workitem.Start, workitem.End, workitem.BatchNumber);
         }
 
         protected override void Complete(string queryId)
@@ -203,5 +204,6 @@ namespace SqlImporter
         public int Seed { get; set; }
         public string Start { get; set; }
         public string End { get; set; }
+        public int BatchNumber { get; set; }
     }
 }

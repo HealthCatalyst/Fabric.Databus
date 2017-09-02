@@ -23,6 +23,8 @@ namespace ElasticSearchJsonWriter
 
         private int _numDocumentsModified;
 
+        private static int _currentBatchNumber = 0;
+
         public JsonDocumentMergerQueueProcessor(IMeteredConcurrentDictionary<string, JsonObjectQueueItem> documentDictionary, QueueContext queueContext)
             : base(queueContext)
         {
@@ -30,7 +32,7 @@ namespace ElasticSearchJsonWriter
         }
 
 
-        private void AddToJsonObject(string queryId, string id, string propertyName, JObject[] newJObjects)
+        private void AddToJsonObject(string queryId, string id, string propertyName, JObject[] newJObjects, int batchNumber)
         {
             //BlockIfMaxSizeReached(id);
 
@@ -43,6 +45,7 @@ namespace ElasticSearchJsonWriter
                     document = new JObject { { Config.TopLevelKeyColumn, id } };
                     var jsonObjectCacheItem = new JsonObjectQueueItem
                     {
+                        BatchNumber = batchNumber,
                         Id = id,
                         Document = document
                     };
@@ -290,12 +293,31 @@ namespace ElasticSearchJsonWriter
 
         protected override void Handle(JsonDocumentMergerQueueItem wt)
         {
-            AddToJsonObject(wt.QueryId, wt.Id, wt.PropertyName, wt.NewJObjects);
+            // if work item batch number is newer than the last one we saw that we can flush anything related to the old batch
+            if(_currentBatchNumber != wt.BatchNumber)
+            {
+                //find all items with old batch numbers and put them in the out queue
+                var list = _documentDictionary.RemoveItems(item => item.Value.BatchNumber != wt.BatchNumber);
+                SendToOutputQueue(list);
+
+                _currentBatchNumber = wt.BatchNumber;
+            }
+
+            AddToJsonObject(wt.QueryId, wt.Id, wt.PropertyName, wt.NewJObjects, wt.BatchNumber);
         }
 
         protected override void Complete(string queryId)
         {
             var list = _documentDictionary.RemoveAll();
+            SendToOutputQueue(list);
+
+            SequenceBarrier.CompleteQuery(queryId);
+
+            MyLogger.Trace("Finished");
+        }
+
+        private void SendToOutputQueue(IList<Tuple<string, JsonObjectQueueItem>> list)
+        {
             foreach (var tuple in list)
             {
                 //remove temporary columns
@@ -311,10 +333,6 @@ namespace ElasticSearchJsonWriter
                     File.WriteAllText(Path.Combine(path, tuple.Item1), tuple.Item2.Document.ToString());
                 }
             }
-
-            SequenceBarrier.CompleteQuery(queryId);
-
-            MyLogger.Trace("Finished");
         }
 
         static void WalkNode(JToken node, Action<JObject> action)
@@ -388,7 +406,7 @@ namespace ElasticSearchJsonWriter
         public string PropertyName { get; set; }
         public string Id { get; set; }
         public JObject Document { get; set; }
-
+        public int BatchNumber { get; set; }
     }
     public class JsonDocumentMergerQueueItem : IQueueItem
     {
@@ -397,6 +415,9 @@ namespace ElasticSearchJsonWriter
 
         public string Id { get; set; }
         public JObject[] NewJObjects { get; set; }
+
+        public int BatchNumber { get; set; }
+
         //public string JoinColumnValue { get; set; }
     }
 

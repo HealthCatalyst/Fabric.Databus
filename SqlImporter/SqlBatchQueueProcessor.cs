@@ -27,6 +27,7 @@ namespace SqlImporter
 
                     AddToOutputQueue(new SqlImportQueueItem
                     {
+                        BatchNumber = workitem.BatchNumber,
                         QueryId = queryId,
                         PropertyName = c.Path,
                         Seed = seed,
@@ -59,5 +60,6 @@ namespace SqlImporter
         public string Start { get; set; }
         public string End { get; set; }
         public List<DataSource> Loads { get; set; }
+        public int BatchNumber { get; set; }
     }
 }

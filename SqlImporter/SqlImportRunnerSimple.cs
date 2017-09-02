@@ -87,10 +87,13 @@ namespace SqlImporter
 
             var ranges = CalculateRanges(config, job);
 
+            int currentBatchNumber = 1;
+
             foreach (var range in ranges)
             {
                 sqlBatchQueue.Add(new SqlBatchQueueItem
                 {
+                    BatchNumber = currentBatchNumber++,
                     Start = range.Item1,
                     End = range.Item2,
                     Loads = job.Data.DataSources,

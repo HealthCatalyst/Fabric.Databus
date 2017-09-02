@@ -14,5 +14,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
         IList<TKey> GetKeys();
         IList<TKey> GetKeysLessThan(TKey min);
         IList<Tuple<TKey, TValue>> RemoveAll();
+        IList<Tuple<TKey, TValue>> RemoveItems(Func<KeyValuePair<TKey, TValue>, bool> fnKey);
     }
 }

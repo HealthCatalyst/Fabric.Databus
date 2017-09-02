@@ -186,6 +186,7 @@ namespace ElasticSearchJsonWriter
 
             AddToOutputQueue(new JsonDocumentMergerQueueItem
             {
+                BatchNumber = wt.BatchNumber,
                 QueryId = wt.QueryId,
                 Id = id,
                 PropertyName = wt.PropertyName,
@@ -234,5 +235,6 @@ namespace ElasticSearchJsonWriter
         public string JoinColumnValue { get; set; }
         public List<object[]> Rows { get; set; }
         public string PropertyType { get; set; }
+        public int BatchNumber { get; set; }
     }
 }

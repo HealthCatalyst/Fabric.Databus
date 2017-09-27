@@ -1,28 +1,29 @@
-﻿using System.IO;
+﻿using System;
 using System.Linq;
 using Fabric.Databus.Domain.Jobs;
 using Nancy;
 using Nancy.Extensions;
 using Nancy.IO;
-using Nancy.ModelBinding;
+using Nancy.Security;
 using Serilog;
-using SqlImporter;
 
 namespace Fabric.Databus.API.Modules
 {
-    public class ValidateJobModule : NancyModule
-    {
-        public ValidateJobModule(ILogger logger, IJobScheduler jobScheduler) : base("/validate")
-        {
-            Post("/", async parameters =>
-            {
-                var jobName = string.Empty; // parameters.jobName;
+		public class ValidateJobModule : NancyModule
+		{
+				public ValidateJobModule(ILogger logger, IJobScheduler jobScheduler) : base("/validate")
+				{
+						this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.validate", StringComparison.OrdinalIgnoreCase));
 
-                var httpFiles = Request.Files.ToList();
+						Post("/", async parameters =>
+						{
+								var jobName = string.Empty; // parameters.jobName;
 
-                var body = RequestStream.FromStream(Request.Body).AsString();
-                return await jobScheduler.ValidateJob(body, jobName);
-            });
-        }
-    }
+								var httpFiles = Request.Files.ToList();
+
+								var body = RequestStream.FromStream(Request.Body).AsString();
+								return await jobScheduler.ValidateJob(body, jobName);
+						});
+				}
+		}
 }

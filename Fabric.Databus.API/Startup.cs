@@ -27,11 +27,13 @@ namespace Fabric.Databus.API
 						_config = new ConfigurationBuilder()
 								.AddJsonFile("appsettings.json")
 								.SetBasePath(env.ContentRootPath)
+								.AddEnvironmentVariables()
 								.Build();
 
 						_hostingConfiguration = new ConfigurationBuilder()
 								.SetBasePath(Directory.GetCurrentDirectory())
 								.AddJsonFile("hosting.json")
+								.AddEnvironmentVariables()
 								.Build();
 				}
 
@@ -39,7 +41,6 @@ namespace Fabric.Databus.API
 				{
 						var appConfig = new AppConfiguration();
 						_config.Bind(appConfig);
-						var idServerSettings = appConfig.IdentityServerConfidentialClientSettings;
 
 						var levelSwitch = new LoggingLevelSwitch();
 						var log = ConfigureLogger(levelSwitch, appConfig);
@@ -47,10 +48,10 @@ namespace Fabric.Databus.API
 						app.UseCors("default");
 						app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
 						{
-								Authority = idServerSettings.Authority,
+								Authority = appConfig.Authority,
 								RequireHttpsMetadata = false,
 
-								ApiName = idServerSettings.ClientId,
+								ApiName = appConfig.ClientId,
 						});
 
 						app.UseOwin(buildFunc =>
@@ -61,7 +62,7 @@ namespace Fabric.Databus.API
 								buildFunc(next => PerformanceLoggingMiddleware.Inject(next, log));
 								buildFunc(next => new DiagnosticsMiddleware(next, levelSwitch).Inject);
 								buildFunc(next => new MonitoringMiddleware(next, HealthCheck).Inject);
-								buildFunc.UseAuthPlatform(idServerSettings.Scopes);
+								buildFunc.UseAuthPlatform(appConfig.Scopes.Split(','));
 								buildFunc.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(log, appConfig));
 						});
 				}

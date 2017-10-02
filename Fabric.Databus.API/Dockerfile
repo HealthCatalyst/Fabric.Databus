@@ -9,4 +9,9 @@ RUN /usr/sbin/update-ca-certificates
 
 RUN mkdir -p /home/hcadmin/json
 
+ENV Authority=https://fabricservices.hqcatalyst.local/identity
+ENV ClientId=fabric-databus
+ENV Scopes=fabric/databus.validate,fabric/databus.queuejob
+ENV urls=http://localhost:5000
+
 ENTRYPOINT ["dotnet", "Fabric.Databus.API.dll"]

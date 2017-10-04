@@ -180,7 +180,7 @@ namespace SqlImporter
             ReadOneQueryFromDatabase(workitem.QueryId, workitem.DataSource, workitem.Seed, workitem.Start, workitem.End, workitem.BatchNumber);
         }
 
-        protected override void Complete(string queryId)
+        protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
             //MarkOutputQueueAsCompleted();
         }

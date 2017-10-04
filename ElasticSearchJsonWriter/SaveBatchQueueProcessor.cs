@@ -21,7 +21,7 @@ namespace ElasticSearchJsonWriter
         }
 
 
-        protected override void Complete(string queryId)
+        protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 

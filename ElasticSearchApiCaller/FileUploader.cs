@@ -16,9 +16,7 @@ namespace ElasticSearchApiCaller
 {
     public class FileUploader
     {
-        const string Folder = @"c:\Catalyst\demodata\patientjson";
-
-        private static readonly Logger Logger =  LogManager.GetLogger("FileUploader");
+        private static readonly Logger Logger = LogManager.GetLogger("FileUploader");
 
         private const int NumberOfParallelUploads = 50;
 
@@ -40,9 +38,9 @@ namespace ElasticSearchApiCaller
             _password = password;
         }
 
-        public async Task CreateIndexAndMappings(List<string> hosts)
+        public async Task CreateIndexAndMappings(List<string> hosts, string index, string alias, string entity, string folder)
         {
-            using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
             {
                 var host = hosts.First();
 
@@ -51,29 +49,30 @@ namespace ElasticSearchApiCaller
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await
                     client.PostAsyncString(host + "/_aliases?pretty",
-                        "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}");
+                        "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias +
+                        "\" } }]}");
 
-                var requestUri = host + @"/patients2";
+                var requestUri = host + $"/{index}";
 
                 await client.DeleteAsync(requestUri);
 
                 // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
                 await client.PostAsync(host + "/_forcemerge?only_expunge_deletes=true", null);
 
-                await client.PutAsyncFile(requestUri, Folder + @"\mainmapping.json");
+                await client.PutAsyncFile(requestUri, folder + @"\mainmapping.json");
 
-                await InternalUploadAllFilesInFolder(hosts, "mapping*", @"/patients2/_mapping/patient");
+                await InternalUploadAllFilesInFolder(hosts, "mapping*", $"/{index}/_mapping/{entity}", folder);
 
                 // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"-1\" } }"
 
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-codec
 
                 await
-                    client.PutAsyncString(host + "/patients2/_settings",
+                    client.PutAsyncString(host + "/" + index + "/_settings",
                         "{ \"index\" : {\"refresh_interval\" : \"30\" } }");
 
                 await
-                    client.PutAsyncString(host + "/patients2/_settings",
+                    client.PutAsyncString(host + "/" + index + "/_settings",
                         "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
             }
         }
@@ -89,9 +88,9 @@ namespace ElasticSearchApiCaller
 
         }
 
-        public async Task DeleteIndex(List<string> hosts, string relativeUrl)
+        public async Task DeleteIndex(List<string> hosts, string relativeUrl, string index, string alias)
         {
-            using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
             {
                 var host = hosts.First();
 
@@ -100,49 +99,55 @@ namespace ElasticSearchApiCaller
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await
                     client.PostAsyncString(host + "/_aliases?pretty",
-                        "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}");
+                        "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
 
                 var requestUri = host + relativeUrl;
 
                 await client.DeleteAsync(requestUri);
+
+                // now also delete the alias in case it was pointing to some other index
+
+                // DELETE /logs_20162801/_alias/current_day
+                await client.DeleteAsync(host + "/_all/_alias/" + alias);
+
             }
         }
 
-        public async Task FinishUpload(List<string> hosts)
+        public async Task FinishUpload(List<string> hosts, string index, string alias)
         {
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
-            using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
             {
                 var host = hosts.First();
 
                 AddAuthorizationToken(client);
 
                 await
-                    client.PutAsyncString(host + "/patients2/_settings",
+                    client.PutAsyncString(host + "/" + index + "/_settings",
                         "{ \"index\" : {\"number_of_replicas\" : \"1\" } }");
 
                 await
-                    client.PutAsyncString(host + "/patients2/_settings",
+                    client.PutAsyncString(host + "/" + index + "/_settings",
                         "{ \"index\" : {\"refresh_interval\" : \"1s\" } }");
 
                 // curl -XPOST %ESURL%/patients2/_forcemerge?max_num_segments=5
-                await client.PostAsync(host + "/patients2/_forcemerge?max_num_segments=5", null);
+                await client.PostAsync(host + "/" + index + "/_forcemerge?max_num_segments=5", null);
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
-                await
-                    client.PostAsyncString(host + "/_aliases?pretty",
-                        "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}");
+                //await
+                //    client.PostAsyncString(host + "/_aliases?pretty",
+                //        "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"add\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await
                     client.PostAsyncString(host + "/_aliases?pretty",
-                        "{\"actions\" : [{ \"add\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}");
+                        "{\"actions\" : [{ \"add\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
             }
         }
 
         public async Task SetupAlias(List<string> hosts, string indexName, string aliasName)
         {
-            using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
             {
                 var host = hosts.First();
                 AddAuthorizationToken(client);
@@ -152,23 +157,23 @@ namespace ElasticSearchApiCaller
             }
         }
 
-        public async Task UploadAllFilesInFolder(List<string> hosts)
+        public async Task UploadAllFilesInFolder(List<string> hosts, string index, string alias, string entity, string folder)
         {
             // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-indexing-speed.html
 
-            await CreateIndexAndMappings(hosts);
-            await InternalUploadAllFilesInFolder(hosts, "patients2-*", @"/patients/patient/_bulk?pretty");
+            await CreateIndexAndMappings(hosts,index,alias,entity,folder);
+            await InternalUploadAllFilesInFolder(hosts, index+ "-*", $"/{index}/{entity}/_bulk?pretty", folder);
             //await InternalUploadAllFilesInFolder(hosts, "patients2-Diagnoses*", @"/patients/_bulk?pretty");
-            await FinishUpload(hosts);
+            await FinishUpload(hosts, index,alias);
         }
 
-        private async Task InternalUploadAllFilesInFolder(List<string> hosts, string searchPattern, string relativeUrl)
+        private async Task InternalUploadAllFilesInFolder(List<string> hosts, string searchPattern, string relativeUrl, string folder)
         {
             _currentRequests = 0;
             _stopwatch.Reset();
             _stopwatch.Start();
 
-            var files = Directory.EnumerateFiles(Folder, searchPattern);
+            var files = Directory.EnumerateFiles(folder, searchPattern);
             var fileList = files.ToList();
 
             fileList.ForEach(f => _queuedFiles.Enqueue(f));
@@ -232,12 +237,10 @@ namespace ElasticSearchApiCaller
             {
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
 
-                //using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
                 using (var handler = new HttpClientHandler())
                 {
                     handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                    using (var client = new HttpClient(new RetryHandler(handler)))
-                    //using (var client = new HttpClient(new RetryHandler(new LoggingHandler(handler))))
+                    using (var client = new HttpClient(new RetryHandler(new HttpLoggingHandler(handler, doLogContent: false))))
                     {
                         var baseUri = url;
                         client.BaseAddress = new Uri(baseUri);
@@ -302,15 +305,16 @@ namespace ElasticSearchApiCaller
 
         }
 
-        internal async Task SendStreamToHosts(List<string> hosts, string relativeUrl, int batch, Stream stream)
+        internal async Task SendStreamToHosts(List<string> hosts, string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             var hostNumber = batch % hosts.Count;
 
             var url = hosts[hostNumber] + relativeUrl;
 
-            await SendStreamToUrl(url,batch, stream);
+            await SendStreamToUrl(url, batch, stream, doLogContent, doCompress);
         }
-        internal async Task SendStreamToUrl(string url, int batch, Stream stream)
+
+        internal async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             try
             {
@@ -322,8 +326,7 @@ namespace ElasticSearchApiCaller
                 using (var handler = new HttpClientHandler())
                 {
                     handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-                    using (var client = new HttpClient(new RetryHandler(handler)))
-                    //using (var client = new HttpClient(new RetryHandler(new LoggingHandler(handler))))
+                    using (var client = new HttpClient(new RetryHandler(new HttpLoggingHandler(handler, doLogContent))))
                     {
                         var baseUri = url;
                         client.BaseAddress = new Uri(baseUri);
@@ -345,14 +348,16 @@ namespace ElasticSearchApiCaller
                                 requestContent = reader.ReadToEnd();
                                 // Do something with the value
 
-                            Logger.Trace($"{requestContent}");
+                                Logger.Trace($"{requestContent}");
                             }
                         }
 
                         Interlocked.Increment(ref _currentRequests);
                         var requestStartTimeMillisecs = _stopwatch.ElapsedMilliseconds;
 
-                        var response = await client.PutAsyncStreamCompressed(url, stream);
+                        var response = doCompress
+                            ? await client.PutAsyncStreamCompressed(url, stream)
+                            : await client.PutAsyncStream(url, stream);
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -406,7 +411,7 @@ namespace ElasticSearchApiCaller
 
         public async Task<string> TestElasticSearchConnection(List<string> hosts)
         {
-            using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
             {
                 var host = hosts.First();
 

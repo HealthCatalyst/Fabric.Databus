@@ -56,7 +56,7 @@ namespace ElasticSearchJsonWriter
 
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             {
-                EsJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType);
+                EsJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, Config.EntityType);
             }
 
             AddToOutputQueue(new MappingUploadQueueItem
@@ -192,7 +192,7 @@ curl -XPOST -u $USR:$PWD $ESURL/'_aliases?pretty' -H 'Content-Type: application/
         }
 
 
-        protected override void Complete(string queryId)
+        protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 

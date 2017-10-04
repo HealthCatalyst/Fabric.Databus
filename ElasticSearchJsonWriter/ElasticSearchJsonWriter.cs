@@ -16,7 +16,7 @@ namespace ElasticSearchJsonWriter
         private readonly ConcurrentDictionary<string, string> _idToFileNameLookup = new ConcurrentDictionary<string, string>();
 
 
-        public static void WriteMappingToStream(List<ColumnInfo> columnList, string propertyPath, StreamWriter textWriter, string propertyType)
+        public static void WriteMappingToStream(List<ColumnInfo> columnList, string propertyPath, StreamWriter textWriter, string propertyType, string entity)
         {
             using (var writer = new JsonTextWriter(textWriter))
             {
@@ -24,7 +24,7 @@ namespace ElasticSearchJsonWriter
 
                 using (new JsonPropertyWrapper(writer, "mappings", propertyPath != null))
                 {
-                    using (new JsonPropertyWrapper(writer, "patient", propertyPath != null))
+                    using (new JsonPropertyWrapper(writer, entity, propertyPath != null))
                     {
                         using (new JsonPropertyWrapper(writer, "properties"))
                         {

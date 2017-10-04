@@ -7,6 +7,9 @@ namespace Fabric.Databus.Config
         public string Name { get; set; }
 
         public string Url { get; set; }
+        public string ElasticSearchUserName { get; set; }
+        public string ElasticSearchPassword { get; set; }
+
         public List<string> Urls => new List<string> {Url};
 
         public string ConnectionString { get; set; }

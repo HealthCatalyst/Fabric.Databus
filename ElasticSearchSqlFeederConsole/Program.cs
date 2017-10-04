@@ -54,7 +54,7 @@ namespace ElasticSearchSqlFeederConsole
 
 #if TRUE
             logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);
-            logger.Error(new Exception("test"), "An error has occurred.");
+            //logger.Error(new Exception("test"), "An error has occurred.");
 
             Log.CloseAndFlush();
 

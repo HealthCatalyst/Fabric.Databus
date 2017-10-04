@@ -16,7 +16,7 @@ namespace ElasticSearchApiCaller
 {
     public class FileUploader
     {
-        const string folder = @"c:\Catalyst\demodata\patientjson";
+        const string Folder = @"c:\Catalyst\demodata\patientjson";
 
         private static readonly Logger Logger =  LogManager.GetLogger("FileUploader");
 
@@ -24,19 +24,29 @@ namespace ElasticSearchApiCaller
 
         readonly Stopwatch _stopwatch = new Stopwatch();
 
-        private SemaphoreSlim maxThread = new SemaphoreSlim(NumberOfParallelUploads);
+        private readonly SemaphoreSlim maxThread = new SemaphoreSlim(NumberOfParallelUploads);
         private int _totalFiles;
 
         private int _currentRequests = 0;
 
         private readonly ConcurrentQueue<string> _queuedFiles = new ConcurrentQueue<string>();
         private int _requestFailures;
+        private readonly string _username;
+        private readonly string _password;
+
+        public FileUploader(string username, string password)
+        {
+            _username = username;
+            _password = password;
+        }
 
         public async Task CreateIndexAndMappings(List<string> hosts)
         {
             using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
             {
                 var host = hosts.First();
+
+                AddAuthorizationToken(client);
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await
@@ -50,7 +60,7 @@ namespace ElasticSearchApiCaller
                 // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
                 await client.PostAsync(host + "/_forcemerge?only_expunge_deletes=true", null);
 
-                await client.PutAsyncFile(requestUri, folder + @"\mainmapping.json");
+                await client.PutAsyncFile(requestUri, Folder + @"\mainmapping.json");
 
                 await InternalUploadAllFilesInFolder(hosts, "mapping*", @"/patients2/_mapping/patient");
 
@@ -68,11 +78,24 @@ namespace ElasticSearchApiCaller
             }
         }
 
+        private void AddAuthorizationToken(HttpClient client)
+        {
+            if (!string.IsNullOrEmpty(_username) && !string.IsNullOrEmpty(_password))
+            {
+                var byteArray = Encoding.ASCII.GetBytes($"{_username}:{_password}");
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            }
+
+        }
+
         public async Task DeleteIndex(List<string> hosts, string relativeUrl)
         {
             using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
             {
                 var host = hosts.First();
+
+                AddAuthorizationToken(client);
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await
@@ -91,6 +114,8 @@ namespace ElasticSearchApiCaller
             using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
             {
                 var host = hosts.First();
+
+                AddAuthorizationToken(client);
 
                 await
                     client.PutAsyncString(host + "/patients2/_settings",
@@ -120,7 +145,7 @@ namespace ElasticSearchApiCaller
             using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
             {
                 var host = hosts.First();
-
+                AddAuthorizationToken(client);
                 await
                     client.PostAsyncString(host + "/_aliases?pretty",
                         "{\"actions\" : [{ \"add\" : { \"index\" : \"" + indexName + "\", \"alias\" : \"" + aliasName + "\" } }]}");
@@ -143,7 +168,7 @@ namespace ElasticSearchApiCaller
             _stopwatch.Reset();
             _stopwatch.Start();
 
-            var files = Directory.EnumerateFiles(folder, searchPattern);
+            var files = Directory.EnumerateFiles(Folder, searchPattern);
             var fileList = files.ToList();
 
             fileList.ForEach(f => _queuedFiles.Enqueue(f));
@@ -217,6 +242,9 @@ namespace ElasticSearchApiCaller
                         var baseUri = url;
                         client.BaseAddress = new Uri(baseUri);
                         client.DefaultRequestHeaders.Accept.Clear();
+
+                        AddAuthorizationToken(client);
+
                         //var fileContent = new FileContent(filepath);
 
                         //Logger.Trace("posting file" + filepath);
@@ -302,6 +330,8 @@ namespace ElasticSearchApiCaller
                         client.DefaultRequestHeaders.Accept.Clear();
                         //var fileContent = new FileContent(filepath);
 
+                        AddAuthorizationToken(client);
+
                         //Logger.Trace("posting file" + filepath);
                         string requestContent;
 
@@ -368,7 +398,7 @@ namespace ElasticSearchApiCaller
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.Error(ex, url);
                 throw;
             }
 
@@ -379,6 +409,8 @@ namespace ElasticSearchApiCaller
             using (var client = new HttpClient(new LoggingHandler(new HttpClientHandler())))
             {
                 var host = hosts.First();
+
+                AddAuthorizationToken(client);
 
                 return await
                     client.GetStringAsync(host);

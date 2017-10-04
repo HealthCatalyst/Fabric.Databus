@@ -36,6 +36,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
         // ReSharper disable once StaticMemberInGenericType
         private static int _processorCount;
+        private static int _maxProcessorCount;
 
         protected readonly QueueContext QueueContext;
         private int _stepNumber;
@@ -59,9 +60,10 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public void MonitorWorkQueue()
         {
-            Interlocked.Increment(ref _processorCount);
+            var currentProcessorCount = Interlocked.Increment(ref _processorCount);
+            Interlocked.Increment(ref _maxProcessorCount);
 
-            var isFirstThreadForThisTask = _processorCount < 2;
+            var isFirstThreadForThisTask = currentProcessorCount < 2;
             Begin(isFirstThreadForThisTask);
 
             LogToConsole(null);
@@ -115,12 +117,12 @@ namespace ElasticSearchSqlFeeder.Shared
                 }
             }
 
-            var isLastThreadForThisTask = _processorCount < 2;
+            currentProcessorCount = Interlocked.Decrement(ref _processorCount);
+            var isLastThreadForThisTask = currentProcessorCount < 1;
             Complete(queryId, isLastThreadForThisTask);
 
             MyLogger.Trace($"Completed {queryId}: queue: {_inQueue.Count}");
-
-            Interlocked.Decrement(ref _processorCount);
+            
             LogToConsole(null);
         }
 
@@ -147,6 +149,7 @@ namespace ElasticSearchSqlFeeder.Shared
                 TotalItemsAddedToOutputQueue = _totalItemsAddedToOutputQueue,
                 OutQueueName = _outQueue.Name,
                 QueueProcessorCount = _processorCount,
+                MaxQueueProcessorCount = _maxProcessorCount,
                 ErrorText = _errorText,
             });
         }

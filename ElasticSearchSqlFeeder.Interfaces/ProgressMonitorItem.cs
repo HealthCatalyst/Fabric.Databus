@@ -25,5 +25,6 @@ namespace ElasticSearchSqlFeeder.ProgressMonitor
         public string InQueueName { get; set; }
         public string OutQueueName { get; set; }
         public string ErrorText { get; set; }
+        public int MaxQueueProcessorCount { get; set; }
     }
 }

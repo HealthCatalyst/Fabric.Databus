@@ -16,7 +16,8 @@ namespace ElasticSearchApiCaller
         public FileUploadQueueProcessor(QueueContext queueContext)
             : base(queueContext)
         {
-            _fileUploader = new FileUploader();
+            _fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
+                queueContext.Config.ElasticSearchPassword);
             _relativeUrlForPosting = queueContext.BulkUploadRelativeUrl;
         }
 

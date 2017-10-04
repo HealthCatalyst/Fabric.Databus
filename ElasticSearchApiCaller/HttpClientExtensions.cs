@@ -10,12 +10,14 @@ namespace ElasticSearchApiCaller
 {
     public static class HttpClientExtensions
     {
+        private static string _contentTypeHeader = "application/json";
+
         public static Task<HttpResponseMessage> PutAsyncFile(this HttpClient client, string url,
             string filename)
         {
             var allText = File.ReadAllText(filename);
             var stringcontent = new StringContent(allText, Encoding.UTF8,
-                "application/x-www-form-urlencoded");
+                _contentTypeHeader);
 
             return client.PutAsync(url, stringcontent);
         }
@@ -32,7 +34,7 @@ namespace ElasticSearchApiCaller
             }
             ms.Position = 0;
             StreamContent content = new StreamContent(ms);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+            content.Headers.ContentType = new MediaTypeHeaderValue(_contentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
 
@@ -52,7 +54,7 @@ namespace ElasticSearchApiCaller
 
             ms.Position = 0;
             StreamContent content = new StreamContent(ms);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
+            content.Headers.ContentType = new MediaTypeHeaderValue(_contentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
             return client.PutAsync(url, content).ConfigureAwait(false); 
@@ -62,7 +64,7 @@ namespace ElasticSearchApiCaller
             string text)
         {
             var stringcontent = new StringContent(text, Encoding.UTF8,
-                "application/x-www-form-urlencoded");
+                _contentTypeHeader);
 
             return client.PutAsync(url, stringcontent);
         }
@@ -71,7 +73,7 @@ namespace ElasticSearchApiCaller
             string text)
         {
             var stringcontent = new StringContent(text, Encoding.UTF8,
-                "application/x-www-form-urlencoded");
+                _contentTypeHeader);
 
             return client.PostAsync(url, stringcontent);
         }

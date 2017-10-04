@@ -17,7 +17,8 @@ namespace ElasticSearchApiCaller
         public MappingUploadQueueProcessor(QueueContext queueContext)
             : base(queueContext)
         {
-            _fileUploader = new FileUploader();
+            _fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
+                queueContext.Config.ElasticSearchPassword);
             _mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;
             _secondaryMappingUploadRelativeUrl = queueContext.SecondaryMappingUploadRelativeUrl;
         }
@@ -72,6 +73,11 @@ namespace ElasticSearchApiCaller
 
         protected override void Handle(MappingUploadQueueItem workitem)
         {
+            if (Config.DropAndReloadIndex)
+            {
+                DeleteIndex();
+            }
+
             UploadFiles(workitem);
         }
 

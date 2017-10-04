@@ -121,7 +121,9 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="NLog.config" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

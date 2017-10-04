@@ -155,7 +155,7 @@ namespace SqlImporter
                 Task.Run(
                     async () =>
                     {
-                        await fileUploader.DeleteIndex(config.Urls, queueContext.MainMappingUploadRelativeUrl);
+                        await fileUploader.DeleteIndex(config.Urls, queueContext.MainMappingUploadRelativeUrl, config.Index, config.Alias);
                     })
                 .Wait();
             }
@@ -201,7 +201,7 @@ namespace SqlImporter
 
         private List<Tuple<string, string>> CalculateRanges(QueryConfig config, Job job)
         {
-            var list = GetListOfPatientIds(config,job);
+            var list = GetListOfEntityKeys(config,job);
 
             var itemsLeft = list.Count;
 
@@ -220,7 +220,7 @@ namespace SqlImporter
             return ranges;
         }
 
-        private static List<string> GetListOfPatientIds(QueryConfig config, Job job)
+        private static List<string> GetListOfEntityKeys(QueryConfig config, Job job)
         {
             var load = job.Data.DataSources.First(c => c.Path == null);
 

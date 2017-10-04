@@ -28,7 +28,7 @@ namespace ElasticSearchApiCaller
                 Task.Run(async () =>
                     {
                         await _fileUploader.SendStreamToHosts(Config.Urls, _relativeUrlForPosting,
-                            wt.BatchNumber, wt.Stream);
+                            wt.BatchNumber, wt.Stream, doLogContent: false, doCompress: Config.CompressFiles);
                     })
                     .Wait();
 
@@ -56,9 +56,16 @@ namespace ElasticSearchApiCaller
             UploadFile(workitem);
         }
 
-        protected override void Complete(string queryId)
+        protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
-
+            if (isLastThreadForThisTask)
+            {
+                Task.Run(async () =>
+                {
+                    await _fileUploader.FinishUpload(Config.Urls, Config.Index, Config.Alias);
+                })
+                .Wait();
+            }
         }
 
         protected override string GetId(FileUploadQueueItem workitem)
@@ -79,6 +86,6 @@ namespace ElasticSearchApiCaller
         public string QueryId { get; set; }
 
         [JsonIgnore]
-        public Stream Stream { get; set; }  
+        public Stream Stream { get; set; }
     }
 }

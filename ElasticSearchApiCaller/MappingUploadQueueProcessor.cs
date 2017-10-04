@@ -34,14 +34,6 @@ namespace ElasticSearchApiCaller
 
         }
 
-        private void DeleteIndex()
-        {
-            Task.Run(async () => { await _fileUploader.DeleteIndex(  Config.Urls, _mainMappingUploadRelativeUrl); })
-                .Wait();
-
-            MyLogger.Trace($"Deleted index: {_mainMappingUploadRelativeUrl} ");
-        }
-
         private Task UploadSingleFile(Stream stream, string relativeUrl)
         {
             try
@@ -49,7 +41,7 @@ namespace ElasticSearchApiCaller
                 return Task.Run(
                         async () =>
                         {
-                            await _fileUploader.SendStreamToHosts(Config.Urls, relativeUrl, 1, stream);
+                            await _fileUploader.SendStreamToHosts(Config.Urls, relativeUrl, 1, stream, doLogContent: true, doCompress: false);
                         });
 
             }
@@ -73,15 +65,10 @@ namespace ElasticSearchApiCaller
 
         protected override void Handle(MappingUploadQueueItem workitem)
         {
-            if (Config.DropAndReloadIndex)
-            {
-                DeleteIndex();
-            }
-
             UploadFiles(workitem);
         }
 
-        protected override void Complete(string queryId)
+        protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 

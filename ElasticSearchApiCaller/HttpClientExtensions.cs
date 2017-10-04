@@ -57,7 +57,23 @@ namespace ElasticSearchApiCaller
             content.Headers.ContentType = new MediaTypeHeaderValue(_contentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            return client.PutAsync(url, content).ConfigureAwait(false); 
+            return client.PutAsync(url, content).ConfigureAwait(false);
+        }
+
+        public static ConfiguredTaskAwaitable<HttpResponseMessage> PutAsyncStream(this HttpClient client, string url,
+            Stream stream)
+        {
+            stream.Position = 0;
+            MemoryStream ms = new MemoryStream();
+            stream.CopyTo(ms);
+
+            stream.Dispose();
+
+            ms.Position = 0;
+            StreamContent content = new StreamContent(ms);
+            content.Headers.ContentType = new MediaTypeHeaderValue(_contentTypeHeader);
+
+            return client.PutAsync(url, content).ConfigureAwait(false);
         }
 
         public static Task<HttpResponseMessage> PutAsyncString(this HttpClient client, string url,

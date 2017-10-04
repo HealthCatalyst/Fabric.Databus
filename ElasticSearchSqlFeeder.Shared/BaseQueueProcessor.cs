@@ -111,11 +111,12 @@ namespace ElasticSearchSqlFeeder.Shared
                 }
             }
 
-            Complete(queryId);
+            var isLastThreadForThisTask = _processorCount < 2;
+            Complete(queryId, isLastThreadForThisTask);
 
             MyLogger.Trace($"Completed {queryId}: queue: {_inQueue.Count}");
 
-            Interlocked.Increment(ref _processorCount);
+            Interlocked.Decrement(ref _processorCount);
             LogToConsole(null);
         }
 
@@ -155,7 +156,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
         protected abstract void Handle(TQueueInItem workitem);
 
-        protected abstract void Complete(string queryId);
+        protected abstract void Complete(string queryId, bool isLastThreadForThisTask);
 
         protected abstract string GetId(TQueueInItem workitem);
 

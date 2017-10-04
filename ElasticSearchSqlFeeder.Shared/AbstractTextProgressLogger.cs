@@ -16,7 +16,7 @@ namespace ElasticSearchSqlFeeder.Shared
             var isQueueCompleted = progressMonitorItem.IsInQueueCompleted ? " [C]" : String.Empty;
 
             var formattableString =
-                $"{key}-{progressMonitorItem.LoggerName}({progressMonitorItem.QueueProcessorCount}) Id:{progressMonitorItem.Id,10} InQueue:{progressMonitorItem.InQueueCount:N0}{isQueueCompleted} Minimum:{progressMonitorItem.Minimum,10}";
+                $"{key}-{progressMonitorItem.LoggerName}({progressMonitorItem.QueueProcessorCount}/{progressMonitorItem.MaxQueueProcessorCount}) Id:{progressMonitorItem.Id,10} InQueue:{progressMonitorItem.InQueueCount:N0}{isQueueCompleted} Minimum:{progressMonitorItem.Minimum,10}";
 
             //if (progressMonitorItem.Value.LastCompletedEntityIdForEachQuery != null)
             //{

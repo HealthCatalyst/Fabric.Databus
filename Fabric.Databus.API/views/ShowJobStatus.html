@@ -43,7 +43,8 @@
                 <td>Out Queue</td>
                 <td>Time Processing</td>
                 <td>Time Blocked</td>
-                <td>QueueProcessorCount</td>
+                <td>Current Threads</td>
+                <td>Max Threads</td>
                 <td>Error</td>
                 <td>IsInQueueCompleted</td>
             </tr>
@@ -61,6 +62,7 @@
                 <td>@Current.TimeElapsedProcessingAsText</td>
                 <td>@Current.TimeElapsedBlockedAsText</td>
                 <td>@Current.QueueProcessorCount</td>
+                <td>@Current.MaxQueueProcessorCount</td>
                 <td>@Current.ErrorText</td>
                 <td>
                     @If.IsInQueueCompleted

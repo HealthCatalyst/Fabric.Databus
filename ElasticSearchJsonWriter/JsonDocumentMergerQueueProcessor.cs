@@ -306,6 +306,10 @@ namespace ElasticSearchJsonWriter
             AddToJsonObject(wt.QueryId, wt.Id, wt.PropertyName, wt.NewJObjects, wt.BatchNumber);
         }
 
+        protected override void Begin(bool isFirstThreadForThisTask)
+        {
+        }
+
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
             var list = _documentDictionary.RemoveAll();

@@ -57,7 +57,7 @@ namespace SqlImporter
                 if (job.Config.UploadToElasticSearch)
                 {
                     string x = await (new FileUploader(job.Config.ElasticSearchUserName,
-                        job.Config.ElasticSearchPassword).TestElasticSearchConnection(job.Config.Urls));
+                        job.Config.ElasticSearchPassword, job.Config.KeepIndexOnline).TestElasticSearchConnection(job.Config.Urls));
 
                     configValidationResult.Results.Add($"ElasticSearch Connection: {x}");
                 }

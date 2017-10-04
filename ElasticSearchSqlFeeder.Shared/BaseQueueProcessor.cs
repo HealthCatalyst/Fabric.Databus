@@ -60,6 +60,10 @@ namespace ElasticSearchSqlFeeder.Shared
         public void MonitorWorkQueue()
         {
             Interlocked.Increment(ref _processorCount);
+
+            var isFirstThreadForThisTask = _processorCount < 2;
+            Begin(isFirstThreadForThisTask);
+
             LogToConsole(null);
 
             string queryId = null;
@@ -155,6 +159,8 @@ namespace ElasticSearchSqlFeeder.Shared
         }
 
         protected abstract void Handle(TQueueInItem workitem);
+
+        protected abstract void Begin(bool isFirstThreadForThisTask);
 
         protected abstract void Complete(string queryId, bool isLastThreadForThisTask);
 

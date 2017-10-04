@@ -17,7 +17,7 @@ namespace ElasticSearchApiCaller
             : base(queueContext)
         {
             _fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
-                queueContext.Config.ElasticSearchPassword);
+                queueContext.Config.ElasticSearchPassword, Config.KeepIndexOnline);
             _relativeUrlForPosting = queueContext.BulkUploadRelativeUrl;
         }
 
@@ -54,6 +54,18 @@ namespace ElasticSearchApiCaller
         protected override void Handle(FileUploadQueueItem workitem)
         {
             UploadFile(workitem);
+        }
+
+        protected override void Begin(bool isFirstThreadForThisTask)
+        {
+            if (isFirstThreadForThisTask)
+            {
+                Task.Run(async () =>
+                    {
+                        await _fileUploader.StartUpload(Config.Urls, Config.Index, Config.Alias);
+                    })
+                    .Wait();
+            }
         }
 
         protected override void Complete(string queryId, bool isLastThreadForThisTask)

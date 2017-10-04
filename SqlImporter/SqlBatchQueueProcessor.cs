@@ -41,6 +41,10 @@ namespace SqlImporter
             //QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
         }
 
+        protected override void Begin(bool isFirstThreadForThisTask)
+        {
+        }
+
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }

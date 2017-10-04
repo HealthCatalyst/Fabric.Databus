@@ -24,6 +24,10 @@ namespace SqlImporter
             });
         }
 
+        protected override void Begin(bool isFirstThreadForThisTask)
+        {
+        }
+
 
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {

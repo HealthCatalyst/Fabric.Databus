@@ -48,6 +48,10 @@ namespace ElasticSearchJsonWriter
             }
         }
 
+        protected override void Begin(bool isFirstThreadForThisTask)
+        {
+        }
+
         private void SendMapping(MappingItem mapping)
         {
             var stream = new MemoryStream(); // do not use using since we'll pass it to next queue

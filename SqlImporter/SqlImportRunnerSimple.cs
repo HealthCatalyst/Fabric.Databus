@@ -148,7 +148,7 @@ namespace SqlImporter
         private void ReadAndSetSchema(QueryConfig config, QueueContext queueContext, Job job)
         {
             var fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
-                queueContext.Config.ElasticSearchPassword);
+                queueContext.Config.ElasticSearchPassword, job.Config.KeepIndexOnline);
 
             if (config.UploadToElasticSearch && config.DropAndReloadIndex)
             {

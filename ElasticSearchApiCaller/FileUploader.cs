@@ -31,16 +31,18 @@ namespace ElasticSearchApiCaller
         private int _requestFailures;
         private readonly string _username;
         private readonly string _password;
+        private readonly bool _keepIndexOnline;
 
-        public FileUploader(string username, string password)
+        public FileUploader(string username, string password, bool keepIndexOnline)
         {
             _username = username;
             _password = password;
+            _keepIndexOnline = keepIndexOnline;
         }
 
         public async Task CreateIndexAndMappings(List<string> hosts, string index, string alias, string entity, string folder)
         {
-            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
                 var host = hosts.First();
 
@@ -65,15 +67,20 @@ namespace ElasticSearchApiCaller
 
                 // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"-1\" } }"
 
+                // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-indexing-speed.html
+
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-codec
 
-                await
-                    client.PutAsyncString(host + "/" + index + "/_settings",
-                        "{ \"index\" : {\"refresh_interval\" : \"30\" } }");
+                if (!_keepIndexOnline)
+                {
+                    await
+                        client.PutAsyncString(host + "/" + index + "/_settings",
+                            "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
 
-                await
-                    client.PutAsyncString(host + "/" + index + "/_settings",
-                        "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
+                    await
+                        client.PutAsyncString(host + "/" + index + "/_settings",
+                            "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
+                }
             }
         }
 
@@ -90,7 +97,7 @@ namespace ElasticSearchApiCaller
 
         public async Task DeleteIndex(List<string> hosts, string relativeUrl, string index, string alias)
         {
-            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
                 var host = hosts.First();
 
@@ -113,30 +120,57 @@ namespace ElasticSearchApiCaller
             }
         }
 
+        public async Task StartUpload(List<string> hosts, string index, string alias)
+        {
+            if (!_keepIndexOnline)
+            {
+                using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
+                {
+                    var host = hosts.First();
+
+                    AddAuthorizationToken(client);
+                    // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
+                    await client.PostAsync(host + "/_forcemerge?only_expunge_deletes=true", null);
+
+                    // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-codec
+                    await
+                        client.PutAsyncString(host + "/" + index + "/_settings",
+                            "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
+
+                    await
+                        client.PutAsyncString(host + "/" + index + "/_settings",
+                            "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
+                }
+            }
+        }
+
         public async Task FinishUpload(List<string> hosts, string index, string alias)
         {
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
-            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
                 var host = hosts.First();
 
                 AddAuthorizationToken(client);
 
-                await
-                    client.PutAsyncString(host + "/" + index + "/_settings",
-                        "{ \"index\" : {\"number_of_replicas\" : \"1\" } }");
+                if (!_keepIndexOnline)
+                {
+                    await
+                        client.PutAsyncString(host + "/" + index + "/_settings",
+                            "{ \"index\" : {\"number_of_replicas\" : \"1\" } }");
 
-                await
-                    client.PutAsyncString(host + "/" + index + "/_settings",
-                        "{ \"index\" : {\"refresh_interval\" : \"1s\" } }");
+                    await
+                        client.PutAsyncString(host + "/" + index + "/_settings",
+                            "{ \"index\" : {\"refresh_interval\" : \"1s\" } }");
 
-                // curl -XPOST %ESURL%/patients2/_forcemerge?max_num_segments=5
-                await client.PostAsync(host + "/" + index + "/_forcemerge?max_num_segments=5", null);
+                    // curl -XPOST %ESURL%/patients2/_forcemerge?max_num_segments=5
+                    await client.PostAsync(host + "/" + index + "/_forcemerge?max_num_segments=5", null);
 
-                // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
-                //await
-                //    client.PostAsyncString(host + "/_aliases?pretty",
-                //        "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
+                    // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
+                    //await
+                    //    client.PostAsyncString(host + "/_aliases?pretty",
+                    //        "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
+                }
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"add\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await
@@ -147,7 +181,7 @@ namespace ElasticSearchApiCaller
 
         public async Task SetupAlias(List<string> hosts, string indexName, string aliasName)
         {
-            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
                 var host = hosts.First();
                 AddAuthorizationToken(client);
@@ -161,10 +195,10 @@ namespace ElasticSearchApiCaller
         {
             // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-indexing-speed.html
 
-            await CreateIndexAndMappings(hosts,index,alias,entity,folder);
-            await InternalUploadAllFilesInFolder(hosts, index+ "-*", $"/{index}/{entity}/_bulk?pretty", folder);
+            await CreateIndexAndMappings(hosts, index, alias, entity, folder);
+            await InternalUploadAllFilesInFolder(hosts, index + "-*", $"/{index}/{entity}/_bulk?pretty", folder);
             //await InternalUploadAllFilesInFolder(hosts, "patients2-Diagnoses*", @"/patients/_bulk?pretty");
-            await FinishUpload(hosts, index,alias);
+            await FinishUpload(hosts, index, alias);
         }
 
         private async Task InternalUploadAllFilesInFolder(List<string> hosts, string searchPattern, string relativeUrl, string folder)
@@ -411,7 +445,7 @@ namespace ElasticSearchApiCaller
 
         public async Task<string> TestElasticSearchConnection(List<string> hosts)
         {
-            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent:true)))
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
                 var host = hosts.First();
 

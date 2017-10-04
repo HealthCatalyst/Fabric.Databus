@@ -36,5 +36,7 @@ namespace Fabric.Databus.Config
         public bool CompressFiles { get; set; }
 
         public int SqlCommandTimeoutInSeconds { get; set; }
+
+        public bool KeepIndexOnline { get; set; }
     }
 }

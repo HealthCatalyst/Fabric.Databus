@@ -18,6 +18,10 @@ namespace ElasticSearchJsonWriter
             FlushDocumentsIfBatchSizeReached();
         }
 
+        protected override void Begin(bool isFirstThreadForThisTask)
+        {
+        }
+
         public void FlushAllDocuments()
         {
             while (_items.Any())

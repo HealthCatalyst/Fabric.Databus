@@ -1,9 +1,11 @@
-﻿using Fabric.Databus.Domain.Configuration;
-
-namespace Fabric.Databus.API.Configuration
+﻿namespace Fabric.Databus.API.Configuration
 {
-    public interface IAppConfiguration
-    {
-        ElasticSearchSettings ElasticSearchSettings { get; }
-    }
+		public interface IAppConfiguration
+		{
+				Domain.Configuration.ElasticSearchSettings ElasticSearchSettings { get; }
+				string Authority { get; set; }
+				string ClientId { get; set; }
+				string ClientSecret { get; set; }
+				string Scopes { get; set; }
+		}
 }

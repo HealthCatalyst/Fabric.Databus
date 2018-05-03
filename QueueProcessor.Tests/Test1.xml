@@ -1,0 +1,108 @@
+﻿<?xml version="1.0"?>
+<Job>
+  <Config>
+    <ConnectionString>Server=tcp:cafeedw.database.windows.net,1433;Initial Catalog=CAFEEDW;Persist Security Info=False;User ID=cafeedw;Password=let#sPlaySQL!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</ConnectionString>
+    <Url>http://dev-es.cafe.healthcatalyst.com:9200</Url>
+    <ElasticSearchUserName>elastic</ElasticSearchUserName>
+    <ElasticSearchPassword>uz3rFriendlyPaSS</ElasticSearchPassword>
+    <MaximumEntitiesToLoad>0</MaximumEntitiesToLoad>
+    <EntitiesPerBatch>5000</EntitiesPerBatch>
+    <EntitiesPerUploadFile>2000</EntitiesPerUploadFile>
+    <LocalSaveFolder>/home/hcadmin/json</LocalSaveFolder>
+    <DropAndReloadIndex>true</DropAndReloadIndex>
+    <WriteTemporaryFilesToDisk>false</WriteTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>false</WriteDetailedTemporaryFilesToDisk>
+    <CompressFiles>true</CompressFiles>
+    <UploadToElasticSearch>true</UploadToElasticSearch>
+    <Index>patient_mvp20_0502</Index>
+    <Alias>patients</Alias>
+    <EntityType>Patient</EntityType>
+    <TopLevelKeyColumn>AliasPatientID</TopLevelKeyColumn>
+  </Config>
+
+  <Data>
+    <DataModel>
+    </DataModel>
+    <DataSource>
+      <Sql>
+        SELECT
+        CustomerNM
+        ,CustomerID
+        ,	AliasPatientID
+        ,	GenderNormDSC
+        ,RaceNormDSC
+        ,MaritalStatusNormDSC
+        FROM CAFEEDW.SharedClinicalUnion.ElasticsearchInputPatient where CustomerID = 4
+      </Sql>
+    </DataSource>
+    <DataSource Path="FacilityAccount">
+      <Sql>
+        SELECT
+        CustomerID
+        , AliasPatientID
+        ,	CustomerNM
+        ,	AliasFacilityAccountID as KeyLevel1
+        ,	AgeNBR
+        ,	DischargeDTS
+        ,	LengthOfStayDaysNBR
+        ,	IndexAdmissionFLG
+        ,	Readmit30FLG
+        ,	DischargeDispositionNormDSC
+        ,	AdmitTypeNormDSC
+        ,	AdmitSourceDSC
+        ,	PrimaryPayorNM
+        ,	FinancialClassDSC
+        ,	DischargePhysicalDepartmentNM
+        ,	PrimaryDiagnosisCD
+        ,	PrimaryProcedureCD
+        ,	MSDRG
+        ,	ElectiveFLG
+        ,	DiedFLG
+        ,	APRDRG
+        ,	TotalChargeAMT
+        ,	ClinicalProgramNM
+        ,	CareProcessFamilyNM
+        ,	CareProcessNM
+        ,	SubCareProcessNM
+        ,	AttendingProviderFullNM
+        ,	AttendingProviderSpecialtyNM
+        ,	ExpectedReadmission
+        ,	ExpectedMortality
+        ,	ExpectedLengthOfStay
+        ,	BillingLocationNM
+        ,	TotalCostAMT
+        ,	LaborCostAMT
+        ,	SupplyCostAMT
+        ,	DrugCostAMT
+        ,	OtherCostAMT
+        ,	OutlierFLG
+        , RiskBasedSeverityOfIllnessNBR
+        FROM CAFEEDW.SharedClinicalUnion.ElasticsearchInput where CustomerID = 4
+      </Sql>
+    </DataSource>
+    <DataSource Path="FacilityAccount.Diagnosis">
+      <Sql>
+        SELECT
+        CustomerID
+        , CustomerNM
+        , AliasDiagnosisID as KeyLevel2
+        , AliasFacilityAccountID as KeyLevel1
+        , AliasPatientID
+        , DiagnosisConcatNormDSC
+        FROM CAFEEDW.SharedClinicalUnion.ElasticsearchInputICDSecondaryDiagnosis where CustomerID = 4
+      </Sql>
+    </DataSource>
+    <DataSource Path="FacilityAccount.Procedure">
+      <Sql>
+        SELECT
+        CustomerID
+        , CustomerNM
+        , AliasProcedureID as KeyLevel2
+        , AliasFacilityAccountID as KeyLevel1
+        , AliasPatientID
+        , ProcedureConcatNormDSC
+        FROM CAFEEDW.SharedClinicalUnion.ElasticsearchInputICDSecondaryProcedure where CustomerID = 4
+      </Sql>
+    </DataSource>
+  </Data>
+</Job>

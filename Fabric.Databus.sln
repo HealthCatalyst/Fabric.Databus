@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticSearchSqlFeeder.Queu
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{4F76F345-8E5D-4965-9696-0A79A3FF7F2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticSearchSqlFeeder.ProgressMonitor", "ElasticSearchSqlFeeder.ProgressMonitor\ElasticSearchSqlFeeder.ProgressMonitor.csproj", "{6B54F568-E193-4B5E-B3A6-827B1D2ACD2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticSearchSqlFeeder.ProgressMonitor", "ElasticSearchSqlFeeder.ProgressMonitor\ElasticSearchSqlFeeder.ProgressMonitor.csproj", "{6B54F568-E193-4B5E-B3A6-827B1D2ACD2E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Console", "Console", "{E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}"
 EndProject
@@ -57,7 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "localhost", "localhost", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{08C7F77C-30FE-40AC-AD28-1076D3EF24CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.API", "Fabric.Databus.API\Fabric.Databus.API.csproj", "{52D08AD1-46FF-42D3-AC93-2D9B2109AFAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.API", "Fabric.Databus.API\Fabric.Databus.API.csproj", "{52D08AD1-46FF-42D3-AC93-2D9B2109AFAC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cafe", "cafe", "{E2C388FB-4619-4FE2-A372-C02316467ABD}"
 	ProjectSection(SolutionItems) = preProject
@@ -65,13 +65,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cafe", "cafe", "{E2C388FB-4
 		configs\cafe\job.xml = configs\cafe\job.xml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Schema", "Fabric.Databus.Schema\Fabric.Databus.Schema.csproj", "{1738C3E7-4DA1-4A7F-9A2A-E595968EE8A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Schema", "Fabric.Databus.Schema\Fabric.Databus.Schema.csproj", "{1738C3E7-4DA1-4A7F-9A2A-E595968EE8A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Config", "Fabric.Databus.Config\Fabric.Databus.Config.csproj", "{C0ED4050-E7FB-4C68-ADF1-6C8E290A2950}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Config", "Fabric.Databus.Config\Fabric.Databus.Config.csproj", "{C0ED4050-E7FB-4C68-ADF1-6C8E290A2950}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Domain", "Fabric.Databus.Domain\Fabric.Databus.Domain.csproj", "{DC1C2DFF-2458-4396-A872-E44FEF249DE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Domain", "Fabric.Databus.Domain\Fabric.Databus.Domain.csproj", "{DC1C2DFF-2458-4396-A872-E44FEF249DE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared", "Fabric.Shared\Fabric.Shared.csproj", "{BB878905-9592-4A9D-A811-46E73D9F7F6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared", "Fabric.Shared\Fabric.Shared.csproj", "{BB878905-9592-4A9D-A811-46E73D9F7F6A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AA32DFFD-FEB5-4676-995E-A41DAE5752E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueueProcessor.Tests", "QueueProcessor.Tests\QueueProcessor.Tests.csproj", "{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.Tests", "Fabric.Shared.Tests\Fabric.Shared.Tests.csproj", "{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,6 +149,14 @@ Global
 		{BB878905-9592-4A9D-A811-46E73D9F7F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB878905-9592-4A9D-A811-46E73D9F7F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB878905-9592-4A9D-A811-46E73D9F7F6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -160,5 +174,10 @@ Global
 		{1738C3E7-4DA1-4A7F-9A2A-E595968EE8A9} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{C0ED4050-E7FB-4C68-ADF1-6C8E290A2950} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{BB878905-9592-4A9D-A811-46E73D9F7F6A} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
+		{7D79D811-9527-44FA-B9AA-1B339A9C5B3A} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
+		{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}
 	EndGlobalSection
 EndGlobal

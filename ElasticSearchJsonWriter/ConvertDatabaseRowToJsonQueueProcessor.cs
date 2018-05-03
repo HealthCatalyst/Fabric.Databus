@@ -27,7 +27,7 @@ namespace ElasticSearchJsonWriter
             _folder = Path.Combine(Config.LocalSaveFolder, "ConvertToJson");
         }
 
-        private JObject[] GetJsonForRowForMerge(List<ColumnInfo> columns, IJsonValueWriter jsonValueWriter, List<object[]> rows, string propertyName, string mypropertyType)
+        private JObject[] GetJsonForRowForMerge(List<ColumnInfo> columns, List<object[]> rows, string propertyName)
         {
             var jObjects = new List<JObject>();
 
@@ -166,7 +166,7 @@ namespace ElasticSearchJsonWriter
         {
             var id = GetId(wt);
 
-            var jsonForRows = GetJsonForRowForMerge(wt.Columns, wt.JsonValueWriter, wt.Rows, wt.PropertyName, wt.PropertyType);
+            var jsonForRows = GetJsonForRowForMerge(wt.Columns, wt.Rows, wt.PropertyName);
 
             if (Config.WriteDetailedTemporaryFilesToDisk)
             {

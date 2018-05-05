@@ -21,6 +21,8 @@ namespace ElasticSearchSqlFeeder.Shared
 
             if (type == typeof(Int64)) return "integer";
 
+            if (type == typeof(Single)) return "integer";
+
             throw new NotImplementedException("No Elastic Search type found for type=" + type);
         }
     }

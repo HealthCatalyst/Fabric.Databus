@@ -46,6 +46,7 @@ namespace Fabric.Databus.Schema
                                 index = columnNumber,
                                 Name = columnName,
                                 IsJoinColumn = columnName.Equals(topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
+                                SqlColumnType = columnType?.FullName,
                                 ElasticSearchType = SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
                                 IsCalculated = false,
                             });

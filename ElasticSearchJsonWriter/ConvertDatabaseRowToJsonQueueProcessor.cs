@@ -16,7 +16,7 @@ namespace ElasticSearchJsonWriter
         private static readonly SequenceBarrier SequenceBarrier = new SequenceBarrier();
 
         private int _limitInProcess;
-        private string _folder;
+        private readonly string _folder;
 
 
         public ConvertDatabaseRowToJsonQueueProcessor(QueueContext queueContext, int limitInProcess)
@@ -24,7 +24,7 @@ namespace ElasticSearchJsonWriter
         {
             _limitInProcess = limitInProcess;
 
-            _folder = Path.Combine(Config.LocalSaveFolder, "ConvertToJson");
+            _folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-ConvertToJson");
         }
 
         private JObject[] GetJsonForRowForMerge(List<ColumnInfo> columns, List<object[]> rows, string propertyName)
@@ -181,7 +181,7 @@ namespace ElasticSearchJsonWriter
                     sb.AppendLine(jsonForRow.ToString());
                 }
 
-                File.WriteAllText(Path.Combine(path, id), sb.ToString());
+                File.AppendAllText(Path.Combine(path, $"{id}.json"), sb.ToString());
             }
 
             AddToOutputQueue(new JsonDocumentMergerQueueItem

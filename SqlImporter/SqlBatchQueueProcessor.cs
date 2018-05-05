@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ElasticSearchSqlFeeder.Interfaces;
@@ -10,8 +11,12 @@ namespace SqlImporter
 {
     public class SqlBatchQueueProcessor : BaseQueueProcessor<SqlBatchQueueItem, SqlImportQueueItem>
     {
+        private readonly string _folder;
+
         public SqlBatchQueueProcessor(QueueContext queueContext) : base(queueContext)
         {
+            _folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlBatch");
+
         }
 
         protected override void Handle(SqlBatchQueueItem workitem)
@@ -37,6 +42,28 @@ namespace SqlImporter
                     });
                 });
 
+            if (Config.WriteDetailedTemporaryFilesToDisk)
+            {
+                foreach (var workitemLoad in workitem.Loads)
+                {
+                    var queryName = workitemLoad.Path ?? "Main";
+                    var queryId = queryName;
+
+                    var path = Path.Combine(_folder, queryId);
+
+                    Directory.CreateDirectory(path);
+
+                    var filepath = Path.Combine(path, Convert.ToString(workitem.BatchNumber) + ".txt");
+
+                    using (var file = File.OpenWrite(filepath))
+                    {
+                        using (var stream = new StreamWriter(file))
+                        {
+                            stream.WriteLine($"start: {workitem.Start}, end: {workitem.End}");
+                        }
+                    }
+                }
+            }
             // wait until the other queues are cleared up
             //QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
         }

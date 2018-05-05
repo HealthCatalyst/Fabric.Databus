@@ -56,6 +56,8 @@ namespace ElasticSearchSqlFeeder.Shared
             _totalItemsAddedToOutputQueue = 0;
         }
 
+        protected int UniqueId => _id;
+
         public QueryConfig Config { get; set; }
 
         public void MonitorWorkQueue()
@@ -113,7 +115,7 @@ namespace ElasticSearchSqlFeeder.Shared
                 {
                     MyLogger.Trace(e);
                     _errorText = e.ToString();
-                    //throw;
+                    throw;
                 }
             }
 

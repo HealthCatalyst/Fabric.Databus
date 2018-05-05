@@ -26,10 +26,15 @@ namespace ElasticSearchJsonWriter
 
         private static int _currentBatchNumber = 0;
 
+        private readonly string _folder;
+        
         public JsonDocumentMergerQueueProcessor(IMeteredConcurrentDictionary<string, JsonObjectQueueItem> documentDictionary, QueueContext queueContext)
             : base(queueContext)
         {
             _documentDictionary = documentDictionary;
+
+            _folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-JsonDocumentMerge");
+
         }
 
 
@@ -159,6 +164,9 @@ namespace ElasticSearchJsonWriter
 
         private void SendToOutputQueue(IList<Tuple<string, JsonObjectQueueItem>> list)
         {
+            var path = _folder;
+            Directory.CreateDirectory(path);
+
             foreach (var tuple in list)
             {
                 //remove temporary columns
@@ -168,10 +176,7 @@ namespace ElasticSearchJsonWriter
 
                 if (Config.WriteDetailedTemporaryFilesToDisk)
                 {
-                    var path = Path.Combine(Config.LocalSaveFolder, "jsondocs");
-                    Directory.CreateDirectory(path);
-
-                    File.WriteAllText(Path.Combine(path, tuple.Item1), tuple.Item2.Document.ToString());
+                    File.AppendAllText(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
                 }
             }
         }

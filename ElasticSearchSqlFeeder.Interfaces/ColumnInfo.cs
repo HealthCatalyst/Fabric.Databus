@@ -13,5 +13,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
         public bool IsCalculated { get; set; }
         public string Transform { get; set; }
         public bool IsJoinColumn { get; set; }
+        public string SqlColumnType { get; set; }
     }
 }

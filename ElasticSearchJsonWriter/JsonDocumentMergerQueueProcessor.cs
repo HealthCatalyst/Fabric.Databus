@@ -165,10 +165,7 @@ namespace ElasticSearchJsonWriter
         private void SendToOutputQueue(IList<Tuple<string, JsonObjectQueueItem>> list)
         {
             var path = _folder;
-            if (Config.WriteDetailedTemporaryFilesToDisk)
-            {
-                Directory.CreateDirectory(path);
-            }
+            Directory.CreateDirectory(path);
 
             foreach (var tuple in list)
             {

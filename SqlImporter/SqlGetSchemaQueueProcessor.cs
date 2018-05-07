@@ -14,10 +14,7 @@ namespace SqlImporter
         public SqlGetSchemaQueueProcessor(QueueContext queueContext) : base(queueContext)
         {
             _folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlGetSchema");
-            if (Config.WriteDetailedTemporaryFilesToDisk)
-            {
-                Directory.CreateDirectory(_folder);
-            }
+            Directory.CreateDirectory(_folder);
         }
 
         protected override void Handle(SqlGetSchemaQueueItem workitem)

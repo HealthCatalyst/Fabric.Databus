@@ -16,7 +16,7 @@ namespace ElasticSearchSqlFeeder.Shared
             var isQueueCompleted = progressMonitorItem.IsInQueueCompleted ? " [C]" : String.Empty;
 
             var formattableString =
-                $"{key,4}-{progressMonitorItem.LoggerName,25}({progressMonitorItem.QueueProcessorCount,3}/{progressMonitorItem.MaxQueueProcessorCount,3}) InQueue:{progressMonitorItem.InQueueCount,10:N0} Minimum:{progressMonitorItem.Minimum,10}";
+                $"{key}-{progressMonitorItem.LoggerName}({progressMonitorItem.QueueProcessorCount}/{progressMonitorItem.MaxQueueProcessorCount}) Id:{progressMonitorItem.Id,10} InQueue:{progressMonitorItem.InQueueCount:N0}{isQueueCompleted} Minimum:{progressMonitorItem.Minimum,10}";
 
             //if (progressMonitorItem.Value.LastCompletedEntityIdForEachQuery != null)
             //{
@@ -30,17 +30,16 @@ namespace ElasticSearchSqlFeeder.Shared
             {
                 // ReSharper disable once UseFormatSpecifierInInterpolation
                 formattableString +=
-                    $" Time:{progressMonitorItem.TimeElapsedProcessing.ToString(@"hh\:mm\:ss"), 10}";
+                    $" Time:{progressMonitorItem.TimeElapsedProcessing.ToString(@"hh\:mm\:ss")}";
             }
 
             if (progressMonitorItem.DocumentDictionaryCount > 0)
             {
-                formattableString += $" Dictionary:{progressMonitorItem.DocumentDictionaryCount, 10}";
+                formattableString += $" Dictionary:{progressMonitorItem.DocumentDictionaryCount}";
             }
 
-            formattableString += $" Processed: {progressMonitorItem.TotalItemsProcessed,10:N0}";
-            formattableString += $" Out: {progressMonitorItem.TotalItemsAddedToOutputQueue,10:N0}";
-            formattableString += $"{isQueueCompleted,3}";
+            formattableString += $" Processed: {progressMonitorItem.TotalItemsProcessed:N0}";
+            formattableString += $" Out: {progressMonitorItem.TotalItemsAddedToOutputQueue:N0}";
 
             AppendLine(formattableString);
 

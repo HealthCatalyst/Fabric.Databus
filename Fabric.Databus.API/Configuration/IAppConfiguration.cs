@@ -7,5 +7,6 @@
 				string ClientId { get; set; }
 				string ClientSecret { get; set; }
 				string Scopes { get; set; }
+		    bool EnableAuthorization { get; set; }
 		}
 }

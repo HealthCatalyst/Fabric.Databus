@@ -1,5 +1,6 @@
 ﻿using System;
 using ElasticSearchSqlFeeder.Shared;
+using Fabric.Databus.API.Configuration;
 using Fabric.Databus.Domain.Jobs;
 using Nancy;
 using Nancy.Security;
@@ -9,9 +10,9 @@ namespace Fabric.Databus.API.Modules
 {
 		public class JobStatusModule : NancyModule
 		{
-				public JobStatusModule(ILogger logger, IJobScheduler jobScheduler) : base("/jobstatus")
+				public JobStatusModule(ILogger logger, IJobScheduler jobScheduler, IAppConfiguration configuration) : base("/jobstatus")
 				{
-						this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
+				    this.RequiresClaimsIfAuthorizationEnabled(configuration, claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
 
 						Get("/", parameters => jobScheduler.GetMostRecentJobs(10));
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Claims;
+using Fabric.Databus.API.Configuration;
 using Fabric.Databus.Config;
 using Fabric.Databus.Domain.Jobs;
 using Fabric.Shared;
@@ -10,43 +12,42 @@ using Serilog;
 
 namespace Fabric.Databus.API.Modules
 {
-		public class JobModule : NancyModule
-		{
-				public JobModule(ILogger logger, IJobScheduler jobScheduler) : base("/jobs")
-				{
-						this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
+    public class JobModule : NancyModule
+    {
+        public JobModule(ILogger logger, IJobScheduler jobScheduler, IAppConfiguration configuration) : base("/jobs")
+        {
+            this.RequiresClaimsIfAuthorizationEnabled(configuration, claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
 
-						Post("/", parameters =>
-						{
-								var body = RequestStream.FromStream(Request.Body).AsString();
-								var queryConfig = body.FromXml<Job>();
+            Post("/", parameters =>
+            {
+                var body = RequestStream.FromStream(Request.Body).AsString();
+                var queryConfig = body.FromXml<Job>();
 
-								var jobId = jobScheduler.ExecuteJobImmediately(queryConfig);
+                var jobId = jobScheduler.ExecuteJobImmediately(queryConfig);
 
-								var uriBuilder = new UriBuilder(Request.Url.Scheme, Request.Url.HostName,
-										Request.Url.Port ?? 80, $"jobstatus/{jobId}");
+                var uriBuilder = new UriBuilder(Request.Url.Scheme, Request.Url.HostName,
+                                    Request.Url.Port ?? 80, $"jobstatus/{jobId}");
 
-								var statusUri = uriBuilder.ToString();
+                var statusUri = uriBuilder.ToString();
 
-								var model = new
-								{
-										JobId = jobId,
-										links = new[]
-										{
-												new
-												{
-														status = statusUri
-												}
-										}
-								};
+                var model = new
+                {
+                    JobId = jobId,
+                    links = new[]
+                                    {
+                                                new
+                                                {
+                                                        status = statusUri
+                                                }
+                            }
+                };
 
-								return Negotiate
-										.WithModel(model)
-										.WithStatusCode(HttpStatusCode.Accepted)
-										.WithHeader("Location", statusUri);
-						});
+                return Negotiate
+                                    .WithModel(model)
+                                    .WithStatusCode(HttpStatusCode.Accepted)
+                                    .WithHeader("Location", statusUri);
+            });
 
-				}
-
-		}
+        }
+    }
 }

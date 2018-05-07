@@ -32,6 +32,7 @@ namespace Fabric.Databus.API
                 return ctx.Response;
             });
             container.Register(_logger);
+            container.Register(_appConfig);
             container.Register(_appConfig.ElasticSearchSettings);
 
             // implement our own json serializer for pretty printing
@@ -46,7 +47,6 @@ namespace Fabric.Databus.API
             container.Register<IJobStatusTracker, JobStatusTracker>().AsMultiInstance();
             container.Register<IImportRunner, SqlImportRunnerSimple>().AsMultiInstance();
             container.Register<IJobScheduler, JobScheduler>().AsMultiInstance();
-
         }
 
         public override void Configure(INancyEnvironment environment)

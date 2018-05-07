@@ -17,106 +17,109 @@ using Serilog.Sinks.Elasticsearch;
 
 namespace Fabric.Databus.API
 {
-		public class Startup
-		{
-				private readonly IConfiguration _config;
-				private readonly IConfiguration _hostingConfiguration;
+    public class Startup
+    {
+        private readonly IConfiguration _config;
+        private readonly IConfiguration _hostingConfiguration;
 
-				public Startup(IHostingEnvironment env)
-				{
-						_config = new ConfigurationBuilder()
-								.AddJsonFile("appsettings.json")
-								.SetBasePath(env.ContentRootPath)
-								.AddEnvironmentVariables()
-								.Build();
+        public Startup(IHostingEnvironment env)
+        {
+            _config = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json")
+                    .SetBasePath(env.ContentRootPath)
+                    .AddEnvironmentVariables()
+                    .Build();
 
-						_hostingConfiguration = new ConfigurationBuilder()
-								.SetBasePath(Directory.GetCurrentDirectory())
-								.AddJsonFile("hosting.json")
-								.AddEnvironmentVariables()
-								.Build();
-				}
+            _hostingConfiguration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("hosting.json")
+                    .AddEnvironmentVariables()
+                    .Build();
+        }
 
-				public void Configure(IApplicationBuilder app)
-				{
-						var appConfig = new AppConfiguration();
-						_config.Bind(appConfig);
+        public void Configure(IApplicationBuilder app)
+        {
+            var appConfig = new AppConfiguration();
+            _config.Bind(appConfig);
 
-						var levelSwitch = new LoggingLevelSwitch();
-						var log = ConfigureLogger(levelSwitch, appConfig);
+            var levelSwitch = new LoggingLevelSwitch();
+            var log = ConfigureLogger(levelSwitch, appConfig);
 
-						app.UseCors("default");
-						app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
-						{
-								Authority = appConfig.Authority,
-								RequireHttpsMetadata = false,
+            app.UseCors("default");
+            app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
+            {
+                Authority = appConfig.Authority,
+                RequireHttpsMetadata = false,
 
-								ApiName = appConfig.ClientId,
-						});
+                ApiName = appConfig.ClientId,
+            });
 
-						app.UseOwin(buildFunc =>
-						{
-								buildFunc(next => GlobalErrorLoggingMiddleware.Inject(next, log));
-								buildFunc(CorrelationTokenMiddleware.Inject);
-								buildFunc(next => RequestLoggingMiddleware.Inject(next, log));
-								buildFunc(next => PerformanceLoggingMiddleware.Inject(next, log));
-								buildFunc(next => new DiagnosticsMiddleware(next, levelSwitch).Inject);
-								buildFunc(next => new MonitoringMiddleware(next, HealthCheck).Inject);
-								buildFunc.UseAuthPlatform(appConfig.Scopes.Split(','));
-								buildFunc.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(log, appConfig));
-						});
-				}
+            app.UseOwin(buildFunc =>
+            {
+                buildFunc(next => GlobalErrorLoggingMiddleware.Inject(next, log));
+                buildFunc(CorrelationTokenMiddleware.Inject);
+                buildFunc(next => RequestLoggingMiddleware.Inject(next, log));
+                buildFunc(next => PerformanceLoggingMiddleware.Inject(next, log));
+                buildFunc(next => new DiagnosticsMiddleware(next, levelSwitch).Inject);
+                buildFunc(next => new MonitoringMiddleware(next, HealthCheck).Inject);
+                if (appConfig.EnableAuthorization)
+                {
+                    buildFunc.UseAuthPlatform(appConfig.Scopes.Split(','));
+                }
+                buildFunc.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(log, appConfig));
+            });
+        }
 
-				public void ConfigureServices(IServiceCollection services)
-				{
-						services.AddWebEncoders();
-						services.AddCors(options =>
-						{
-								options.AddPolicy("default", policy =>
-								{
-										policy.WithOrigins(_hostingConfiguration.GetSection("urls").Value).AllowAnyHeader().AllowAnyMethod();
-								});
-						});
-				}
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddWebEncoders();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("default", policy =>
+                            {
+                        policy.WithOrigins(_hostingConfiguration.GetSection("urls").Value).AllowAnyHeader().AllowAnyMethod();
+                    });
+            });
+        }
 
-				public Task<bool> HealthCheck()
-				{
-						//TODO: dummy deep health check for now
-						return Task.FromResult(true);
-				}
+        public Task<bool> HealthCheck()
+        {
+            //TODO: dummy deep health check for now
+            return Task.FromResult(true);
+        }
 
-				private ILogger ConfigureLogger(LoggingLevelSwitch levelSwitch, IAppConfiguration appConfig)
-				{
+        private ILogger ConfigureLogger(LoggingLevelSwitch levelSwitch, IAppConfiguration appConfig)
+        {
 
-						var sinkOptions = new ElasticsearchSinkOptions(CreateElasticSearchUri(appConfig.ElasticSearchSettings))
-						{
-								IndexFormat = "logstash-fabricdatabus-{0:yyyy.MM.dd}"
-						};
-						return new LoggerConfiguration()
-								.MinimumLevel.ControlledBy(levelSwitch)
-								.Enrich.FromLogContext()
-								.WriteTo
-								.Elasticsearch(sinkOptions).CreateLogger();
-				}
+            var sinkOptions = new ElasticsearchSinkOptions(CreateElasticSearchUri(appConfig.ElasticSearchSettings))
+            {
+                IndexFormat = "logstash-fabricdatabus-{0:yyyy.MM.dd}"
+            };
+            return new LoggerConfiguration()
+                    .MinimumLevel.ControlledBy(levelSwitch)
+                    .Enrich.FromLogContext()
+                    .WriteTo
+                    .Elasticsearch(sinkOptions).CreateLogger();
+        }
 
-				private Uri CreateElasticSearchUri(ElasticSearchSettings elasticSearchConfig)
-				{
-						if (string.IsNullOrEmpty(elasticSearchConfig.Scheme) || string.IsNullOrEmpty(elasticSearchConfig.Server) ||
-								string.IsNullOrEmpty(elasticSearchConfig.Port))
-						{
-								throw new ConfigurationException("You must specify Scheme, Server and Port for elastic search.");
-						}
+        private Uri CreateElasticSearchUri(ElasticSearchSettings elasticSearchConfig)
+        {
+            if (string.IsNullOrEmpty(elasticSearchConfig.Scheme) || string.IsNullOrEmpty(elasticSearchConfig.Server) ||
+                    string.IsNullOrEmpty(elasticSearchConfig.Port))
+            {
+                throw new ConfigurationException("You must specify Scheme, Server and Port for elastic search.");
+            }
 
-						if (!string.IsNullOrEmpty(elasticSearchConfig.Username) &&
-								!string.IsNullOrEmpty(elasticSearchConfig.Password))
-						{
-								return new Uri(
-										$"{elasticSearchConfig.Scheme}://{elasticSearchConfig.Username}:{elasticSearchConfig.Password}@{elasticSearchConfig.Server}:{elasticSearchConfig.Port}");
-						}
+            if (!string.IsNullOrEmpty(elasticSearchConfig.Username) &&
+                    !string.IsNullOrEmpty(elasticSearchConfig.Password))
+            {
+                return new Uri(
+                        $"{elasticSearchConfig.Scheme}://{elasticSearchConfig.Username}:{elasticSearchConfig.Password}@{elasticSearchConfig.Server}:{elasticSearchConfig.Port}");
+            }
 
-						return new Uri($"{elasticSearchConfig.Scheme}://{elasticSearchConfig.Server}:{elasticSearchConfig.Port}");
+            return new Uri($"{elasticSearchConfig.Scheme}://{elasticSearchConfig.Server}:{elasticSearchConfig.Port}");
 
 
-				}
-		}
+        }
+    }
 }

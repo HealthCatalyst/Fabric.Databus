@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0"?>
 <Job>
   <Config>
-    <ConnectionString>Server=tcp:cafeedw.database.windows.net,1433;Initial Catalog=CAFEEDW;Persist Security Info=False;User ID=cafeedw;Password=let#sPlaySQL!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</ConnectionString>
-    <Url>http://dev-es.cafe.healthcatalyst.com:9200</Url>
+    <ConnectionString>Server=tcp:[elasticurl],1433;Initial Catalog=CAFEEDW;Persist Security Info=False;User ID=cafeedw;Password=[password];MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;</ConnectionString>
+    <Url>[elasticurl]</Url>
     <ElasticSearchUserName>elastic</ElasticSearchUserName>
-    <ElasticSearchPassword>uz3rFriendlyPaSS</ElasticSearchPassword>
+    <ElasticSearchPassword>[password]</ElasticSearchPassword>
     <MaximumEntitiesToLoad>0</MaximumEntitiesToLoad>
     <EntitiesPerBatch>5000</EntitiesPerBatch>
     <EntitiesPerUploadFile>2000</EntitiesPerUploadFile>

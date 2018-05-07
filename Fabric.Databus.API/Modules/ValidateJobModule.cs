@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Fabric.Databus.API.Configuration;
 using Fabric.Databus.Domain.Jobs;
 using Nancy;
 using Nancy.Extensions;
@@ -9,21 +10,21 @@ using Serilog;
 
 namespace Fabric.Databus.API.Modules
 {
-		public class ValidateJobModule : NancyModule
-		{
-				public ValidateJobModule(ILogger logger, IJobScheduler jobScheduler) : base("/validate")
-				{
-						this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.validate", StringComparison.OrdinalIgnoreCase));
+    public class ValidateJobModule : NancyModule
+    {
+        public ValidateJobModule(ILogger logger, IJobScheduler jobScheduler, IAppConfiguration configuration) : base("/validate")
+        {
+            this.RequiresClaimsIfAuthorizationEnabled(configuration, claim => claim.Value.Equals("fabric/databus.validate", StringComparison.OrdinalIgnoreCase));
 
-						Post("/", async parameters =>
-						{
-								var jobName = string.Empty; // parameters.jobName;
+            Post("/", async parameters =>
+            {
+                var jobName = string.Empty; // parameters.jobName;
 
-								var httpFiles = Request.Files.ToList();
+                var httpFiles = Request.Files.ToList();
 
-								var body = RequestStream.FromStream(Request.Body).AsString();
-								return await jobScheduler.ValidateJob(body, jobName);
-						});
-				}
-		}
+                var body = RequestStream.FromStream(Request.Body).AsString();
+                return await jobScheduler.ValidateJob(body, jobName);
+            });
+        }
+    }
 }

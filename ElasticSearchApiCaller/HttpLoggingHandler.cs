@@ -20,49 +20,56 @@ namespace ElasticSearchApiCaller
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-
-            var sb = new StringBuilder();
-
-            sb.AppendLine("------------------- REQUEST ----------------------------");
-            sb.AppendLine($"{request.Method} {request.RequestUri}");
-            sb.AppendLine($"{request.Headers}");
-
-            HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
-
-            if (_doLogContent)
+            try
             {
-                if (_doLogContent && request.Content != null)
+                var sb = new StringBuilder();
+
+                sb.AppendLine("------------------- REQUEST ----------------------------");
+                sb.AppendLine($"{request.Method} {request.RequestUri}");
+                sb.AppendLine($"{request.Headers}");
+
+                HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
+
+                if (_doLogContent)
                 {
-                    sb.AppendLine(await request.Content.ReadAsStringAsync());
+                    if (_doLogContent && request.Content != null)
+                    {
+                        sb.AppendLine(await request.Content.ReadAsStringAsync());
+                    }
                 }
+                else
+                {
+                    sb.AppendLine("[Content was hidden by app code]");
+                }
+                //if (request.Headers != null)
+                //{
+                //    foreach (var header in request.Headers)
+                //    {
+                //        sb.AppendLine($"{header.Key}={header.Value}");
+                //    }
+                //}
+
+                Logger.Trace(sb.ToString());
+
+                sb.Clear();
+                sb.AppendLine("------------------- RESPONSE ----------------------------");
+                sb.AppendLine($"{response.StatusCode} {response.ReasonPhrase}");
+                sb.AppendLine($"{response.Headers}");
+
+                if (response.Content != null)
+                {
+                    sb.AppendLine(await response.Content.ReadAsStringAsync());
+                }
+
+                Logger.Trace(sb.ToString());
+
+                return response;
+
             }
-            else
+            catch (Exception e)
             {
-                sb.AppendLine("[Content was hidden by app code]");
+                throw new Exception($"Unable to connect to {request.RequestUri}", e);
             }
-            //if (request.Headers != null)
-            //{
-            //    foreach (var header in request.Headers)
-            //    {
-            //        sb.AppendLine($"{header.Key}={header.Value}");
-            //    }
-            //}
-
-            Logger.Trace(sb.ToString());
-
-            sb.Clear();
-            sb.AppendLine("------------------- RESPONSE ----------------------------");
-            sb.AppendLine($"{response.StatusCode} {response.ReasonPhrase}");
-            sb.AppendLine($"{response.Headers}");
-
-            if (response.Content != null)
-            {
-                sb.AppendLine(await response.Content.ReadAsStringAsync());
-            }
-
-            Logger.Trace(sb.ToString());
-
-            return response;
         }
     }
 }

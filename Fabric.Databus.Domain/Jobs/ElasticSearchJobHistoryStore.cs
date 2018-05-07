@@ -66,7 +66,7 @@ namespace Fabric.Databus.Domain.Jobs
 
         public void AddJobHistoryItem(JobHistoryItem item)
         {
-            _client.Index(item);
+            _client.IndexDocument(item);
         }
 
         public void UpdateJobHistoryItem(JobHistoryItem item)

@@ -27,9 +27,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Owin" Version="1.1.1" />
     <PackageReference Include="Nancy" Version="2.0.0-clinteastwood" />
     <PackageReference Include="Nancy.Serialization.JsonNet" Version="2.0.0-clinteastwood" />
-    <PackageReference Include="NEST" Version="5.2.0" />
-    <PackageReference Include="Serilog" Version="2.4.0" />
-    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="5.0.0" />
+    <PackageReference Include="NEST" Version="6.1.0" />
+    <PackageReference Include="Serilog" Version="2.6.0" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />

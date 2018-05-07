@@ -1,4 +1,3 @@
-@echo off
 docker stop fabricdatabus
 docker rm fabricdatabus
 cd Fabric.Databus.API

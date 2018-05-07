@@ -14,7 +14,10 @@ namespace SqlImporter
         public SqlGetSchemaQueueProcessor(QueueContext queueContext) : base(queueContext)
         {
             _folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlGetSchema");
-            Directory.CreateDirectory(_folder);
+            if (Config.WriteDetailedTemporaryFilesToDisk)
+            {
+                Directory.CreateDirectory(_folder);
+            }
         }
 
         protected override void Handle(SqlGetSchemaQueueItem workitem)
@@ -35,7 +38,7 @@ namespace SqlImporter
                     File.AppendAllText(filePath, mappingItem.ToJsonPretty());
                 }
             }
-            
+
             AddToOutputQueue(new SaveSchemaQueueItem
             {
                 Mappings = mappingItems

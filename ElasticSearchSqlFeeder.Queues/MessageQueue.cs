@@ -71,7 +71,7 @@ namespace ElasticSearchSqlFeeder.Queues
                     channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 };
                 channel.BasicConsume(queue: "task_queue",
-                                     noAck: false,
+                                     autoAck: false,
                                      consumer: consumer);
 
                 Console.WriteLine(" Press [enter] to exit.");

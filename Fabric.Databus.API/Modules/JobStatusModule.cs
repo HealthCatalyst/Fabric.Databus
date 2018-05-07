@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ElasticSearchSqlFeeder.Shared;
 using Fabric.Databus.API.Configuration;
 using Fabric.Databus.Domain.Jobs;
@@ -14,7 +15,14 @@ namespace Fabric.Databus.API.Modules
 				{
 				    this.RequiresClaimsIfAuthorizationEnabled(configuration, claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
 
-						Get("/", parameters => jobScheduler.GetMostRecentJobs(10));
+						Get("/", parameters =>
+						{
+						    JobHistoryItem lastjob = jobScheduler.GetMostRecentJobs(1).FirstOrDefault();
+
+						    return Negotiate
+						        .WithModel(lastjob)
+						        .WithView("ShowJobStatus");
+                        });
 
 						Get("/{jobName}", parameters =>
 						{

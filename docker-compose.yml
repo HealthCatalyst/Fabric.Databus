@@ -1,8 +1,0 @@
-version: '3'
-
-services:
-  fabric.databus.api:
-    image: fabric.databus.api
-    build:
-      context: ./Fabric.Databus.API
-      dockerfile: Dockerfile

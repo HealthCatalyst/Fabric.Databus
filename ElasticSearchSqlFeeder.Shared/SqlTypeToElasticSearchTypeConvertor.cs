@@ -23,6 +23,10 @@ namespace ElasticSearchSqlFeeder.Shared
 
             if (type == typeof(Single)) return "integer";
 
+            if (type == typeof(Boolean)) return "boolean";
+            if (type == typeof(Int16)) return "short";
+            if (type == typeof(Guid)) return "keyword";
+
             throw new NotImplementedException("No Elastic Search type found for type=" + type);
         }
     }

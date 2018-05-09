@@ -42,6 +42,8 @@ namespace Fabric.Databus.API
             var appConfig = new AppConfiguration();
             _config.Bind(appConfig);
 
+            Console.WriteLine("Configuring with EnableAuthorization=" + appConfig.EnableAuthorization);
+
             var levelSwitch = new LoggingLevelSwitch();
             var log = ConfigureLogger(levelSwitch, appConfig);
 

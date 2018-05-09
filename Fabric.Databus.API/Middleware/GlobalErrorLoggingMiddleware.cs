@@ -18,6 +18,7 @@ namespace Fabric.Databus.API.Middleware
                 {
                     var contextSpecificLogger = logger.ForContext<GlobalErrorLoggingMiddleware>();
                     contextSpecificLogger.Error(ex, "Unhandled exception");
+                    Console.WriteLine(ex.Message);
                 }
             };
         }

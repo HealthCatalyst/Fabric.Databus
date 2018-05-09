@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using LibOwin;
 using Serilog;
@@ -30,7 +31,9 @@ namespace Fabric.Databus.API.Middleware
                 //        owinContext.Request.Path,
                 //        owinContext.Request.Headers,
                 //        body);
-                
+
+                Console.WriteLine($"Incoming request: {owinContext.Request.Method} {owinContext.Request.Path}");
+
                 await next(env);
 
                 //contextSpecificLogger.Information("Outgoing response: {@StatusCode}, {@Headers}, {@Body}",

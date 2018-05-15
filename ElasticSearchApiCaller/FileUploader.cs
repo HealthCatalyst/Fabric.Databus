@@ -456,6 +456,22 @@ namespace ElasticSearchApiCaller
             }
         }
 
+        public async Task RefreshIndex(List<string> hosts, string index, string alias)
+        {
+            // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
+            using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
+            {
+                var host = hosts.First();
+
+                AddAuthorizationToken(client);
+
+                if (!_keepIndexOnline)
+                {
+                    await
+                        client.PostAsyncString(host + "/" + index + "/_refresh",null);
+                }
+            }
+        }
     }
 
     public class ElasticSearchJsonResponse

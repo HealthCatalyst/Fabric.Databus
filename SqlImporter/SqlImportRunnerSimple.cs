@@ -140,6 +140,15 @@ namespace SqlImporter
 
             Task.WaitAll(tasks.ToArray());
 
+            //if (config.UploadToElasticSearch)
+            //{
+            //    var fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
+            //        queueContext.Config.ElasticSearchPassword, job.Config.KeepIndexOnline);
+
+            //    fileUploader.RefreshIndex(queueContext.Config.Urls, queueContext.Config.Index,
+            //        queueContext.Config.Alias).Wait(30*1000);
+            //}
+
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
             Console.WriteLine(stopwatchElapsed);

@@ -53,7 +53,7 @@ namespace QueueProcessor.Tests
 
             // DatabusSqlReader.ReadDataFromQuery(job.Config, )
 
-            var jsonDocumentMergerQueueProcessor = new JsonDocumentMergerQueueProcessor(documentDictionary, queueContext);
+            var jsonDocumentMergerQueueProcessor = new ObjectMergerQueueProcessor(documentDictionary, queueContext);
 
             var jsonDocumentMergerQueueItem = new JsonDocumentMergerQueueItem();
             // jsonDocumentMergerQueueProcessor.Handle(jsonDocumentMergerQueueItem);

@@ -116,7 +116,7 @@ namespace SqlImporter
             newTasks = RunAsync(() => new ConvertDatabaseRowToJsonQueueProcessor(queueContext, 0), 1, queueContext);
             tasks.AddRange(newTasks);
 
-            newTasks = RunAsync(() => new JsonDocumentMergerQueueProcessor(documentDictionary, queueContext), 1,
+            newTasks = RunAsync(() => new ObjectMergerQueueProcessor(documentDictionary, queueContext), 1,
                 queueContext);
             tasks.AddRange(newTasks);
 

@@ -51,9 +51,6 @@ namespace ElasticSearchSqlFeeder.Shared
             _id = queueContext.QueueManager.GetUniqueId();
 
             MyLogger = LogManager.GetLogger(LoggerName + "_" + _id);
-
-            _totalItemsProcessed = 0;
-            _totalItemsAddedToOutputQueue = 0;
         }
 
         protected int UniqueId => _id;

@@ -29,14 +29,19 @@ namespace ElasticSearchSqlFeeder.Shared
                 if (config.SqlCommandTimeoutInSeconds != 0)
                     cmd.CommandTimeout = config.SqlCommandTimeoutInSeconds;
 
-                //cmd.CommandText = "SELECT TOP 10 * FROM [CatalystDevSubset].[dbo].[Patients]";
-
-                cmd.CommandText =
-                    $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {config.TopLevelKeyColumn} BETWEEN '{start}' AND '{end}' ORDER BY {config.TopLevelKeyColumn} ASC;";
+                if (start == null)
+                {
+                    cmd.CommandText =
+                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE ORDER BY {config.TopLevelKeyColumn} ASC;";
+                }
+                else
+                {
+                    cmd.CommandText =
+                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {config.TopLevelKeyColumn} BETWEEN '{start}' AND '{end}' ORDER BY {config.TopLevelKeyColumn} ASC;";
+                }
 
                 logger.Trace($"Start: {cmd.CommandText}");
                 var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-
 
                 //var schema = reader.GetSchemaTable();
 

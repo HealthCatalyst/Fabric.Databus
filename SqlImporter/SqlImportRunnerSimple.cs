@@ -84,20 +84,32 @@ namespace SqlImporter
 
             //int seed = 0;
 
-
-            var ranges = CalculateRanges(config, job);
-
-            int currentBatchNumber = 1;
-
-            foreach (var range in ranges)
+            if (queueContext.Config.EntitiesPerBatch <= 0)
             {
                 sqlBatchQueue.Add(new SqlBatchQueueItem
                 {
-                    BatchNumber = currentBatchNumber++,
-                    Start = range.Item1,
-                    End = range.Item2,
+                    BatchNumber = 1,
+                    Start = null,
+                    End = null,
                     Loads = job.Data.DataSources,
                 });
+            }
+            else
+            {
+                var ranges = CalculateRanges(config, job);
+
+                int currentBatchNumber = 1;
+
+                foreach (var range in ranges)
+                {
+                    sqlBatchQueue.Add(new SqlBatchQueueItem
+                    {
+                        BatchNumber = currentBatchNumber++,
+                        Start = range.Item1,
+                        End = range.Item2,
+                        Loads = job.Data.DataSources,
+                    });
+                }
             }
 
             sqlBatchQueue.CompleteAdding();

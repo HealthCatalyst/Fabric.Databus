@@ -8,6 +8,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NLog" Version="5.0.0-beta06" />
     <PackageReference Include="Serilog" Version="2.6.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,12 +16,6 @@
     <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
     <ProjectReference Include="..\ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Data.SqlClient">
-      <HintPath>..\..\..\..\Users\imran.qureshi\.nuget\packages\system.data.sqlclient\4.3.0\ref\netstandard1.3\System.Data.SqlClient.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

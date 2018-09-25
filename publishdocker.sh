@@ -1,6 +1,6 @@
 echo off
 
-version=1.3
+version=2.1
 
 read -n 1 -p 'Are you sure you want to publish to dockerhub?'
 echo "(ok)"

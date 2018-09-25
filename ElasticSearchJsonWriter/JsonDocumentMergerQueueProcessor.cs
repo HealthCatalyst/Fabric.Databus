@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using ElasticSearchSqlFeeder.Interfaces;
-using ElasticSearchSqlFeeder.ProgressMonitor;
-using ElasticSearchSqlFeeder.Shared;
-using Fabric.Shared;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-namespace ElasticSearchJsonWriter
+﻿namespace ElasticSearchJsonWriter
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using ElasticSearchSqlFeeder.Interfaces;
+    using ElasticSearchSqlFeeder.ProgressMonitor;
+    using ElasticSearchSqlFeeder.Shared;
+    using Fabric.Shared;
+    using Newtonsoft.Json.Linq;
 
     public class JsonDocumentMergerQueueProcessor : BaseQueueProcessor<JsonDocumentMergerQueueItem, JsonObjectQueueItem>
     {
@@ -33,10 +31,14 @@ namespace ElasticSearchJsonWriter
         {
             _documentDictionary = documentDictionary;
 
-            _folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-JsonDocumentMerge");
+            var configLocalSaveFolder = this.Config.LocalSaveFolder;
+            if (configLocalSaveFolder == null)
+            {
+                throw new ArgumentNullException(nameof(this.Config.LocalSaveFolder));
+            }
 
+            _folder = Path.Combine(configLocalSaveFolder, $"{UniqueId}-JsonDocumentMerge");
         }
-
 
         private void AddToJsonObject(string queryId, string id, string propertyName, JObject[] newJObjects, int batchNumber)
         {

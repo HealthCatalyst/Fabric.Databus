@@ -1,14 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using ElasticSearchJsonWriter;
-using ElasticSearchSqlFeeder.Interfaces;
-using ElasticSearchSqlFeeder.ProgressMonitor;
-using ElasticSearchSqlFeeder.Shared;
-using Fabric.Databus.Config;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="JsonDocumentMergerQueueProcessorTester.cs" company="Health Catalyst">
+//   2018
+// </copyright>
+// <summary>
+//   Defines the JsonDocumentMergerQueueProcessorTester type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace QueueProcessor.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    using ElasticSearchJsonWriter;
+    using ElasticSearchSqlFeeder.Interfaces;
+    using ElasticSearchSqlFeeder.ProgressMonitor;
+    using ElasticSearchSqlFeeder.Shared;
+    using Fabric.Databus.Config;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class JsonDocumentMergerQueueProcessorTester
     {
@@ -23,7 +34,7 @@ namespace QueueProcessor.Tests
             {
                 Config = new QueryConfig
                 {
-
+                    LocalSaveFolder = Path.GetTempPath()
                 },
                 Data = new Data
                 {
@@ -52,13 +63,12 @@ namespace QueueProcessor.Tests
             };
 
             // DatabusSqlReader.ReadDataFromQuery(job.Config, )
-
             var jsonDocumentMergerQueueProcessor = new JsonDocumentMergerQueueProcessor(documentDictionary, queueContext);
 
             var jsonDocumentMergerQueueItem = new JsonDocumentMergerQueueItem();
+
             // jsonDocumentMergerQueueProcessor.Handle(jsonDocumentMergerQueueItem);
         }
-
     }
 
     public class MockProgressMonitor : IProgressMonitor

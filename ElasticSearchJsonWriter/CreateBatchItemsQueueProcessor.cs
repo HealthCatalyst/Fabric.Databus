@@ -12,9 +12,9 @@ namespace ElasticSearchJsonWriter
         {
         }
 
-        protected override void Handle(JsonObjectQueueItem workitem)
+        protected override void Handle(JsonObjectQueueItem workItem)
         {
-            _items.Enqueue(workitem);
+            _items.Enqueue(workItem);
             FlushDocumentsIfBatchSizeReached();
         }
 
@@ -62,7 +62,7 @@ namespace ElasticSearchJsonWriter
 
             if (docsToSave.Any())
             {
-                MyLogger.Trace($"Saved Batch: count:{docsToSave.Count} from {docsToSave.First().Id} to {docsToSave.Last().Id}, inQueue:{_inQueue.Count} ");
+                MyLogger.Trace($"Saved Batch: count:{docsToSave.Count} from {docsToSave.First().Id} to {docsToSave.Last().Id}, inQueue:{this.InQueue.Count} ");
                 AddToOutputQueue(new SaveBatchQueueItem { ItemsToSave = docsToSave });
 
             }
@@ -73,9 +73,9 @@ namespace ElasticSearchJsonWriter
             FlushAllDocuments();
         }
 
-        protected override string GetId(JsonObjectQueueItem workitem)
+        protected override string GetId(JsonObjectQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
         protected override string LoggerName => "CreateBatchItems";

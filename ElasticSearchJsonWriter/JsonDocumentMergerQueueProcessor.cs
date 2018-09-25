@@ -1,4 +1,13 @@
-﻿namespace ElasticSearchJsonWriter
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="JsonDocumentMergerQueueProcessor.cs" company="Health Catalyst">
+//   2018
+// </copyright>
+// <summary>
+//   Defines the JsonDocumentMergerQueueProcessor type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ElasticSearchJsonWriter
 {
     using System;
     using System.Collections.Concurrent;
@@ -6,187 +15,138 @@
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.ProgressMonitor;
+
     using ElasticSearchSqlFeeder.Shared;
     using Fabric.Shared;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// The json document merger queue processor.
+    /// </summary>
     public class JsonDocumentMergerQueueProcessor : BaseQueueProcessor<JsonDocumentMergerQueueItem, JsonObjectQueueItem>
     {
-        private readonly IMeteredConcurrentDictionary<string, JsonObjectQueueItem> _documentDictionary;
-
-        private readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
-
+        /// <summary>
+        /// The sequence barrier.
+        /// </summary>
         private static readonly SequenceBarrier SequenceBarrier = new SequenceBarrier();
 
-        private int _numDocumentsModified;
+        /// <summary>
+        /// The current batch number.
+        /// </summary>
+        private static int currentBatchNumber = 0;
 
-        private static int _currentBatchNumber = 0;
+        /// <summary>
+        /// The _locks.
+        /// </summary>
+        private readonly ConcurrentDictionary<string, object> locks = new ConcurrentDictionary<string, object>();
 
-        private readonly string _folder;
-        
-        public JsonDocumentMergerQueueProcessor(IMeteredConcurrentDictionary<string, JsonObjectQueueItem> documentDictionary, QueueContext queueContext)
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
+
+        /// <summary>
+        /// The num documents modified.
+        /// </summary>
+        private int numDocumentsModified;
+
+        /// <inheritdoc />
+        public JsonDocumentMergerQueueProcessor(QueueContext queueContext)
             : base(queueContext)
         {
-            _documentDictionary = documentDictionary;
-
             var configLocalSaveFolder = this.Config.LocalSaveFolder;
             if (configLocalSaveFolder == null)
             {
                 throw new ArgumentNullException(nameof(this.Config.LocalSaveFolder));
             }
 
-            _folder = Path.Combine(configLocalSaveFolder, $"{UniqueId}-JsonDocumentMerge");
+            this.folder = Path.Combine(configLocalSaveFolder, $"{UniqueId}-JsonDocumentMerge");
         }
 
-        private void AddToJsonObject(string queryId, string id, string propertyName, JObject[] newJObjects, int batchNumber)
-        {
-            //BlockIfMaxSizeReached(id);
+        /// <summary>
+        /// The logger name.
+        /// </summary>
+        protected override string LoggerName => "JsonDocumentMerger";
 
-            // lock on id so multiple threads cannot update the same document at the same time
-            lock (_locks.GetOrAdd(id, s => new object()))
-            {
-                JObject document;
-                if (!_documentDictionary.ContainsKey(id))
-                {
-                    document = new JObject { { Config.TopLevelKeyColumn, id } };
-                    var jsonObjectCacheItem = new JsonObjectQueueItem
-                    {
-                        BatchNumber = batchNumber,
-                        Id = id,
-                        Document = document
-                    };
-
-
-                    _documentDictionary.Add(id, jsonObjectCacheItem);
-
-                    Interlocked.Increment(ref _numDocumentsModified);
-
-                    MyLogger.Trace($"AddToJsonObject: id:{id} _numDocumentsModified={_numDocumentsModified:N0} _documentDictionary.Count={_documentDictionary.Count:N0}");
-                    JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
-                }
-                else
-                {
-                    document = _documentDictionary[id].Document;
-
-                    MyLogger.Trace($"UpdatedJsonObject: id:{id}  _numDocumentsModified={_numDocumentsModified:N0} _documentDictionary.Count={_documentDictionary.Count:N0}");
-                    JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
-                }
-
-            }
-
-            var minimum = SequenceBarrier.UpdateMinimumEntityIdProcessed(queryId, id);
-
-            //QueueContext.
-            //    ProgressMonitor.SetProgressItem(new ProgressMonitorItem
-            //    {
-            //        LoggerName = LoggerName,
-            //        Id = id,
-            //        StepNumber = _stepNumber,
-            //        //QueryId = queryId,
-            //        InQueueCount = _inQueue.Count,
-            //        Minimum = minimum,
-            //        TimeElapsed = TimeSpan.Zero,
-            //        LastCompletedEntityIdForEachQuery = SequenceBarrier.LastCompletedEntityIdForEachQuery.ToList(),
-            //        DocumentDictionaryCount = _documentDictionary.Count,
-
-            //        TotalItemsProcessed = _totalItemsProcessed,
-            //        TotalItemsAddedToOutputQueue = _totalItemsAddedToOutputQueue,
-            //    });
-
-            //Console.Write($"\r{LoggerName} Id:{id} Remaining: {_inQueue.Count:N0} queryId:{queryId} Minimum id:{minimum}");
-
-            MyLogger.Trace($"Processed id: {id} for queryId:{queryId} Minimum id:{minimum}");
-
-            // AddDocumentsToOutQueue(minimum);
-
-            //AddDocumentToOutputQueueByKey(id);
-
-        }
-
-
-        private void AddDocumentsToOutQueue(string min)
-        {
-            var keys = _documentDictionary.GetKeysLessThan(min);
-
-            AddDocumentsToOutQueueByKeys(keys);
-        }
-
-        private void AddDocumentsToOutQueueByKeys(IList<string> keys)
-        {
-            foreach (var key in keys)
-            {
-                AddDocumentToOutputQueueByKey(key);
-            }
-        }
-
-        private void AddDocumentToOutputQueueByKey(string key)
-        {
-            JsonObjectQueueItem item;
-            if (_documentDictionary.TryRemove(key, out item))
-            {
-                MyLogger.Trace(
-                    $"Remove from Dictionary: _documentDictionary.Count={_documentDictionary.Count:N0}");
-
-
-                AddToOutputQueue(item);
-            }
-        }
-
-
-        protected override void Handle(JsonDocumentMergerQueueItem wt)
+        /// <summary>
+        /// The handle.
+        /// </summary>
+        /// <param name="workItem">
+        /// The workItem.
+        /// </param>
+        protected override void Handle(JsonDocumentMergerQueueItem workItem)
         {
             // if work item batch number is newer than the last one we saw that we can flush anything related to the old batch
-            if(_currentBatchNumber != wt.BatchNumber)
+            if (currentBatchNumber != workItem.BatchNumber)
             {
-                //find all items with old batch numbers and put them in the out queue
-                var list = _documentDictionary.RemoveItems(item => item.Value.BatchNumber != wt.BatchNumber);
-                SendToOutputQueue(list);
+                // find all items with old batch numbers and put them in the out queue
+                var list = this.QueueContext.DocumentDictionary.RemoveItems(item => item.Value.BatchNumber != workItem.BatchNumber);
+                this.SendToOutputQueue(list);
 
-                _currentBatchNumber = wt.BatchNumber;
+                currentBatchNumber = workItem.BatchNumber;
             }
 
-            AddToJsonObject(wt.QueryId, wt.Id, wt.PropertyName, wt.NewJObjects, wt.BatchNumber);
+            this.AddToJsonObject(workItem.QueryId, workItem.Id, workItem.PropertyName, workItem.NewJObjects, workItem.BatchNumber);
         }
 
+        /// <summary>
+        /// The begin.
+        /// </summary>
+        /// <param name="isFirstThreadForThisTask">
+        /// The is first thread for this task.
+        /// </param>
         protected override void Begin(bool isFirstThreadForThisTask)
         {
         }
 
+        /// <summary>
+        /// The complete.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="isLastThreadForThisTask">
+        /// The is last thread for this task.
+        /// </param>
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
-            var list = _documentDictionary.RemoveAll();
-            SendToOutputQueue(list);
+            var list = this.QueueContext.DocumentDictionary.RemoveAll();
+            this.SendToOutputQueue(list);
 
             SequenceBarrier.CompleteQuery(queryId);
 
-            MyLogger.Trace("Finished");
+            this.MyLogger.Trace("Finished");
         }
 
-        private void SendToOutputQueue(IList<Tuple<string, JsonObjectQueueItem>> list)
+        /// <summary>
+        /// The get id.
+        /// </summary>
+        /// <param name="workItem">
+        /// The workItem.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        protected override string GetId(JsonDocumentMergerQueueItem workItem)
         {
-            var path = _folder;
-            if (Config.WriteDetailedTemporaryFilesToDisk)
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            foreach (var tuple in list)
-            {
-                //remove temporary columns
-                RemoveTemporaryColumns(tuple.Item2.Document);
-
-                AddToOutputQueue(tuple.Item2);
-
-                if (Config.WriteDetailedTemporaryFilesToDisk)
-                {
-                    File.AppendAllText(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
-                }
-            }
+            return null;
         }
 
-        static void WalkNode(JToken node, Action<JObject> action)
+        // protected override void LogItemToConsole(JsonDocumentMergerQueueItem workItem)
+        // {
+        //    // don't log here
+        // }
+
+        /// <summary>
+        /// The walk node.
+        /// </summary>
+        /// <param name="node">
+        /// The node.
+        /// </param>
+        /// <param name="action">
+        /// The action.
+        /// </param>
+        private static void WalkNode(JToken node, Action<JObject> action)
         {
             if (node.Type == JTokenType.Object)
             {
@@ -205,13 +165,175 @@
                 }
             }
         }
+
+        /// <summary>
+        /// The add to json object.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="id">
+        /// The id.
+        /// </param>
+        /// <param name="propertyName">
+        /// The property name.
+        /// </param>
+        /// <param name="newJObjects">
+        /// The new j objects.
+        /// </param>
+        /// <param name="batchNumber">
+        /// The batch number.
+        /// </param>
+        private void AddToJsonObject(string queryId, string id, string propertyName, JObject[] newJObjects, int batchNumber)
+        {
+            // BlockIfMaxSizeReached(id);
+
+            // lock on id so multiple threads cannot update the same document at the same time
+            lock (this.locks.GetOrAdd(id, s => new object()))
+            {
+                JObject document;
+                if (!this.QueueContext.DocumentDictionary.ContainsKey(id))
+                {
+                    document = new JObject { { this.Config.TopLevelKeyColumn, id } };
+                    var jsonObjectCacheItem = new JsonObjectQueueItem
+                    {
+                        BatchNumber = batchNumber,
+                        Id = id,
+                        Document = document
+                    };
+
+
+                    this.QueueContext.DocumentDictionary.Add(id, jsonObjectCacheItem);
+
+                    Interlocked.Increment(ref this.numDocumentsModified);
+
+                    this.MyLogger.Trace($"AddToJsonObject: id:{id} _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+                    JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
+                }
+                else
+                {
+                    document = this.QueueContext.DocumentDictionary[id].Document;
+
+                    this.MyLogger.Trace($"UpdatedJsonObject: id:{id}  _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+                    JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
+                }
+
+            }
+
+            var minimum = SequenceBarrier.UpdateMinimumEntityIdProcessed(queryId, id);
+
+            // QueueContext.
+            //    ProgressMonitor.SetProgressItem(new ProgressMonitorItem
+            //    {
+            //        LoggerName = LoggerName,
+            //        Id = id,
+            //        StepNumber = _stepNumber,
+            //        //QueryId = queryId,
+            //        InQueueCount = _inQueue.Count,
+            //        Minimum = minimum,
+            //        TimeElapsed = TimeSpan.Zero,
+            //        LastCompletedEntityIdForEachQuery = SequenceBarrier.LastCompletedEntityIdForEachQuery.ToList(),
+            //        DocumentDictionaryCount = _documentDictionary.Count,
+            //        TotalItemsProcessed = _totalItemsProcessed,
+            //        TotalItemsAddedToOutputQueue = _totalItemsAddedToOutputQueue,
+            //    });
+
+            // Console.Write($"\r{LoggerName} Id:{id} Remaining: {_inQueue.Count:N0} queryId:{queryId} Minimum id:{minimum}");
+            this.MyLogger.Trace($"Processed id: {id} for queryId:{queryId} Minimum id:{minimum}");
+
+            // AddDocumentsToOutQueue(minimum);
+
+            // AddDocumentToOutputQueueByKey(id);
+        }
+
+        /// <summary>
+        /// The add documents to out queue.
+        /// </summary>
+        /// <param name="min">
+        /// The min.
+        /// </param>
+        private void AddDocumentsToOutQueue(string min)
+        {
+            var keys = this.QueueContext.DocumentDictionary.GetKeysLessThan(min);
+
+            this.AddDocumentsToOutQueueByKeys(keys);
+        }
+
+        /// <summary>
+        /// The add documents to out queue by keys.
+        /// </summary>
+        /// <param name="keys">
+        /// The keys.
+        /// </param>
+        private void AddDocumentsToOutQueueByKeys(IList<string> keys)
+        {
+            foreach (var key in keys)
+            {
+                this.AddDocumentToOutputQueueByKey(key);
+            }
+        }
+
+        /// <summary>
+        /// The add document to output queue by key.
+        /// </summary>
+        /// <param name="key">
+        /// The key.
+        /// </param>
+        private void AddDocumentToOutputQueueByKey(string key)
+        {
+            JsonObjectQueueItem item;
+            if (this.QueueContext.DocumentDictionary.TryRemove(key, out item))
+            {
+                this.MyLogger.Trace(
+                    $"Remove from Dictionary: _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+
+                this.AddToOutputQueue(item);
+            }
+        }
+
+        /// <summary>
+        /// The send to output queue.
+        /// </summary>
+        /// <param name="list">
+        /// The list.
+        /// </param>
+        private void SendToOutputQueue(IList<Tuple<string, JsonObjectQueueItem>> list)
+        {
+            var path = this.folder;
+            if (this.Config.WriteDetailedTemporaryFilesToDisk)
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            foreach (var tuple in list)
+            {
+                // remove temporary columns
+                this.RemoveTemporaryColumns(tuple.Item2.Document);
+
+                this.AddToOutputQueue(tuple.Item2);
+
+                if (this.Config.WriteDetailedTemporaryFilesToDisk)
+                {
+                    File.AppendAllText(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// The remove temporary columns.
+        /// </summary>
+        /// <param name="node">
+        /// The node.
+        /// </param>
         private void RemoveTemporaryColumns(JObject node)
         {
-            if (!Config.KeepTemporaryLookupColumnsInOutput)
+            if (!this.Config.KeepTemporaryLookupColumnsInOutput)
             {
-                WalkNode(node, n =>
-                {
-                    var properties = n.Properties().Select(p => p.Name).ToList();
+                WalkNode(
+                    node,
+                    n =>
+                        {
+                            var properties = n.Properties().Select(p => p.Name).ToList();
                     var propertiesToRemove = properties
                         .Where(p => p.StartsWith("KeyLevel", StringComparison.OrdinalIgnoreCase))
                         .ToList();
@@ -236,52 +358,5 @@
                 });
             }
         }
-
-        protected override string GetId(JsonDocumentMergerQueueItem workitem)
-        {
-            return null;
-        }
-
-        //protected override void LogItemToConsole(JsonDocumentMergerQueueItem wt)
-        //{
-        //    // don't log here
-        //}
-
-        protected override string LoggerName => "JsonDocumentMerger";
-
-    }
-
-    public class JsonObjectQueueItem : IQueueItem
-    {
-        public string QueryId { get; set; }
-        public string PropertyName { get; set; }
-        public string Id { get; set; }
-        public JObject Document { get; set; }
-        public int BatchNumber { get; set; }
-    }
-    public class JsonDocumentMergerQueueItem : IQueueItem
-    {
-        public string QueryId { get; set; }
-        public string PropertyName { get; set; }
-
-        public string Id { get; set; }
-        public JObject[] NewJObjects { get; set; }
-
-        public int BatchNumber { get; set; }
-
-        //public string JoinColumnValue { get; set; }
-    }
-
-    public class CurrentProcessingEntity
-    {
-        public int Id { get; set; }
-        public CurrentProcessingEntityLockType ProcessingType { get; set; }
-    }
-
-    public enum CurrentProcessingEntityLockType
-    {
-        None,
-        Add,
-        Update
     }
 }

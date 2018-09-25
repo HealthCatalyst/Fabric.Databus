@@ -48,7 +48,7 @@ namespace ElasticSearchSqlFeederConsole
             stopwatch.Start();
             using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
             {
-                new SqlImportRunnerSimple().ReadFromDatabase(config, progressMonitor);
+                new SqlImportRunnerSimple().RunPipeline(config, progressMonitor);
             }
             stopwatch.Stop();
 

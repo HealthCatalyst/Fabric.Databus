@@ -9,20 +9,24 @@
 
 namespace QueueProcessor.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
 
     using ElasticSearchJsonWriter;
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.ProgressMonitor;
+
     using ElasticSearchSqlFeeder.Shared;
     using Fabric.Databus.Config;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    /// <summary>
+    /// The json document merger queue processor tester.
+    /// </summary>
     [TestClass]
     public class JsonDocumentMergerQueueProcessorTester
     {
+        /// <summary>
+        /// The test simple.
+        /// </summary>
         [TestMethod]
         public void TestSimple()
         {
@@ -60,27 +64,15 @@ namespace QueueProcessor.Tests
                 Config = job.Config,
                 QueueManager = new QueueManager(),
                 ProgressMonitor = new MockProgressMonitor(),
+                DocumentDictionary = documentDictionary
             };
 
             // DatabusSqlReader.ReadDataFromQuery(job.Config, )
-            var jsonDocumentMergerQueueProcessor = new JsonDocumentMergerQueueProcessor(documentDictionary, queueContext);
+            var jsonDocumentMergerQueueProcessor = new JsonDocumentMergerQueueProcessor(queueContext);
 
             var jsonDocumentMergerQueueItem = new JsonDocumentMergerQueueItem();
 
-            // jsonDocumentMergerQueueProcessor.Handle(jsonDocumentMergerQueueItem);
-        }
-    }
-
-    public class MockProgressMonitor : IProgressMonitor
-    {
-        public Action JobHistoryUpdateAction { get; set; }
-        public void SetProgressItem(ProgressMonitorItem progressMonitorItem)
-        {
-        }
-
-        public IList<ProgressMonitorItem> GetSnapshotOfProgressItems()
-        {
-            throw new NotImplementedException();
+            jsonDocumentMergerQueueProcessor.InternalHandle(jsonDocumentMergerQueueItem);
         }
     }
 }

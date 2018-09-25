@@ -14,5 +14,7 @@ namespace ElasticSearchSqlFeeder.Shared
         public string SecondaryMappingUploadRelativeUrl { get; set; }
         public QueryConfig Config { get; set; }
         public Dictionary<string, string> PropertyTypes { get; set; }
+
+        public IMeteredConcurrentDictionary<string, JsonObjectQueueItem> DocumentDictionary { get; set; }
     }
 }

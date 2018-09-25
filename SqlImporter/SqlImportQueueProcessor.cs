@@ -116,9 +116,9 @@ namespace SqlImporter
         }
 
 
-        protected override void Handle(SqlImportQueueItem workitem)
+        protected override void Handle(SqlImportQueueItem workItem)
         {
-            ReadOneQueryFromDatabase(workitem.QueryId, workitem.DataSource, workitem.Seed, workitem.Start, workitem.End, workitem.BatchNumber);
+            ReadOneQueryFromDatabase(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber);
         }
 
         protected override void Begin(bool isFirstThreadForThisTask)
@@ -130,9 +130,9 @@ namespace SqlImporter
             //MarkOutputQueueAsCompleted();
         }
 
-        protected override string GetId(SqlImportQueueItem workitem)
+        protected override string GetId(SqlImportQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
         protected override string LoggerName => "SqlImport";

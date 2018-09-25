@@ -15,15 +15,12 @@ namespace ElasticSearchJsonWriter
     {
         private static readonly SequenceBarrier SequenceBarrier = new SequenceBarrier();
 
-        private int _limitInProcess;
         private readonly string _folder;
 
 
-        public ConvertDatabaseRowToJsonQueueProcessor(QueueContext queueContext, int limitInProcess)
+        public ConvertDatabaseRowToJsonQueueProcessor(QueueContext queueContext)
             : base(queueContext)
         {
-            _limitInProcess = limitInProcess;
-
             _folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-ConvertToJson");
         }
 
@@ -190,7 +187,7 @@ namespace ElasticSearchJsonWriter
                 QueryId = wt.QueryId,
                 Id = id,
                 PropertyName = wt.PropertyName,
-                //JoinColumnValue = wt.JoinColumnValue,
+                //JoinColumnValue = workItem.JoinColumnValue,
                 NewJObjects = jsonForRows
             });
 
@@ -206,9 +203,9 @@ namespace ElasticSearchJsonWriter
 
         }
 
-        protected override void Handle(ConvertDatabaseToJsonQueueItem workitem)
+        protected override void Handle(ConvertDatabaseToJsonQueueItem workItem)
         {
-            WriteObjectToJson(workitem);
+            WriteObjectToJson(workItem);
 
         }
 
@@ -221,9 +218,9 @@ namespace ElasticSearchJsonWriter
             SequenceBarrier.CompleteQuery(queryId);
         }
 
-        protected override string GetId(ConvertDatabaseToJsonQueueItem workitem)
+        protected override string GetId(ConvertDatabaseToJsonQueueItem workItem)
         {
-            return Convert.ToString(workitem.JoinColumnValue);
+            return Convert.ToString(workItem.JoinColumnValue);
         }
 
         protected override string LoggerName => "ConvertDatabaseRow";

@@ -59,9 +59,9 @@ namespace ElasticSearchApiCaller
             AddToOutputQueue(wt);
         }
 
-        protected override void Handle(FileUploadQueueItem workitem)
+        protected override void Handle(FileUploadQueueItem workItem)
         {
-            SaveFile(workitem);
+            SaveFile(workItem);
         }
 
         protected override void Begin(bool isFirstThreadForThisTask)
@@ -73,9 +73,9 @@ namespace ElasticSearchApiCaller
 
         }
 
-        protected override string GetId(FileUploadQueueItem workitem)
+        protected override string GetId(FileUploadQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
         protected override string LoggerName => "FileSave";

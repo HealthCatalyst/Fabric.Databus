@@ -30,12 +30,12 @@ namespace ElasticSearchJsonWriter
                 _mainMappingUploadRelativeUrl = '/' + _mainMappingUploadRelativeUrl;
         }
 
-        protected override void Handle(SaveSchemaQueueItem workitem)
+        protected override void Handle(SaveSchemaQueueItem workItem)
         {
             //first send the base mapping
-            //SendMapping(workitem.Mappings.First(m => IsNullOrEmpty(m.Key)));
+            //SendMapping(workItem.Mappings.First(m => IsNullOrEmpty(m.Key)));
 
-            foreach (var mapping in workitem.Mappings.OrderBy(m => m.SequenceNumber).ToList())
+            foreach (var mapping in workItem.Mappings.OrderBy(m => m.SequenceNumber).ToList())
             {
                 SendMapping(mapping);
             }
@@ -200,9 +200,9 @@ curl -XPOST -u $USR:$PWD $ESURL/'_aliases?pretty' -H 'Content-Type: application/
         {
         }
 
-        protected override string GetId(SaveSchemaQueueItem workitem)
+        protected override string GetId(SaveSchemaQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
         protected override string LoggerName => "SaveSchema";

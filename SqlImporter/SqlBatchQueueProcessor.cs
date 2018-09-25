@@ -19,32 +19,32 @@ namespace SqlImporter
 
         }
 
-        protected override void Handle(SqlBatchQueueItem workitem)
+        protected override void Handle(SqlBatchQueueItem workItem)
         {
             int seed = 0;
 
-            workitem.Loads
-                .ForEach(c =>
+            workItem.Loads
+                .ForEach(dataSource =>
                 {
-                    var queryName = c.Path ?? "Main";
+                    var queryName = dataSource.Path ?? "Main";
                     var queryId = queryName;
                     //var queryId = JsonDocumentMergerQueueProcessor.RegisterQuery(seed, queryName);
 
                     AddToOutputQueue(new SqlImportQueueItem
                     {
-                        BatchNumber = workitem.BatchNumber,
+                        BatchNumber = workItem.BatchNumber,
                         QueryId = queryId,
-                        PropertyName = c.Path,
+                        PropertyName = dataSource.Path,
                         Seed = seed,
-                        DataSource = c,
-                        Start = workitem.Start,
-                        End = workitem.End,
+                        DataSource = dataSource,
+                        Start = workItem.Start,
+                        End = workItem.End,
                     });
                 });
 
             if (Config.WriteDetailedTemporaryFilesToDisk)
             {
-                foreach (var workitemLoad in workitem.Loads)
+                foreach (var workitemLoad in workItem.Loads)
                 {
                     var queryName = workitemLoad.Path ?? "Main";
                     var queryId = queryName;
@@ -53,13 +53,13 @@ namespace SqlImporter
 
                     Directory.CreateDirectory(path);
 
-                    var filepath = Path.Combine(path, Convert.ToString(workitem.BatchNumber) + ".txt");
+                    var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
 
                     using (var file = File.OpenWrite(filepath))
                     {
                         using (var stream = new StreamWriter(file))
                         {
-                            stream.WriteLine($"start: {workitem.Start}, end: {workitem.End}");
+                            stream.WriteLine($"start: {workItem.Start}, end: {workItem.End}");
                         }
                     }
                 }
@@ -76,9 +76,9 @@ namespace SqlImporter
         {
         }
 
-        protected override string GetId(SqlBatchQueueItem workitem)
+        protected override string GetId(SqlBatchQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
         protected override string LoggerName => "SqlBatch";

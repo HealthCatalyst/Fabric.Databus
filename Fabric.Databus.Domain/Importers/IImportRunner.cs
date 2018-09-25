@@ -7,6 +7,6 @@ namespace Fabric.Databus.Domain.Importers
 {
     public interface IImportRunner
     {
-        void ReadFromDatabase(Job config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker);
+        void RunPipeline(Job config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker);
     }
 }

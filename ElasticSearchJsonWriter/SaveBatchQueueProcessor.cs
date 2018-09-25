@@ -29,14 +29,14 @@ namespace ElasticSearchJsonWriter
         {
         }
 
-        protected override string GetId(SaveBatchQueueItem workitem)
+        protected override string GetId(SaveBatchQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
-        protected override void Handle(SaveBatchQueueItem workitem)
+        protected override void Handle(SaveBatchQueueItem workItem)
         {
-            FlushDocumentsToBatchFile(workitem.ItemsToSave);
+            FlushDocumentsToBatchFile(workItem.ItemsToSave);
         }
 
         private void FlushDocumentsToBatchFile(IEnumerable<JsonObjectQueueItem> documentCacheItems)

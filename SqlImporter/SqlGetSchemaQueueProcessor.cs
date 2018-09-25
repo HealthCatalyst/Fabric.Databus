@@ -20,10 +20,10 @@ namespace SqlImporter
             }
         }
 
-        protected override void Handle(SqlGetSchemaQueueItem workitem)
+        protected override void Handle(SqlGetSchemaQueueItem workItem)
         {
 
-            var workitemLoads = workitem.Loads;
+            var workitemLoads = workItem.Loads;
 
             var dictionary = SchemaLoader.GetSchemasForLoads(workitemLoads, Config.ConnectionString, Config.TopLevelKeyColumn);
 
@@ -54,9 +54,9 @@ namespace SqlImporter
         {
         }
 
-        protected override string GetId(SqlGetSchemaQueueItem workitem)
+        protected override string GetId(SqlGetSchemaQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
         protected override string LoggerName => "SqlGetSchema";

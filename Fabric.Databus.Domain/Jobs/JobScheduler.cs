@@ -62,7 +62,7 @@ namespace Fabric.Databus.Domain.Jobs
             var jobHistoryItem = CreateJobHistoryItem(query);
             _jobHistoryStore.AddJobHistoryItem(jobHistoryItem);
             var jobStatusTracker = _jobStatusTrackerFactory.GetTracker(_jobHistoryStore, jobHistoryItem);
-            Task.Run(() => _importRunner.ReadFromDatabase(query, jobHistoryItem.ProgressMonitor, jobStatusTracker));
+            Task.Run(() => _importRunner.RunPipeline(query, jobHistoryItem.ProgressMonitor, jobStatusTracker));
             return jobHistoryItem.Id;
         }
 

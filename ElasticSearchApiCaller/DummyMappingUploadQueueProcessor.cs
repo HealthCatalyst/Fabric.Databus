@@ -8,7 +8,7 @@ namespace ElasticSearchApiCaller
         {
         }
 
-        protected override void Handle(MappingUploadQueueItem workitem)
+        protected override void Handle(MappingUploadQueueItem workItem)
         {
             // do nothing
         }
@@ -21,9 +21,9 @@ namespace ElasticSearchApiCaller
         {
         }
 
-        protected override string GetId(MappingUploadQueueItem workitem)
+        protected override string GetId(MappingUploadQueueItem workItem)
         {
-            return workitem.QueryId;
+            return workItem.QueryId;
         }
 
         protected override string LoggerName => "NullMappingUpload";

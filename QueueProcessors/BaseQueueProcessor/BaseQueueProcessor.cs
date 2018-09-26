@@ -155,6 +155,8 @@ namespace BaseQueueProcessor
 
             while (true)
             {
+                this.QueueContext.CancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     stopWatch.Restart();

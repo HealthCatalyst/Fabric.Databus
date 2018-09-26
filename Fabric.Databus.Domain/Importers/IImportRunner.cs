@@ -9,8 +9,6 @@
 
 namespace Fabric.Databus.Domain.Importers
 {
-    using System.Threading;
-
     using ElasticSearchSqlFeeder.Interfaces;
 
     using Fabric.Databus.Config;
@@ -33,9 +31,6 @@ namespace Fabric.Databus.Domain.Importers
         /// <param name="jobStatusTracker">
         /// The job status tracker.
         /// </param>
-        /// <param name="cancellationToken">
-        /// The cancellation token.
-        /// </param>
-        void RunPipeline(IJob config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker, CancellationToken cancellationToken);
+        void RunPipeline(IJob config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker);
     }
 }

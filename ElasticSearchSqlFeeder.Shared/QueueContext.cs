@@ -1,11 +1,26 @@
-﻿using System.Collections.Generic;
-using ElasticSearchSqlFeeder.Interfaces;
-using Fabric.Databus.Config;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="QueueContext.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the QueueContext type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Shared
 {
+    using System.Collections.Generic;
+    using System.Threading;
+
+    using ElasticSearchSqlFeeder.Interfaces;
+
+    using Fabric.Databus.Config;
+
     using QueueItems;
 
+    /// <summary>
+    /// The queue context.
+    /// </summary>
     public class QueueContext : IQueueContext
     {
         public IProgressMonitor ProgressMonitor { get; set; }
@@ -18,5 +33,7 @@ namespace ElasticSearchSqlFeeder.Shared
         public Dictionary<string, string> PropertyTypes { get; set; }
 
         public IMeteredConcurrentDictionary<string, IJsonObjectQueueItem> DocumentDictionary { get; set; }
+
+        public CancellationToken CancellationToken { get; set; }
     }
 }

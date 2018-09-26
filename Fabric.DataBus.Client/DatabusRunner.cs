@@ -12,12 +12,15 @@ namespace Fabric.DataBus.Client
     using System.Diagnostics;
     using System.Threading;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
 
     using PipelineRunner;
+
+    using Unity;
 
     /// <summary>
     /// The runner.
@@ -39,7 +42,12 @@ namespace Fabric.DataBus.Client
             stopwatch.Start();
             using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
             {
-                new PipelineRunner().RunPipeline(config, progressMonitor, cancellationToken);
+                var container = new UnityContainer();
+                container.RegisterType<IDatabusSqlReader, DatabusSqlReader>();
+
+                var pipelineRunner = new PipelineRunner(container, cancellationToken);
+
+                pipelineRunner.RunPipeline(config, progressMonitor);
             }
 
             stopwatch.Stop();

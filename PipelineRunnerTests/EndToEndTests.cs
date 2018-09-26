@@ -14,6 +14,7 @@ namespace PipelineRunnerTests
     using System.IO;
     using System.Threading;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Config;
@@ -22,6 +23,8 @@ namespace PipelineRunnerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using PipelineRunner;
+
+    using Unity;
 
     /// <summary>
     /// The end to end tests.
@@ -61,11 +64,13 @@ namespace PipelineRunnerTests
             {
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
-                    var pipelineRunner = new PipelineRunner();  
-                    pipelineRunner.Init();
+                    var container = new UnityContainer();
+                    container.RegisterType<IDatabusSqlReader, DatabusSqlReader>();
+
+                    var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);  
                     try
                     {
-                        pipelineRunner.RunPipeline(job, progressMonitor, cancellationTokenSource.Token);
+                        pipelineRunner.RunPipeline(job, progressMonitor);
                     }
                     catch (OperationCanceledException e)
                     {

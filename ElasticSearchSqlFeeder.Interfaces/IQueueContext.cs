@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace ElasticSearchSqlFeeder.Interfaces
 {
+    using System.Threading;
+
     using QueueItems;
 
     public interface IQueueContext
@@ -24,5 +26,7 @@ namespace ElasticSearchSqlFeeder.Interfaces
         Dictionary<string, string> PropertyTypes { get; set; }
 
         IMeteredConcurrentDictionary<string, IJsonObjectQueueItem> DocumentDictionary { get; set; }
+
+        CancellationToken CancellationToken { get; set; }
     }
 }

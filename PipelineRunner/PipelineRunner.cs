@@ -83,14 +83,21 @@ namespace PipelineRunner
         /// <summary>
         /// The cancellation token source.
         /// </summary>
-        private CancellationTokenSource cancellationTokenSource;
+        private readonly CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
-        /// The init.
+        /// Initializes a new instance of the <see cref="PipelineRunner"/> class.
         /// </summary>
-        public void Init()
+        /// <param name="container">
+        /// The container.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// The cancellation token.
+        /// </param>
+        public PipelineRunner(IUnityContainer container, CancellationToken cancellationToken)
         {
-            this.container = new UnityContainer();
+            this.container = container;
+            this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         }
 
         /// <summary>
@@ -105,15 +112,12 @@ namespace PipelineRunner
         /// <param name="jobStatusTracker">
         /// The job status tracker.
         /// </param>
-        /// <param name="cancellationToken">
-        /// The cancellation Token.
-        /// </param>
-        public void RunPipeline(IJob config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker, CancellationToken cancellationToken)
+        public void RunPipeline(IJob config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker)
         {
             jobStatusTracker.TrackStart();
             try
             {
-                this.RunPipeline(config, progressMonitor, cancellationToken);
+                this.RunPipeline(config, progressMonitor);
             }
             catch (Exception e)
             {
@@ -133,11 +137,8 @@ namespace PipelineRunner
         /// <param name="progressMonitor">
         /// The progress monitor.
         /// </param>
-        /// <param name="cancellationToken">cancellation token</param>
-        public void RunPipeline(IJob job, IProgressMonitor progressMonitor, CancellationToken cancellationToken)
+        public void RunPipeline(IJob job, IProgressMonitor progressMonitor)
         {
-            this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
             var config = job.Config;
 
             if (config.WriteTemporaryFilesToDisk)
@@ -160,7 +161,8 @@ namespace PipelineRunner
                 MainMappingUploadRelativeUrl = $"/{config.Index}",
                 SecondaryMappingUploadRelativeUrl = $"/{config.Index}/_mapping/{config.EntityType}",
                 PropertyTypes = job.Data.DataSources.Where(a => a.Path != null).ToDictionary(a => a.Path, a => a.PropertyType),
-                DocumentDictionary = documentDictionary
+                DocumentDictionary = documentDictionary,
+                CancellationToken = this.cancellationTokenSource.Token
             };
 
             this.container.RegisterInstance<IQueueContext>(queueContext);
@@ -244,7 +246,15 @@ namespace PipelineRunner
                 tasks.AddRange(newTasks);
             }
 
-            Task.WaitAll(tasks.ToArray(), TimeoutInMilliseconds, cancellationToken);
+            try
+            {
+                Task.WaitAll(tasks.ToArray(), TimeoutInMilliseconds, this.cancellationTokenSource.Token);
+            }
+            catch (Exception)
+            {
+                var exceptions = tasks.Where(task => task.Exception != null).Select(task => task.Exception.Flatten()).ToList();
+                throw new AggregateException(exceptions);
+            }
 
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
@@ -434,7 +444,8 @@ namespace PipelineRunner
                             queueProcessor.MonitorWorkQueue();
                             return 1;
                         },
-                    thisStepNumber);
+                    thisStepNumber,
+                    this.cancellationTokenSource.Token);
 
                 tasks.Add(task);
             }

@@ -1,4 +1,13 @@
-﻿namespace SqlImportQueueProcessor
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SqlImportQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SqlImportQueueProcessor type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace SqlImportQueueProcessor
 {
     using System;
     using System.IO;
@@ -9,35 +18,131 @@
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
-    using Fabric.Databus.Config;
-
     using QueueItems;
 
+    /// <summary>
+    /// The sql import queue processor.
+    /// </summary>
     public class SqlImportQueueProcessor : BaseQueueProcessor<SqlImportQueueItem, ConvertDatabaseToJsonQueueItem>
     {
-        private readonly string _folder;
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
 
-        public SqlImportQueueProcessor(IQueueContext queueContext)
+        /// <summary>
+        /// The databus sql reader.
+        /// </summary>
+        private readonly IDatabusSqlReader databusSqlReader;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlImportQueueProcessor"/> class.
+        /// </summary>
+        /// <param name="queueContext">
+        /// The queue context.
+        /// </param>
+        /// <param name="databusSqlReader">
+        /// The databus sql reader.
+        /// </param>
+        public SqlImportQueueProcessor(IQueueContext queueContext, IDatabusSqlReader databusSqlReader)
             : base(queueContext)
         {
-            this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlImport");
+            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
 
+            this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
         }
 
-        private void ReadOneQueryFromDatabase(string queryId, DataSource load, int seed, string start, string end, int workitemBatchNumber)
+        /// <summary>
+        /// The logger name.
+        /// </summary>
+        protected override string LoggerName => "SqlImport";
+
+        /// <summary>
+        /// The handle.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        protected override void Handle(SqlImportQueueItem workItem)
+        {
+            this.ReadOneQueryFromDatabase(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber);
+        }
+
+        /// <summary>
+        /// The begin.
+        /// </summary>
+        /// <param name="isFirstThreadForThisTask">
+        /// The is first thread for this task.
+        /// </param>
+        protected override void Begin(bool isFirstThreadForThisTask)
+        {
+        }
+
+        /// <summary>
+        /// The complete.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="isLastThreadForThisTask">
+        /// The is last thread for this task.
+        /// </param>
+        protected override void Complete(string queryId, bool isLastThreadForThisTask)
+        {
+            //MarkOutputQueueAsCompleted();
+        }
+
+        /// <summary>
+        /// The get id.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        protected override string GetId(SqlImportQueueItem workItem)
+        {
+            return workItem.QueryId;
+        }
+
+        /// <summary>
+        /// The read one query from database.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="load">
+        /// The load.
+        /// </param>
+        /// <param name="seed">
+        /// The seed.
+        /// </param>
+        /// <param name="start">
+        /// The start.
+        /// </param>
+        /// <param name="end">
+        /// The end.
+        /// </param>
+        /// <param name="workItemBatchNumber">
+        /// The workItem batch number.
+        /// </param>
+        /// <exception cref="Exception"> exception thrown
+        /// </exception>
+        private void ReadOneQueryFromDatabase(string queryId, IDataSource load, int seed, string start, string end, int workItemBatchNumber)
         {
             try
             {
-                this.InternalReadOneQueryFromDatabase(queryId, load, start, end, workitemBatchNumber);
+                this.InternalReadOneQueryFromDatabase(queryId, load, start, end, workItemBatchNumber);
             }
             catch (Exception e)
             {
                 if (Config.WriteDetailedTemporaryFilesToDisk)
                 {
-                    var path = Path.Combine(this._folder, queryId);
+                    var path = Path.Combine(this.folder, queryId);
                     Directory.CreateDirectory(path);
 
-                    var filepath = Path.Combine(path, Convert.ToString(workitemBatchNumber) + "-exceptions.txt");
+                    var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
 
                     File.AppendAllText(filepath, e.ToString());
                 }
@@ -45,15 +150,33 @@
             }
         }
 
-        private void InternalReadOneQueryFromDatabase(string queryId, DataSource load, string start, string end, int batchNumber)
+        /// <summary>
+        /// The internal read one query from database.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="load">
+        /// The load.
+        /// </param>
+        /// <param name="start">
+        /// The start.
+        /// </param>
+        /// <param name="end">
+        /// The end.
+        /// </param>
+        /// <param name="batchNumber">
+        /// The batch number.
+        /// </param>
+        private void InternalReadOneQueryFromDatabase(string queryId, IDataSource load, string start, string end, int batchNumber)
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
-            var result = DatabusSqlReader.ReadDataFromQuery(Config, load, start, end, MyLogger);
+            var result = this.databusSqlReader.ReadDataFromQuery(this.Config, load, start, end, this.MyLogger);
 
-            if (Config.WriteDetailedTemporaryFilesToDisk)
+            if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
-                var path = Path.Combine(Path.Combine(this._folder, queryId), Convert.ToString(batchNumber));
+                var path = Path.Combine(Path.Combine(this.folder, queryId), Convert.ToString(batchNumber));
 
                 Directory.CreateDirectory(path);
 
@@ -86,8 +209,7 @@
 
             foreach (var frame in result.Data)
             {
-
-                AddToOutputQueue(new ConvertDatabaseToJsonQueueItem
+                this.AddToOutputQueue(new ConvertDatabaseToJsonQueueItem
                 {
                     BatchNumber = batchNumber,
                     QueryId = queryId,
@@ -99,7 +221,8 @@
                     JsonValueWriter = sqlJsonValueWriter
                 });
             }
-            //now all the source data has been loaded
+
+            // now all the source data has been loaded
 
             // handle fields without any transform
             var untransformedFields = load.Fields.Where(f => f.Transform == QueryFieldTransform.None)
@@ -113,29 +236,7 @@
             //esJsonWriter.WriteRawObjectsToJson(data, columnList, seed, load.PropertyPath, 
             //    new SqlJsonValueWriter(), load.Index, load.EntityType);
 
-            MyLogger.Trace($"Finished reading rows for {queryId}");
+            this.MyLogger.Trace($"Finished reading rows for {queryId}");
         }
-
-
-        protected override void Handle(SqlImportQueueItem workItem)
-        {
-            this.ReadOneQueryFromDatabase(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber);
-        }
-
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
-            //MarkOutputQueueAsCompleted();
-        }
-
-        protected override string GetId(SqlImportQueueItem workItem)
-        {
-            return workItem.QueryId;
-        }
-
-        protected override string LoggerName => "SqlImport";
     }
 }

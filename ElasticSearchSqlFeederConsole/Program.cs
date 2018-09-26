@@ -14,6 +14,7 @@ namespace ElasticSearchSqlFeederConsole
     using System.Linq;
     using System.Threading;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Config;
@@ -21,6 +22,8 @@ namespace ElasticSearchSqlFeederConsole
 
     using PipelineRunner;
     using Serilog;
+
+    using Unity;
 
     /// <summary>
     /// The program.
@@ -75,7 +78,12 @@ namespace ElasticSearchSqlFeederConsole
             {
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
-                    new PipelineRunner().RunPipeline(config, progressMonitor, cancellationTokenSource.Token);
+                    var container = new UnityContainer();
+                    container.RegisterType<IDatabusSqlReader, DatabusSqlReader>();
+
+                    var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+
+                    pipelineRunner.RunPipeline(config, progressMonitor);
                 }
             }
 

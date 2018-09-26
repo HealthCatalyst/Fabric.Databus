@@ -1,45 +1,42 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="QueryField.cs" company="">
+// <copyright file="IQueryField.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the QueryField type.
+//   Defines the IQueryField type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Config
+namespace ElasticSearchSqlFeeder.Interfaces
 {
-    using ElasticSearchSqlFeeder.Interfaces;
-
     /// <summary>
-    /// The query field.
+    /// The QueryField interface.
     /// </summary>
-    public class QueryField : IQueryField
+    public interface IQueryField
     {
         /// <summary>
         /// Gets or sets the source.
         /// </summary>
-        public string Source { get; set; }
+        string Source { get; set; }
 
         /// <summary>
         /// Gets or sets the destination.
         /// </summary>
-        public string Destination { get; set; }
+        string Destination { get; set; }
 
         /// <summary>
         /// Gets or sets the destination type.
         /// </summary>
-        public ElasticSearchTypes DestinationType { get; set; }
+        ElasticSearchTypes DestinationType { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether skip.
         /// </summary>
-        public bool Skip { get; set; }
+        bool Skip { get; set; }
 
         /// <summary>
         /// Gets or sets the transform.
         /// </summary>
-        public QueryFieldTransform Transform { get; set; }
-
+        QueryFieldTransform Transform { get; set; }
     }
 }

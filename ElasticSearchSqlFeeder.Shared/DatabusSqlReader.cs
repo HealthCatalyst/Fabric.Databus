@@ -1,26 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using ElasticSearchSqlFeeder.Interfaces;
-using Fabric.Databus.Config;
-using NLog;
-using ZipCodeToGeoCodeConverter;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DatabusSqlReader.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The databus sql reader.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Shared
 {
-    public class DatabusSqlReader
-    {
-        public class ReadSqlDataResult
-        {
-            public Dictionary<string, List<object[]>> Data { get; set; }
-            public List<ColumnInfo> ColumnList { get; set; }
-        }
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Data.SqlClient;
+    using System.Linq;
 
-        public static ReadSqlDataResult ReadDataFromQuery(IQueryConfig config, DataSource load, string start, string end, ILogger logger)
+    using ElasticSearchSqlFeeder.Interfaces;
+
+    using Fabric.Databus.Config;
+
+    using NLog;
+
+    using ZipCodeToGeoCodeConverter;
+
+    /// <summary>
+    /// The databus sql reader.
+    /// </summary>
+    public class DatabusSqlReader : IDatabusSqlReader
+    {
+        /// <summary>
+        /// The read data from query.
+        /// </summary>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        /// <param name="load">
+        /// The load.
+        /// </param>
+        /// <param name="start">
+        /// The start.
+        /// </param>
+        /// <param name="end">
+        /// The end.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ReadSqlDataResult"/>ReadSqlDataResult
+        /// </returns>
+        /// <exception cref="ArgumentNullException">exception thrown
+        /// </exception>
+        public ReadSqlDataResult ReadDataFromQuery(IQueryConfig config, IDataSource load, string start, string end, ILogger logger)
         {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
+            if (config.ConnectionString == null)
+            {
+                throw new ArgumentNullException(nameof(config.ConnectionString));
+            }
+
             using (var conn = new SqlConnection(config.ConnectionString))
             {
                 conn.Open();
@@ -138,7 +180,5 @@ namespace ElasticSearchSqlFeeder.Shared
                 return new ReadSqlDataResult { Data = data, ColumnList = columnList };
             }
         }
-
-
     }
 }

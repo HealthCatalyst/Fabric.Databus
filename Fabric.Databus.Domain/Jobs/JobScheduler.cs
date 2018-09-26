@@ -65,7 +65,7 @@ namespace Fabric.Databus.Domain.Jobs
             var jobStatusTracker = _jobStatusTrackerFactory.GetTracker(_jobHistoryStore, jobHistoryItem);
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                Task.Run(() => _importRunner.RunPipeline(query, jobHistoryItem.ProgressMonitor, jobStatusTracker, cancellationTokenSource.Token));
+                Task.Run(() => _importRunner.RunPipeline(query, jobHistoryItem.ProgressMonitor, jobStatusTracker));
             }
             return jobHistoryItem.Id;
         }

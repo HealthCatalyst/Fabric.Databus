@@ -169,9 +169,9 @@
       <Project>{df401a17-f37b-4db4-85f3-113da9906305}</Project>
       <Name>JsonSchemaValidator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SqlImporter\SqlImporter.csproj">
-      <Project>{f1673d77-f28f-4da5-a945-ad951894e711}</Project>
-      <Name>SqlImporter</Name>
+    <ProjectReference Include="..\PipelineRunner\PipelineRunner.csproj">
+      <Project>{AF1ADF05-EC10-43EA-877E-AD504A113B58}</Project>
+      <Name>PipelineRunner</Name>
     </ProjectReference>
     <ProjectReference Include="..\ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj">
       <Project>{5ba49a86-b7fa-4504-92d1-db7ac5695b09}</Project>

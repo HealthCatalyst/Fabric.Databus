@@ -104,7 +104,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseQueueProcessor", "Queue
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.DataBus.Client", "Fabric.DataBus.Client\Fabric.DataBus.Client.csproj", "{CA8ABDC1-A834-4C57-BC3A-E7C6D3BA0AD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineRunner", "PipelineRunner\PipelineRunner.csproj", "{AF1ADF05-EC10-43EA-877E-AD504A113B58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PipelineRunner", "PipelineRunner\PipelineRunner.csproj", "{AF1ADF05-EC10-43EA-877E-AD504A113B58}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineRunnerTests", "PipelineRunnerTests\PipelineRunnerTests.csproj", "{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -240,6 +242,10 @@ Global
 		{AF1ADF05-EC10-43EA-877E-AD504A113B58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF1ADF05-EC10-43EA-877E-AD504A113B58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF1ADF05-EC10-43EA-877E-AD504A113B58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -278,6 +284,7 @@ Global
 		{939E622B-F7D7-4C51-9878-C62939FBF5B4} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 		{51002114-0F10-403E-AE3E-2A55C27590B4} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 		{CFD6967D-8547-42ED-8EED-CBAA607CDDED} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
+		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

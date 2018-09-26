@@ -45,7 +45,7 @@ namespace QueueProcessor.Tests
                 {
                     LocalSaveFolder = Path.GetTempPath()
                 },
-                Data = new Data
+                Data = new JobData
                 {
                     DataSources = new List<DataSource>
                     {

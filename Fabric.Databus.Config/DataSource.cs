@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace Fabric.Databus.Config
 {
-    public class DataSource
+    public class DataSource : IDataSource
     {
         public string Sql { get; set; }
 

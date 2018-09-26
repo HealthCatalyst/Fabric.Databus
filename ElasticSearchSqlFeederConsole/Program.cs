@@ -1,17 +1,41 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using SqlImporter;
-using ElasticSearchSqlFeeder.Shared;
-using Fabric.Databus.Config;
-using Fabric.Databus.Domain.ProgressMonitors;
-using Serilog;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Program.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the Program type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeederConsole
 {
-    class Program
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading;
+
+    using ElasticSearchSqlFeeder.Shared;
+
+    using Fabric.Databus.Config;
+    using Fabric.Databus.Domain.ProgressMonitors;
+
+    using PipelineRunner;
+    using Serilog;
+
+    /// <summary>
+    /// The program.
+    /// </summary>
+    public class Program
     {
-        static void Main(string[] args)
+        /// <summary>
+        /// The main.
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <exception cref="Exception">exception
+        /// </exception>
+        public static void Main(string[] args)
         {
             if (!args.Any()) throw new Exception("Please pass the job.xml file as a parameter");
 
@@ -48,8 +72,12 @@ namespace ElasticSearchSqlFeederConsole
             stopwatch.Start();
             using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
             {
-                new SqlImportRunnerSimple().RunPipeline(config, progressMonitor);
+                using (var cancellationTokenSource = new CancellationTokenSource())
+                {
+                    new PipelineRunner().RunPipeline(config, progressMonitor, cancellationTokenSource.Token);
+                }
             }
+
             stopwatch.Stop();
 
 #if TRUE

@@ -1,20 +1,11 @@
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
 namespace Fabric.Databus.Config
 {
-    public class Job
+    using ElasticSearchSqlFeeder.Interfaces;
+
+    public class Job : IJob
     {
-        public QueryConfig Config { get; set; }
+        public IQueryConfig Config { get; set; }
 
-        public Data Data { get; set; }
-    }
-
-    public class Data
-    {
-        public string DataModel { get; set; }
-
-        [XmlElement("DataSource")]
-        public List<DataSource> DataSources { get; set; }
+        public IJobData Data { get; set; }
     }
 }

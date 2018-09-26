@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlImportRunnerSimple.cs" company="Health Catalyst">
+// <copyright file="PipelineRunner.cs" company="Health Catalyst">
 //   2018
 // </copyright>
 // <summary>
@@ -56,7 +56,7 @@ namespace PipelineRunner
     /// <summary>
     /// The sql import runner simple.
     /// </summary>
-    public class SqlImportRunnerSimple : IImportRunner
+    public class PipelineRunner : IImportRunner
     {
         /// <summary>
         /// The maximum documents in queue.
@@ -80,12 +80,15 @@ namespace PipelineRunner
         /// <param name="jobStatusTracker">
         /// The job status tracker.
         /// </param>
-        public void RunPipeline(Job config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker)
+        /// <param name="cancellationToken">
+        /// The cancellation Token.
+        /// </param>
+        public void RunPipeline(IJob config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker, CancellationToken cancellationToken)
         {
             jobStatusTracker.TrackStart();
             try
             {
-                this.RunPipeline(config, progressMonitor);
+                this.RunPipeline(config, progressMonitor, cancellationToken);
             }
             catch (Exception e)
             {
@@ -105,7 +108,8 @@ namespace PipelineRunner
         /// <param name="progressMonitor">
         /// The progress monitor.
         /// </param>
-        public void RunPipeline(Job job, IProgressMonitor progressMonitor)
+        /// <param name="cancellationToken">cancellation token</param>
+        public void RunPipeline(IJob job, IProgressMonitor progressMonitor, CancellationToken cancellationToken)
         {
             var config = job.Config;
 
@@ -232,7 +236,7 @@ namespace PipelineRunner
         /// <returns>
         /// The <see cref="IEnumerable"/>.
         /// </returns>
-        private static IEnumerable<Tuple<string, string>> CalculateRanges(QueryConfig config, Job job)
+        private static IEnumerable<Tuple<string, string>> CalculateRanges(IQueryConfig config, IJob job)
         {
             var list = GetListOfEntityKeys(config, job);
 
@@ -265,7 +269,7 @@ namespace PipelineRunner
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
-        private static List<string> GetListOfEntityKeys(QueryConfig config, Job job)
+        private static List<string> GetListOfEntityKeys(IQueryConfig config, IJob job)
         {
             var load = job.Data.DataSources.First(c => c.Path == null);
 
@@ -311,7 +315,7 @@ namespace PipelineRunner
         /// <param name="job">
         /// The job.
         /// </param>
-        private void ReadAndSetSchema(QueryConfig config, QueueContext queueContext, Job job)
+        private void ReadAndSetSchema(IQueryConfig config, QueueContext queueContext, IJob job)
         {
             var fileUploader = new FileUploader(
                 queueContext.Config.ElasticSearchUserName,

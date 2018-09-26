@@ -1,6 +1,6 @@
 namespace Fabric.Databus.Config
 {
-    public class QueryField
+    public class QueryField : IQueryField
     {
         public string Source { get; set; }
         public string Destination { get; set; }

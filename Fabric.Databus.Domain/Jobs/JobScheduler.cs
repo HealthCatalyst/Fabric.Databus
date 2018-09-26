@@ -10,7 +10,8 @@ using Serilog;
 
 namespace Fabric.Databus.Domain.Jobs
 {
-    
+    using System.Threading;
+
     public class JobScheduler : IJobScheduler
     {
         private readonly ILogger _logger;
@@ -62,7 +63,10 @@ namespace Fabric.Databus.Domain.Jobs
             var jobHistoryItem = CreateJobHistoryItem(query);
             _jobHistoryStore.AddJobHistoryItem(jobHistoryItem);
             var jobStatusTracker = _jobStatusTrackerFactory.GetTracker(_jobHistoryStore, jobHistoryItem);
-            Task.Run(() => _importRunner.RunPipeline(query, jobHistoryItem.ProgressMonitor, jobStatusTracker));
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                Task.Run(() => _importRunner.RunPipeline(query, jobHistoryItem.ProgressMonitor, jobStatusTracker, cancellationTokenSource.Token));
+            }
             return jobHistoryItem.Id;
         }
 

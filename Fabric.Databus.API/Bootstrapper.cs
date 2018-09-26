@@ -46,7 +46,7 @@ namespace Fabric.Databus.API
 
             //Multi-instance lifetimes
             container.Register<IJobStatusTracker, JobStatusTracker>().AsMultiInstance();
-            container.Register<IImportRunner, SqlImportRunnerSimple>().AsMultiInstance();
+            container.Register<IImportRunner, PipelineRunner>().AsMultiInstance();
             container.Register<IJobScheduler, JobScheduler>().AsMultiInstance();
         }
 

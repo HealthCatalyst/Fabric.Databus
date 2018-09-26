@@ -1,4 +1,13 @@
-﻿namespace FileUploadQueueProcessor
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FileUploadQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the FileUploadQueueProcessor type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace FileUploadQueueProcessor
 {
     using System;
     using System.Threading.Tasks;
@@ -12,31 +21,67 @@
 
     using QueueItems;
 
+    /// <summary>
+    /// The file upload queue processor.
+    /// </summary>
     public class FileUploadQueueProcessor : BaseQueueProcessor<FileUploadQueueItem, EndPointQueueItem>
     {
-        readonly FileUploader _fileUploader;
-        private readonly string _relativeUrlForPosting;
+        /// <summary>
+        /// The file uploader.
+        /// </summary>
+        private readonly IFileUploader fileUploader;
 
-        public FileUploadQueueProcessor(IQueueContext queueContext)
+        /// <summary>
+        /// The relative url for posting.
+        /// </summary>
+        private readonly string relativeUrlForPosting;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileUploadQueueProcessor"/> class.
+        /// </summary>
+        /// <param name="queueContext">
+        /// The queue context.
+        /// </param>
+        /// <param name="fileUploaderFactory">fileUploader Factory</param>
+        public FileUploadQueueProcessor(IQueueContext queueContext, IFileUploaderFactory fileUploaderFactory)
             : base(queueContext)
         {
-            this._fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
-                queueContext.Config.ElasticSearchPassword, Config.KeepIndexOnline);
-            this._relativeUrlForPosting = queueContext.BulkUploadRelativeUrl;
+            if (fileUploaderFactory == null)
+            {
+                throw new ArgumentNullException(nameof(fileUploaderFactory));
+            }
+
+            this.fileUploader = fileUploaderFactory.Create(
+                queueContext.Config.ElasticSearchUserName,
+                queueContext.Config.ElasticSearchPassword,
+                this.Config.KeepIndexOnline);
+
+            this.relativeUrlForPosting = queueContext.BulkUploadRelativeUrl;
         }
 
+        /// <summary>
+        /// The upload file.
+        /// </summary>
+        /// <param name="wt">
+        /// The wt.
+        /// </param>
         private void UploadFile(FileUploadQueueItem wt)
         {
             try
             {
                 Task.Run(async () =>
-                    {
-                        await this._fileUploader.SendStreamToHosts(Config.Urls, this._relativeUrlForPosting,
-                            wt.BatchNumber, wt.Stream, doLogContent: false, doCompress: Config.CompressFiles);
-                    })
+                            {
+                                await this.fileUploader.SendStreamToHosts(
+                                    this.Config.Urls,
+                                    this.relativeUrlForPosting,
+                                    wt.BatchNumber,
+                                    wt.Stream,
+                                    doLogContent: false,
+                                    doCompress: this.Config.CompressFiles);
+                            })
                     .Wait();
 
-                MyLogger.Trace($"Uploaded batch: {wt.BatchNumber} ");
+                this.MyLogger.Trace($"Uploaded batch: {wt.BatchNumber} ");
 
             }
             catch (AggregateException ae)
@@ -49,24 +94,27 @@
                     //    Console.WriteLine("See your network administrator or try another path.");
                     //    return true;
                     //}
-                    MyLogger.Error(x);
+
+                    this.MyLogger.Error(x);
                     return false; // Let anything else stop the application.
                 });
             }
         }
 
+        /// <inheritdoc />
         protected override void Handle(FileUploadQueueItem workItem)
         {
             this.UploadFile(workItem);
         }
 
+        /// <inheritdoc />
         protected override void Begin(bool isFirstThreadForThisTask)
         {
             if (isFirstThreadForThisTask)
             {
                 Task.Run(async () =>
                     {
-                        await this._fileUploader.StartUpload(Config.Urls, Config.Index, Config.Alias);
+                        await this.fileUploader.StartUpload(Config.Urls, Config.Index, Config.Alias);
                     })
                     .Wait();
             }
@@ -78,7 +126,7 @@
             {
                 Task.Run(async () =>
                 {
-                    await this._fileUploader.FinishUpload(Config.Urls, Config.Index, Config.Alias);
+                    await this.fileUploader.FinishUpload(Config.Urls, Config.Index, Config.Alias);
                 })
                 .Wait();
             }

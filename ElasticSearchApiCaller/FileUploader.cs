@@ -14,7 +14,7 @@ using NLog;
 
 namespace ElasticSearchApiCaller
 {
-    public class FileUploader
+    public class FileUploader : IFileUploader
     {
         private static readonly Logger Logger = LogManager.GetLogger("FileUploader");
 
@@ -126,7 +126,7 @@ namespace ElasticSearchApiCaller
             {
                 using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
                 {
-                    var host = hosts.First();
+                    var host = hosts.First() ?? throw new ArgumentNullException("hosts.First()");
 
                     AddAuthorizationToken(client);
                     // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'

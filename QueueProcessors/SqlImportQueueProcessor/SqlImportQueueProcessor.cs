@@ -180,7 +180,6 @@ namespace SqlImportQueueProcessor
 
                 Directory.CreateDirectory(path);
 
-
                 foreach (var frame in result.Data)
                 {
                     var key = frame.Key;

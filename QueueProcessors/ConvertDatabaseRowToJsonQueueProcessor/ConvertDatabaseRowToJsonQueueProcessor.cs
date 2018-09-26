@@ -27,6 +27,9 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
     using QueueItems;
 
+    /// <summary>
+    /// The convert database row to json queue processor.
+    /// </summary>
     public class ConvertDatabaseRowToJsonQueueProcessor : BaseQueueProcessor<ConvertDatabaseToJsonQueueItem, JsonDocumentMergerQueueItem>
     {
         private static readonly SequenceBarrier SequenceBarrier = new SequenceBarrier();
@@ -40,8 +43,30 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
             this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-ConvertToJson");
         }
 
+        /// <summary>
+        /// The get json for row for merge.
+        /// </summary>
+        /// <param name="columns">
+        /// The columns.
+        /// </param>
+        /// <param name="rows">
+        /// The rows.
+        /// </param>
+        /// <param name="propertyName">
+        /// The property name.
+        /// </param>
+        /// <returns>
+        /// The <see cref="JObject[]"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">exception thrown
+        /// </exception>
         private JObject[] GetJsonForRowForMerge(List<ColumnInfo> columns, List<object[]> rows, string propertyName)
         {
+            if (columns == null)
+            {
+                throw new ArgumentNullException(nameof(columns));
+            }
+
             var jObjects = new List<JObject>();
 
             foreach (var row in rows)
@@ -222,7 +247,6 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         protected override void Handle(ConvertDatabaseToJsonQueueItem workItem)
         {
             this.WriteObjectToJson(workItem);
-
         }
 
         protected override void Begin(bool isFirstThreadForThisTask)

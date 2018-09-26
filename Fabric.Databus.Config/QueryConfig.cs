@@ -1,9 +1,21 @@
-using System.Collections.Generic;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="QueryConfig.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the QueryConfig type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.Config
 {
+    using System.Collections.Generic;
+
     using ElasticSearchSqlFeeder.Interfaces;
 
+    /// <summary>
+    /// The query config.
+    /// </summary>
     public class QueryConfig : IQueryConfig
     {
         public string Name { get; set; }

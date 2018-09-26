@@ -10,6 +10,7 @@
 
     using ElasticSearchJsonWriter;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Newtonsoft.Json;
@@ -20,7 +21,7 @@
     {
         private static int _currentBatchFileNumber = 0;
 
-        public SaveBatchQueueProcessor(QueueContext queueContext) : base(queueContext)
+        public SaveBatchQueueProcessor(IQueueContext queueContext) : base(queueContext)
         {
         }
 

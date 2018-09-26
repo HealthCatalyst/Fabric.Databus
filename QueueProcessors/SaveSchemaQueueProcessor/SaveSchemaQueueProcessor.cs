@@ -21,7 +21,7 @@ namespace SaveSchemaQueueProcessor
         private readonly string _secondaryMappingUploadRelativeUrl;
         private readonly string _bulkUploadRelativeUrl;
 
-        public SaveSchemaQueueProcessor(QueueContext queueContext) : base(queueContext)
+        public SaveSchemaQueueProcessor(IQueueContext queueContext) : base(queueContext)
         {
             this._uploadUrl = Config.Urls.First();
             this._mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;

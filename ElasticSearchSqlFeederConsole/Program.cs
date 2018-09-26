@@ -70,6 +70,7 @@ namespace ElasticSearchSqlFeederConsole
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+
             using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
             {
                 using (var cancellationTokenSource = new CancellationTokenSource())

@@ -5,6 +5,7 @@
 
     using BaseQueueProcessor;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
@@ -13,7 +14,7 @@
     {
         private readonly Queue<JsonObjectQueueItem> _items = new Queue<JsonObjectQueueItem>();
 
-        public CreateBatchItemsQueueProcessor(QueueContext queueContext) : base(queueContext)
+        public CreateBatchItemsQueueProcessor(IQueueContext queueContext) : base(queueContext)
         {
         }
 

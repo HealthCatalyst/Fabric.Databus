@@ -53,6 +53,8 @@ namespace PipelineRunner
 
     using SqlImportQueueProcessor;
 
+    using Unity;
+
     /// <summary>
     /// The sql import runner simple.
     /// </summary>
@@ -67,6 +69,19 @@ namespace PipelineRunner
         /// The step number.
         /// </summary>
         private int stepNumber;
+
+        /// <summary>
+        /// The unity container.
+        /// </summary>
+        private IUnityContainer container;
+
+        /// <summary>
+        /// The init.
+        /// </summary>
+        public void Init()
+        {
+            this.container = new UnityContainer();
+        }
 
         /// <summary>
         /// The run pipeline.
@@ -124,8 +139,6 @@ namespace PipelineRunner
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            CancellationTokenSource cts = new CancellationTokenSource();
-
             var queueContext = new QueueContext
             {
                 Config = config,
@@ -134,9 +147,11 @@ namespace PipelineRunner
                 BulkUploadRelativeUrl = $"/{config.Index}/{config.EntityType}/_bulk?pretty",
                 MainMappingUploadRelativeUrl = $"/{config.Index}",
                 SecondaryMappingUploadRelativeUrl = $"/{config.Index}/_mapping/{config.EntityType}",
-                PropertyTypes = job.Data.DataSources.Where(a => a.Path != null).ToDictionary(a => a.Path, a => a.PropertyType), 
+                PropertyTypes = job.Data.DataSources.Where(a => a.Path != null).ToDictionary(a => a.Path, a => a.PropertyType),
                 DocumentDictionary = documentDictionary
             };
+
+            this.container.RegisterInstance<IQueueContext>(queueContext);
 
             int loadNumber = 0;
 
@@ -187,33 +202,33 @@ namespace PipelineRunner
             // ReSharper disable once JoinDeclarationAndInitializer
             IList<Task> newTasks;
 
-            newTasks = this.RunAsync(() => new SqlBatchQueueProcessor(queueContext), 1);
+            newTasks = this.RunAsync(() => this.container.Resolve<SqlBatchQueueProcessor>(), 1);
             tasks.AddRange(newTasks);
 
-            newTasks = this.RunAsync(() => new SqlImportQueueProcessor(queueContext), 2);
+            newTasks = this.RunAsync(() => this.container.Resolve<SqlImportQueueProcessor>(), 2);
             tasks.AddRange(newTasks);
 
-            newTasks = this.RunAsync(() => new ConvertDatabaseRowToJsonQueueProcessor(queueContext), 1);
+            newTasks = this.RunAsync(() => this.container.Resolve<ConvertDatabaseRowToJsonQueueProcessor>(), 1);
             tasks.AddRange(newTasks);
 
-            newTasks = this.RunAsync(() => new JsonDocumentMergerQueueProcessor(queueContext), 1);
+            newTasks = this.RunAsync(() => this.container.Resolve<JsonDocumentMergerQueueProcessor>(), 1);
             tasks.AddRange(newTasks);
 
-            newTasks = this.RunAsync(() => new CreateBatchItemsQueueProcessor(queueContext), 2);
+            newTasks = this.RunAsync(() => this.container.Resolve<CreateBatchItemsQueueProcessor>(), 2);
             tasks.AddRange(newTasks);
 
-            newTasks = this.RunAsync(() => new SaveBatchQueueProcessor(queueContext), 2);
+            newTasks = this.RunAsync(() => this.container.Resolve<SaveBatchQueueProcessor>(), 2);
             tasks.AddRange(newTasks);
 
             if (config.WriteTemporaryFilesToDisk)
             {
-                newTasks = this.RunAsync(() => new FileSaveQueueProcessor(queueContext), 2);
+                newTasks = this.RunAsync(() => this.container.Resolve<FileSaveQueueProcessor>(), 2);
                 tasks.AddRange(newTasks);
             }
 
             if (config.UploadToElasticSearch)
             {
-                newTasks = this.RunAsync(() => new FileUploadQueueProcessor(queueContext), 1);
+                newTasks = this.RunAsync(() => this.container.Resolve<FileUploadQueueProcessor>(), 1);
                 tasks.AddRange(newTasks);
             }
 
@@ -315,7 +330,7 @@ namespace PipelineRunner
         /// <param name="job">
         /// The job.
         /// </param>
-        private void ReadAndSetSchema(IQueryConfig config, QueueContext queueContext, IJob job)
+        private void ReadAndSetSchema(IQueryConfig config, IQueueContext queueContext, IJob job)
         {
             var fileUploader = new FileUploader(
                 queueContext.Config.ElasticSearchUserName,
@@ -346,15 +361,15 @@ namespace PipelineRunner
 
             sqlGetSchemaQueue.CompleteAdding();
 
-            newTasks = this.RunAsync(() => new SqlGetSchemaQueueProcessor(queueContext), 1);
+            newTasks = this.RunAsync(() => this.container.Resolve<SqlGetSchemaQueueProcessor>(), 1);
             tasks.AddRange(newTasks);
 
-            newTasks = this.RunAsync(() => new SaveSchemaQueueProcessor(queueContext), 1);
+            newTasks = this.RunAsync(() => this.container.Resolve<SaveSchemaQueueProcessor>(), 1);
             tasks.AddRange(newTasks);
 
             newTasks = config.UploadToElasticSearch
-                           ? this.RunAsync(() => new MappingUploadQueueProcessor(queueContext), 1)
-                           : this.RunAsync(() => new DummyMappingUploadQueueProcessor(queueContext), 1);
+                           ? this.RunAsync(() => this.container.Resolve<MappingUploadQueueProcessor>(), 1)
+                           : this.RunAsync(() => this.container.Resolve<DummyMappingUploadQueueProcessor>(), 1);
 
             tasks.AddRange(newTasks);
 

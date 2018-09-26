@@ -6,6 +6,7 @@
 
     using BaseQueueProcessor;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Config;
@@ -16,7 +17,7 @@
     {
         private readonly string _folder;
 
-        public SqlImportQueueProcessor(QueueContext queueContext)
+        public SqlImportQueueProcessor(IQueueContext queueContext)
             : base(queueContext)
         {
             this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlImport");

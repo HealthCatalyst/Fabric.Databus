@@ -5,6 +5,7 @@
 
     using BaseQueueProcessor;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
@@ -13,10 +14,9 @@
     {
         private readonly string _folder;
 
-        public SqlBatchQueueProcessor(QueueContext queueContext) : base(queueContext)
+        public SqlBatchQueueProcessor(IQueueContext queueContext) : base(queueContext)
         {
             this._folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
-
         }
 
         protected override void Handle(SqlBatchQueueItem workItem)

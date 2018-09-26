@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Unity" Version="5.8.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
     <ProjectReference Include="..\QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonQueueProcessor.csproj" />
     <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj" />

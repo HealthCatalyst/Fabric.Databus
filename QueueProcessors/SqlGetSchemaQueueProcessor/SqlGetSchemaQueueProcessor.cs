@@ -6,6 +6,7 @@ namespace SqlGetSchemaQueueProcessor
 
     using BaseQueueProcessor;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Schema;
@@ -17,7 +18,7 @@ namespace SqlGetSchemaQueueProcessor
     {
         private readonly string _folder;
 
-        public SqlGetSchemaQueueProcessor(QueueContext queueContext) : base(queueContext)
+        public SqlGetSchemaQueueProcessor(IQueueContext queueContext) : base(queueContext)
         {
             this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlGetSchema");
             if (Config.WriteDetailedTemporaryFilesToDisk)

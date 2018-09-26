@@ -2,13 +2,14 @@ namespace DummyMappingUploadQueueProcessor
 {
     using BaseQueueProcessor;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
 
     public class DummyMappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, EndPointQueueItem>
     {
-        public DummyMappingUploadQueueProcessor(QueueContext queueContext) : base(queueContext)
+        public DummyMappingUploadQueueProcessor(IQueueContext queueContext) : base(queueContext)
         {
         }
 

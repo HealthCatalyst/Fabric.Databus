@@ -57,11 +57,13 @@ namespace PipelineRunnerTests
                 }
             };
 
-            using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
+            using (ProgressMonitor progressMonitor = new ProgressMonitor(new StringProgressLogger()))
             {
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
-                    new PipelineRunner().RunPipeline(job, progressMonitor, cancellationTokenSource.Token);
+                    var pipelineRunner = new PipelineRunner();  
+                    pipelineRunner.Init();
+                    pipelineRunner.RunPipeline(job, progressMonitor, cancellationTokenSource.Token);
                 }
             }
         }

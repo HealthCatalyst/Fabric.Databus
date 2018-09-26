@@ -8,6 +8,7 @@ namespace MappingUploadQueueProcessor
 
     using ElasticSearchApiCaller;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
@@ -18,7 +19,7 @@ namespace MappingUploadQueueProcessor
         private readonly string _mainMappingUploadRelativeUrl;
         private readonly string _secondaryMappingUploadRelativeUrl;
 
-        public MappingUploadQueueProcessor(QueueContext queueContext)
+        public MappingUploadQueueProcessor(IQueueContext queueContext)
             : base(queueContext)
         {
             this._fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,

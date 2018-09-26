@@ -6,6 +6,7 @@
 
     using BaseQueueProcessor;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
@@ -14,7 +15,7 @@
     {
         private readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
 
-        public FileSaveQueueProcessor(QueueContext queueContext)
+        public FileSaveQueueProcessor(IQueueContext queueContext)
             : base(queueContext)
         {
         }

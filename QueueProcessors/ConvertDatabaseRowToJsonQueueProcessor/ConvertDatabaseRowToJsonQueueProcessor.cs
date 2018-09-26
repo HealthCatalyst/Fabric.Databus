@@ -34,7 +34,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         private readonly string _folder;
 
 
-        public ConvertDatabaseRowToJsonQueueProcessor(QueueContext queueContext)
+        public ConvertDatabaseRowToJsonQueueProcessor(IQueueContext queueContext)
             : base(queueContext)
         {
             this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-ConvertToJson");

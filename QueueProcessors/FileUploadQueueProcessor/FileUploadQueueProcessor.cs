@@ -7,6 +7,7 @@
 
     using ElasticSearchApiCaller;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
@@ -16,7 +17,7 @@
         readonly FileUploader _fileUploader;
         private readonly string _relativeUrlForPosting;
 
-        public FileUploadQueueProcessor(QueueContext queueContext)
+        public FileUploadQueueProcessor(IQueueContext queueContext)
             : base(queueContext)
         {
             this._fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,

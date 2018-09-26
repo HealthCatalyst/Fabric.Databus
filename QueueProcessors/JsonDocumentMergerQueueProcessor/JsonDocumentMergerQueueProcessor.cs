@@ -18,6 +18,7 @@ namespace JsonDocumentMergerQueueProcessor
 
     using BaseQueueProcessor;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Shared;
@@ -57,7 +58,7 @@ namespace JsonDocumentMergerQueueProcessor
         private int numDocumentsModified;
 
         /// <inheritdoc />
-        public JsonDocumentMergerQueueProcessor(QueueContext queueContext)
+        public JsonDocumentMergerQueueProcessor(IQueueContext queueContext)
             : base(queueContext)
         {
             var configLocalSaveFolder = this.Config.LocalSaveFolder;

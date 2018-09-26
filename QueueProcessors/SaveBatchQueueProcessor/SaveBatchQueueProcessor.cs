@@ -44,7 +44,7 @@
             this.FlushDocumentsToBatchFile(workItem.ItemsToSave);
         }
 
-        private void FlushDocumentsToBatchFile(IEnumerable<JsonObjectQueueItem> documentCacheItems)
+        private void FlushDocumentsToBatchFile(List<IJsonObjectQueueItem> documentCacheItems)
         {
             var docs = documentCacheItems.Select(c => c.Document).ToList();
 

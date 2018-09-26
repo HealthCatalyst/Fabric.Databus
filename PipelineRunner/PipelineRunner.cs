@@ -66,6 +66,11 @@ namespace PipelineRunner
         private const int MaximumDocumentsInQueue = 1 * 1000;
 
         /// <summary>
+        /// The timeout in milliseconds.
+        /// </summary>
+        private const int TimeoutInMilliseconds = 5 * 60 * 60 * 60;
+
+        /// <summary>
         /// The step number.
         /// </summary>
         private int stepNumber;
@@ -74,6 +79,11 @@ namespace PipelineRunner
         /// The unity container.
         /// </summary>
         private IUnityContainer container;
+
+        /// <summary>
+        /// The cancellation token source.
+        /// </summary>
+        private CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
         /// The init.
@@ -126,6 +136,8 @@ namespace PipelineRunner
         /// <param name="cancellationToken">cancellation token</param>
         public void RunPipeline(IJob job, IProgressMonitor progressMonitor, CancellationToken cancellationToken)
         {
+            this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
             var config = job.Config;
 
             if (config.WriteTemporaryFilesToDisk)
@@ -232,7 +244,7 @@ namespace PipelineRunner
                 tasks.AddRange(newTasks);
             }
 
-            Task.WaitAll(tasks.ToArray());
+            Task.WaitAll(tasks.ToArray(), TimeoutInMilliseconds, cancellationToken);
 
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
@@ -429,8 +441,24 @@ namespace PipelineRunner
 
             var taskArray = tasks.ToArray();
 
-            Task.WhenAll(taskArray).ContinueWith(a =>
-                functionQueueProcessor().MarkOutputQueueAsCompleted(thisStepNumber));
+            Task.WhenAll(taskArray).ContinueWith(
+                t =>
+                    {
+                        if (t.IsFaulted)
+                        {
+                            this.cancellationTokenSource.Cancel();
+                        }
+                    },
+                this.cancellationTokenSource.Token,
+                TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Current).ContinueWith(
+                task =>
+                    {
+                        if (!task.IsFaulted)
+                        {
+                            functionQueueProcessor().MarkOutputQueueAsCompleted(thisStepNumber);
+                        }
+                    });
 
             return tasks;
         }

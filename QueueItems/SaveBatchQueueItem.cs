@@ -15,7 +15,7 @@ namespace QueueItems
 
     public class SaveBatchQueueItem : IQueueItem
     {
-        public IEnumerable<JsonObjectQueueItem> ItemsToSave { get; set; }
+        public List<IJsonObjectQueueItem> ItemsToSave { get; set; }
 
         public string PropertyName { get; set; }
 

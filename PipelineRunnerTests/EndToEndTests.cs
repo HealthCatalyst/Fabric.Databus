@@ -63,7 +63,25 @@ namespace PipelineRunnerTests
                 {
                     var pipelineRunner = new PipelineRunner();  
                     pipelineRunner.Init();
-                    pipelineRunner.RunPipeline(job, progressMonitor, cancellationTokenSource.Token);
+                    try
+                    {
+                        pipelineRunner.RunPipeline(job, progressMonitor, cancellationTokenSource.Token);
+                    }
+                    catch (OperationCanceledException e)
+                    {
+                        Console.WriteLine(e.ToString());
+                        throw;
+                    }
+                    catch (AggregateException e)
+                    {
+                        Console.WriteLine(e.Flatten().ToString());
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
                 }
             }
         }

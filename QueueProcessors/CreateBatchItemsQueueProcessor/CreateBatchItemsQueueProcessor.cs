@@ -10,15 +10,15 @@
 
     using QueueItems;
 
-    public class CreateBatchItemsQueueProcessor : BaseQueueProcessor<JsonObjectQueueItem, SaveBatchQueueItem>
+    public class CreateBatchItemsQueueProcessor : BaseQueueProcessor<IJsonObjectQueueItem, SaveBatchQueueItem>
     {
-        private readonly Queue<JsonObjectQueueItem> _items = new Queue<JsonObjectQueueItem>();
+        private readonly Queue<IJsonObjectQueueItem> _items = new Queue<IJsonObjectQueueItem>();
 
         public CreateBatchItemsQueueProcessor(IQueueContext queueContext) : base(queueContext)
         {
         }
 
-        protected override void Handle(JsonObjectQueueItem workItem)
+        protected override void Handle(IJsonObjectQueueItem workItem)
         {
             this._items.Enqueue(workItem);
             this.FlushDocumentsIfBatchSizeReached();
@@ -59,10 +59,10 @@
 
         private void FlushDocumentsToLimit(int limit)
         {
-            var docsToSave = new List<JsonObjectQueueItem>();
+            var docsToSave = new List<IJsonObjectQueueItem>();
             for (int i = 0; i < limit; i++)
             {
-                JsonObjectQueueItem cacheItem = this._items.Dequeue();
+                IJsonObjectQueueItem cacheItem = this._items.Dequeue();
                 docsToSave.Add(cacheItem);
             }
 
@@ -79,7 +79,7 @@
             this.FlushAllDocuments();
         }
 
-        protected override string GetId(JsonObjectQueueItem workItem)
+        protected override string GetId(IJsonObjectQueueItem workItem)
         {
             return workItem.QueryId;
         }

@@ -7,16 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticSearchJsonWriter", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZipCodeToGeoCodeConverter", "ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj", "{5BA49A86-B7FA-4504-92D1-DB7AC5695B09}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlImporter", "SqlImporter\SqlImporter.csproj", "{F1673D77-F28F-4DA5-A945-AD951894E711}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonSchemaValidator", "JsonSchemaValidator\JsonSchemaValidator.csproj", "{DF401A17-F37B-4DB4-85F3-113DA9906305}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticSearchApiCaller", "ElasticSearchApiCaller\ElasticSearchApiCaller.csproj", "{3BBF6CF0-197F-4980-BDAF-1418E473C014}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticSearchSqlFeederConsole", "ElasticSearchSqlFeederConsole\ElasticSearchSqlFeederConsole.csproj", "{148CF889-C721-4AD9-83BF-BDF7629A8C55}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F1673D77-F28F-4DA5-A945-AD951894E711} = {F1673D77-F28F-4DA5-A945-AD951894E711}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElasticSearchSqlFeeder.Interfaces", "ElasticSearchSqlFeeder.Interfaces\ElasticSearchSqlFeeder.Interfaces.csproj", "{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}"
 EndProject
@@ -79,33 +74,37 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.Tests", "Fabr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QueueProcessors", "QueueProcessors", "{E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlBatchQueueProcessor", "QueueProcessors\SqlBatchQueueProcessor\SqlBatchQueueProcessor.csproj", "{D6AC0664-F085-4228-980E-0DCE58E1CF35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlBatchQueueProcessor", "QueueProcessors\SqlBatchQueueProcessor\SqlBatchQueueProcessor.csproj", "{D6AC0664-F085-4228-980E-0DCE58E1CF35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueueItems", "QueueItems\QueueItems.csproj", "{EFC37D49-40FA-4F53-B956-B63F7EB47244}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueueItems", "QueueItems\QueueItems.csproj", "{EFC37D49-40FA-4F53-B956-B63F7EB47244}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlImportQueueProcessor", "QueueProcessors\SqlImportQueueProcessor\SqlImportQueueProcessor.csproj", "{006D43E7-A1EB-4C7A-B200-E5AEB77F3DAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlImportQueueProcessor", "QueueProcessors\SqlImportQueueProcessor\SqlImportQueueProcessor.csproj", "{006D43E7-A1EB-4C7A-B200-E5AEB77F3DAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertDatabaseRowToJsonQueueProcessor", "QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonQueueProcessor.csproj", "{F2250C96-197D-42EB-8E37-22255C8F81B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertDatabaseRowToJsonQueueProcessor", "QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonQueueProcessor.csproj", "{F2250C96-197D-42EB-8E37-22255C8F81B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileUploadQueueProcessor", "QueueProcessors\FileUploadQueueProcessor\FileUploadQueueProcessor.csproj", "{7B4B18B6-4657-4627-9546-45F567596015}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileUploadQueueProcessor", "QueueProcessors\FileUploadQueueProcessor\FileUploadQueueProcessor.csproj", "{7B4B18B6-4657-4627-9546-45F567596015}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MappingUploadQueueProcessor", "QueueProcessors\MappingUploadQueueProcessor\MappingUploadQueueProcessor.csproj", "{83F19C59-C1D6-4D70-9C76-CF36B5B1F423}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingUploadQueueProcessor", "QueueProcessors\MappingUploadQueueProcessor\MappingUploadQueueProcessor.csproj", "{83F19C59-C1D6-4D70-9C76-CF36B5B1F423}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateBatchItemsQueueProcessor", "QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj", "{E6B53794-9D7D-4688-AC87-B229E49D681B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateBatchItemsQueueProcessor", "QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj", "{E6B53794-9D7D-4688-AC87-B229E49D681B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyMappingUploadQueueProcessor", "QueueProcessors\DummyMappingUploadQueueProcessor\DummyMappingUploadQueueProcessor.csproj", "{B8712B8C-A76D-496C-AD15-BC13EA3BA870}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyMappingUploadQueueProcessor", "QueueProcessors\DummyMappingUploadQueueProcessor\DummyMappingUploadQueueProcessor.csproj", "{B8712B8C-A76D-496C-AD15-BC13EA3BA870}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSaveQueueProcessor", "QueueProcessors\FileSaveQueueProcessor\FileSaveQueueProcessor.csproj", "{C9A27F6C-DE16-4699-8623-0C5169FC4128}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSaveQueueProcessor", "QueueProcessors\FileSaveQueueProcessor\FileSaveQueueProcessor.csproj", "{C9A27F6C-DE16-4699-8623-0C5169FC4128}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonDocumentMergerQueueProcessor", "QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj", "{2D062F58-8DA2-4993-8EA5-D596544E1D72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonDocumentMergerQueueProcessor", "QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj", "{2D062F58-8DA2-4993-8EA5-D596544E1D72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaveBatchQueueProcessor", "QueueProcessors\SaveBatchQueueProcessor\SaveBatchQueueProcessor.csproj", "{C2E36B66-0231-4952-945D-252B58CD0BA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveBatchQueueProcessor", "QueueProcessors\SaveBatchQueueProcessor\SaveBatchQueueProcessor.csproj", "{C2E36B66-0231-4952-945D-252B58CD0BA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaveSchemaQueueProcessor", "QueueProcessors\SaveSchemaQueueProcessor\SaveSchemaQueueProcessor.csproj", "{939E622B-F7D7-4C51-9878-C62939FBF5B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveSchemaQueueProcessor", "QueueProcessors\SaveSchemaQueueProcessor\SaveSchemaQueueProcessor.csproj", "{939E622B-F7D7-4C51-9878-C62939FBF5B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlGetSchemaQueueProcessor", "QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaQueueProcessor.csproj", "{51002114-0F10-403E-AE3E-2A55C27590B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlGetSchemaQueueProcessor", "QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaQueueProcessor.csproj", "{51002114-0F10-403E-AE3E-2A55C27590B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseQueueProcessor", "QueueProcessors\BaseQueueProcessor\BaseQueueProcessor.csproj", "{CFD6967D-8547-42ED-8EED-CBAA607CDDED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseQueueProcessor", "QueueProcessors\BaseQueueProcessor\BaseQueueProcessor.csproj", "{CFD6967D-8547-42ED-8EED-CBAA607CDDED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.DataBus.Client", "Fabric.DataBus.Client\Fabric.DataBus.Client.csproj", "{CA8ABDC1-A834-4C57-BC3A-E7C6D3BA0AD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineRunner", "PipelineRunner\PipelineRunner.csproj", "{AF1ADF05-EC10-43EA-877E-AD504A113B58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -121,10 +120,6 @@ Global
 		{5BA49A86-B7FA-4504-92D1-DB7AC5695B09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BA49A86-B7FA-4504-92D1-DB7AC5695B09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BA49A86-B7FA-4504-92D1-DB7AC5695B09}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F1673D77-F28F-4DA5-A945-AD951894E711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F1673D77-F28F-4DA5-A945-AD951894E711}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F1673D77-F28F-4DA5-A945-AD951894E711}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F1673D77-F28F-4DA5-A945-AD951894E711}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF401A17-F37B-4DB4-85F3-113DA9906305}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DF401A17-F37B-4DB4-85F3-113DA9906305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF401A17-F37B-4DB4-85F3-113DA9906305}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -237,22 +232,35 @@ Global
 		{CFD6967D-8547-42ED-8EED-CBAA607CDDED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFD6967D-8547-42ED-8EED-CBAA607CDDED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFD6967D-8547-42ED-8EED-CBAA607CDDED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA8ABDC1-A834-4C57-BC3A-E7C6D3BA0AD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA8ABDC1-A834-4C57-BC3A-E7C6D3BA0AD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA8ABDC1-A834-4C57-BC3A-E7C6D3BA0AD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA8ABDC1-A834-4C57-BC3A-E7C6D3BA0AD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF1ADF05-EC10-43EA-877E-AD504A113B58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF1ADF05-EC10-43EA-877E-AD504A113B58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF1ADF05-EC10-43EA-877E-AD504A113B58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF1ADF05-EC10-43EA-877E-AD504A113B58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{FC8CF81F-9790-4A46-9FD8-AFB220C4EF81} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{5BA49A86-B7FA-4504-92D1-DB7AC5695B09} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{DF401A17-F37B-4DB4-85F3-113DA9906305} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
+		{3BBF6CF0-197F-4980-BDAF-1418E473C014} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{148CF889-C721-4AD9-83BF-BDF7629A8C55} = {E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}
 		{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{ADE06C2E-4DD9-4C82-ACE2-BFEB881F74EF} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
+		{623DECA8-87EE-4C04-B245-3F2DAA152289} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
+		{6B54F568-E193-4B5E-B3A6-827B1D2ACD2E} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{BE2F7D4B-C934-458B-AC4F-26321870F25F} = {0FAB6634-9A09-434B-8679-D3AB04A3A991}
 		{3EFB9E07-4AD4-4A75-9C40-E42877A607F5} = {0FAB6634-9A09-434B-8679-D3AB04A3A991}
 		{52D08AD1-46FF-42D3-AC93-2D9B2109AFAC} = {08C7F77C-30FE-40AC-AD28-1076D3EF24CC}
 		{E2C388FB-4619-4FE2-A372-C02316467ABD} = {0FAB6634-9A09-434B-8679-D3AB04A3A991}
 		{1738C3E7-4DA1-4A7F-9A2A-E595968EE8A9} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{C0ED4050-E7FB-4C68-ADF1-6C8E290A2950} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
+		{DC1C2DFF-2458-4396-A872-E44FEF249DE1} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{BB878905-9592-4A9D-A811-46E73D9F7F6A} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{7D79D811-9527-44FA-B9AA-1B339A9C5B3A} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 		{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}

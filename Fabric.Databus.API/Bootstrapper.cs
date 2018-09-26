@@ -8,10 +8,11 @@ using Nancy.Configuration;
 using Nancy.TinyIoc;
 using Newtonsoft.Json;
 using Serilog;
-using SqlImporter;
 
 namespace Fabric.Databus.API
 {
+    using PipelineRunner;
+
     public class Bootstrapper : DefaultNancyBootstrapper
     {
         private readonly ILogger _logger;

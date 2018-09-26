@@ -173,10 +173,6 @@
       <Project>{f1673d77-f28f-4da5-a945-ad951894e711}</Project>
       <Name>SqlImporter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SqlImporter\SqlImporter.csproj">
-      <Project>{f1673d77-f28f-4da5-a945-ad951894e711}</Project>
-      <Name>SqlImporter</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj">
       <Project>{5ba49a86-b7fa-4504-92d1-db7ac5695b09}</Project>
       <Name>ZipCodeToGeoCodeConverter</Name>

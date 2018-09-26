@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
+    <ProjectReference Include="..\QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\DummyMappingUploadQueueProcessor\DummyMappingUploadQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\FileSaveQueueProcessor\FileSaveQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\FileUploadQueueProcessor\FileUploadQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\MappingUploadQueueProcessor\MappingUploadQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SaveBatchQueueProcessor\SaveBatchQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SaveSchemaQueueProcessor\SaveSchemaQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SqlBatchQueueProcessor\SqlBatchQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SqlImportQueueProcessor\SqlImportQueueProcessor.csproj" />
+  </ItemGroup>
+
+</Project>

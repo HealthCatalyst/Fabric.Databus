@@ -34,7 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
-    <ProjectReference Include="..\SqlImporter\SqlImporter.csproj" />
+    <ProjectReference Include="..\PipelineRunner\PipelineRunner.csproj" />
   </ItemGroup>
 
 </Project>

@@ -339,7 +339,7 @@ namespace ElasticSearchApiCaller
 
         }
 
-        internal async Task SendStreamToHosts(List<string> hosts, string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
+        public async Task SendStreamToHosts(List<string> hosts, string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             var hostNumber = batch % hosts.Count;
 

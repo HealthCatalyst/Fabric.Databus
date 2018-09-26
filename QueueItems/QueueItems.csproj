@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\ElasticSearchSqlFeeder.Interfaces.csproj" />
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj" />
+  </ItemGroup>
+
+</Project>

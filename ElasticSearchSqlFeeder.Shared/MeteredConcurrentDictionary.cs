@@ -63,10 +63,8 @@ namespace ElasticSearchSqlFeeder.Shared
                 // http://www.albahari.com/threading/part4.aspx#_Signaling_with_Wait_and_Pulse
                 lock (_locker)
                 {
-                    bool didLock;
                     while (Count > _maxItems)
                     {
-                        didLock = true;
                         Logger.Trace($"MeteredDictionary.Block id={id} Count={Count:N0}");
                         Monitor.Wait(_locker); // Lock is released while we’re waiting
 

@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\ElasticSearchSqlFeeder.Interfaces.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
   </ItemGroup>
 

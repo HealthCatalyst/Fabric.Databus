@@ -83,6 +83,18 @@
       <Project>{C0ED4050-E7FB-4C68-ADF1-6C8E290A2950}</Project>
       <Name>Fabric.Databus.Config</Name>
     </ProjectReference>
+    <ProjectReference Include="..\QueueItems\QueueItems.csproj">
+      <Project>{EFC37D49-40FA-4F53-B956-B63F7EB47244}</Project>
+      <Name>QueueItems</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QueueProcessors\BaseQueueProcessor\BaseQueueProcessor.csproj">
+      <Project>{CFD6967D-8547-42ED-8EED-CBAA607CDDED}</Project>
+      <Name>BaseQueueProcessor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj">
+      <Project>{2D062F58-8DA2-4993-8EA5-D596544E1D72}</Project>
+      <Name>JsonDocumentMergerQueueProcessor</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Databus.mdf">

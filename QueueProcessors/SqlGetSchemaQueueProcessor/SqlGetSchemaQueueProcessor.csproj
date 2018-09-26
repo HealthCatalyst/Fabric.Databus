@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj" />
+    <ProjectReference Include="..\..\Fabric.Databus.Schema\Fabric.Databus.Schema.csproj" />
+    <ProjectReference Include="..\..\QueueItems\QueueItems.csproj" />
+    <ProjectReference Include="..\BaseQueueProcessor\BaseQueueProcessor.csproj" />
+  </ItemGroup>
+
+</Project>

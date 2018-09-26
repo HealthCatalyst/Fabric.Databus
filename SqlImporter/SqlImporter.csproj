@@ -19,6 +19,18 @@
     <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
     <ProjectReference Include="..\Fabric.Databus.Schema\Fabric.Databus.Schema.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
+    <ProjectReference Include="..\QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\DummyMappingUploadQueueProcessor\DummyMappingUploadQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\FileSaveQueueProcessor\FileSaveQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\FileUploadQueueProcessor\FileUploadQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\MappingUploadQueueProcessor\MappingUploadQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SaveBatchQueueProcessor\SaveBatchQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SaveSchemaQueueProcessor\SaveSchemaQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SqlBatchQueueProcessor\SqlBatchQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SqlImportQueueProcessor\SqlImportQueueProcessor.csproj" />
     <ProjectReference Include="..\ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj" />
   </ItemGroup>
 

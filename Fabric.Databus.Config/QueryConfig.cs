@@ -2,7 +2,9 @@ using System.Collections.Generic;
 
 namespace Fabric.Databus.Config
 {
-    public class QueryConfig
+    using ElasticSearchSqlFeeder.Interfaces;
+
+    public class QueryConfig : IQueryConfig
     {
         public string Name { get; set; }
 

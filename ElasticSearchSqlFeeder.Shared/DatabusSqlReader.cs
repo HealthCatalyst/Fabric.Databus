@@ -19,7 +19,7 @@ namespace ElasticSearchSqlFeeder.Shared
             public List<ColumnInfo> ColumnList { get; set; }
         }
 
-        public static ReadSqlDataResult ReadDataFromQuery(QueryConfig config, DataSource load, string start, string end, ILogger logger)
+        public static ReadSqlDataResult ReadDataFromQuery(IQueryConfig config, DataSource load, string start, string end, ILogger logger)
         {
             using (var conn = new SqlConnection(config.ConnectionString))
             {

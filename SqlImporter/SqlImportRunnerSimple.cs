@@ -17,6 +17,13 @@ namespace SqlImporter
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
+    using ConvertDatabaseRowToJsonQueueProcessor;
+
+    using CreateBatchItemsQueueProcessor;
+
+    using DummyMappingUploadQueueProcessor;
+
     using ElasticSearchApiCaller;
     using ElasticSearchJsonWriter;
     using ElasticSearchSqlFeeder.Interfaces;
@@ -24,6 +31,26 @@ namespace SqlImporter
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Importers;
     using Fabric.Databus.Domain.Jobs;
+
+    using FileSaveQueueProcessor;
+
+    using FileUploadQueueProcessor;
+
+    using JsonDocumentMergerQueueProcessor;
+
+    using MappingUploadQueueProcessor;
+
+    using QueueItems;
+
+    using SaveBatchQueueProcessor;
+
+    using SaveSchemaQueueProcessor;
+
+    using SqlBatchQueueProcessor;
+
+    using SqlGetSchemaQueueProcessor;
+
+    using SqlImportQueueProcessor;
 
     /// <summary>
     /// The sql import runner simple.
@@ -87,7 +114,7 @@ namespace SqlImporter
             }
 
             var documentDictionary =
-                new MeteredConcurrentDictionary<string, JsonObjectQueueItem>(MaximumDocumentsInQueue);
+                new MeteredConcurrentDictionary<string, IJsonObjectQueueItem>(MaximumDocumentsInQueue);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();

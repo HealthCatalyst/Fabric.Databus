@@ -16,7 +16,12 @@ namespace QueueProcessor.Tests
 
     using ElasticSearchSqlFeeder.Shared;
     using Fabric.Databus.Config;
+
+    using JsonDocumentMergerQueueProcessor;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using QueueItems;
 
     /// <summary>
     /// The json document merger queue processor tester.
@@ -32,7 +37,7 @@ namespace QueueProcessor.Tests
         {
             var maximumDocumentsInQueue = 1;
             var documentDictionary =
-                new MeteredConcurrentDictionary<string, JsonObjectQueueItem>(maximumDocumentsInQueue);
+                new MeteredConcurrentDictionary<string, IJsonObjectQueueItem>(maximumDocumentsInQueue);
 
             var job = new Job
             {

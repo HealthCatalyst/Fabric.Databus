@@ -88,41 +88,5 @@ namespace ElasticSearchJsonWriter
                 }
             }
         }
-
-
-    }
-
-    public class JsonPropertyWrapper : IDisposable
-    {
-        private readonly JsonTextWriter _writer;
-        private readonly bool _skip;
-
-        public JsonPropertyWrapper(JsonTextWriter writer, string propertyname, bool skip = false)
-        {
-            _writer = writer;
-            _skip = skip;
-
-            if (!_skip)
-            {
-                writer.WritePropertyName(propertyname);
-
-                writer.WriteStartObject();
-            }
-
-
-        }
-
-        public void Dispose()
-        {
-            if (!_skip)
-            {
-                _writer.WriteEndObject();
-            }
-        }
-    }
-
-    public interface IJsonValueWriter
-    {
-        void WriteValue(JsonTextWriter writer, string elasticSearchType, object value);
     }
 }

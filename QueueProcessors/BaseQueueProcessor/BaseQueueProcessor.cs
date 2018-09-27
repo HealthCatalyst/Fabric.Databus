@@ -16,9 +16,7 @@ namespace BaseQueueProcessor
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.ProgressMonitor;
 
-    using NLog;
-
-    using QueueItems;
+    using Serilog;
 
     /// <summary>
     /// The base queue processor.
@@ -45,7 +43,7 @@ namespace BaseQueueProcessor
         /// <summary>
         /// The my logger.
         /// </summary>
-        protected Logger MyLogger;
+        protected ILogger MyLogger;
 
         /// <summary>
         /// The _in queue.
@@ -113,18 +111,22 @@ namespace BaseQueueProcessor
         /// Initializes a new instance of the <see cref="BaseQueueProcessor{TQueueInItem,TQueueOutItem}"/> class.
         /// </summary>
         /// <param name="queueContext">
-        /// The queue context.
+        ///     The queue context.
         /// </param>
-        protected BaseQueueProcessor(IQueueContext queueContext)
+        /// <param name="logger">The logger</param>
+        protected BaseQueueProcessor(IQueueContext queueContext, ILogger logger)
         {
-            this.QueueContext = queueContext;
+            this.QueueContext = queueContext ?? throw new ArgumentNullException(nameof(queueContext));
 
             this.Config = queueContext.Config;
+            if (this.Config == null)
+            {
+                throw new ArgumentNullException(nameof(this.Config));
+            }
 
             this.id = queueContext.QueueManager.GetUniqueId();
 
-            // ReSharper disable once VirtualMemberCallInConstructor
-            this.MyLogger = LogManager.GetLogger(this.LoggerName + "_" + this.id);
+            this.MyLogger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -182,7 +184,7 @@ namespace BaseQueueProcessor
 
                     this.LogItemToConsole(wt);
 
-                    this.MyLogger.Trace(
+                    this.MyLogger.Verbose(
                         $"Processing: {wt.QueryId} {this.GetId(wt)}, Queue Length: {this.outQueue.Count:N0}, Processed: {totalItemsProcessed:N0}, ByThisProcessor: {this.totalItemsProcessedByThisProcessor:N0}");
 
                 }
@@ -198,7 +200,7 @@ namespace BaseQueueProcessor
                 }
                 catch (Exception e)
                 {
-                    this.MyLogger.Trace(e);
+                    this.MyLogger.Verbose("{@Exception}", e);
                     errorText = e.ToString();
                     throw;
                 }
@@ -208,7 +210,7 @@ namespace BaseQueueProcessor
             var isLastThreadForThisTask = currentProcessorCount < 1;
             this.Complete(queryId, isLastThreadForThisTask);
 
-            this.MyLogger.Trace($"Completed {queryId}: queue: {this.InQueue.Count}");
+            this.MyLogger.Verbose($"Completed {queryId}: queue: {this.InQueue.Count}");
 
             this.LogToConsole(null);
         }
@@ -280,7 +282,7 @@ namespace BaseQueueProcessor
         /// </param>
         protected void AddToOutputQueue(TQueueOutItem item)
         {
-            // Logger.Trace($"AddToOutputQueue {item.ToJson()}");
+            // Logger.Verbose($"AddToOutputQueue {item.ToJson()}");
             this.outQueue.Add(item);
             Interlocked.Increment(ref totalItemsAddedToOutputQueue);
         }

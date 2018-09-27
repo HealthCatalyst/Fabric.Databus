@@ -14,7 +14,6 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
     using System.IO;
     using System.Linq;
     using System.Text;
-    using System.Xml;
 
     using BaseQueueProcessor;
 
@@ -27,6 +26,8 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
     using QueueItems;
 
+    using Serilog;
+
     /// <summary>
     /// The convert database row to json queue processor.
     /// </summary>
@@ -36,9 +37,17 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
         private readonly string _folder;
 
-
-        public ConvertDatabaseRowToJsonQueueProcessor(IQueueContext queueContext)
-            : base(queueContext)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConvertDatabaseRowToJsonQueueProcessor"/> class.
+        /// </summary>
+        /// <param name="queueContext">
+        /// The queue context.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        public ConvertDatabaseRowToJsonQueueProcessor(IQueueContext queueContext, ILogger logger)
+            : base(queueContext, logger)
         {
             this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-ConvertToJson");
         }
@@ -234,7 +243,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
             var minimumEntityIdProcessed = SequenceBarrier.UpdateMinimumEntityIdProcessed(wt.QueryId, id);
 
-            MyLogger.Trace($"Add to queue: {id}");
+            MyLogger.Verbose($"Add to queue: {id}");
 
             this.CleanListIfNeeded(wt.QueryId, minimumEntityIdProcessed);
         }

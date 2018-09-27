@@ -27,6 +27,8 @@ namespace JsonDocumentMergerQueueProcessor
 
     using QueueItems;
 
+    using Serilog;
+
     /// <summary>
     /// The json document merger queue processor.
     /// </summary>
@@ -58,8 +60,8 @@ namespace JsonDocumentMergerQueueProcessor
         private int numDocumentsModified;
 
         /// <inheritdoc />
-        public JsonDocumentMergerQueueProcessor(IQueueContext queueContext)
-            : base(queueContext)
+        public JsonDocumentMergerQueueProcessor(IQueueContext queueContext, ILogger logger)
+            : base(queueContext, logger)
         {
             var configLocalSaveFolder = this.Config.LocalSaveFolder;
             if (configLocalSaveFolder == null)
@@ -122,7 +124,7 @@ namespace JsonDocumentMergerQueueProcessor
 
             SequenceBarrier.CompleteQuery(queryId);
 
-            this.MyLogger.Trace("Finished");
+            this.MyLogger.Verbose("Finished");
         }
 
         /// <summary>
@@ -214,14 +216,14 @@ namespace JsonDocumentMergerQueueProcessor
 
                     Interlocked.Increment(ref this.numDocumentsModified);
 
-                    this.MyLogger.Trace($"AddToJsonObject: id:{id} _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+                    this.MyLogger.Verbose($"AddToJsonObject: id:{id} _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
                     JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
                 }
                 else
                 {
                     document = this.QueueContext.DocumentDictionary[id].Document;
 
-                    this.MyLogger.Trace($"UpdatedJsonObject: id:{id}  _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+                    this.MyLogger.Verbose($"UpdatedJsonObject: id:{id}  _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
                     JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
                 }
 
@@ -246,7 +248,7 @@ namespace JsonDocumentMergerQueueProcessor
             //    });
 
             // Console.Write($"\r{LoggerName} Id:{id} Remaining: {_inQueue.Count:N0} queryId:{queryId} Minimum id:{minimum}");
-            this.MyLogger.Trace($"Processed id: {id} for queryId:{queryId} Minimum id:{minimum}");
+            this.MyLogger.Verbose($"Processed id: {id} for queryId:{queryId} Minimum id:{minimum}");
 
             // AddDocumentsToOutQueue(minimum);
 
@@ -291,7 +293,7 @@ namespace JsonDocumentMergerQueueProcessor
             IJsonObjectQueueItem item;
             if (this.QueueContext.DocumentDictionary.TryRemove(key, out item))
             {
-                this.MyLogger.Trace(
+                this.MyLogger.Verbose(
                     $"Remove from Dictionary: _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
 
                 this.AddToOutputQueue(item);

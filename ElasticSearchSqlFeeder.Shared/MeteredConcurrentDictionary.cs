@@ -6,15 +6,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ElasticSearchSqlFeeder.Interfaces;
-using NLog;
 
 namespace ElasticSearchSqlFeeder.Shared
 {
+    using Serilog;
+    using Serilog.Core;
 
     public class MeteredConcurrentDictionary<TKey, TValue> : IMeteredConcurrentDictionary<TKey, TValue> where TKey : IComparable
     {
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly Logger Logger = LogManager.GetLogger("MeteredConcurrentDictionary");
+        private static readonly Logger Logger = new LoggerConfiguration().CreateLogger();
 
         //private readonly ConcurrentDictionary<TKey, TValue> _concurrentDictionary = 
         //    new ConcurrentDictionary<TKey, TValue>();
@@ -65,11 +66,11 @@ namespace ElasticSearchSqlFeeder.Shared
                 {
                     while (Count > _maxItems)
                     {
-                        Logger.Trace($"MeteredDictionary.Block id={id} Count={Count:N0}");
+                        Logger.Verbose($"MeteredDictionary.Block id={id} Count={Count:N0}");
                         Monitor.Wait(_locker); // Lock is released while we’re waiting
 
                     }
-                    Logger.Trace($"MeteredDictionary.Released id={id} Count={Count:N0}");
+                    Logger.Verbose($"MeteredDictionary.Released id={id} Count={Count:N0}");
                 }
             }
         }
@@ -146,7 +147,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
                 if (keysLessThan.Any())
                 {
-                    Logger.Trace($"Removing keys from dictionary: {keysLessThan.FirstOrDefault()} to {keysLessThan.LastOrDefault()}");
+                    Logger.Verbose($"Removing keys from dictionary: {keysLessThan.FirstOrDefault()} to {keysLessThan.LastOrDefault()}");
                 }
                 return keysLessThan;
             }
@@ -175,7 +176,7 @@ namespace ElasticSearchSqlFeeder.Shared
                     var lastOrDefault = itemsToRemove.LastOrDefault();
                     if (firstOrDefault != null && lastOrDefault != null)
                     {
-                        Logger.Trace($"Removing keys from dictionary: {firstOrDefault.Item1} to {lastOrDefault.Item1}");
+                        Logger.Verbose($"Removing keys from dictionary: {firstOrDefault.Item1} to {lastOrDefault.Item1}");
                     }
 
                     var itemsToKeep = KeyHash.Where(a => !fnKey(a)).ToList();

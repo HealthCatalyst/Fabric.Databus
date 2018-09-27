@@ -14,6 +14,8 @@ namespace SaveSchemaQueueProcessor
 
     using QueueItems;
 
+    using Serilog;
+
     public class SaveSchemaQueueProcessor : BaseQueueProcessor<SaveSchemaQueueItem, MappingUploadQueueItem>
     {
         private readonly string _uploadUrl;
@@ -21,7 +23,7 @@ namespace SaveSchemaQueueProcessor
         private readonly string _secondaryMappingUploadRelativeUrl;
         private readonly string _bulkUploadRelativeUrl;
 
-        public SaveSchemaQueueProcessor(IQueueContext queueContext) : base(queueContext)
+        public SaveSchemaQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
             this._uploadUrl = Config.Urls.First();
             this._mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;

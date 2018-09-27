@@ -14,11 +14,13 @@ namespace SqlGetSchemaQueueProcessor
 
     using QueueItems;
 
+    using Serilog;
+
     public class SqlGetSchemaQueueProcessor : BaseQueueProcessor<SqlGetSchemaQueueItem, SaveSchemaQueueItem>
     {
         private readonly string _folder;
 
-        public SqlGetSchemaQueueProcessor(IQueueContext queueContext) : base(queueContext)
+        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
             this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlGetSchema");
             if (Config.WriteDetailedTemporaryFilesToDisk)

@@ -1,4 +1,13 @@
-﻿namespace SqlBatchQueueProcessor
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SqlBatchQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The sql batch queue processor.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace SqlBatchQueueProcessor
 {
     using System;
     using System.IO;
@@ -6,19 +15,36 @@
     using BaseQueueProcessor;
 
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
 
+    using Serilog;
+
+    /// <summary>
+    /// The sql batch queue processor.
+    /// </summary>
     public class SqlBatchQueueProcessor : BaseQueueProcessor<SqlBatchQueueItem, SqlImportQueueItem>
     {
-        private readonly string _folder;
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
 
-        public SqlBatchQueueProcessor(IQueueContext queueContext) : base(queueContext)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlBatchQueueProcessor"/> class.
+        /// </summary>
+        /// <param name="queueContext">
+        /// The queue context.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        public SqlBatchQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
-            this._folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
+            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
         }
 
+        /// <inheritdoc />
         protected override void Handle(SqlBatchQueueItem workItem)
         {
             int seed = 0;
@@ -49,7 +75,7 @@
                     var queryName = workitemLoad.Path ?? "Main";
                     var queryId = queryName;
 
-                    var path = Path.Combine(this._folder, queryId);
+                    var path = Path.Combine(this.folder, queryId);
 
                     Directory.CreateDirectory(path);
 
@@ -68,14 +94,17 @@
             //QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
         }
 
+        /// <inheritdoc />
         protected override void Begin(bool isFirstThreadForThisTask)
         {
         }
 
+        /// <inheritdoc />
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 
+        /// <inheritdoc />
         protected override string GetId(SqlBatchQueueItem workItem)
         {
             return workItem.QueryId;

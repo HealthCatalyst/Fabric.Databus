@@ -10,13 +10,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using NLog;
 
 namespace ElasticSearchApiCaller
 {
+    using Serilog;
+    using Serilog.Core;
+
     public class FileUploader : IFileUploader
     {
-        private static readonly Logger Logger = LogManager.GetLogger("FileUploader");
+        private static readonly Logger Logger = new LoggerConfiguration().CreateLogger();
 
         private const int NumberOfParallelUploads = 50;
 
@@ -221,7 +223,7 @@ namespace ElasticSearchApiCaller
             var stopwatchElapsed = _stopwatch.Elapsed;
             var millisecsPerFile = stopwatchElapsed.TotalMilliseconds / fileList.Count;
 
-            Logger.Trace($"total: {stopwatchElapsed}, per file: {millisecsPerFile}");
+            Logger.Verbose($"total: {stopwatchElapsed}, per file: {millisecsPerFile}");
 
         }
 
@@ -284,7 +286,7 @@ namespace ElasticSearchApiCaller
 
                         //var fileContent = new FileContent(filepath);
 
-                        //Logger.Trace("posting file" + filepath);
+                        //Logger.Verbose("posting file" + filepath);
 
                         Interlocked.Increment(ref _currentRequests);
                         var requestStartTimeMillisecs = _stopwatch.ElapsedMilliseconds;
@@ -310,22 +312,22 @@ namespace ElasticSearchApiCaller
                                     // add back to queue for sending
                                     _queuedFiles.Enqueue(filepath);
                                     _requestFailures++;
-                                    Logger.Trace($"Failed: {filepath} status: {response.StatusCode} requests:{_currentRequests} Left:{_queuedFiles.Count}/{_totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+                                    Logger.Verbose($"Failed: {filepath} status: {response.StatusCode} requests:{_currentRequests} Left:{_queuedFiles.Count}/{_totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
                                 }
                             }
                             else
                             {
-                                Logger.Trace($"Finished: {filepath} status: {response.StatusCode} requests:{_currentRequests} Left:{_queuedFiles.Count}/{_totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+                                Logger.Verbose($"Finished: {filepath} status: {response.StatusCode} requests:{_currentRequests} Left:{_queuedFiles.Count}/{_totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
                             }
 
                         }
                         else
                         {
-                            Logger.Trace("========= Error =================");
+                            Logger.Verbose("========= Error =================");
                             var responseJson = await response.Content.ReadAsStringAsync();
 
-                            Logger.Trace(responseJson);
-                            Logger.Trace("========= Error =================");
+                            Logger.Verbose(responseJson);
+                            Logger.Verbose("========= Error =================");
 
                         }
                     }
@@ -333,7 +335,7 @@ namespace ElasticSearchApiCaller
             }
             catch (Exception ex)
             {
-                Logger.Trace(ex);
+                Logger.Verbose("{Exception}", ex);
                 throw;
             }
 
@@ -352,7 +354,7 @@ namespace ElasticSearchApiCaller
         {
             try
             {
-                Logger.Trace($"Sending file {batch} of size {stream.Length:N0} to {url}");
+                Logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
 
@@ -369,7 +371,7 @@ namespace ElasticSearchApiCaller
 
                         AddAuthorizationToken(client);
 
-                        //Logger.Trace("posting file" + filepath);
+                        //Logger.Verbose("posting file" + filepath);
                         string requestContent;
 
                         using (var newMemoryStream = new MemoryStream())
@@ -382,7 +384,7 @@ namespace ElasticSearchApiCaller
                                 requestContent = reader.ReadToEnd();
                                 // Do something with the value
 
-                                Logger.Trace($"{requestContent}");
+                                Logger.Verbose($"{requestContent}");
                             }
                         }
 
@@ -417,19 +419,19 @@ namespace ElasticSearchApiCaller
                             }
                             else
                             {
-                                Logger.Trace($"Finished: {batch} status: {response.StatusCode} requests:{_currentRequests} Left:{_queuedFiles.Count}/{_totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+                                Logger.Verbose($"Finished: {batch} status: {response.StatusCode} requests:{_currentRequests} Left:{_queuedFiles.Count}/{_totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
                             }
 
                         }
                         else
                         {
-                            //Logger.Trace("========= Error =================");
+                            //Logger.Verbose("========= Error =================");
                             Logger.Error(requestContent);
 
                             var responseJson = await response.Content.ReadAsStringAsync();
 
                             Logger.Error(responseJson);
-                            //Logger.Trace("========= Error =================");
+                            //Logger.Verbose("========= Error =================");
 
                         }
                     }

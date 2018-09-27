@@ -17,9 +17,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
     using ElasticSearchSqlFeeder.Interfaces;
 
-    using Fabric.Databus.Config;
-
-    using NLog;
+    using Serilog;
 
     using ZipCodeToGeoCodeConverter;
 
@@ -82,7 +80,7 @@ namespace ElasticSearchSqlFeeder.Shared
                         $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {config.TopLevelKeyColumn} BETWEEN '{start}' AND '{end}' ORDER BY {config.TopLevelKeyColumn} ASC;";
                 }
 
-                logger.Trace($"Start: {cmd.CommandText}");
+                logger.Verbose($"Start: {cmd.CommandText}");
                 var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
 
                 //var schema = reader.GetSchemaTable();
@@ -175,7 +173,7 @@ namespace ElasticSearchSqlFeeder.Shared
                     data[key].Add(values);
                 }
 
-                logger.Trace($"Finish: {cmd.CommandText} rows={rows}");
+                logger.Verbose($"Finish: {cmd.CommandText} rows={rows}");
 
                 return new ReadSqlDataResult { Data = data, ColumnList = columnList };
             }

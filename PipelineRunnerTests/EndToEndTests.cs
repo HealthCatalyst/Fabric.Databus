@@ -26,9 +26,9 @@ namespace PipelineRunnerTests
 
     using Moq;
 
-    using NLog;
-
     using PipelineRunner;
+
+    using Serilog;
 
     using Unity;
 
@@ -60,7 +60,8 @@ namespace PipelineRunnerTests
                     ConnectionString = "foo",
                     LocalSaveFolder = Path.GetTempPath(),
                     TopLevelKeyColumn = "AliasPatientID",
-                    Url = "http://foo"
+                    Url = "http://foo",
+                    UploadToElasticSearch = false
                 },
                 Data = new JobData
                 {
@@ -123,13 +124,19 @@ namespace PipelineRunnerTests
                 .Setup(service => service.StartUpload(It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            using (ProgressMonitor progressMonitor = new ProgressMonitor(new StringProgressLogger()))
+            ILogger logger = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .WriteTo.Debug()
+                .CreateLogger();
+
+            using (ProgressMonitor progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
             {
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
                     var container = new UnityContainer();
                     container.RegisterInstance(mockDatabusSqlReader.Object);
                     container.RegisterInstance(mockFileUploaderFactory.Object);
+                    container.RegisterInstance(logger);
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try

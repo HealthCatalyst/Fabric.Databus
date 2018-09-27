@@ -20,6 +20,8 @@ namespace SqlImportQueueProcessor
 
     using QueueItems;
 
+    using Serilog;
+
     /// <summary>
     /// The sql import queue processor.
     /// </summary>
@@ -44,8 +46,8 @@ namespace SqlImportQueueProcessor
         /// <param name="databusSqlReader">
         /// The databus sql reader.
         /// </param>
-        public SqlImportQueueProcessor(IQueueContext queueContext, IDatabusSqlReader databusSqlReader)
-            : base(queueContext)
+        public SqlImportQueueProcessor(IQueueContext queueContext, IDatabusSqlReader databusSqlReader, ILogger logger)
+            : base(queueContext, logger)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
 
@@ -235,7 +237,7 @@ namespace SqlImportQueueProcessor
             //esJsonWriter.WriteRawObjectsToJson(data, columnList, seed, load.PropertyPath, 
             //    new SqlJsonValueWriter(), load.Index, load.EntityType);
 
-            this.MyLogger.Trace($"Finished reading rows for {queryId}");
+            this.MyLogger.Verbose($"Finished reading rows for {queryId}");
         }
     }
 }

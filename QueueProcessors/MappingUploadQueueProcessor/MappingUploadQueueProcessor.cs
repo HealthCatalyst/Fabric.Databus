@@ -13,14 +13,16 @@ namespace MappingUploadQueueProcessor
 
     using QueueItems;
 
+    using Serilog;
+
     public class MappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, EndPointQueueItem>
     {
         readonly FileUploader _fileUploader;
         private readonly string _mainMappingUploadRelativeUrl;
         private readonly string _secondaryMappingUploadRelativeUrl;
 
-        public MappingUploadQueueProcessor(IQueueContext queueContext)
-            : base(queueContext)
+        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger)
+            : base(queueContext, logger)
         {
             this._fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
                 queueContext.Config.ElasticSearchPassword, Config.KeepIndexOnline);
@@ -35,7 +37,7 @@ namespace MappingUploadQueueProcessor
 
             this.UploadSingleFile(wt.Stream, relativeUrl ).Wait();
 
-            MyLogger.Trace($"Uploaded mapping file: {wt.PropertyName} ");
+            MyLogger.Verbose($"Uploaded mapping file: {wt.PropertyName} ");
 
         }
 
@@ -60,7 +62,7 @@ namespace MappingUploadQueueProcessor
                     //    Console.WriteLine("See your network administrator or try another path.");
                     //    return true;
                     //}
-                    MyLogger.Error(x);
+                    MyLogger.Error("{@Exception}", x);
                     return false;
                 });
 

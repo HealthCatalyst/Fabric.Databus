@@ -23,6 +23,8 @@ namespace QueueProcessor.Tests
 
     using QueueItems;
 
+    using Serilog;
+
     /// <summary>
     /// The json document merger queue processor tester.
     /// </summary>
@@ -73,7 +75,12 @@ namespace QueueProcessor.Tests
             };
 
             // DatabusSqlReader.ReadDataFromQuery(job.Config, )
-            var jsonDocumentMergerQueueProcessor = new JsonDocumentMergerQueueProcessor(queueContext);
+
+            var logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .CreateLogger();
+
+            var jsonDocumentMergerQueueProcessor = new JsonDocumentMergerQueueProcessor(queueContext, logger);
 
             var jsonDocumentMergerQueueItem = new JsonDocumentMergerQueueItem();
 

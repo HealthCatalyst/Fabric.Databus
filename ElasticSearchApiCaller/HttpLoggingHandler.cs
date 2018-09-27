@@ -3,13 +3,15 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NLog;
 
 namespace ElasticSearchApiCaller
 {
+    using Serilog;
+    using Serilog.Core;
+
     public class HttpLoggingHandler : DelegatingHandler
     {
-        private static readonly Logger Logger = LogManager.GetLogger("HttpLoggingHandler");
+        private static readonly Logger Logger = new LoggerConfiguration().CreateLogger();
         private readonly bool _doLogContent;
 
         public HttpLoggingHandler(HttpMessageHandler innerHandler, bool doLogContent)
@@ -49,7 +51,7 @@ namespace ElasticSearchApiCaller
                 //    }
                 //}
 
-                Logger.Trace(sb.ToString());
+                Logger.Verbose(sb.ToString());
 
                 sb.Clear();
                 sb.AppendLine("------------------- RESPONSE ----------------------------");
@@ -61,7 +63,7 @@ namespace ElasticSearchApiCaller
                     sb.AppendLine(await response.Content.ReadAsStringAsync());
                 }
 
-                Logger.Trace(sb.ToString());
+                Logger.Verbose(sb.ToString());
 
                 return response;
 

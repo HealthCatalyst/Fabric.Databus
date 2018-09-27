@@ -11,12 +11,14 @@
 
     using QueueItems;
 
+    using Serilog;
+
     public class FileSaveQueueProcessor : BaseQueueProcessor<FileUploadQueueItem, FileUploadQueueItem>
     {
         private readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
 
-        public FileSaveQueueProcessor(IQueueContext queueContext)
-            : base(queueContext)
+        public FileSaveQueueProcessor(IQueueContext queueContext, ILogger logger)
+            : base(queueContext, logger)
         {
         }
 
@@ -31,7 +33,7 @@
 
                 lock (this._locks.GetOrAdd(path, s => new object()))
                 {
-                    MyLogger.Trace($"Saving file: {path} ");
+                    MyLogger.Verbose($"Saving file: {path} ");
 
                     if (Config.CompressFiles)
                     {
@@ -57,7 +59,7 @@
                         }
                     }
 
-                    MyLogger.Trace($"Saved file: {path} ");
+                    MyLogger.Verbose($"Saved file: {path} ");
                 }
             }
 

@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\ElasticSearchApiCaller\ElasticSearchApiCaller.csproj" />
     <ProjectReference Include="..\..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj" />
     <ProjectReference Include="..\..\QueueItems\QueueItems.csproj" />

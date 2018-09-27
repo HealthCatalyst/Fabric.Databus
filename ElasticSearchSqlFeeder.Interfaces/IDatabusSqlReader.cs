@@ -11,7 +11,7 @@ namespace ElasticSearchSqlFeeder.Interfaces
 {
     using System;
 
-    using NLog;
+    using Serilog;
 
     /// <summary>
     /// The DatabusSqlReader interface.

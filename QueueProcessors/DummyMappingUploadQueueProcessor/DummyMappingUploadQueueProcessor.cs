@@ -7,9 +7,11 @@ namespace DummyMappingUploadQueueProcessor
 
     using QueueItems;
 
+    using Serilog;
+
     public class DummyMappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, EndPointQueueItem>
     {
-        public DummyMappingUploadQueueProcessor(IQueueContext queueContext) : base(queueContext)
+        public DummyMappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
         }
 

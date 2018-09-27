@@ -35,7 +35,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
             var min = LastCompletedEntityIdForEachQuery.Min(q => q.Value);
 
-            //Logger.Trace($"Minimum Key in Dictionary: {min}, {JsonConvert.SerializeObject(LastCompletedEntityIdForEachQuery)}");
+            //Logger.Verbose($"Minimum Key in Dictionary: {min}, {JsonConvert.SerializeObject(LastCompletedEntityIdForEachQuery)}");
 
             return min;
 
@@ -49,7 +49,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
                 LastCompletedEntityIdForEachQuery.TryRemove(queryId, out temp);
             }
-            //Logger.Trace($"Completed {queryId}: queue: {_inQueue.Count}");
+            //Logger.Verbose($"Completed {queryId}: queue: {_inQueue.Count}");
         }
     }
 }

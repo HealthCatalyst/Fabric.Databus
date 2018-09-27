@@ -68,7 +68,7 @@ namespace PipelineRunner
         /// <summary>
         /// The timeout in milliseconds.
         /// </summary>
-        private const int TimeoutInMilliseconds = 5 * 60 * 60 * 60;
+        private const int TimeoutInMilliseconds = 30 * 60 * 1000; // 5 * 60 * 60 * 1000;
 
         /// <summary>
         /// The step number.
@@ -324,7 +324,7 @@ namespace PipelineRunner
                                       ? $";WITH CTE AS ( {load.Sql} )  SELECT TOP {config.MaximumEntitiesToLoad} {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;"
                                       : $";WITH CTE AS ( {load.Sql} )  SELECT {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;";
 
-                // Logger.Trace($"Start: {cmd.CommandText}");
+                // Logger.Verbose($"Start: {cmd.CommandText}");
                 var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
 
                 var list = new List<string>();
@@ -335,7 +335,7 @@ namespace PipelineRunner
                     list.Add(Convert.ToString(obj));
                 }
 
-                // Logger.Trace($"Finish: {cmd.CommandText}");
+                // Logger.Verbose($"Finish: {cmd.CommandText}");
                 return list;
             }
         }

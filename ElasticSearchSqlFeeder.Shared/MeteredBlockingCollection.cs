@@ -1,16 +1,36 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
-using ElasticSearchSqlFeeder.Interfaces;
-using NLog;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MeteredBlockingCollection.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the MeteredBlockingCollection type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Shared
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Linq;
+    using System.Threading;
+
+    using ElasticSearchSqlFeeder.Interfaces;
+
+    using Serilog;
+    using Serilog.Core;
+
+    /// <summary>
+    /// The metered blocking collection.
+    /// </summary>
+    /// <typeparam name="T">
+    /// </typeparam>
     public class MeteredBlockingCollection<T> : IMeteredBlockingCollection<T>
     {
+        /// <summary>
+        /// The logger.
+        /// </summary>
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = new LoggerConfiguration().CreateLogger();
 
         private readonly BlockingCollection<T> _blockingCollection;
 
@@ -46,7 +66,7 @@ namespace ElasticSearchSqlFeeder.Shared
                 {
                     if (Count <= _maxItems)
                     {
-                        Logger.Trace($"MeteredQueue.ReleaseAll {_name}");
+                        Logger.Verbose($"MeteredQueue.ReleaseAll {_name}");
 
                         Monitor.PulseAll(_locker);
                     }
@@ -73,12 +93,12 @@ namespace ElasticSearchSqlFeeder.Shared
                     while (Count > _maxItems)
                     {
                         didLock = true;
-                        Logger.Trace($"MeteredQueue.Block {_name}, Count={Count:N0}");
+                        Logger.Verbose($"MeteredQueue.Block {_name}, Count={Count:N0}");
                         Monitor.Wait(_locker); // Lock is released while we’re waiting
                     }
                     if (didLock)
                     {
-                        Logger.Trace($"MeteredQueue.Released {_name}, Count={Count:N0}");
+                        Logger.Verbose($"MeteredQueue.Released {_name}, Count={Count:N0}");
                     }
                 }
             }

@@ -17,11 +17,13 @@
     using Newtonsoft.Json.Linq;
     using QueueItems;
 
+    using Serilog;
+
     public class SaveBatchQueueProcessor : BaseQueueProcessor<SaveBatchQueueItem, FileUploadQueueItem>
     {
         private static int _currentBatchFileNumber = 0;
 
-        public SaveBatchQueueProcessor(IQueueContext queueContext) : base(queueContext)
+        public SaveBatchQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
         }
 
@@ -93,7 +95,7 @@
                 Stream = stream
             });
 
-            MyLogger.Trace($"Wrote batch: {batchNumber}");
+            MyLogger.Verbose($"Wrote batch: {batchNumber}");
         }
 
         protected override string LoggerName => "SaveBatch";

@@ -3,14 +3,16 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using ElasticSearchSqlFeeder.Interfaces;
-using NLog;
 
 namespace ElasticSearchSqlFeeder.Shared
 {
+    using Serilog;
+    using Serilog.Core;
+
     public class SimpleBlockingCollection<T> : IMeteredBlockingCollection<T>
     {
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = new LoggerConfiguration().CreateLogger();
 
         private readonly BlockingCollection<T> _blockingCollection;
 

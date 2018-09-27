@@ -9,42 +9,56 @@
 
 namespace CreateBatchItemsQueueProcessor
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using BaseQueueProcessor;
 
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The create batch items queue processor.
     /// </summary>
     public class CreateBatchItemsQueueProcessor : BaseQueueProcessor<IJsonObjectQueueItem, SaveBatchQueueItem>
     {
-        private readonly Queue<IJsonObjectQueueItem> _items = new Queue<IJsonObjectQueueItem>();
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateBatchItemsQueueProcessor"/> class.
+        /// The temporary cache.
         /// </summary>
-        /// <param name="queueContext">
-        /// The queue context.
-        /// </param>
-        /// <param name="logger">
-        /// The logger.
-        /// </param>
+        private readonly Queue<IJsonObjectQueueItem> temporaryCache = new Queue<IJsonObjectQueueItem>();
+
+        /// <inheritdoc />
         public CreateBatchItemsQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
+            if (this.Config.EntitiesPerUploadFile < 1)
+            {
+                throw new ArgumentException(nameof(this.Config.EntitiesPerUploadFile));
+            }
+        }
+
+        /// <inheritdoc />
+        protected override string LoggerName => "CreateBatchItems";
+
+        /// <summary>
+        /// The flush all documents.
+        /// </summary>
+        public void FlushAllDocuments()
+        {
+            while (this.temporaryCache.Any())
+            {
+                this.FlushDocumentsToLimit(this.temporaryCache.Count);
+            }
         }
 
         /// <inheritdoc />
         protected override void Handle(IJsonObjectQueueItem workItem)
         {
-            this._items.Enqueue(workItem);
+            this.temporaryCache.Enqueue(workItem);
             this.FlushDocumentsIfBatchSizeReached();
         }
 
@@ -53,15 +67,16 @@ namespace CreateBatchItemsQueueProcessor
         {
         }
 
-        /// <summary>
-        /// The flush all documents.
-        /// </summary>
-        public void FlushAllDocuments()
+        /// <inheritdoc />
+        protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
-            while (this._items.Any())
-            {
-                this.FlushDocumentsToLimit(this._items.Count);
-            }
+            this.FlushAllDocuments();
+        }
+
+        /// <inheritdoc />
+        protected override string GetId(IJsonObjectQueueItem workItem)
+        {
+            return workItem.QueryId;
         }
 
         /// <summary>
@@ -70,7 +85,7 @@ namespace CreateBatchItemsQueueProcessor
         private void FlushDocumentsIfBatchSizeReached()
         {
             // see if there are enough to create a batch
-            if (this._items.Count > Config.EntitiesPerUploadFile)
+            if (this.temporaryCache.Count > Config.EntitiesPerUploadFile)
             {
                 this.FlushDocuments();
             }
@@ -89,9 +104,9 @@ namespace CreateBatchItemsQueueProcessor
         /// </summary>
         private void FlushDocumentsWithoutLock()
         {
-            while (this._items.Count > Config.EntitiesPerUploadFile)
+            while (this.temporaryCache.Count > this.Config.EntitiesPerUploadFile)
             {
-                this.FlushDocumentsToLimit(Config.EntitiesPerUploadFile);
+                this.FlushDocumentsToLimit(this.Config.EntitiesPerUploadFile);
             }
         }
 
@@ -106,31 +121,15 @@ namespace CreateBatchItemsQueueProcessor
             var docsToSave = new List<IJsonObjectQueueItem>();
             for (int i = 0; i < limit; i++)
             {
-                IJsonObjectQueueItem cacheItem = this._items.Dequeue();
+                IJsonObjectQueueItem cacheItem = this.temporaryCache.Dequeue();
                 docsToSave.Add(cacheItem);
             }
 
             if (docsToSave.Any())
             {
-                MyLogger.Verbose($"Saved Batch: count:{docsToSave.Count} from {docsToSave.First().Id} to {docsToSave.Last().Id}, inQueue:{this.InQueue.Count} ");
-                AddToOutputQueue(new SaveBatchQueueItem { ItemsToSave = docsToSave });
-
+                this.MyLogger.Verbose($"Saved Batch: count:{docsToSave.Count} from {docsToSave.First().Id} to {docsToSave.Last().Id}, inQueue:{this.InQueue.Count} ");
+                this.AddToOutputQueue(new SaveBatchQueueItem { ItemsToSave = docsToSave });
             }
         }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
-            this.FlushAllDocuments();
-        }
-
-        /// <inheritdoc />
-        protected override string GetId(IJsonObjectQueueItem workItem)
-        {
-            return workItem.QueryId;
-        }
-
-        protected override string LoggerName => "CreateBatchItems";
     }
-
 }

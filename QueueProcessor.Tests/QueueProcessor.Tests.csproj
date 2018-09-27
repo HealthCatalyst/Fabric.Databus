@@ -68,6 +68,7 @@
     <Compile Include="JsonDocumentMergerQueueProcessorTester.cs" />
     <Compile Include="MockProgressMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CreateBatchItemsQueueProcessorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ElasticSearchJsonWriter\ElasticSearchJsonWriter.csproj">
@@ -93,6 +94,10 @@
     <ProjectReference Include="..\QueueProcessors\BaseQueueProcessor\BaseQueueProcessor.csproj">
       <Project>{CFD6967D-8547-42ED-8EED-CBAA607CDDED}</Project>
       <Name>BaseQueueProcessor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj">
+      <Project>{E6B53794-9D7D-4688-AC87-B229E49D681B}</Project>
+      <Name>CreateBatchItemsQueueProcessor</Name>
     </ProjectReference>
     <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj">
       <Project>{2D062F58-8DA2-4993-8EA5-D596544E1D72}</Project>

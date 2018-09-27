@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MultiThreaderPipelineExecutor.cs" company="">
+// <copyright file="MultiThreadedPipelineExecutor.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the MultiThreaderPipelineExecutor type.
+//   Defines the MultiThreadedPipelineExecutor type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -39,10 +39,10 @@ namespace PipelineRunner
     /// <summary>
     /// The multi threader pipeline executor.
     /// </summary>
-    public class MultiThreaderPipelineExecutor : PipelineExecutorBase
+    public class MultiThreadedPipelineExecutor : PipelineExecutorBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultiThreaderPipelineExecutor"/> class.
+        /// Initializes a new instance of the <see cref="MultiThreadedPipelineExecutor"/> class.
         /// </summary>
         /// <param name="container">
         /// The container.
@@ -50,7 +50,7 @@ namespace PipelineRunner
         /// <param name="cancellationTokenSource">
         /// The cancellation token source.
         /// </param>
-        public MultiThreaderPipelineExecutor(IUnityContainer container, CancellationTokenSource cancellationTokenSource)
+        public MultiThreadedPipelineExecutor(IUnityContainer container, CancellationTokenSource cancellationTokenSource)
             : base(container, cancellationTokenSource)
         {
         }

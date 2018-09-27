@@ -21,7 +21,7 @@ namespace PipelineRunner
         /// <inheritdoc />
         public IPipelineExecutor Create(IUnityContainer container, CancellationTokenSource cancellationTokenSource)
         {
-            return new MultiThreaderPipelineExecutor(container, cancellationTokenSource);
+            return new MultiThreadedPipelineExecutor(container, cancellationTokenSource);
         }
     }
 }

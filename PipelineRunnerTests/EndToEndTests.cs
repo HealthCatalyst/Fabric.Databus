@@ -137,6 +137,7 @@ namespace PipelineRunnerTests
                     container.RegisterInstance(mockDatabusSqlReader.Object);
                     container.RegisterInstance(mockFileUploaderFactory.Object);
                     container.RegisterInstance(logger);
+                    container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try

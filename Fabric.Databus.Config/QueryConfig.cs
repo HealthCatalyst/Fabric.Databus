@@ -10,12 +10,14 @@
 namespace Fabric.Databus.Config
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
     /// <summary>
     /// The query config.
     /// </summary>
+    [DataContract(Name = "Config", Namespace = "")]
     public class QueryConfig : IQueryConfig
     {
         public string Name { get; set; }

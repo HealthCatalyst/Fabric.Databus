@@ -4,6 +4,12 @@ using System.Xml.Serialization;
 
 namespace Fabric.Shared
 {
+    using System.Runtime.Serialization;
+    using System.Text;
+    using System.Xml;
+
+    using Formatting = Newtonsoft.Json.Formatting;
+
     public static class ListHelpers
     {
         public static string ToJson(this object obj)
@@ -23,13 +29,17 @@ namespace Fabric.Shared
 
         public static T FromXml<T>(this string txt) where T : class
         {
-            var xmlSerializer = new XmlSerializer(typeof(T));
+            var xmlSerializer = new DataContractSerializer(typeof(T));
 
-            var reader = new StringReader(txt);
-            var jobconfig = xmlSerializer.Deserialize(reader) as T;
+            var content = Encoding.UTF8.GetBytes(txt);
+
+            XmlDictionaryReader reader =
+                XmlDictionaryReader.CreateTextReader(content, new XmlDictionaryReaderQuotas());
+
+            var jobconfig = xmlSerializer.ReadObject(reader) as T;
 
             return jobconfig;
-        }
+        }   
 
         public static bool DoesStringContainPeriods(this string txt)
         {

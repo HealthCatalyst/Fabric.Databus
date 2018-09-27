@@ -1,12 +1,23 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using ElasticSearchSqlFeeder.Interfaces;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="QueueManager.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The queue manager.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Shared
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Threading;
+
+    using ElasticSearchSqlFeeder.Interfaces;
+
+    /// <summary>
+    /// The queue manager.
+    /// </summary>
     public class QueueManager : IQueueManager
     {
         private readonly ConcurrentDictionary<string, IMeteredBlockingCollection> _queues = 

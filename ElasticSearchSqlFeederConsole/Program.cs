@@ -14,6 +14,8 @@ namespace ElasticSearchSqlFeederConsole
     using System.Linq;
     using System.Threading;
 
+    using ElasticSearchApiCaller;
+
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
@@ -36,7 +38,7 @@ namespace ElasticSearchSqlFeederConsole
         /// <param name="args">
         /// The args.
         /// </param>
-        /// <exception cref="Exception">exception
+        /// <exception cref="Exception">exception thrown
         /// </exception>
         public static void Main(string[] args)
         {
@@ -59,20 +61,13 @@ namespace ElasticSearchSqlFeederConsole
 
             var config = new ConfigReader().ReadXml(inputFile);
 
-#if TRUE
-//            Serilog.Debugging.SelfLog.Enable(Console.Error);
-
-            //var file = File.CreateText(@"c:\temp\serilog.out");
-            //Serilog.Debugging.SelfLog.Enable(TextWriter.Synchronized(file));
-
-            var logger = new LoggerConfiguration()
-              .ReadFrom.AppSettings()
-              .CreateLogger();
-
-#endif
-
             var stopwatch = new Stopwatch();
             stopwatch.Start();
+
+            ILogger logger = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
+                .WriteTo.Console()
+                .CreateLogger();
 
             using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
             {
@@ -80,6 +75,9 @@ namespace ElasticSearchSqlFeederConsole
                 {
                     var container = new UnityContainer();
                     container.RegisterType<IDatabusSqlReader, DatabusSqlReader>();
+                    container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
+                    container.RegisterType<IFileUploader, FileUploader>();
+                    container.RegisterInstance(logger);
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 

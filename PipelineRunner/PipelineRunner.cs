@@ -212,49 +212,48 @@ namespace PipelineRunner
 
             sqlBatchQueue.CompleteAdding();
 
-            var tasks = new List<Task>();
-            // ReSharper disable once JoinDeclarationAndInitializer
-            IList<Task> newTasks;
+            var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
 
-            newTasks = this.RunAsync(() => this.container.Resolve<SqlBatchQueueProcessor>(), 1);
-            tasks.AddRange(newTasks);
+            var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
 
-            newTasks = this.RunAsync(() => this.container.Resolve<SqlImportQueueProcessor>(), 2);
-            tasks.AddRange(newTasks);
-
-            newTasks = this.RunAsync(() => this.container.Resolve<ConvertDatabaseRowToJsonQueueProcessor>(), 1);
-            tasks.AddRange(newTasks);
-
-            newTasks = this.RunAsync(() => this.container.Resolve<JsonDocumentMergerQueueProcessor>(), 1);
-            tasks.AddRange(newTasks);
-
-            newTasks = this.RunAsync(() => this.container.Resolve<CreateBatchItemsQueueProcessor>(), 2);
-            tasks.AddRange(newTasks);
-
-            newTasks = this.RunAsync(() => this.container.Resolve<SaveBatchQueueProcessor>(), 2);
-            tasks.AddRange(newTasks);
+            var processors = new List<QueueProcessorInfo>
+                                 {
+                                     new QueueProcessorInfo { Type = typeof(SqlBatchQueueProcessor), Count = 1 },
+                                     new QueueProcessorInfo { Type = typeof(SqlImportQueueProcessor), Count = 1 },
+                                     new QueueProcessorInfo
+                                         {
+                                             Type = typeof(ConvertDatabaseRowToJsonQueueProcessor), Count = 1
+                                         },
+                                     new QueueProcessorInfo
+                                         {
+                                             Type = typeof(JsonDocumentMergerQueueProcessor), Count = 1
+                                         },
+                                     new QueueProcessorInfo
+                                         {
+                                             Type = typeof(CreateBatchItemsQueueProcessor), Count = 1
+                                         },
+                                     new QueueProcessorInfo { Type = typeof(SaveBatchQueueProcessor), Count = 1 }
+                                 };
 
             if (config.WriteTemporaryFilesToDisk)
             {
-                newTasks = this.RunAsync(() => this.container.Resolve<FileSaveQueueProcessor>(), 2);
-                tasks.AddRange(newTasks);
+                processors.Add(new QueueProcessorInfo
+                {
+                    Type = typeof(FileSaveQueueProcessor),
+                    Count = 1
+                });
             }
 
             if (config.UploadToElasticSearch)
             {
-                newTasks = this.RunAsync(() => this.container.Resolve<FileUploadQueueProcessor>(), 1);
-                tasks.AddRange(newTasks);
+                processors.Add(new QueueProcessorInfo
+                                   {
+                                       Type = typeof(FileUploadQueueProcessor),
+                                       Count = 1
+                                   });
             }
 
-            try
-            {
-                Task.WaitAll(tasks.ToArray(), TimeoutInMilliseconds, this.cancellationTokenSource.Token);
-            }
-            catch (Exception)
-            {
-                var exceptions = tasks.Where(task => task.Exception != null).Select(task => task.Exception.Flatten()).ToList();
-                throw new AggregateException(exceptions);
-            }
+            pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
 
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
@@ -354,124 +353,54 @@ namespace PipelineRunner
         /// </param>
         private void ReadAndSetSchema(IQueryConfig config, IQueueContext queueContext, IJob job)
         {
-            var fileUploader = new FileUploader(
-                queueContext.Config.ElasticSearchUserName,
-                queueContext.Config.ElasticSearchPassword,
-                job.Config.KeepIndexOnline);
+            //var fileUploader = new FileUploader(
+            //    queueContext.Config.ElasticSearchUserName,
+            //    queueContext.Config.ElasticSearchPassword,
+            //    job.Config.KeepIndexOnline);
 
-            if (config.UploadToElasticSearch && config.DropAndReloadIndex)
-            {
-                Task.Run(
-                    async () =>
-                    {
-                        await fileUploader.DeleteIndex(config.Urls, queueContext.MainMappingUploadRelativeUrl, config.Index, config.Alias);
-                    })
-                .Wait();
-            }
+            //if (config.UploadToElasticSearch && config.DropAndReloadIndex)
+            //{
+            //    Task.Run(
+            //        async () =>
+            //        {
+            //            await fileUploader.DeleteIndex(config.Urls, queueContext.MainMappingUploadRelativeUrl, config.Index, config.Alias);
+            //        })
+            //    .Wait();
+            //}
 
-            var tasks = new List<Task>();
-            // ReSharper disable once JoinDeclarationAndInitializer
-            IList<Task> newTasks;
+            //var tasks = new List<Task>();
+            //// ReSharper disable once JoinDeclarationAndInitializer
+            //IList<Task> newTasks;
 
-            var sqlGetSchemaQueue = queueContext.QueueManager
-                .CreateInputQueue<SqlGetSchemaQueueItem>(this.stepNumber + 1);
+            //var sqlGetSchemaQueue = queueContext.QueueManager
+            //    .CreateInputQueue<SqlGetSchemaQueueItem>(this.stepNumber + 1);
 
-            sqlGetSchemaQueue.Add(new SqlGetSchemaQueueItem
-            {
-                Loads = job.Data.DataSources
-            });
+            //sqlGetSchemaQueue.Add(new SqlGetSchemaQueueItem
+            //{
+            //    Loads = job.Data.DataSources
+            //});
 
-            sqlGetSchemaQueue.CompleteAdding();
+            //sqlGetSchemaQueue.CompleteAdding();
 
-            newTasks = this.RunAsync(() => this.container.Resolve<SqlGetSchemaQueueProcessor>(), 1);
-            tasks.AddRange(newTasks);
+            //newTasks = this.RunAsync(() => this.container.Resolve<SqlGetSchemaQueueProcessor>(), 1);
+            //tasks.AddRange(newTasks);
 
-            newTasks = this.RunAsync(() => this.container.Resolve<SaveSchemaQueueProcessor>(), 1);
-            tasks.AddRange(newTasks);
+            //newTasks = this.RunAsync(() => this.container.Resolve<SaveSchemaQueueProcessor>(), 1);
+            //tasks.AddRange(newTasks);
 
-            newTasks = config.UploadToElasticSearch
-                           ? this.RunAsync(() => this.container.Resolve<MappingUploadQueueProcessor>(), 1)
-                           : this.RunAsync(() => this.container.Resolve<DummyMappingUploadQueueProcessor>(), 1);
+            //newTasks = config.UploadToElasticSearch
+            //               ? this.RunAsync(() => this.container.Resolve<MappingUploadQueueProcessor>(), 1)
+            //               : this.RunAsync(() => this.container.Resolve<DummyMappingUploadQueueProcessor>(), 1);
 
-            tasks.AddRange(newTasks);
+            //tasks.AddRange(newTasks);
 
-            Task.WaitAll(tasks.ToArray());
+            //Task.WaitAll(tasks.ToArray());
 
-            // set up aliases
-            if (config.UploadToElasticSearch)
-            {
-                fileUploader.SetupAlias(config.Urls, config.Index, config.Alias).Wait();
-            }
-        }
-
-        /// <summary>
-        /// The run async.
-        /// </summary>
-        /// <param name="functionQueueProcessor">
-        /// The fn queue processor.
-        /// </param>
-        /// <param name="count">
-        /// The count.
-        /// </param>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
-        private IList<Task> RunAsync(Func<IBaseQueueProcessor> functionQueueProcessor, int count)
-        {
-            IList<Task> tasks = new List<Task>();
-
-            this.stepNumber++;
-
-            var thisStepNumber = this.stepNumber;
-
-            bool isFirst = true;
-
-            for (var i = 0; i < count; i++)
-            {
-                var queueProcessor = functionQueueProcessor();
-
-                if (isFirst)
-                {
-                    queueProcessor.CreateOutQueue(thisStepNumber);
-                    isFirst = false;
-                }
-
-                queueProcessor.InitializeWithStepNumber(thisStepNumber);
-
-                var task = Task.Factory.StartNew(
-                    (o) =>
-                        {
-                            queueProcessor.MonitorWorkQueue();
-                            return 1;
-                        },
-                    thisStepNumber,
-                    this.cancellationTokenSource.Token);
-
-                tasks.Add(task);
-            }
-
-            var taskArray = tasks.ToArray();
-
-            Task.WhenAll(taskArray).ContinueWith(
-                t =>
-                    {
-                        if (t.IsFaulted)
-                        {
-                            this.cancellationTokenSource.Cancel();
-                        }
-                    },
-                this.cancellationTokenSource.Token,
-                TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Current).ContinueWith(
-                task =>
-                    {
-                        if (!task.IsFaulted)
-                        {
-                            functionQueueProcessor().MarkOutputQueueAsCompleted(thisStepNumber);
-                        }
-                    });
-
-            return tasks;
+            //// set up aliases
+            //if (config.UploadToElasticSearch)
+            //{
+            //    fileUploader.SetupAlias(config.Urls, config.Index, config.Alias).Wait();
+            //}
         }
     }
 }

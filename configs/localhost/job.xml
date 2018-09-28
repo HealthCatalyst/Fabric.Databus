@@ -22,7 +22,6 @@
       {
       }
     </DataModel>
-    <DataSources>
       <DataSource>
         <Sql>
           SELECT
@@ -55,6 +54,5 @@
           FROM dbo.Elasticsearchtest
         </Sql>
       </DataSource>
-    </DataSources>
   </Data>
 </Job>

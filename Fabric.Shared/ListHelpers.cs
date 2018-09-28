@@ -29,17 +29,13 @@ namespace Fabric.Shared
 
         public static T FromXml<T>(this string txt) where T : class
         {
-            var xmlSerializer = new DataContractSerializer(typeof(T));
+            var xmlSerializer = new XmlSerializer(typeof(T));
 
-            var content = Encoding.UTF8.GetBytes(txt);
+            var reader = new StringReader(txt);
+            var jobConfig = xmlSerializer.Deserialize(reader) as T;
 
-            XmlDictionaryReader reader =
-                XmlDictionaryReader.CreateTextReader(content, new XmlDictionaryReaderQuotas());
-
-            var jobconfig = xmlSerializer.ReadObject(reader) as T;
-
-            return jobconfig;
-        }   
+            return jobConfig;
+        }
 
         public static bool DoesStringContainPeriods(this string txt)
         {

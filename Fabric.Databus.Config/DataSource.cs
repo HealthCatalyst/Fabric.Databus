@@ -44,6 +44,7 @@ namespace Fabric.Databus.Config
         /// <summary>
         /// Gets or sets the fields.
         /// </summary>
+        [XmlIgnore]
         public List<IQueryField> Fields { get; set; } = new List<IQueryField>();
 
         /// <summary>

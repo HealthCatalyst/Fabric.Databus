@@ -1,5 +1,6 @@
 ﻿namespace FileSaveQueueProcessor
 {
+    using System;
     using System.Collections.Concurrent;
     using System.IO;
     using System.IO.Compression;
@@ -94,6 +95,11 @@
 
         public static void DeleteDirectory(string target_dir)
         {
+            if (!Directory.Exists(target_dir))
+            {
+                throw new Exception($"Folder {target_dir} does not exist");
+            }
+
             string[] files = Directory.GetFiles(target_dir);
             string[] dirs = Directory.GetDirectories(target_dir);
 

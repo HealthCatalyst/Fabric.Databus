@@ -31,5 +31,4 @@ namespace Fabric.Databus.Config
             return fileContents.FromXml<XmlJob>();
         }
     }
-
 }

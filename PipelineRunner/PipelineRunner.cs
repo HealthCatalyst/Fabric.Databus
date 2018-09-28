@@ -180,16 +180,13 @@ namespace PipelineRunner
 
             int loadNumber = 0;
 
+            // add sequence number to every load
             foreach (var load in job.Data.DataSources)
             {
                 load.SequenceNumber = ++loadNumber;
             }
 
-            if (config.DropAndReloadIndex)
-            {
-                this.ReadAndSetSchema(config, queueContext, job);
-            }
-
+            // add job to the first queue
             var sqlJobQueue = queueContext.QueueManager
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
 
@@ -200,29 +197,36 @@ namespace PipelineRunner
 
             sqlJobQueue.CompleteAdding();
 
-            var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
+            var processors = new List<QueueProcessorInfo>();
 
-            var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
+            if (config.DropAndReloadIndex)
+            {
+                processors.AddRange(
+                    new List<QueueProcessorInfo>
+                        {
+                            new QueueProcessorInfo { Type = typeof(SqlGetSchemaQueueProcessor), Count = 1 },
+                            new QueueProcessorInfo { Type = typeof(SaveSchemaQueueProcessor), Count = 1 },
+                            new QueueProcessorInfo
+                                {
+                                    Type = config.UploadToElasticSearch
+                                               ? typeof(MappingUploadQueueProcessor)
+                                               : typeof(DummyMappingUploadQueueProcessor),
+                                    Count = 1
+                                }
+                        });
+            }
 
-            var processors = new List<QueueProcessorInfo>
-                                 {
-                                     new QueueProcessorInfo { Type = typeof(SqlJobQueueProcessor), Count = 1 },
-                                     new QueueProcessorInfo { Type = typeof(SqlBatchQueueProcessor), Count = 1 },
-                                     new QueueProcessorInfo { Type = typeof(SqlImportQueueProcessor), Count = 1 },
-                                     new QueueProcessorInfo
-                                         {
-                                             Type = typeof(ConvertDatabaseRowToJsonQueueProcessor), Count = 1
-                                         },
-                                     new QueueProcessorInfo
-                                         {
-                                             Type = typeof(JsonDocumentMergerQueueProcessor), Count = 1
-                                         },
-                                     new QueueProcessorInfo
-                                         {
-                                             Type = typeof(CreateBatchItemsQueueProcessor), Count = 1
-                                         },
-                                     new QueueProcessorInfo { Type = typeof(SaveBatchQueueProcessor), Count = 1 }
-                                 };
+            processors.AddRange(
+                new List<QueueProcessorInfo>
+                    {
+                        new QueueProcessorInfo { Type = typeof(SqlJobQueueProcessor), Count = 1 },
+                        new QueueProcessorInfo { Type = typeof(SqlBatchQueueProcessor), Count = 1 },
+                        new QueueProcessorInfo { Type = typeof(SqlImportQueueProcessor), Count = 1 },
+                        new QueueProcessorInfo { Type = typeof(ConvertDatabaseRowToJsonQueueProcessor), Count = 1 },
+                        new QueueProcessorInfo { Type = typeof(JsonDocumentMergerQueueProcessor), Count = 1 },
+                        new QueueProcessorInfo { Type = typeof(CreateBatchItemsQueueProcessor), Count = 1 },
+                        new QueueProcessorInfo { Type = typeof(SaveBatchQueueProcessor), Count = 1 }
+                    });
 
             if (config.WriteTemporaryFilesToDisk)
             {
@@ -242,83 +246,15 @@ namespace PipelineRunner
                                    });
             }
 
+            var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
+
+            var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
+
             pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
 
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
             Console.WriteLine(stopwatchElapsed);
-        }
-
-        /// <summary>
-        /// The read and set schema.
-        /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        /// <param name="queueContext">
-        /// The queue context.
-        /// </param>
-        /// <param name="job">
-        /// The job.
-        /// </param>
-        private void ReadAndSetSchema(IQueryConfig config, IQueueContext queueContext, IJob job)
-        {
-            var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
-
-            var fileUploader = fileUploaderFactory.Create(
-                queueContext.Config.ElasticSearchUserName,
-                queueContext.Config.ElasticSearchPassword,
-                job.Config.KeepIndexOnline);
-
-            if (config.UploadToElasticSearch && config.DropAndReloadIndex)
-            {
-                fileUploader.DeleteIndex(
-                    config.Urls,
-                    queueContext.MainMappingUploadRelativeUrl,
-                    config.Index,
-                    config.Alias).Wait();
-            }
-
-            var sqlGetSchemaQueue = queueContext.QueueManager
-                .CreateInputQueue<SqlGetSchemaQueueItem>(++this.stepNumber);
-
-            sqlGetSchemaQueue.Add(new SqlGetSchemaQueueItem
-            {
-                Loads = job.Data.DataSources
-            });
-
-            sqlGetSchemaQueue.CompleteAdding();
-
-            var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
-
-            var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
-
-            IList<QueueProcessorInfo> processors = new List<QueueProcessorInfo>
-                                                       {
-                                                           new QueueProcessorInfo
-                                                               {
-                                                                   Type = typeof(SqlGetSchemaQueueProcessor),
-                                                                   Count = 1
-                                                               },
-                                                           new QueueProcessorInfo
-                                                               {
-                                                                   Type = typeof(SaveSchemaQueueProcessor),
-                                                                   Count = 1
-                                                               },
-                                                           new QueueProcessorInfo()
-                                                               {
-                                                                   Type = config.UploadToElasticSearch ? typeof(MappingUploadQueueProcessor) : typeof(DummyMappingUploadQueueProcessor),
-                                                                   Count = 1
-                                                               }
-                                                       };
-
-            pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
-
-            // set up aliases
-            if (config.UploadToElasticSearch)
-            {
-                fileUploader.SetupAlias(config.Urls, config.Index, config.Alias).Wait();
-            }
         }
     }
 }

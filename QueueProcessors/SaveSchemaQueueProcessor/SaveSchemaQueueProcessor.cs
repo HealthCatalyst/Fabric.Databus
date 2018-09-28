@@ -1,6 +1,14 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SaveSchemaQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SaveSchemaQueueProcessor type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace SaveSchemaQueueProcessor
 {
-    using System;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -10,12 +18,16 @@ namespace SaveSchemaQueueProcessor
     using ElasticSearchJsonWriter;
 
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
+
+    using Fabric.Databus.Config;
 
     using QueueItems;
 
     using Serilog;
 
+    /// <summary>
+    /// The save schema queue processor.
+    /// </summary>
     public class SaveSchemaQueueProcessor : BaseQueueProcessor<SaveSchemaQueueItem, MappingUploadQueueItem>
     {
         private readonly string _uploadUrl;
@@ -23,20 +35,39 @@ namespace SaveSchemaQueueProcessor
         private readonly string _secondaryMappingUploadRelativeUrl;
         private readonly string _bulkUploadRelativeUrl;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SaveSchemaQueueProcessor"/> class.
+        /// </summary>
+        /// <param name="queueContext">
+        /// The queue context.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         public SaveSchemaQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
-            this._uploadUrl = Config.Urls.First();
+            this._uploadUrl = this.Config.Urls.First();
             this._mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;
             this._secondaryMappingUploadRelativeUrl = queueContext.SecondaryMappingUploadRelativeUrl;
             this._bulkUploadRelativeUrl = queueContext.BulkUploadRelativeUrl;
 
             if (this._uploadUrl.Last() == '/')
-                this._uploadUrl = this._uploadUrl.Substring(1, this._uploadUrl.Length-1);
+            {
+                this._uploadUrl = this._uploadUrl.Substring(1, this._uploadUrl.Length - 1);
+            }
 
             if (this._mainMappingUploadRelativeUrl.First() != '/')
+            {
                 this._mainMappingUploadRelativeUrl = '/' + this._mainMappingUploadRelativeUrl;
+            }
         }
 
+        /// <summary>
+        /// The handle.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
         protected override void Handle(SaveSchemaQueueItem workItem)
         {
             //first send the base mapping
@@ -44,10 +75,10 @@ namespace SaveSchemaQueueProcessor
 
             foreach (var mapping in workItem.Mappings.OrderBy(m => m.SequenceNumber).ToList())
             {
-                this.SendMapping(mapping);
+                this.SendMapping(mapping, workItem.Job);
             }
 
-            if (Config.WriteTemporaryFilesToDisk)
+            if (this.Config.WriteTemporaryFilesToDisk)
             {
                 //WriteWindowsBatchFile();
 
@@ -59,27 +90,28 @@ namespace SaveSchemaQueueProcessor
         {
         }
 
-        private void SendMapping(MappingItem mapping)
+        private void SendMapping(MappingItem mapping, IJob workItemJob)
         {
             var stream = new MemoryStream(); // do not use using since we'll pass it to next queue
 
-            var propertyPath = mapping.PropertyPath == String.Empty ? null : mapping.PropertyPath;
+            var propertyPath = mapping.PropertyPath == string.Empty ? null : mapping.PropertyPath;
 
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             {
-                EsJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, Config.EntityType);
+                EsJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, this.Config.EntityType);
             }
 
-            AddToOutputQueue(new MappingUploadQueueItem
+            this.AddToOutputQueue(new MappingUploadQueueItem
             {
                 PropertyName = mapping.PropertyPath,
                 SequenceNumber = mapping.SequenceNumber,
                 Stream = stream,
+                Job = workItemJob
             });
 
-            if (Config.WriteTemporaryFilesToDisk)
+            if (this.Config.WriteTemporaryFilesToDisk)
             {
-                string path = Path.Combine(Config.LocalSaveFolder, (propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json"));
+                string path = Path.Combine(this.Config.LocalSaveFolder, propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
                 using (var fileStream = File.Create(path))
                 {
                     stream.Seek(0, SeekOrigin.Begin);
@@ -88,7 +120,6 @@ namespace SaveSchemaQueueProcessor
                     fileStream.Flush();
                 }
             }
-
         }
 
 #if FALSE

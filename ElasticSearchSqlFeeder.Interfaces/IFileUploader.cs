@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchApiCaller
+namespace ElasticSearchSqlFeeder.Interfaces
 {
     using System.Collections.Generic;
     using System.IO;

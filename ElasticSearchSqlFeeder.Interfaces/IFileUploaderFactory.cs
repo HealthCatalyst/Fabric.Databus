@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchApiCaller
+namespace ElasticSearchSqlFeeder.Interfaces
 {
     /// <summary>
     /// The FileUploaderFactory interface.

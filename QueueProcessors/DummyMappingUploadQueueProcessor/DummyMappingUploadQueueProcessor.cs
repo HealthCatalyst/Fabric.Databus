@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DummyMappingUploadQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the DummyMappingUploadQueueProcessor type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace DummyMappingUploadQueueProcessor
 {
     using BaseQueueProcessor;
@@ -9,30 +18,75 @@ namespace DummyMappingUploadQueueProcessor
 
     using Serilog;
 
-    public class DummyMappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, EndPointQueueItem>
+    /// <summary>
+    /// The dummy mapping upload queue processor.
+    /// </summary>
+    public class DummyMappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, SqlJobQueueItem>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DummyMappingUploadQueueProcessor"/> class.
+        /// </summary>
+        /// <param name="queueContext">
+        /// The queue context.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         public DummyMappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
         {
         }
 
+        /// <summary>
+        /// The logger name.
+        /// </summary>
+        protected override string LoggerName => "NullMappingUpload";
+
+        /// <summary>
+        /// The handle.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
         protected override void Handle(MappingUploadQueueItem workItem)
         {
             // do nothing
         }
 
+        /// <summary>
+        /// The begin.
+        /// </summary>
+        /// <param name="isFirstThreadForThisTask">
+        /// The is first thread for this task.
+        /// </param>
         protected override void Begin(bool isFirstThreadForThisTask)
         {
         }
 
+        /// <summary>
+        /// The complete.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="isLastThreadForThisTask">
+        /// The is last thread for this task.
+        /// </param>
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 
+        /// <summary>
+        /// The get id.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         protected override string GetId(MappingUploadQueueItem workItem)
         {
             return workItem.QueryId;
         }
-
-        protected override string LoggerName => "NullMappingUpload";
     }
 }

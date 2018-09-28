@@ -1,93 +1,144 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MappingUploadQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the MappingUploadQueueProcessor type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace MappingUploadQueueProcessor
 {
     using System;
     using System.IO;
-    using System.Threading.Tasks;
 
     using BaseQueueProcessor;
 
-    using ElasticSearchApiCaller;
-
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
 
     using Serilog;
 
-    public class MappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, EndPointQueueItem>
+    /// <inheritdoc />
+    /// <summary>
+    /// The mapping upload queue processor.
+    /// </summary>
+    public class MappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, SqlJobQueueItem>
     {
-        readonly FileUploader _fileUploader;
-        private readonly string _mainMappingUploadRelativeUrl;
-        private readonly string _secondaryMappingUploadRelativeUrl;
+        /// <summary>
+        /// The file uploader factory.
+        /// </summary>
+        private readonly IFileUploaderFactory fileUploaderFactory;
 
-        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger)
+        /// <summary>
+        /// The main mapping upload relative url.
+        /// </summary>
+        private readonly string mainMappingUploadRelativeUrl;
+
+        /// <summary>
+        /// The secondary mapping upload relative url.
+        /// </summary>
+        private readonly string secondaryMappingUploadRelativeUrl;
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:MappingUploadQueueProcessor.MappingUploadQueueProcessor" /> class.
+        /// </summary>
+        /// <param name="queueContext">
+        /// The queue context.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploaderFactory fileUploaderFactory)
             : base(queueContext, logger)
         {
-            this._fileUploader = new FileUploader(queueContext.Config.ElasticSearchUserName,
-                queueContext.Config.ElasticSearchPassword, Config.KeepIndexOnline);
-            this._mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;
-            this._secondaryMappingUploadRelativeUrl = queueContext.SecondaryMappingUploadRelativeUrl;
+            this.fileUploaderFactory = fileUploaderFactory ?? throw new ArgumentNullException(nameof(fileUploaderFactory));
+            this.mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;
+            this.secondaryMappingUploadRelativeUrl = queueContext.SecondaryMappingUploadRelativeUrl;
         }
 
-        private void UploadFiles(MappingUploadQueueItem wt)
-        {
+        /// <summary>
+        /// The logger name.
+        /// </summary>
+        protected override string LoggerName => "MappingUpload";
 
-            var relativeUrl = string.IsNullOrEmpty(wt.PropertyName) ? this._mainMappingUploadRelativeUrl : this._secondaryMappingUploadRelativeUrl;
-
-            this.UploadSingleFile(wt.Stream, relativeUrl ).Wait();
-
-            MyLogger.Verbose($"Uploaded mapping file: {wt.PropertyName} ");
-
-        }
-
-        private Task UploadSingleFile(Stream stream, string relativeUrl)
-        {
-            try
-            {
-                return Task.Run(
-                        async () =>
-                        {
-                            await this._fileUploader.SendStreamToHosts(Config.Urls, relativeUrl, 1, stream, doLogContent: true, doCompress: false);
-                        });
-
-            }
-            catch (AggregateException ae)
-            {
-                ae.Handle((x) =>
-                {
-                    //if (x is UnauthorizedAccessException) // This we know how to handle.
-                    //{
-                    //    Console.WriteLine("You do not have permission to access all folders in this path.");
-                    //    Console.WriteLine("See your network administrator or try another path.");
-                    //    return true;
-                    //}
-                    MyLogger.Error("{@Exception}", x);
-                    return false;
-                });
-
-                throw;
-            }
-        }
-
+        /// <inheritdoc />
+        /// <summary>
+        /// The handle.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
         protected override void Handle(MappingUploadQueueItem workItem)
         {
             this.UploadFiles(workItem);
+
+            this.AddToOutputQueue(new SqlJobQueueItem { Job = workItem.Job });
         }
 
+        /// <inheritdoc />
         protected override void Begin(bool isFirstThreadForThisTask)
         {
         }
 
+        /// <inheritdoc />
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
+            if (isLastThreadForThisTask)
+            {
+                // set up aliases
+                if (this.QueueContext.Config.UploadToElasticSearch)
+                {
+                    var fileUploader = this.fileUploaderFactory.Create(
+                        this.QueueContext.Config.ElasticSearchUserName,
+                        this.QueueContext.Config.ElasticSearchPassword,
+                        this.Config.KeepIndexOnline);
+
+                    fileUploader.SetupAlias(this.QueueContext.Config.Urls, this.QueueContext.Config.Index, this.QueueContext.Config.Alias).Wait();
+                }
+            }
         }
 
+        /// <inheritdoc />
         protected override string GetId(MappingUploadQueueItem workItem)
         {
             return workItem.QueryId;
         }
 
-        protected override string LoggerName => "MappingUpload";
+        /// <summary>
+        /// The upload single file.
+        /// </summary>
+        /// <param name="stream">
+        /// The stream.
+        /// </param>
+        /// <param name="relativeUrl">
+        /// The relative url.
+        /// </param>
+        private void UploadSingleFile(Stream stream, string relativeUrl)
+        {
+            var fileUploader = this.fileUploaderFactory.Create(
+                this.QueueContext.Config.ElasticSearchUserName,
+                this.QueueContext.Config.ElasticSearchPassword,
+                this.Config.KeepIndexOnline);
+
+            fileUploader.SendStreamToHosts(this.Config.Urls, relativeUrl, 1, stream, doLogContent: true, doCompress: false).Wait();
+        }
+
+        /// <summary>
+        /// The upload files.
+        /// </summary>
+        /// <param name="wt">
+        /// The wt.
+        /// </param>
+        private void UploadFiles(MappingUploadQueueItem wt)
+        {
+            var relativeUrl = string.IsNullOrEmpty(wt.PropertyName) ? this.mainMappingUploadRelativeUrl : this.secondaryMappingUploadRelativeUrl;
+
+            this.UploadSingleFile(wt.Stream, relativeUrl);
+
+            this.MyLogger.Verbose($"Uploaded mapping file: {wt.PropertyName} ");
+        }
     }
 }

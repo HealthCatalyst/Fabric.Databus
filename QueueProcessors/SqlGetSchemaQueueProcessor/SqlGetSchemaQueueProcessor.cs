@@ -1,13 +1,21 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SqlGetSchemaQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SqlGetSchemaQueueProcessor type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace SqlGetSchemaQueueProcessor
 {
+    using System;
     using System.IO;
     using System.Linq;
-    using System.Xml;
 
     using BaseQueueProcessor;
 
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Schema;
     using Fabric.Shared;
@@ -16,58 +24,119 @@ namespace SqlGetSchemaQueueProcessor
 
     using Serilog;
 
-    public class SqlGetSchemaQueueProcessor : BaseQueueProcessor<SqlGetSchemaQueueItem, SaveSchemaQueueItem>
+    /// <inheritdoc />
+    /// <summary>
+    /// The sql get schema queue processor.
+    /// </summary>
+    public class SqlGetSchemaQueueProcessor : BaseQueueProcessor<SqlJobQueueItem, SaveSchemaQueueItem>
     {
-        private readonly string _folder;
+        /// <summary>
+        /// The file uploader factory.
+        /// </summary>
+        private readonly IFileUploaderFactory fileUploaderFactory;
 
-        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
+
+        /// <inheritdoc />
+        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploaderFactory fileUploaderFactory) : base(queueContext, logger)
         {
-            this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-SqlGetSchema");
-            if (Config.WriteDetailedTemporaryFilesToDisk)
+            this.fileUploaderFactory = fileUploaderFactory ?? throw new ArgumentNullException(nameof(fileUploaderFactory));
+            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");
+            if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
-                Directory.CreateDirectory(this._folder);
+                Directory.CreateDirectory(this.folder);
             }
         }
 
-        protected override void Handle(SqlGetSchemaQueueItem workItem)
+        /// <summary>
+        /// The logger name.
+        /// </summary>
+        protected override string LoggerName => "SqlGetSchema";
+
+        /// <inheritdoc />
+        /// <summary>
+        /// The handle.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        protected override void Handle(SqlJobQueueItem workItem)
         {
+            var workItemLoads = workItem.Job.Data.DataSources;
 
-            var workitemLoads = workItem.Loads;
-
-            var dictionary = SchemaLoader.GetSchemasForLoads(workitemLoads, Config.ConnectionString, Config.TopLevelKeyColumn);
+            var dictionary = SchemaLoader.GetSchemasForLoads(workItemLoads, this.Config.ConnectionString, this.Config.TopLevelKeyColumn);
 
             var mappingItems = dictionary.ToList();
 
-            if (Config.WriteDetailedTemporaryFilesToDisk)
+            if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
                 foreach (var mappingItem in mappingItems)
                 {
-                    var filePath = Path.Combine(this._folder, $"{mappingItem.PropertyPath ?? "main"}.json");
+                    var filePath = Path.Combine(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
 
                     File.AppendAllText(filePath, mappingItem.ToJsonPretty());
                 }
             }
 
-            AddToOutputQueue(new SaveSchemaQueueItem
+            this.AddToOutputQueue(new SaveSchemaQueueItem
             {
-                Mappings = mappingItems
+                Mappings = mappingItems,
+                Job = workItem.Job
             });
         }
 
+        /// <summary>
+        /// The begin.
+        /// </summary>
+        /// <param name="isFirstThreadForThisTask">
+        /// The is first thread for this task.
+        /// </param>
         protected override void Begin(bool isFirstThreadForThisTask)
         {
+            if (isFirstThreadForThisTask)
+            {
+                var config = this.QueueContext.Config;
+                if (config.UploadToElasticSearch && config.DropAndReloadIndex)
+                {
+                    var fileUploader = this.fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
+
+                    fileUploader.DeleteIndex(
+                        config.Urls,
+                        this.QueueContext.MainMappingUploadRelativeUrl,
+                        config.Index,
+                        config.Alias).Wait();
+                }
+            }
         }
 
-
+        /// <summary>
+        /// The complete.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="isLastThreadForThisTask">
+        /// The is last thread for this task.
+        /// </param>
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 
-        protected override string GetId(SqlGetSchemaQueueItem workItem)
+        /// <summary>
+        /// The get id.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        protected override string GetId(SqlJobQueueItem workItem)
         {
             return workItem.QueryId;
         }
-
-        protected override string LoggerName => "SqlGetSchema";
     }
 }

@@ -9,6 +9,8 @@
 
 namespace ElasticSearchApiCaller
 {
+    using ElasticSearchSqlFeeder.Interfaces;
+
     /// <summary>
     /// The file uploader factory.
     /// </summary>

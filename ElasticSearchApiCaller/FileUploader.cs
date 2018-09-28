@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 
 namespace ElasticSearchApiCaller
 {
+    using ElasticSearchSqlFeeder.Interfaces;
+
     using Serilog;
     using Serilog.Core;
 

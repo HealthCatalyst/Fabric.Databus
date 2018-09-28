@@ -16,7 +16,6 @@ namespace PipelineRunner
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
-    using System.Threading.Tasks;
 
     using ConvertDatabaseRowToJsonQueueProcessor;
 
@@ -71,19 +70,19 @@ namespace PipelineRunner
         private const int TimeoutInMilliseconds = 30 * 60 * 1000; // 5 * 60 * 60 * 1000;
 
         /// <summary>
-        /// The step number.
-        /// </summary>
-        private int stepNumber;
-
-        /// <summary>
         /// The unity container.
         /// </summary>
-        private IUnityContainer container;
+        private readonly IUnityContainer container;
 
         /// <summary>
         /// The cancellation token source.
         /// </summary>
         private readonly CancellationTokenSource cancellationTokenSource;
+
+        /// <summary>
+        /// The step number.
+        /// </summary>
+        private int stepNumber;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PipelineRunner"/> class.
@@ -190,7 +189,7 @@ namespace PipelineRunner
             }
 
             var sqlBatchQueue = queueContext.QueueManager
-                .CreateInputQueue<SqlBatchQueueItem>(this.stepNumber + 1);
+                .CreateInputQueue<SqlBatchQueueItem>(++this.stepNumber);
 
             if (queueContext.Config.EntitiesPerBatch <= 0)
             {
@@ -363,54 +362,62 @@ namespace PipelineRunner
         /// </param>
         private void ReadAndSetSchema(IQueryConfig config, IQueueContext queueContext, IJob job)
         {
-            //var fileUploader = new FileUploader(
-            //    queueContext.Config.ElasticSearchUserName,
-            //    queueContext.Config.ElasticSearchPassword,
-            //    job.Config.KeepIndexOnline);
+            var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
 
-            //if (config.UploadToElasticSearch && config.DropAndReloadIndex)
-            //{
-            //    Task.Run(
-            //        async () =>
-            //        {
-            //            await fileUploader.DeleteIndex(config.Urls, queueContext.MainMappingUploadRelativeUrl, config.Index, config.Alias);
-            //        })
-            //    .Wait();
-            //}
+            var fileUploader = fileUploaderFactory.Create(
+                queueContext.Config.ElasticSearchUserName,
+                queueContext.Config.ElasticSearchPassword,
+                job.Config.KeepIndexOnline);
 
-            //var tasks = new List<Task>();
-            //// ReSharper disable once JoinDeclarationAndInitializer
-            //IList<Task> newTasks;
+            if (config.UploadToElasticSearch && config.DropAndReloadIndex)
+            {
+                fileUploader.DeleteIndex(
+                    config.Urls,
+                    queueContext.MainMappingUploadRelativeUrl,
+                    config.Index,
+                    config.Alias).Wait();
+            }
 
-            //var sqlGetSchemaQueue = queueContext.QueueManager
-            //    .CreateInputQueue<SqlGetSchemaQueueItem>(this.stepNumber + 1);
+            var sqlGetSchemaQueue = queueContext.QueueManager
+                .CreateInputQueue<SqlGetSchemaQueueItem>(++this.stepNumber);
 
-            //sqlGetSchemaQueue.Add(new SqlGetSchemaQueueItem
-            //{
-            //    Loads = job.Data.DataSources
-            //});
+            sqlGetSchemaQueue.Add(new SqlGetSchemaQueueItem
+            {
+                Loads = job.Data.DataSources
+            });
 
-            //sqlGetSchemaQueue.CompleteAdding();
+            sqlGetSchemaQueue.CompleteAdding();
 
-            //newTasks = this.RunAsync(() => this.container.Resolve<SqlGetSchemaQueueProcessor>(), 1);
-            //tasks.AddRange(newTasks);
+            var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
 
-            //newTasks = this.RunAsync(() => this.container.Resolve<SaveSchemaQueueProcessor>(), 1);
-            //tasks.AddRange(newTasks);
+            var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
 
-            //newTasks = config.UploadToElasticSearch
-            //               ? this.RunAsync(() => this.container.Resolve<MappingUploadQueueProcessor>(), 1)
-            //               : this.RunAsync(() => this.container.Resolve<DummyMappingUploadQueueProcessor>(), 1);
+            IList<QueueProcessorInfo> processors = new List<QueueProcessorInfo>
+                                                       {
+                                                           new QueueProcessorInfo
+                                                               {
+                                                                   Type = typeof(SqlGetSchemaQueueProcessor),
+                                                                   Count = 1
+                                                               },
+                                                           new QueueProcessorInfo
+                                                               {
+                                                                   Type = typeof(SaveSchemaQueueProcessor),
+                                                                   Count = 1
+                                                               },
+                                                           new QueueProcessorInfo()
+                                                               {
+                                                                   Type = config.UploadToElasticSearch ? typeof(MappingUploadQueueProcessor) : typeof(DummyMappingUploadQueueProcessor),
+                                                                   Count = 1
+                                                               }
+                                                       };
 
-            //tasks.AddRange(newTasks);
+            pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
 
-            //Task.WaitAll(tasks.ToArray());
-
-            //// set up aliases
-            //if (config.UploadToElasticSearch)
-            //{
-            //    fileUploader.SetupAlias(config.Urls, config.Index, config.Alias).Wait();
-            //}
+            // set up aliases
+            if (config.UploadToElasticSearch)
+            {
+                fileUploader.SetupAlias(config.Urls, config.Index, config.Alias).Wait();
+            }
         }
     }
 }

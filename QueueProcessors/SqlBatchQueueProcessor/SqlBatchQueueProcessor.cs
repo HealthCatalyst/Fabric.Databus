@@ -20,6 +20,7 @@ namespace SqlBatchQueueProcessor
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The sql batch queue processor.
     /// </summary>
@@ -30,8 +31,9 @@ namespace SqlBatchQueueProcessor
         /// </summary>
         private readonly string folder;
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlBatchQueueProcessor"/> class.
+        /// Initializes a new instance of the <see cref="T:SqlBatchQueueProcessor.SqlBatchQueueProcessor" /> class.
         /// </summary>
         /// <param name="queueContext">
         /// The queue context.
@@ -54,7 +56,6 @@ namespace SqlBatchQueueProcessor
                 {
                     var queryName = dataSource.Path ?? "Main";
                     var queryId = queryName;
-                    //var queryId = JsonDocumentMergerQueueProcessor.RegisterQuery(seed, queryName);
 
                     this.AddToOutputQueue(new SqlImportQueueItem
                     {
@@ -70,9 +71,9 @@ namespace SqlBatchQueueProcessor
 
             if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
-                foreach (var workitemLoad in workItem.Loads)
+                foreach (var workItemLoad in workItem.Loads)
                 {
-                    var queryName = workitemLoad.Path ?? "Main";
+                    var queryName = workItemLoad.Path ?? "Main";
                     var queryId = queryName;
 
                     var path = Path.Combine(this.folder, queryId);

@@ -23,6 +23,7 @@
     <ProjectReference Include="..\QueueProcessors\SqlBatchQueueProcessor\SqlBatchQueueProcessor.csproj" />
     <ProjectReference Include="..\QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaQueueProcessor.csproj" />
     <ProjectReference Include="..\QueueProcessors\SqlImportQueueProcessor\SqlImportQueueProcessor.csproj" />
+    <ProjectReference Include="..\QueueProcessors\SqlJobQueueProcessor\SqlJobQueueProcessor.csproj" />
   </ItemGroup>
 
 </Project>

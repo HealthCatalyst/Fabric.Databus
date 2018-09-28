@@ -52,6 +52,8 @@ namespace PipelineRunner
 
     using SqlImportQueueProcessor;
 
+    using SqlJobQueueProcessor;
+
     using Unity;
 
     /// <summary>
@@ -188,38 +190,15 @@ namespace PipelineRunner
                 this.ReadAndSetSchema(config, queueContext, job);
             }
 
-            var sqlBatchQueue = queueContext.QueueManager
-                .CreateInputQueue<SqlBatchQueueItem>(++this.stepNumber);
+            var sqlJobQueue = queueContext.QueueManager
+                .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
 
-            if (queueContext.Config.EntitiesPerBatch <= 0)
-            {
-                sqlBatchQueue.Add(new SqlBatchQueueItem
-                {
-                    BatchNumber = 1,
-                    Start = null,
-                    End = null,
-                    Loads = job.Data.DataSources,
-                });
-            }
-            else
-            {
-                var ranges = CalculateRanges(config, job);
+            sqlJobQueue.Add(new SqlJobQueueItem
+                                {
+                                    Job = job
+                                });
 
-                int currentBatchNumber = 1;
-
-                foreach (var range in ranges)
-                {
-                    sqlBatchQueue.Add(new SqlBatchQueueItem
-                    {
-                        BatchNumber = currentBatchNumber++,
-                        Start = range.Item1,
-                        End = range.Item2,
-                        Loads = job.Data.DataSources,
-                    });
-                }
-            }
-
-            sqlBatchQueue.CompleteAdding();
+            sqlJobQueue.CompleteAdding();
 
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
 
@@ -227,6 +206,7 @@ namespace PipelineRunner
 
             var processors = new List<QueueProcessorInfo>
                                  {
+                                     new QueueProcessorInfo { Type = typeof(SqlJobQueueProcessor), Count = 1 },
                                      new QueueProcessorInfo { Type = typeof(SqlBatchQueueProcessor), Count = 1 },
                                      new QueueProcessorInfo { Type = typeof(SqlImportQueueProcessor), Count = 1 },
                                      new QueueProcessorInfo
@@ -267,85 +247,6 @@ namespace PipelineRunner
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
             Console.WriteLine(stopwatchElapsed);
-        }
-
-        /// <summary>
-        /// The calculate ranges.
-        /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        /// <param name="job">
-        /// The job.
-        /// </param>
-        /// <returns>
-        /// The <see cref="IEnumerable"/>.
-        /// </returns>
-        private static IEnumerable<Tuple<string, string>> CalculateRanges(IQueryConfig config, IJob job)
-        {
-            var list = GetListOfEntityKeys(config, job);
-
-            var itemsLeft = list.Count;
-
-            var start = 1;
-
-            var ranges = new List<Tuple<string, string>>();
-
-            while (itemsLeft > 0)
-            {
-                var end = start + (itemsLeft > config.EntitiesPerBatch ? config.EntitiesPerBatch : itemsLeft) - 1;
-                ranges.Add(new Tuple<string, string>(list[start - 1], list[end - 1]));
-                itemsLeft = list.Count - end;
-                start = end + 1;
-            }
-
-            return ranges;
-        }
-
-        /// <summary>
-        /// The get list of entity keys.
-        /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        /// <param name="job">
-        /// The job.
-        /// </param>
-        /// <returns>
-        /// The <see cref="List"/>.
-        /// </returns>
-        private static List<string> GetListOfEntityKeys(IQueryConfig config, IJob job)
-        {
-            var load = job.Data.DataSources.First(c => c.Path == null);
-
-            using (var conn = new SqlConnection(config.ConnectionString))
-            {
-                conn.Open();
-                var cmd = conn.CreateCommand();
-
-                if (job.Config.SqlCommandTimeoutInSeconds != 0)
-                {
-                    cmd.CommandTimeout = job.Config.SqlCommandTimeoutInSeconds;
-                }
-
-                cmd.CommandText = config.MaximumEntitiesToLoad > 0
-                                      ? $";WITH CTE AS ( {load.Sql} )  SELECT TOP {config.MaximumEntitiesToLoad} {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;"
-                                      : $";WITH CTE AS ( {load.Sql} )  SELECT {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;";
-
-                // Logger.Verbose($"Start: {cmd.CommandText}");
-                var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-
-                var list = new List<string>();
-
-                while (reader.Read())
-                {
-                    var obj = reader.GetValue(0);
-                    list.Add(Convert.ToString(obj));
-                }
-
-                // Logger.Verbose($"Finish: {cmd.CommandText}");
-                return list;
-            }
         }
 
         /// <summary>

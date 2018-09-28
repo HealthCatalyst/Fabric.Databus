@@ -108,6 +108,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PipelineRunner", "PipelineR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineRunnerTests", "PipelineRunnerTests\PipelineRunnerTests.csproj", "{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlJobQueueProcessor", "QueueProcessors\SqlJobQueueProcessor\SqlJobQueueProcessor.csproj", "{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -246,6 +248,10 @@ Global
 		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -285,6 +291,7 @@ Global
 		{51002114-0F10-403E-AE3E-2A55C27590B4} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 		{CFD6967D-8547-42ED-8EED-CBAA607CDDED} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
+		{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

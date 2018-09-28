@@ -1,24 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlBatchQueueItem.cs" company="">
+// <copyright file="SqlJobQueueItem.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlBatchQueueItem type.
+//   Defines the SqlJobQueueItem type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace QueueItems
 {
-    using System.Collections.Generic;
-
     using ElasticSearchSqlFeeder.Interfaces;
 
     using Fabric.Databus.Config;
 
     /// <summary>
-    /// The sql batch queue item.
+    /// The sql job queue item.
     /// </summary>
-    public class SqlBatchQueueItem : IQueueItem
+    public class SqlJobQueueItem : IQueueItem
     {
         /// <summary>
         /// Gets or sets the query id.
@@ -31,23 +29,8 @@ namespace QueueItems
         public string PropertyName { get; set; }
 
         /// <summary>
-        /// Gets or sets the start.
+        /// Gets or sets the job.
         /// </summary>
-        public string Start { get; set; }
-
-        /// <summary>
-        /// Gets or sets the end.
-        /// </summary>
-        public string End { get; set; }
-
-        /// <summary>
-        /// Gets or sets the loads.
-        /// </summary>
-        public List<DataSource> Loads { get; set; }
-
-        /// <summary>
-        /// Gets or sets the batch number.
-        /// </summary>
-        public int BatchNumber { get; set; }
+        public IJob Job { get; set; }
     }
 }

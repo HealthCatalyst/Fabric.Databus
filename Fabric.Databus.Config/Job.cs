@@ -24,13 +24,11 @@ namespace Fabric.Databus.Config
         /// <summary>
         /// Gets or sets the config.
         /// </summary>
-        [DataMember(Name = "Config")]
         public IQueryConfig Config { get; set; }
 
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
-        [DataMember]
         public IJobData Data { get; set; }
     }
 }

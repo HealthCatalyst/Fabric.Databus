@@ -22,37 +22,39 @@
       {
       }
     </DataModel>
-    <DataSource>
-      <Sql>
-        SELECT
-        CustomerID
-        ,	CustomerNM
-        ,	FacilityAccountID
-        ,	AgeNBR
-        ,	DischargeDTS
-        ,	LengthOfStayDaysNBR
-        ,	IndexAdmissionFLG
-        ,	Readmit30FLG
-        ,	MaritalStatusNormDSC
-        ,	RaceNormDSC
-        ,	AdmitTypeNormDSC
-        ,	AdmitSourceDSC
-        ,	PrimaryPayorNM
-        ,	FinancialClassDSC
-        ,	DischargePhysicalDepartmentNM
-        ,	BillingLocationNM
-        ,	PrimaryDiagnosisCD
-        ,	PrimaryProcedureCD
-        ,	MSDRG
-        ,	ElectiveFLG 
-        ,	EmergencyDepartmentFLG
-        ,	GenderDSC
-        ,	DiedFLG
-        ,	ExpectedReadmission
-        ,	ExpectedMortality
-        ,	ExpectedLengthOfStay
-        FROM dbo.Elasticsearchtest
-      </Sql>
-    </DataSource>
+    <DataSources>
+      <DataSource>
+        <Sql>
+          SELECT
+          CustomerID
+          ,	CustomerNM
+          ,	FacilityAccountID
+          ,	AgeNBR
+          ,	DischargeDTS
+          ,	LengthOfStayDaysNBR
+          ,	IndexAdmissionFLG
+          ,	Readmit30FLG
+          ,	MaritalStatusNormDSC
+          ,	RaceNormDSC
+          ,	AdmitTypeNormDSC
+          ,	AdmitSourceDSC
+          ,	PrimaryPayorNM
+          ,	FinancialClassDSC
+          ,	DischargePhysicalDepartmentNM
+          ,	BillingLocationNM
+          ,	PrimaryDiagnosisCD
+          ,	PrimaryProcedureCD
+          ,	MSDRG
+          ,	ElectiveFLG
+          ,	EmergencyDepartmentFLG
+          ,	GenderDSC
+          ,	DiedFLG
+          ,	ExpectedReadmission
+          ,	ExpectedMortality
+          ,	ExpectedLengthOfStay
+          FROM dbo.Elasticsearchtest
+        </Sql>
+      </DataSource>
+    </DataSources>
   </Data>
 </Job>

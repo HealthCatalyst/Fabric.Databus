@@ -251,6 +251,20 @@ namespace BaseQueueProcessor
         }
 
         /// <summary>
+        /// The test complete.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="isLastThreadForThisTask">
+        /// The is last thread for this task.
+        /// </param>
+        public void TestComplete(string queryId, bool isLastThreadForThisTask)
+        {
+            this.Complete(queryId, isLastThreadForThisTask);
+        }
+
+        /// <summary>
         /// The internal handle.
         /// </summary>
         /// <param name="wt">

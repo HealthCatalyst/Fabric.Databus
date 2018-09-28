@@ -19,16 +19,16 @@ namespace Fabric.Databus.Config
         //    return configs;
         //}
 
-        public Job ReadXml(string inputFile)
+        public XmlJob ReadXml(string inputFile)
         {
             var fileContents = File.ReadAllText(inputFile);
 
-            return ReadXmlFromText(fileContents);
+            return this.ReadXmlFromText(fileContents);
         }
 
-        public Job ReadXmlFromText(string fileContents)
+        public XmlJob ReadXmlFromText(string fileContents)
         {
-            return fileContents.FromXml<Job>();
+            return fileContents.FromXml<XmlJob>();
         }
     }
 

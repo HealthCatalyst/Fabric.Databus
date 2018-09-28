@@ -139,7 +139,17 @@ namespace PipelineRunner
         /// </param>
         public void RunPipeline(IJob job, IProgressMonitor progressMonitor)
         {
+            if (job == null)
+            {
+                throw new ArgumentNullException(nameof(job));
+            }
+            if (job.Config == null)
+            {
+                throw new ArgumentNullException(nameof(job.Config));
+            }
+
             var config = job.Config;
+
 
             if (config.WriteTemporaryFilesToDisk)
             {

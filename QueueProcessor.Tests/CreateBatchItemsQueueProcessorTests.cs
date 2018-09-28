@@ -1,7 +1,14 @@
-﻿namespace QueueProcessor.Tests
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="CreateBatchItemsQueueProcessorTests.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The create batch items queue processor tests.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace QueueProcessor.Tests
 {
-    using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
@@ -11,8 +18,6 @@
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Config;
-
-    using JsonDocumentMergerQueueProcessor;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -34,6 +39,7 @@
         [TestMethod]
         public void TestSuccess()
         {
+            // Arrange
             var job = new Job
                           {
                               Config = new QueryConfig
@@ -65,18 +71,28 @@
 
             createBatchItemsQueueProcessor.InitializeWithStepNumber(stepNumber);
 
+            string queryId = "1";
+
             var jsonObjectQueueItem1 = new JsonObjectQueueItem
                                            {
                                                Document = JObject.Parse(@"{test:'ff'}"),
-                                               PropertyName = "foo"
+                                               PropertyName = "foo",
+                                               QueryId = queryId
                                            };
 
             createBatchItemsQueueProcessor.InternalHandle(jsonObjectQueueItem1);
 
-            var jsonObjectQueueItem2 = new JsonObjectQueueItem();
+            var jsonObjectQueueItem2 = new JsonObjectQueueItem
+                                           {
+                                               Document = JObject.Parse(@"{test2:'ff'}"),
+                                               PropertyName = "foo2",
+                                               QueryId = queryId
+                                           };
 
+            // Act
             createBatchItemsQueueProcessor.InternalHandle(jsonObjectQueueItem2);
 
+            // Assert
             var queues = queueManager.Queues;
 
             Assert.AreEqual(2, queues.Count);
@@ -90,6 +106,8 @@
 
             var saveBatchQueueItem = outputQueue.Take();
 
+            Assert.AreEqual(0, outputQueue.Count);
+
             Assert.AreEqual(1, saveBatchQueueItem.ItemsToSave.Count);
 
             var jsonObjectQueueItem = saveBatchQueueItem.ItemsToSave.First();
@@ -97,6 +115,25 @@
             Assert.AreEqual(jsonObjectQueueItem1, jsonObjectQueueItem);
 
             Assert.AreEqual(jsonObjectQueueItem1.PropertyName, jsonObjectQueueItem.PropertyName);
+
+            // Act
+            // now complete the queue
+            createBatchItemsQueueProcessor.TestComplete(queryId, true);
+
+            // Assert
+            Assert.AreEqual(1, outputQueue.Count);
+
+            saveBatchQueueItem = outputQueue.Take();
+
+            Assert.AreEqual(0, outputQueue.Count);
+
+            Assert.AreEqual(1, saveBatchQueueItem.ItemsToSave.Count);
+
+            jsonObjectQueueItem = saveBatchQueueItem.ItemsToSave.First();
+
+            Assert.AreEqual(jsonObjectQueueItem2, jsonObjectQueueItem);
+
+            Assert.AreEqual(jsonObjectQueueItem2.PropertyName, jsonObjectQueueItem.PropertyName);
         }
     }
 }

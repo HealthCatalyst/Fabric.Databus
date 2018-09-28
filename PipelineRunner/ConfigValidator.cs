@@ -9,6 +9,7 @@ namespace PipelineRunner
 
     using ElasticSearchApiCaller;
 
+    using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
     using Fabric.Databus.Config;
@@ -75,7 +76,7 @@ namespace PipelineRunner
             return configValidationResult;
         }
 
-        public bool CheckDatabaseConnectionStringIsValid(Job job)
+        public bool CheckDatabaseConnectionStringIsValid(IJob job)
         {
             using (var conn = new SqlConnection(job.Config.ConnectionString))
             {
@@ -86,14 +87,14 @@ namespace PipelineRunner
             return true;
         }
 
-        public bool CheckFirstQueryIsValid(Job job)
+        public bool CheckFirstQueryIsValid(IJob job)
         {
             var load = job.Data.DataSources.First(c => c.Path == null);
 
             return this.CheckQueryIsValid(job, load);
         }
 
-        public bool CheckQueryIsValid(Job job, DataSource load)
+        public bool CheckQueryIsValid(IJob job, IDataSource load)
         {
             var numberOfLevels =
                 (load.Path?.Count(a => a == '.') + 1) ?? 0;

@@ -1,16 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using ElasticSearchSqlFeeder.Shared;
-using Fabric.Databus.Config;
-using Fabric.Databus.Domain.ConfigValidators;
-using Fabric.Databus.Domain.Importers;
-using Fabric.Databus.Domain.ProgressMonitors;
-using Serilog;
-
 namespace Fabric.Databus.Domain.Jobs
 {
+    using System;
+    using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
+
+    using ElasticSearchSqlFeeder.Shared;
+
+    using Fabric.Databus.Config;
+    using Fabric.Databus.Domain.ConfigValidators;
+    using Fabric.Databus.Domain.Importers;
+    using Fabric.Databus.Domain.ProgressMonitors;
+
+    using Serilog;
 
     public class JobScheduler : IJobScheduler
     {

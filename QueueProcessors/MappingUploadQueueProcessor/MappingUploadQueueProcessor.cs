@@ -27,9 +27,9 @@ namespace MappingUploadQueueProcessor
     public class MappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, SqlJobQueueItem>
     {
         /// <summary>
-        /// The file uploader factory.
+        /// The file uploader.
         /// </summary>
-        private readonly IFileUploaderFactory fileUploaderFactory;
+        private readonly IFileUploader fileUploader;
 
         /// <summary>
         /// The main mapping upload relative url.
@@ -51,10 +51,11 @@ namespace MappingUploadQueueProcessor
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploaderFactory fileUploaderFactory)
+        /// <param name="fileUploader"></param>
+        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploader fileUploader)
             : base(queueContext, logger)
         {
-            this.fileUploaderFactory = fileUploaderFactory ?? throw new ArgumentNullException(nameof(fileUploaderFactory));
+            this.fileUploader = fileUploader ?? throw new ArgumentNullException(nameof(fileUploader));
             this.mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;
             this.secondaryMappingUploadRelativeUrl = queueContext.SecondaryMappingUploadRelativeUrl;
         }
@@ -91,12 +92,7 @@ namespace MappingUploadQueueProcessor
                 // set up aliases
                 if (this.QueueContext.Config.UploadToElasticSearch)
                 {
-                    var fileUploader = this.fileUploaderFactory.Create(
-                        this.QueueContext.Config.ElasticSearchUserName,
-                        this.QueueContext.Config.ElasticSearchPassword,
-                        this.Config.KeepIndexOnline);
-
-                    fileUploader.SetupAlias(this.QueueContext.Config.Urls, this.QueueContext.Config.Index, this.QueueContext.Config.Alias).Wait();
+                    this.fileUploader.SetupAlias(this.QueueContext.Config.Urls, this.QueueContext.Config.Index, this.QueueContext.Config.Alias).Wait();
                 }
             }
         }
@@ -118,12 +114,7 @@ namespace MappingUploadQueueProcessor
         /// </param>
         private void UploadSingleFile(Stream stream, string relativeUrl)
         {
-            var fileUploader = this.fileUploaderFactory.Create(
-                this.QueueContext.Config.ElasticSearchUserName,
-                this.QueueContext.Config.ElasticSearchPassword,
-                this.Config.KeepIndexOnline);
-
-            fileUploader.SendStreamToHosts(this.Config.Urls, relativeUrl, 1, stream, doLogContent: true, doCompress: false).Wait();
+            this.fileUploader.SendStreamToHosts(this.Config.Urls, relativeUrl, 1, stream, doLogContent: true, doCompress: false).Wait();
         }
 
         /// <summary>

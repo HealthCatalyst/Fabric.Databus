@@ -11,29 +11,34 @@ namespace ElasticSearchApiCaller
 {
     using ElasticSearchSqlFeeder.Interfaces;
 
+    using Serilog;
+
+    /// <inheritdoc />
     /// <summary>
     /// The file uploader factory.
     /// </summary>
     public class FileUploaderFactory : IFileUploaderFactory
     {
         /// <summary>
-        /// The create.
+        /// The logger.
         /// </summary>
-        /// <param name="userName">
-        ///     The config elastic search user name.
+        private readonly ILogger logger;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileUploaderFactory"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger.
         /// </param>
-        /// <param name="password">
-        ///     The config elastic search password.
-        /// </param>
-        /// <param name="keepIndexOnline">
-        ///     The config keep index online.
-        /// </param>
-        /// <returns>
-        /// The <see cref="FileUploader"/>.
-        /// </returns>
+        public FileUploaderFactory(ILogger logger)
+        {
+            this.logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc />
         public IFileUploader Create(string userName, string password, bool keepIndexOnline)
         {
-            return new FileUploader(userName, password, keepIndexOnline);
+            return new FileUploader(userName, password, keepIndexOnline, this.logger);
         }
     }
 }

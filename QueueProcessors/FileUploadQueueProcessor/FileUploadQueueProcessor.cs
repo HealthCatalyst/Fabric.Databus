@@ -9,11 +9,7 @@
 
 namespace FileUploadQueueProcessor
 {
-    using System;
-
     using BaseQueueProcessor;
-
-    using ElasticSearchApiCaller;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -42,20 +38,16 @@ namespace FileUploadQueueProcessor
         /// <param name="queueContext">
         /// The queue context.
         /// </param>
-        /// <param name="fileUploaderFactory">fileUploader Factory</param>
-        public FileUploadQueueProcessor(IQueueContext queueContext, IFileUploaderFactory fileUploaderFactory, ILogger logger)
+        /// <param name="fileUploader">
+        /// The fileUploader
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        public FileUploadQueueProcessor(IQueueContext queueContext, IFileUploader fileUploader, ILogger logger)
             : base(queueContext, logger)
         {
-            if (fileUploaderFactory == null)
-            {
-                throw new ArgumentNullException(nameof(fileUploaderFactory));
-            }
-
-            this.fileUploader = fileUploaderFactory.Create(
-                queueContext.Config.ElasticSearchUserName,
-                queueContext.Config.ElasticSearchPassword,
-                this.Config.KeepIndexOnline);
-
+            this.fileUploader = fileUploader;
             this.relativeUrlForPosting = queueContext.BulkUploadRelativeUrl;
         }
 
@@ -92,7 +84,7 @@ namespace FileUploadQueueProcessor
         {
             if (isLastThreadForThisTask)
             {
-                this.fileUploader.FinishUpload(Config.Urls, Config.Index, Config.Alias).Wait();
+                this.fileUploader.FinishUpload(this.Config.Urls, this.Config.Index, this.Config.Alias).Wait();
             }
         }
 

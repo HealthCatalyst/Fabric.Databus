@@ -11,8 +11,6 @@ namespace PipelineRunner
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
-    using System.Data.SqlClient;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
@@ -22,8 +20,6 @@ namespace PipelineRunner
     using CreateBatchItemsQueueProcessor;
 
     using DummyMappingUploadQueueProcessor;
-
-    using ElasticSearchApiCaller;
 
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
@@ -177,7 +173,10 @@ namespace PipelineRunner
             };
 
             this.container.RegisterInstance<IQueueContext>(queueContext);
-
+            IFileUploaderFactory fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
+            IFileUploader fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
+            this.container.RegisterInstance(fileUploader);
+           
             int loadNumber = 0;
 
             // add sequence number to every load

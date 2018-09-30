@@ -9,6 +9,8 @@
 
 namespace ElasticSearchSqlFeeder.Interfaces
 {
+    using Serilog;
+
     /// <summary>
     /// The FileUploaderFactory interface.
     /// </summary>
@@ -18,13 +20,13 @@ namespace ElasticSearchSqlFeeder.Interfaces
         /// The create.
         /// </summary>
         /// <param name="userName">
-        ///     The config elastic search user name.
+        /// The config elastic search user name.
         /// </param>
         /// <param name="password">
-        ///     The config elastic search password.
+        /// The config elastic search password.
         /// </param>
         /// <param name="keepIndexOnline">
-        ///     The config keep index online.
+        /// The config keep index online.
         /// </param>
         /// <returns>
         /// The <see cref="FileUploader"/>.

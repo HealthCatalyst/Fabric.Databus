@@ -31,9 +31,9 @@ namespace SqlGetSchemaQueueProcessor
     public class SqlGetSchemaQueueProcessor : BaseQueueProcessor<SqlJobQueueItem, SaveSchemaQueueItem>
     {
         /// <summary>
-        /// The file uploader factory.
+        /// The file uploader.
         /// </summary>
-        private readonly IFileUploaderFactory fileUploaderFactory;
+        private readonly IFileUploader fileUploader;
 
         /// <summary>
         /// The folder.
@@ -41,9 +41,9 @@ namespace SqlGetSchemaQueueProcessor
         private readonly string folder;
 
         /// <inheritdoc />
-        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploaderFactory fileUploaderFactory) : base(queueContext, logger)
+        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploader fileUploader) : base(queueContext, logger)
         {
-            this.fileUploaderFactory = fileUploaderFactory ?? throw new ArgumentNullException(nameof(fileUploaderFactory));
+            this.fileUploader = fileUploader ?? throw new ArgumentNullException(nameof(fileUploader));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");
             if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
@@ -101,9 +101,7 @@ namespace SqlGetSchemaQueueProcessor
                 var config = this.QueueContext.Config;
                 if (config.UploadToElasticSearch && config.DropAndReloadIndex)
                 {
-                    var fileUploader = this.fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
-
-                    fileUploader.DeleteIndex(
+                    this.fileUploader.DeleteIndex(
                         config.Urls,
                         this.QueueContext.MainMappingUploadRelativeUrl,
                         config.Index,

@@ -1,0 +1,51 @@
+<?xml version="1.0"?> 
+<Job>
+  <Config>
+    <ConnectionString>server=(local);initial catalog=DatabusTest;Trusted_Connection=True;</ConnectionString>
+    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
+    <Url>http://localhost:9200</Url>
+    <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
+    <EntitiesPerBatch>100</EntitiesPerBatch>
+    <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
+    <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
+    <DropAndReloadIndex>false</DropAndReloadIndex>
+    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
+    <CompressFiles>false</CompressFiles>
+    <UploadToElasticSearch>false</UploadToElasticSearch>
+    <Index>patients2</Index>
+    <Alias>patients</Alias>
+    <EntityType>patient</EntityType>
+    <TopLevelKeyColumn>PatientID</TopLevelKeyColumn>
+  </Config>
+
+  <Data>
+    <DataSource>
+      <Sql>
+        SELECT [PatientID]
+        ,[PatientLastNM]
+        ,[PatientFirstNM]
+        ,[DateOfBirth]
+        FROM [Patients]
+      </Sql>
+    </DataSource>
+    <DataSource Path="diagnoses">
+      <Sql>
+        SELECT [DiagnosisID] as KeyLevel1
+        ,[PatientID]
+        ,[DiagnosisCode]
+        ,[DiagnosisDescription]
+        FROM [PatientDiagnoses]
+      </Sql>
+    </DataSource>
+    <DataSource Path="labs">
+      <Sql>
+        SELECT [LabID] as KeyLevel1
+        ,[PatientID]
+        ,[LabCode]
+        ,[LabResult]
+        FROM [PatientLabs]
+      </Sql>
+    </DataSource>
+  </Data>
+</Job>

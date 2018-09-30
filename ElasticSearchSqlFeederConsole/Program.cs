@@ -11,6 +11,7 @@ namespace ElasticSearchSqlFeederConsole
 {
     using System;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Threading;
 
@@ -66,7 +67,7 @@ namespace ElasticSearchSqlFeederConsole
 
             ILogger logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
-                .WriteTo.Console()
+                .WriteTo.File(Path.Combine(Path.GetTempPath(), "Databus.out.txt"))
                 .CreateLogger();
 
             using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
@@ -78,6 +79,7 @@ namespace ElasticSearchSqlFeederConsole
                     container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
                     container.RegisterType<IFileUploader, FileUploader>();
                     container.RegisterInstance(logger);
+                    container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 

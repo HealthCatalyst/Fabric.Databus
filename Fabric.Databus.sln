@@ -111,6 +111,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineRunnerTests", "Pipe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlJobQueueProcessor", "QueueProcessors\SqlJobQueueProcessor\SqlJobQueueProcessor.csproj", "{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sql", "Sql", "{2BA682DB-D121-49E3-A577-DD819BC341F7}"
+	ProjectSection(SolutionItems) = preProject
+		CreateDatabase.sql = CreateDatabase.sql
+		CreateTables.sql = CreateTables.sql
+		InitPatientDiagnoses.sql = InitPatientDiagnoses.sql
+		InitPatientLabs.sql = InitPatientLabs.sql
+		InitPatients.sql = InitPatients.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -293,6 +302,7 @@ Global
 		{CFD6967D-8547-42ED-8EED-CBAA607CDDED} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 		{F03C5E9C-2DDA-4709-8F98-4690944CFB0D} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 		{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
+		{2BA682DB-D121-49E3-A577-DD819BC341F7} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

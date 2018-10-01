@@ -18,7 +18,6 @@ namespace SqlGetSchemaQueueProcessor
 
     using ElasticSearchSqlFeeder.Interfaces;
 
-    using Fabric.Databus.Schema;
     using Fabric.Shared;
 
     using QueueItems;
@@ -36,7 +35,15 @@ namespace SqlGetSchemaQueueProcessor
         /// </summary>
         private readonly IElasticSearchUploader elasticSearchUploader;
 
+        /// <summary>
+        /// The schema loader.
+        /// </summary>
         private readonly ISchemaLoader schemaLoader;
+
+        /// <summary>
+        /// The file writer.
+        /// </summary>
+        private readonly IFileWriter fileWriter;
 
         /// <summary>
         /// The folder.
@@ -51,11 +58,13 @@ namespace SqlGetSchemaQueueProcessor
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             ISchemaLoader schemaLoader,
+            IFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.schemaLoader = schemaLoader ?? throw new ArgumentNullException(nameof(schemaLoader));
+            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");
             if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
@@ -69,12 +78,6 @@ namespace SqlGetSchemaQueueProcessor
         protected override string LoggerName => "SqlGetSchema";
 
         /// <inheritdoc />
-        /// <summary>
-        /// The handle.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
         protected override void Handle(SqlJobQueueItem workItem)
         {
             var workItemLoads = workItem.Job.Data.DataSources;
@@ -89,7 +92,7 @@ namespace SqlGetSchemaQueueProcessor
                 {
                     var filePath = Path.Combine(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
 
-                    File.AppendAllText(filePath, mappingItem.ToJsonPretty());
+                    this.fileWriter.WriteToFile(filePath, mappingItem.ToJsonPretty());
                 }
             }
 
@@ -100,12 +103,7 @@ namespace SqlGetSchemaQueueProcessor
             });
         }
 
-        /// <summary>
-        /// The begin.
-        /// </summary>
-        /// <param name="isFirstThreadForThisTask">
-        /// The is first thread for this task.
-        /// </param>
+        /// <inheritdoc />
         protected override void Begin(bool isFirstThreadForThisTask)
         {
             if (isFirstThreadForThisTask)
@@ -114,28 +112,12 @@ namespace SqlGetSchemaQueueProcessor
             }
         }
 
-        /// <summary>
-        /// The complete.
-        /// </summary>
-        /// <param name="queryId">
-        /// The query id.
-        /// </param>
-        /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
-        /// </param>
+        /// <inheritdoc />
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 
-        /// <summary>
-        /// The get id.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <inheritdoc />
         protected override string GetId(SqlJobQueueItem workItem)
         {
             return workItem.QueryId;

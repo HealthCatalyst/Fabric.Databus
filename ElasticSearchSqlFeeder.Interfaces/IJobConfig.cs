@@ -23,5 +23,7 @@ namespace ElasticSearchSqlFeeder.Interfaces
         bool CompressFiles { get; set; }
 
         int SqlCommandTimeoutInSeconds { get; set; }
+
+        string EntityType { get; set; }
     }
 }

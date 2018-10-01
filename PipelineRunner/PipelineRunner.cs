@@ -153,7 +153,7 @@ namespace PipelineRunner
 
             if (config.WriteTemporaryFilesToDisk)
             {
-                FileSaveQueueProcessor.CleanOutputFolder(config.LocalSaveFolder);
+                this.container.Resolve<IFileWriter>().DeleteDirectory(config.LocalSaveFolder);
             }
 
             var stopwatch = new Stopwatch();
@@ -281,6 +281,8 @@ namespace PipelineRunner
             this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
 
             this.container.RegisterType<IEntityJsonWriter, EntityJsonWriter>();
+
+            this.container.RegisterType<IFileWriter, FileWriter>();
         }
     }
 }

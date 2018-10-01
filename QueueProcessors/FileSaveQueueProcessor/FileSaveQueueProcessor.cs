@@ -1,4 +1,13 @@
-﻿namespace FileSaveQueueProcessor
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FileSaveQueueProcessor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The file save queue processor.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace FileSaveQueueProcessor
 {
     using System;
     using System.Collections.Concurrent;
@@ -9,15 +18,23 @@
     using BaseQueueProcessor;
 
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
 
     using Serilog;
 
+    /// <inheritdoc />
+    /// <summary>
+    /// The file save queue processor.
+    /// </summary>
     public class FileSaveQueueProcessor : BaseQueueProcessor<FileUploadQueueItem, FileUploadQueueItem>
     {
-        private readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
+        private readonly IFileWriter fileWriter;
+
+        /// <summary>
+        /// The _locks.
+        /// </summary>
+        private readonly ConcurrentDictionary<string, object> locks = new ConcurrentDictionary<string, object>();
 
         /// <inheritdoc />
         /// <summary>
@@ -35,64 +52,32 @@
         /// <param name="progressMonitor">
         /// The progress monitor.
         /// </param>
+        /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
         public FileSaveQueueProcessor(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
+            IFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
+            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
         }
 
+        /// <inheritdoc />
+        protected override string LoggerName => "FileSave";
+
         /// <summary>
-        /// The save file.
+        /// The clean output folder.
         /// </summary>
-        /// <param name="wt">
-        /// The wt.
+        /// <param name="configLocalSaveFolder">
+        /// The config local save folder.
         /// </param>
-        private void SaveFile(FileUploadQueueItem wt)
+        public void CleanOutputFolder(string configLocalSaveFolder)
         {
-            if (this.Config.WriteTemporaryFilesToDisk)
-            {
-                var fileExtension = this.Config.CompressFiles ? @".json.gz" : @".json";
-
-                var path = Path.Combine(this.Config.LocalSaveFolder, $@"data-{wt.BatchNumber}{fileExtension}");
-
-                lock (this._locks.GetOrAdd(path, s => new object()))
-                {
-                    this.MyLogger.Verbose($"Saving file: {path} ");
-
-                    if (this.Config.CompressFiles)
-                    {
-                        using (var fileStream = File.Create(path))
-                        {
-                            using (var zipStream = new GZipStream(fileStream, CompressionMode.Compress, false))
-                            {
-                                wt.Stream.Seek(0, SeekOrigin.Begin);
-                                wt.Stream.CopyTo(zipStream);
-
-                                fileStream.Flush();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (var fileStream = File.Create(path))
-                        {
-                            wt.Stream.Seek(0, SeekOrigin.Begin);
-                            wt.Stream.CopyTo(fileStream);
-
-                            fileStream.Flush();
-                        }
-                    }
-
-                    this.MyLogger.Verbose($"Saved file: {path} ");
-                }
-            }
-
-            this.AddToOutputQueue(wt);
+            this.fileWriter.DeleteDirectory(configLocalSaveFolder);
         }
 
         /// <inheritdoc />
@@ -109,7 +94,6 @@
         /// <inheritdoc />
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
-
         }
 
         /// <inheritdoc />
@@ -118,48 +102,53 @@
             return workItem.QueryId;
         }
 
-        /// <inheritdoc />
-        protected override string LoggerName => "FileSave";
-
         /// <summary>
-        /// The clean output folder.
+        /// The save file.
         /// </summary>
-        /// <param name="configLocalSaveFolder">
-        /// The config local save folder.
+        /// <param name="wt">
+        /// The wt.
         /// </param>
-        public static void CleanOutputFolder(string configLocalSaveFolder)
+        private void SaveFile(FileUploadQueueItem wt)
         {
-            DeleteDirectory(configLocalSaveFolder);
-        }
-
-        /// <summary>
-        /// The delete directory.
-        /// </summary>
-        /// <param name="target_dir">
-        /// The target_dir.
-        /// </param>
-        /// <exception cref="Exception">
-        /// </exception>
-        public static void DeleteDirectory(string target_dir)
-        {
-            if (!Directory.Exists(target_dir))
+            if (this.Config.WriteTemporaryFilesToDisk)
             {
-                throw new Exception($"Folder {target_dir} does not exist");
+                var fileExtension = this.Config.CompressFiles ? @".json.gz" : @".json";
+
+                var path = Path.Combine(this.Config.LocalSaveFolder, $@"data-{wt.BatchNumber}{fileExtension}");
+
+                lock (this.locks.GetOrAdd(path, s => new object()))
+                {
+                    this.MyLogger.Verbose($"Saving file: {path} ");
+
+                    if (this.Config.CompressFiles)
+                    {
+                        using (var fileStream = this.fileWriter.CreateFile(path))
+                        {
+                            using (var zipStream = new GZipStream(fileStream, CompressionMode.Compress, false))
+                            {
+                                wt.Stream.Seek(0, SeekOrigin.Begin);
+                                wt.Stream.CopyTo(zipStream);
+
+                                fileStream.Flush();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        using (var fileStream = this.fileWriter.CreateFile(path))
+                        {
+                            wt.Stream.Seek(0, SeekOrigin.Begin);
+                            wt.Stream.CopyTo(fileStream);
+
+                            fileStream.Flush();
+                        }
+                    }
+
+                    this.MyLogger.Verbose($"Saved file: {path} ");
+                }
             }
 
-            string[] files = Directory.GetFiles(target_dir);
-            string[] dirs = Directory.GetDirectories(target_dir);
-
-            foreach (string file in files)
-            {
-                File.SetAttributes(file, FileAttributes.Normal);
-                File.Delete(file);
-            }
-
-            foreach (string dir in dirs)
-            {
-                DeleteDirectory(dir);
-            }
+            this.AddToOutputQueue(wt);
         }
     }
 }

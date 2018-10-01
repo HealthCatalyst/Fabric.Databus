@@ -41,7 +41,13 @@ namespace SqlImportQueueProcessor
         private readonly IDatabusSqlReader databusSqlReader;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlImportQueueProcessor"/> class.
+        /// The file writer.
+        /// </summary>
+        private readonly IFileWriter fileWriter;
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:SqlImportQueueProcessor.SqlImportQueueProcessor" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -58,6 +64,9 @@ namespace SqlImportQueueProcessor
         /// <param name="progressMonitor">
         /// The progress monitor
         /// </param>
+        /// <param name="fileWriter">
+        /// file writer
+        /// </param>
         /// <param name="cancellationToken">
         /// cancellation token
         /// </param>
@@ -67,61 +76,37 @@ namespace SqlImportQueueProcessor
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
+            IFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
 
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
+            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
         }
 
         /// <inheritdoc />
         protected override string LoggerName => "SqlImport";
 
-        /// <summary>
-        /// The handle.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
+        /// <inheritdoc />
         protected override void Handle(SqlImportQueueItem workItem)
         {
             this.ReadOneQueryFromDatabase(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber, workItem.PropertyTypes);
         }
 
-        /// <summary>
-        /// The begin.
-        /// </summary>
-        /// <param name="isFirstThreadForThisTask">
-        /// The is first thread for this task.
-        /// </param>
+        /// <inheritdoc />
         protected override void Begin(bool isFirstThreadForThisTask)
         {
         }
 
-        /// <summary>
-        /// The complete.
-        /// </summary>
-        /// <param name="queryId">
-        /// The query id.
-        /// </param>
-        /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
-        /// </param>
+        /// <inheritdoc />
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
             //MarkOutputQueueAsCompleted();
         }
 
-        /// <summary>
-        /// The get id.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <inheritdoc />
         protected override string GetId(SqlImportQueueItem workItem)
         {
             return workItem.QueryId;
@@ -154,7 +139,14 @@ namespace SqlImportQueueProcessor
         /// <exception cref="Exception">
         /// exception thrown
         /// </exception>
-        private void ReadOneQueryFromDatabase(string queryId, IDataSource load, int seed, string start, string end, int workItemBatchNumber, IDictionary<string, string> propertyTypes)
+        private void ReadOneQueryFromDatabase(
+            string queryId,
+            IDataSource load,
+            int seed,
+            string start,
+            string end,
+            int workItemBatchNumber,
+            IDictionary<string, string> propertyTypes)
         {
             try
             {
@@ -165,11 +157,11 @@ namespace SqlImportQueueProcessor
                 if (this.Config.WriteDetailedTemporaryFilesToDisk)
                 {
                     var path = Path.Combine(this.folder, queryId);
-                    Directory.CreateDirectory(path);
+                    this.fileWriter.CreateDirectory(path);
 
                     var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
 
-                    File.AppendAllText(filepath, e.ToString());
+                    this.fileWriter.WriteToFile(filepath, e.ToString());
                 }
 
                 throw;
@@ -197,7 +189,13 @@ namespace SqlImportQueueProcessor
         /// <param name="propertyTypes">
         /// The property Types.
         /// </param>
-        private void InternalReadOneQueryFromDatabase(string queryId, IDataSource load, string start, string end, int batchNumber, IDictionary<string, string> propertyTypes)
+        private void InternalReadOneQueryFromDatabase(
+            string queryId,
+            IDataSource load,
+            string start,
+            string end,
+            int batchNumber,
+            IDictionary<string, string> propertyTypes)
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
@@ -215,22 +213,21 @@ namespace SqlImportQueueProcessor
 
                     var filepath = Path.Combine(path, Convert.ToString(key) + ".csv");
 
-                    using (var file = File.OpenWrite(filepath))
+                    using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
                     {
-                        using (var stream = new StreamWriter(file))
+                        using (var streamWriter = new StreamWriter(stream))
                         {
                             var columns = result.ColumnList.Select(c => c.Name).ToList();
                             var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
 
-                            stream.WriteLine(text);
+                            streamWriter.WriteLine(text);
 
                             var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
                             foreach (var item in list)
                             {
-                                stream.WriteLine($@"""{key}""," + item);
+                                streamWriter.WriteLine($@"""{key}""," + item);
                             }
                         }
-
                     }
                 }
             }

@@ -23,6 +23,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The convert database row to json queue processor.
     /// </summary>
@@ -37,6 +38,8 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         /// The entity json writer.
         /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
+
+        private readonly IFileWriter fileWriter;
 
         /// <summary>
         /// The folder.
@@ -56,6 +59,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
         /// <param name="entityJsonWriter"></param>
+        /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
         public ConvertDatabaseRowToJsonQueueProcessor(
             IJobConfig jobConfig, 
@@ -63,10 +67,12 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             IEntityJsonWriter entityJsonWriter,
+            IFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
+            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-ConvertToJson");
         }
 
@@ -112,7 +118,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
             {
                 var path = Path.Combine(this.folder, wt.PropertyName ?? "main");
 
-                Directory.CreateDirectory(path);
+                this.fileWriter.CreateDirectory(path);
 
                 var sb = new StringBuilder();
 
@@ -121,7 +127,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
                     sb.AppendLine(jsonForRow.ToString());
                 }
 
-                File.AppendAllText(Path.Combine(path, $"{id}.json"), sb.ToString());
+                this.fileWriter.WriteToFile(Path.Combine(path, $"{id}.json"), sb.ToString());
             }
 
             this.AddToOutputQueue(new JsonDocumentMergerQueueItem

@@ -49,7 +49,15 @@ namespace JsonDocumentMergerQueueProcessor
         /// </summary>
         private readonly IDocumentDictionary documentDictionary;
 
+        /// <summary>
+        /// The entity json writer.
+        /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
+
+        /// <summary>
+        /// The file writer.
+        /// </summary>
+        private readonly IFileWriter fileWriter;
 
         /// <summary>
         /// The _locks.
@@ -68,17 +76,19 @@ namespace JsonDocumentMergerQueueProcessor
 
         /// <inheritdoc />
         public JsonDocumentMergerQueueProcessor(
-            IJobConfig jobConfig, 
-            ILogger logger, 
-            IQueueManager queueManager, 
-            IProgressMonitor progressMonitor, 
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
+            IProgressMonitor progressMonitor,
             IDocumentDictionary documentDictionary,
             IEntityJsonWriter entityJsonWriter,
+            IFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.documentDictionary = documentDictionary ?? throw new ArgumentNullException(nameof(documentDictionary));
             this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
+            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
             var configLocalSaveFolder = this.Config.LocalSaveFolder;
             if (configLocalSaveFolder == null)
             {
@@ -88,17 +98,10 @@ namespace JsonDocumentMergerQueueProcessor
             this.folder = Path.Combine(configLocalSaveFolder, $"{this.UniqueId}-JsonDocumentMerge");
         }
 
-        /// <summary>
-        /// The logger name.
-        /// </summary>
+        /// <inheritdoc />
         protected override string LoggerName => "JsonDocumentMerger";
 
-        /// <summary>
-        /// The handle.
-        /// </summary>
-        /// <param name="workItem">
-        /// The workItem.
-        /// </param>
+        /// <inheritdoc />
         protected override void Handle(JsonDocumentMergerQueueItem workItem)
         {
             // if work item batch number is newer than the last one we saw that we can flush anything related to the old batch
@@ -114,25 +117,12 @@ namespace JsonDocumentMergerQueueProcessor
             this.AddToJsonObject(workItem.QueryId, workItem.Id, workItem.PropertyName, workItem.NewJObjects, workItem.BatchNumber);
         }
 
-        /// <summary>
-        /// The begin.
-        /// </summary>
-        /// <param name="isFirstThreadForThisTask">
-        /// The is first thread for this task.
-        /// </param>
+        /// <inheritdoc />
         protected override void Begin(bool isFirstThreadForThisTask)
         {
         }
 
-        /// <summary>
-        /// The complete.
-        /// </summary>
-        /// <param name="queryId">
-        /// The query id.
-        /// </param>
-        /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
-        /// </param>
+        /// <inheritdoc />
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
             var list = this.documentDictionary.RemoveAll();
@@ -143,15 +133,7 @@ namespace JsonDocumentMergerQueueProcessor
             this.MyLogger.Verbose("Finished");
         }
 
-        /// <summary>
-        /// The get id.
-        /// </summary>
-        /// <param name="workItem">
-        /// The workItem.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <inheritdoc />
         protected override string GetId(JsonDocumentMergerQueueItem workItem)
         {
             return null;
@@ -161,35 +143,6 @@ namespace JsonDocumentMergerQueueProcessor
         // {
         //    // don't log here
         // }
-
-        /// <summary>
-        /// The walk node.
-        /// </summary>
-        /// <param name="node">
-        /// The node.
-        /// </param>
-        /// <param name="action">
-        /// The action.
-        /// </param>
-        private static void WalkNode(JToken node, Action<JObject> action)
-        {
-            if (node.Type == JTokenType.Object)
-            {
-                action((JObject)node);
-
-                foreach (JProperty child in node.Children<JProperty>())
-                {
-                    WalkNode(child.Value, action);
-                }
-            }
-            else if (node.Type == JTokenType.Array)
-            {
-                foreach (JToken child in node.Children())
-                {
-                    WalkNode(child, action);
-                }
-            }
-        }
 
         /// <summary>
         /// The add to json object.
@@ -316,55 +269,18 @@ namespace JsonDocumentMergerQueueProcessor
 
             foreach (var tuple in list)
             {
-                // remove temporary columns
-                this.RemoveTemporaryColumns(tuple.Item2.Document);
+                if (!this.Config.KeepTemporaryLookupColumnsInOutput)
+                {
+                    // remove temporary columns
+                    this.entityJsonWriter.RemoveTemporaryColumns(tuple.Item2.Document, this.Config.TopLevelKeyColumn);
+                }
 
                 this.AddToOutputQueue(tuple.Item2);
 
                 if (this.Config.WriteDetailedTemporaryFilesToDisk)
                 {
-                    File.AppendAllText(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
+                    this.fileWriter.WriteToFile(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
                 }
-            }
-        }
-
-        /// <summary>
-        /// The remove temporary columns.
-        /// </summary>
-        /// <param name="node">
-        /// The node.
-        /// </param>
-        private void RemoveTemporaryColumns(JObject node)
-        {
-            if (!this.Config.KeepTemporaryLookupColumnsInOutput)
-            {
-                WalkNode(
-                    node,
-                    n =>
-                        {
-                            var properties = n.Properties().Select(p => p.Name).ToList();
-                    var propertiesToRemove = properties
-                        .Where(p => p.StartsWith("KeyLevel", StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-
-                    foreach (var property in propertiesToRemove)
-                    {
-                        n.Remove(property);
-                    }
-
-                    if (n.Parent != null)
-                    {
-                        propertiesToRemove =
-                            properties.Where(
-                                    p => p.StartsWith(this.Config.TopLevelKeyColumn, StringComparison.OrdinalIgnoreCase))
-                                .ToList();
-
-                        foreach (var property in propertiesToRemove)
-                        {
-                            n.Remove(property);
-                        }
-                    }
-                });
             }
         }
     }

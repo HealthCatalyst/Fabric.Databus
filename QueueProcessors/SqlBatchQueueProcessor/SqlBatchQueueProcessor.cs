@@ -28,6 +28,11 @@ namespace SqlBatchQueueProcessor
     public class SqlBatchQueueProcessor : BaseQueueProcessor<SqlBatchQueueItem, SqlImportQueueItem>
     {
         /// <summary>
+        /// The file writer.
+        /// </summary>
+        private readonly IFileWriter fileWriter;
+
+        /// <summary>
         /// The folder.
         /// </summary>
         private readonly string folder;
@@ -44,17 +49,23 @@ namespace SqlBatchQueueProcessor
         /// </param>
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
+        /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
         public SqlBatchQueueProcessor(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
+            IFileWriter fileWriter,
             CancellationToken cancellationToken) 
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
+            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
         }
+
+        /// <inheritdoc />
+        protected override string LoggerName => "SqlBatch";
 
         /// <inheritdoc />
         protected override void Handle(SqlBatchQueueItem workItem)
@@ -66,17 +77,18 @@ namespace SqlBatchQueueProcessor
                 var queryName = dataSource.Path ?? "Main";
                 var queryId = queryName;
 
-                this.AddToOutputQueue(new SqlImportQueueItem
-                                          {
-                                              BatchNumber = workItem.BatchNumber,
-                                              QueryId = queryId,
-                                              PropertyName = dataSource.Path,
-                                              Seed = seed,
-                                              DataSource = dataSource,
-                                              Start = workItem.Start,
-                                              End = workItem.End,
-                                              PropertyTypes = workItem.PropertyTypes
-                                          });
+                this.AddToOutputQueue(
+                    new SqlImportQueueItem
+                        {
+                            BatchNumber = workItem.BatchNumber,
+                            QueryId = queryId,
+                            PropertyName = dataSource.Path,
+                            Seed = seed,
+                            DataSource = dataSource,
+                            Start = workItem.Start,
+                            End = workItem.End,
+                            PropertyTypes = workItem.PropertyTypes
+                        });
             }
 
             if (this.Config.WriteDetailedTemporaryFilesToDisk)
@@ -88,21 +100,17 @@ namespace SqlBatchQueueProcessor
 
                     var path = Path.Combine(this.folder, queryId);
 
-                    Directory.CreateDirectory(path);
+                    this.fileWriter.CreateDirectory(path);
 
                     var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
 
-                    using (var file = File.OpenWrite(filepath))
-                    {
-                        using (var stream = new StreamWriter(file))
-                        {
-                            stream.WriteLine($"start: {workItem.Start}, end: {workItem.End}");
-                        }
-                    }
+                    this.fileWriter.WriteToFile(filepath, $"start: {workItem.Start}, end: {workItem.End}");
                 }
             }
+
             // wait until the other queues are cleared up
-            //QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
+
+            // QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
         }
 
         /// <inheritdoc />
@@ -120,7 +128,5 @@ namespace SqlBatchQueueProcessor
         {
             return workItem.QueryId;
         }
-
-        protected override string LoggerName => "SqlBatch";
     }
 }

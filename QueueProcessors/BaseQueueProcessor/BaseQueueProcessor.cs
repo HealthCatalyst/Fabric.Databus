@@ -376,16 +376,16 @@ namespace BaseQueueProcessor
         /// <summary>
         /// The log to console.
         /// </summary>
-        /// <param name="id">
+        /// <param name="id1">
         /// The id.
         /// </param>
-        private void LogToConsole(string id)
+        private void LogToConsole(string id1)
         {
             this.progressMonitor.SetProgressItem(new ProgressMonitorItem
             {
                 StepNumber = this.stepNumber,
                 LoggerName = this.LoggerName,
-                Id = id,
+                Id = id1,
                 InQueueCount = this.InQueue.Count,
                 InQueueName = this.InQueue.Name,
                 IsInQueueCompleted = this.InQueue.IsCompleted,

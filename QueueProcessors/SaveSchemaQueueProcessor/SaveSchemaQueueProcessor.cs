@@ -9,6 +9,7 @@
 
 namespace SaveSchemaQueueProcessor
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -26,11 +27,22 @@ namespace SaveSchemaQueueProcessor
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The save schema queue processor.
     /// </summary>
     public class SaveSchemaQueueProcessor : BaseQueueProcessor<SaveSchemaQueueItem, MappingUploadQueueItem>
     {
+        /// <summary>
+        /// The file writer.
+        /// </summary>
+        private readonly IFileWriter fileWriter;
+
+        /// <summary>
+        /// The entity json writer.
+        /// </summary>
+        private readonly IEntityJsonWriter entityJsonWriter;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:SaveSchemaQueueProcessor.SaveSchemaQueueProcessor" /> class.
@@ -45,26 +57,27 @@ namespace SaveSchemaQueueProcessor
         /// The queue Manager.
         /// </param>
         /// <param name="progressMonitor"></param>
+        /// <param name="fileWriter"></param>
+        /// <param name="entityJsonWriter"></param>
         /// <param name="cancellationToken"></param>
         public SaveSchemaQueueProcessor(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
+            IFileWriter fileWriter,
+            IEntityJsonWriter entityJsonWriter,
             CancellationToken cancellationToken) 
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
+            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
+            this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
         }
 
         /// <inheritdoc />
         protected override string LoggerName => "SaveSchema";
 
-        /// <summary>
-        /// The handle.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
+        /// <inheritdoc />
         protected override void Handle(SaveSchemaQueueItem workItem)
         {
             foreach (var mapping in workItem.Mappings.OrderBy(m => m.SequenceNumber).ToList())
@@ -78,28 +91,12 @@ namespace SaveSchemaQueueProcessor
         {
         }
 
-        /// <summary>
-        /// The complete.
-        /// </summary>
-        /// <param name="queryId">
-        /// The query id.
-        /// </param>
-        /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
-        /// </param>
+        /// <inheritdoc />
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
         }
 
-        /// <summary>
-        /// The get id.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <inheritdoc />
         protected override string GetId(SaveSchemaQueueItem workItem)
         {
             return workItem.QueryId;
@@ -122,8 +119,7 @@ namespace SaveSchemaQueueProcessor
 
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             {
-                // TOD: Imran
-                // EsJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, this.Config.EntityType);
+                this.entityJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, this.Config.EntityType);
             }
 
             this.AddToOutputQueue(new MappingUploadQueueItem
@@ -137,13 +133,8 @@ namespace SaveSchemaQueueProcessor
             if (this.Config.WriteTemporaryFilesToDisk)
             {
                 string path = Path.Combine(this.Config.LocalSaveFolder, propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
-                using (var fileStream = File.Create(path))
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-                    stream.CopyTo(fileStream);
 
-                    fileStream.Flush();
-                }
+                this.fileWriter.WriteStream(path, stream);
             }
         }
     }

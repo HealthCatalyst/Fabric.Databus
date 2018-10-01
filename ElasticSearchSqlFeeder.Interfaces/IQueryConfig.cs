@@ -32,8 +32,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
 
         string Alias { get; set; }
 
-        string EntityType { get; set; }
-
         bool UploadToElasticSearch { get; set; }
 
         bool KeepIndexOnline { get; set; }

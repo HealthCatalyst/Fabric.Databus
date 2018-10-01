@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using ElasticSearchSqlFeeder.Interfaces;
@@ -9,6 +10,7 @@
 
     using Fabric.Shared;
 
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <inheritdoc />
@@ -159,11 +161,203 @@
             }
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// The remove temporary columns.
+        /// </summary>
+        /// <param name="node">
+        ///     The node.
+        /// </param>
+        /// <param name="topLevelKeyColumn">
+        /// The top level key column
+        /// </param>
+        public void RemoveTemporaryColumns(JObject node, string topLevelKeyColumn)
+        {
+            this.WalkNode(
+                node,
+                n =>
+                    {
+                        var properties = n.Properties().Select(p => p.Name).ToList();
+                        var propertiesToRemove = properties
+                            .Where(p => p.StartsWith("KeyLevel", StringComparison.OrdinalIgnoreCase)).ToList();
+
+                        foreach (var property in propertiesToRemove)
+                        {
+                            n.Remove(property);
+                        }
+
+                        if (n.Parent != null)
+                        {
+                            propertiesToRemove = properties.Where(
+                                p => p.StartsWith(topLevelKeyColumn, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                            foreach (var property in propertiesToRemove)
+                            {
+                                n.Remove(property);
+                            }
+                        }
+                    });
+        }
+
+        /// <inheritdoc />
+        public void WriteMappingToStream(List<ColumnInfo> columnList, string propertyPath, StreamWriter textWriter, string propertyType, string entity)
+        {
+            using (var writer = new JsonTextWriter(textWriter))
+            {
+                writer.WriteStartObject(); // begin
+
+                using (new JsonPropertyWrapper(writer, "mappings", propertyPath != null))
+                {
+                    using (new JsonPropertyWrapper(writer, entity, propertyPath != null))
+                    {
+                        using (new JsonPropertyWrapper(writer, "properties"))
+                        {
+                            // see if propertyPath was specified
+                            if (!string.IsNullOrEmpty(propertyPath))
+                            {
+                                var queue = new Queue<string>();
+                                foreach (var property in propertyPath.Split('.'))
+                                {
+                                    queue.Enqueue(property);
+                                }
+
+                                this.WriteNestedProperty(columnList, queue, writer, propertyType);
+                            }
+                            else
+                            {
+                                this.InternalWriteColumnsToJson(columnList, writer);
+                            }
+                        }
+                    }
+                }
+
+                writer.WriteEndObject(); // end
+            }
+        }
+
+        /// <summary>
+        /// The write nested property.
+        /// </summary>
+        /// <param name="columnList">
+        /// The column list.
+        /// </param>
+        /// <param name="properties">
+        /// The properties.
+        /// </param>
+        /// <param name="writer">
+        /// The writer.
+        /// </param>
+        /// <param name="propertyType">
+        /// The property type.
+        /// </param>
+        private void WriteNestedProperty(List<ColumnInfo> columnList, Queue<string> properties, JsonTextWriter writer, string propertyType)
+        {
+            if (properties.Any())
+            {
+                var propertyName = properties.Dequeue();
+
+                using (new JsonPropertyWrapper(writer, propertyName))
+                {
+                    writer.WritePropertyName("type");
+                    var type = propertyType != null && propertyType.Equals("object", StringComparison.OrdinalIgnoreCase)
+                        ? "object"
+                        : "nested";
+
+                    writer.WriteValue(type);
+                    using (new JsonPropertyWrapper(writer, "properties"))
+                    {
+                        this.WriteNestedProperty(columnList, properties, writer, propertyType);
+                    }
+                }
+            }
+            else
+            {
+                this.InternalWriteColumnsToJson(columnList, writer);
+            }
+        }
+
+        /// <summary>
+        /// The internal write columns to json.
+        /// </summary>
+        /// <param name="columnList">
+        /// The column list.
+        /// </param>
+        /// <param name="writer">
+        /// The writer.
+        /// </param>
+        private void InternalWriteColumnsToJson(List<ColumnInfo> columnList, JsonTextWriter writer)
+        {
+            foreach (var column in columnList)
+            {
+                using (new JsonPropertyWrapper(writer, column.Name))
+                {
+                    writer.WritePropertyName("type");
+                    writer.WriteValue(column.ElasticSearchType);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The walk node.
+        /// </summary>
+        /// <param name="node">
+        /// The node.
+        /// </param>
+        /// <param name="action">
+        /// The action.
+        /// </param>
+        private void WalkNode(JToken node, Action<JObject> action)
+        {
+            if (node.Type == JTokenType.Object)
+            {
+                action((JObject)node);
+
+                foreach (JProperty child in node.Children<JProperty>())
+                {
+                    this.WalkNode(child.Value, action);
+                }
+            }
+            else if (node.Type == JTokenType.Array)
+            {
+                foreach (JToken child in node.Children())
+                {
+                    this.WalkNode(child, action);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The get j token.
+        /// </summary>
+        /// <param name="value">
+        /// The value.
+        /// </param>
+        /// <returns>
+        /// The <see cref="JToken"/>.
+        /// </returns>
         private static JToken GetJToken(object value)
         {
             return value != null ? JToken.FromObject(value) : null;
         }
 
+        /// <summary>
+        /// The get json for rows.
+        /// </summary>
+        /// <param name="columns">
+        /// The columns.
+        /// </param>
+        /// <param name="jsonValueWriter">
+        /// The json value writer.
+        /// </param>
+        /// <param name="rows">
+        /// The rows.
+        /// </param>
+        /// <param name="propertyName">
+        /// The property name.
+        /// </param>
+        /// <returns>
+        /// The <see cref="JObject[]"/>.
+        /// </returns>
         private JObject[] GetJsonForRows(List<ColumnInfo> columns, IJsonValueWriter jsonValueWriter, List<object[]> rows, string propertyName)
         {
             // ReSharper disable once StyleCop.SA1305

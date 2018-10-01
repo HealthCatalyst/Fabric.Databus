@@ -105,8 +105,8 @@ namespace PipelineRunnerTests
                                    }
                 });
 
-            var mockFileUploaderFactory = mockRepository.Create<IFileUploaderFactory>();
-            var mockFileUploader = mockRepository.Create<IFileUploader>();
+            var mockFileUploaderFactory = mockRepository.Create<IElasticSearchUploaderFactory>();
+            var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
                 .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
@@ -231,8 +231,8 @@ namespace PipelineRunnerTests
                                    }
                 });
 
-            var mockFileUploaderFactory = mockRepository.Create<IFileUploaderFactory>();
-            var mockFileUploader = mockRepository.Create<IFileUploader>();
+            var mockFileUploaderFactory = mockRepository.Create<IElasticSearchUploaderFactory>();
+            var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
                 .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))

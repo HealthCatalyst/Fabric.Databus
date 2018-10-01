@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IFileUploaderFactory.cs" company="">
+// <copyright file="IElasticSearchUploaderFactory.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the IFileUploaderFactory type.
+//   Defines the IElasticSearchUploaderFactory type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace ElasticSearchSqlFeeder.Interfaces
     /// <summary>
     /// The FileUploaderFactory interface.
     /// </summary>
-    public interface IFileUploaderFactory
+    public interface IElasticSearchUploaderFactory
     {
         /// <summary>
         /// The create.
@@ -31,6 +31,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
         /// <returns>
         /// The <see cref="FileUploader"/>.
         /// </returns>
-        IFileUploader Create(string userName, string password, bool keepIndexOnline);
+        IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline);
     }
 }

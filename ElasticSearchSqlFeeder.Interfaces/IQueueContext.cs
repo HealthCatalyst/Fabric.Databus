@@ -1,7 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IQueueContext.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the IQueueContext type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Interfaces
 {
@@ -9,24 +13,34 @@ namespace ElasticSearchSqlFeeder.Interfaces
 
     using QueueItems;
 
+    /// <summary>
+    /// The QueueContext interface.
+    /// </summary>
     public interface IQueueContext
     {
+        /// <summary>
+        /// Gets or sets the progress monitor.
+        /// </summary>
         IProgressMonitor ProgressMonitor { get; set; }
 
+        /// <summary>
+        /// Gets or sets the queue manager.
+        /// </summary>
         IQueueManager QueueManager { get; set; }
 
-        string BulkUploadRelativeUrl { get; set; }
-
-        string MainMappingUploadRelativeUrl { get; set; }
-
-        string SecondaryMappingUploadRelativeUrl { get; set; }
-
+        /// <summary>
+        /// Gets or sets the config.
+        /// </summary>
         IQueryConfig Config { get; set; }
 
-        Dictionary<string, string> PropertyTypes { get; set; }
-
+        /// <summary>
+        /// Gets or sets the document dictionary.
+        /// </summary>
         IMeteredConcurrentDictionary<string, IJsonObjectQueueItem> DocumentDictionary { get; set; }
 
+        /// <summary>
+        /// Gets or sets the cancellation token.
+        /// </summary>
         CancellationToken CancellationToken { get; set; }
     }
 }

@@ -60,7 +60,7 @@ namespace PipelineRunner
 
                 if (job.Config.UploadToElasticSearch)
                 {
-                    // string x = await (new FileUploader(job.Config.ElasticSearchUserName,
+                    // string x = await (new ElasticSearchUploader(job.Config.ElasticSearchUserName,
                     //    job.Config.ElasticSearchPassword, job.Config.KeepIndexOnline).TestElasticSearchConnection(job.Config.Urls));
 
                     // configValidationResult.Results.Add($"ElasticSearch Connection: {x}");

@@ -164,18 +164,14 @@ namespace PipelineRunner
                 Config = config,
                 QueueManager = new QueueManager(),
                 ProgressMonitor = progressMonitor,
-                BulkUploadRelativeUrl = $"/{config.Index}/{config.EntityType}/_bulk?pretty",
-                MainMappingUploadRelativeUrl = $"/{config.Index}",
-                SecondaryMappingUploadRelativeUrl = $"/{config.Index}/_mapping/{config.EntityType}",
-                PropertyTypes = job.Data.DataSources.Where(a => a.Path != null).ToDictionary(a => a.Path, a => a.PropertyType),
                 DocumentDictionary = documentDictionary,
                 CancellationToken = this.cancellationTokenSource.Token
             };
 
             this.container.RegisterInstance<IQueueContext>(queueContext);
-            IFileUploaderFactory fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
-            IFileUploader fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
-            this.container.RegisterInstance(fileUploader);
+            IElasticSearchUploaderFactory elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
+            IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
+            this.container.RegisterInstance(elasticSearchUploader);
            
             int loadNumber = 0;
 

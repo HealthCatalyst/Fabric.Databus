@@ -9,7 +9,6 @@
 
 namespace ElasticSearchSqlFeeder.Shared
 {
-    using System.Collections.Generic;
     using System.Threading;
 
     using ElasticSearchSqlFeeder.Interfaces;
@@ -18,22 +17,25 @@ namespace ElasticSearchSqlFeeder.Shared
 
     using QueueItems;
 
+    /// <inheritdoc />
     /// <summary>
     /// The queue context.
     /// </summary>
     public class QueueContext : IQueueContext
     {
+        /// <inheritdoc />
         public IProgressMonitor ProgressMonitor { get; set; }
 
+        /// <inheritdoc />
         public IQueueManager QueueManager { get; set; }
-        public string BulkUploadRelativeUrl { get; set; }
-        public string MainMappingUploadRelativeUrl { get; set; }
-        public string SecondaryMappingUploadRelativeUrl { get; set; }
-        public IQueryConfig Config { get; set; }
-        public Dictionary<string, string> PropertyTypes { get; set; }
 
+        /// <inheritdoc />
+        public IQueryConfig Config { get; set; }
+
+        /// <inheritdoc />
         public IMeteredConcurrentDictionary<string, IJsonObjectQueueItem> DocumentDictionary { get; set; }
 
+        /// <inheritdoc />
         public CancellationToken CancellationToken { get; set; }
     }
 }

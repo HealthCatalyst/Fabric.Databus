@@ -10,6 +10,7 @@
 namespace SqlImportQueueProcessor
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
@@ -22,6 +23,7 @@ namespace SqlImportQueueProcessor
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The sql import queue processor.
     /// </summary>
@@ -46,6 +48,9 @@ namespace SqlImportQueueProcessor
         /// <param name="databusSqlReader">
         /// The databus sql reader.
         /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         public SqlImportQueueProcessor(IQueueContext queueContext, IDatabusSqlReader databusSqlReader, ILogger logger)
             : base(queueContext, logger)
         {
@@ -54,9 +59,7 @@ namespace SqlImportQueueProcessor
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
         }
 
-        /// <summary>
-        /// The logger name.
-        /// </summary>
+        /// <inheritdoc />
         protected override string LoggerName => "SqlImport";
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace SqlImportQueueProcessor
         /// </param>
         protected override void Handle(SqlImportQueueItem workItem)
         {
-            this.ReadOneQueryFromDatabase(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber);
+            this.ReadOneQueryFromDatabase(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber, workItem.PropertyTypes);
         }
 
         /// <summary>
@@ -131,15 +134,15 @@ namespace SqlImportQueueProcessor
         /// </param>
         /// <exception cref="Exception"> exception thrown
         /// </exception>
-        private void ReadOneQueryFromDatabase(string queryId, IDataSource load, int seed, string start, string end, int workItemBatchNumber)
+        private void ReadOneQueryFromDatabase(string queryId, IDataSource load, int seed, string start, string end, int workItemBatchNumber, IDictionary<string, string> propertyTypes)
         {
             try
             {
-                this.InternalReadOneQueryFromDatabase(queryId, load, start, end, workItemBatchNumber);
+                this.InternalReadOneQueryFromDatabase(queryId, load, start, end, workItemBatchNumber, propertyTypes);
             }
             catch (Exception e)
             {
-                if (Config.WriteDetailedTemporaryFilesToDisk)
+                if (this.Config.WriteDetailedTemporaryFilesToDisk)
                 {
                     var path = Path.Combine(this.folder, queryId);
                     Directory.CreateDirectory(path);
@@ -148,7 +151,8 @@ namespace SqlImportQueueProcessor
 
                     File.AppendAllText(filepath, e.ToString());
                 }
-                throw new Exception($"Connection String: {Config.ConnectionString}", e);
+
+                throw new Exception($"Connection String: {this.Config.ConnectionString}", e);
             }
         }
 
@@ -170,7 +174,7 @@ namespace SqlImportQueueProcessor
         /// <param name="batchNumber">
         /// The batch number.
         /// </param>
-        private void InternalReadOneQueryFromDatabase(string queryId, IDataSource load, string start, string end, int batchNumber)
+        private void InternalReadOneQueryFromDatabase(string queryId, IDataSource load, string start, string end, int batchNumber, IDictionary<string, string> propertyTypes)
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
@@ -219,7 +223,8 @@ namespace SqlImportQueueProcessor
                     Columns = result.ColumnList,
                     PropertyName = load.Path,
                     PropertyType = load.PropertyType,
-                    JsonValueWriter = sqlJsonValueWriter
+                    JsonValueWriter = sqlJsonValueWriter,
+                    PropertyTypes = propertyTypes
                 });
             }
 

@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FileUploaderFactory.cs" company="">
+// <copyright file="ElasticSearchUploaderFactory.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the FileUploaderFactory type.
+//   Defines the ElasticSearchUploaderFactory type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace ElasticSearchApiCaller
     /// <summary>
     /// The file uploader factory.
     /// </summary>
-    public class FileUploaderFactory : IFileUploaderFactory
+    public class ElasticSearchUploaderFactory : IElasticSearchUploaderFactory
     {
         /// <summary>
         /// The logger.
@@ -25,20 +25,20 @@ namespace ElasticSearchApiCaller
         private readonly ILogger logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileUploaderFactory"/> class.
+        /// Initializes a new instance of the <see cref="ElasticSearchUploaderFactory"/> class.
         /// </summary>
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public FileUploaderFactory(ILogger logger)
+        public ElasticSearchUploaderFactory(ILogger logger)
         {
             this.logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public IFileUploader Create(string userName, string password, bool keepIndexOnline)
+        public IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline)
         {
-            return new FileUploader(userName, password, keepIndexOnline, this.logger);
+            return new ElasticSearchUploader(userName, password, keepIndexOnline, this.logger);
         }
     }
 }

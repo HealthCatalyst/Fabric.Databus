@@ -25,12 +25,7 @@ namespace FileUploadQueueProcessor
         /// <summary>
         /// The file uploader.
         /// </summary>
-        private readonly IFileUploader fileUploader;
-
-        /// <summary>
-        /// The relative url for posting.
-        /// </summary>
-        private readonly string relativeUrlForPosting;
+        private readonly IElasticSearchUploader elasticSearchUploader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileUploadQueueProcessor"/> class.
@@ -38,17 +33,16 @@ namespace FileUploadQueueProcessor
         /// <param name="queueContext">
         /// The queue context.
         /// </param>
-        /// <param name="fileUploader">
-        /// The fileUploader
+        /// <param name="elasticSearchUploader">
+        /// The elasticSearchUploader
         /// </param>
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public FileUploadQueueProcessor(IQueueContext queueContext, IFileUploader fileUploader, ILogger logger)
+        public FileUploadQueueProcessor(IQueueContext queueContext, IElasticSearchUploader elasticSearchUploader, ILogger logger)
             : base(queueContext, logger)
         {
-            this.fileUploader = fileUploader;
-            this.relativeUrlForPosting = queueContext.BulkUploadRelativeUrl;
+            this.elasticSearchUploader = elasticSearchUploader;
         }
 
         /// <summary>
@@ -67,7 +61,7 @@ namespace FileUploadQueueProcessor
         {
             if (isFirstThreadForThisTask)
             {
-                this.fileUploader.StartUpload(Config.Urls, Config.Index, Config.Alias).Wait();
+                this.elasticSearchUploader.StartUpload(Config.Urls, Config.Index, Config.Alias).Wait();
             }
         }
 
@@ -84,7 +78,7 @@ namespace FileUploadQueueProcessor
         {
             if (isLastThreadForThisTask)
             {
-                this.fileUploader.FinishUpload(this.Config.Urls, this.Config.Index, this.Config.Alias).Wait();
+                this.elasticSearchUploader.FinishUpload(this.Config.Urls, this.Config.Index, this.Config.Alias).Wait();
             }
         }
 
@@ -110,9 +104,10 @@ namespace FileUploadQueueProcessor
         /// </param>
         private void UploadFile(FileUploadQueueItem wt)
         {
-            this.fileUploader.SendStreamToHosts(
+            this.elasticSearchUploader.SendDataToHosts(
                     this.Config.Urls,
-                    this.relativeUrlForPosting,
+                    this.Config.Index,
+                    this.Config.EntityType,
                     wt.BatchNumber,
                     wt.Stream,
                     doLogContent: false,

@@ -44,18 +44,17 @@ namespace SqlJobQueueProcessor
         {
         }
 
-        /// <summary>
-        /// The logger name.
-        /// </summary>
+        /// <inheritdoc />
         protected override string LoggerName => "SqlJob";
 
+        /// <inheritdoc />
         /// <summary>
         /// The handle.
         /// </summary>
         /// <param name="workItem">
         /// The work item.
         /// </param>
-        /// <exception cref="NotImplementedException">exception thrown
+        /// <exception cref="T:System.NotImplementedException">exception thrown
         /// </exception>
         protected override void Handle(SqlJobQueueItem workItem)
         {
@@ -77,13 +76,16 @@ namespace SqlJobQueueProcessor
 
                 foreach (var range in ranges)
                 {
-                    this.AddToOutputQueue(new SqlBatchQueueItem
-                                          {
-                                              BatchNumber = currentBatchNumber++,
-                                              Start = range.Item1,
-                                              End = range.Item2,
-                                              Loads = workItem.Job.Data.DataSources,
-                                          });
+                    this.AddToOutputQueue(
+                        new SqlBatchQueueItem
+                            {
+                                BatchNumber = currentBatchNumber++,
+                                Start = range.Item1,
+                                End = range.Item2,
+                                Loads = workItem.Job.Data.DataSources,
+                                PropertyTypes = workItem.Job.Data.DataSources.Where(a => a.Path != null)
+                                    .ToDictionary(a => a.Path, a => a.PropertyType)
+                            });
                 }
             }
         }

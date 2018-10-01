@@ -33,7 +33,7 @@ namespace SqlGetSchemaQueueProcessor
         /// <summary>
         /// The file uploader.
         /// </summary>
-        private readonly IFileUploader fileUploader;
+        private readonly IElasticSearchUploader elasticSearchUploader;
 
         /// <summary>
         /// The folder.
@@ -41,9 +41,9 @@ namespace SqlGetSchemaQueueProcessor
         private readonly string folder;
 
         /// <inheritdoc />
-        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploader fileUploader) : base(queueContext, logger)
+        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IElasticSearchUploader elasticSearchUploader) : base(queueContext, logger)
         {
-            this.fileUploader = fileUploader ?? throw new ArgumentNullException(nameof(fileUploader));
+            this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");
             if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
@@ -101,9 +101,8 @@ namespace SqlGetSchemaQueueProcessor
                 var config = this.QueueContext.Config;
                 if (config.UploadToElasticSearch && config.DropAndReloadIndex)
                 {
-                    this.fileUploader.DeleteIndex(
+                    this.elasticSearchUploader.DeleteIndex(
                         config.Urls,
-                        this.QueueContext.MainMappingUploadRelativeUrl,
                         config.Index,
                         config.Alias).Wait();
                 }

@@ -66,6 +66,7 @@ namespace SqlBatchQueueProcessor
                         DataSource = dataSource,
                         Start = workItem.Start,
                         End = workItem.End,
+                        PropertyTypes = workItem.PropertyTypes
                     });
                 });
 

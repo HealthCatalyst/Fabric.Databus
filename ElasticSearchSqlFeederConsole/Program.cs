@@ -76,8 +76,8 @@ namespace ElasticSearchSqlFeederConsole
                 {
                     var container = new UnityContainer();
                     container.RegisterType<IDatabusSqlReader, DatabusSqlReader>();
-                    container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
-                    container.RegisterType<IFileUploader, FileUploader>();
+                    container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
+                    container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
                     container.RegisterInstance(logger);
                     container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
 

@@ -33,12 +33,19 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
     /// </summary>
     public class ConvertDatabaseRowToJsonQueueProcessor : BaseQueueProcessor<ConvertDatabaseToJsonQueueItem, JsonDocumentMergerQueueItem>
     {
+        /// <summary>
+        /// The sequence barrier.
+        /// </summary>
         private static readonly SequenceBarrier SequenceBarrier = new SequenceBarrier();
 
-        private readonly string _folder;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConvertDatabaseRowToJsonQueueProcessor"/> class.
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:ConvertDatabaseRowToJsonQueueProcessor.ConvertDatabaseRowToJsonQueueProcessor" /> class.
         /// </summary>
         /// <param name="queueContext">
         /// The queue context.
@@ -49,39 +56,49 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         public ConvertDatabaseRowToJsonQueueProcessor(IQueueContext queueContext, ILogger logger)
             : base(queueContext, logger)
         {
-            this._folder = Path.Combine(Config.LocalSaveFolder, $"{UniqueId}-ConvertToJson");
+            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-ConvertToJson");
         }
 
         /// <summary>
         /// The get json for row for merge.
         /// </summary>
         /// <param name="columns">
-        /// The columns.
+        ///     The columns.
         /// </param>
         /// <param name="rows">
-        /// The rows.
+        ///     The rows.
         /// </param>
         /// <param name="propertyName">
-        /// The property name.
+        ///     The property name.
+        /// </param>
+        /// <param name="propertyTypes">
+        /// The property types
         /// </param>
         /// <returns>
         /// The <see cref="JObject[]"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">exception thrown
         /// </exception>
-        private JObject[] GetJsonForRowForMerge(List<ColumnInfo> columns, List<object[]> rows, string propertyName)
+        private JObject[] GetJsonForRowForMerge(
+            List<ColumnInfo> columns,
+            List<object[]> rows,
+            string propertyName,
+            IDictionary<string, string> propertyTypes)
         {
             if (columns == null)
             {
                 throw new ArgumentNullException(nameof(columns));
             }
 
+            // ReSharper disable once StyleCop.SA1305
             var jObjects = new List<JObject>();
 
             foreach (var row in rows)
             {
+                // ReSharper disable once StyleCop.SA1305
                 var jObjectOuter = new JObject();
 
+                // ReSharper disable once StyleCop.SA1305
                 var jObject = jObjectOuter;
 
                 if (!string.IsNullOrEmpty(propertyName))
@@ -89,6 +106,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
                     var properties = propertyName.Split('.');
 
 
+                    // ReSharper disable once StyleCop.SA1305
                     var jObject1 = jObjectOuter;
                     int level = 1;
 
@@ -102,7 +120,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
                         jObject = new JObject();
 
-                        var propertyType = QueueContext.PropertyTypes[currentFullPropertyName];
+                        var propertyType = propertyTypes[currentFullPropertyName];
 
                         if (propertyType != null && propertyType.Equals("object", StringComparison.OrdinalIgnoreCase))
                         {
@@ -213,11 +231,11 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         {
             var id = this.GetId(wt);
 
-            var jsonForRows = this.GetJsonForRowForMerge(wt.Columns, wt.Rows, wt.PropertyName);
+            var jsonForRows = this.GetJsonForRowForMerge(wt.Columns, wt.Rows, wt.PropertyName, wt.PropertyTypes);
 
             if (Config.WriteDetailedTemporaryFilesToDisk)
             {
-                var path = Path.Combine(this._folder, wt.PropertyName ?? "main");
+                var path = Path.Combine(this.folder, wt.PropertyName ?? "main");
 
                 Directory.CreateDirectory(path);
 

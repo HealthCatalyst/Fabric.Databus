@@ -10,7 +10,6 @@
 namespace MappingUploadQueueProcessor
 {
     using System;
-    using System.IO;
 
     using BaseQueueProcessor;
 
@@ -29,17 +28,7 @@ namespace MappingUploadQueueProcessor
         /// <summary>
         /// The file uploader.
         /// </summary>
-        private readonly IFileUploader fileUploader;
-
-        /// <summary>
-        /// The main mapping upload relative url.
-        /// </summary>
-        private readonly string mainMappingUploadRelativeUrl;
-
-        /// <summary>
-        /// The secondary mapping upload relative url.
-        /// </summary>
-        private readonly string secondaryMappingUploadRelativeUrl;
+        private readonly IElasticSearchUploader elasticSearchUploader;
 
         /// <inheritdoc />
         /// <summary>
@@ -51,15 +40,14 @@ namespace MappingUploadQueueProcessor
         /// <param name="logger">
         /// The logger.
         /// </param>
-        /// <param name="fileUploader"></param>
-        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IFileUploader fileUploader)
+        /// <param name="elasticSearchUploader"></param>
+        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IElasticSearchUploader elasticSearchUploader)
             : base(queueContext, logger)
         {
-            this.fileUploader = fileUploader ?? throw new ArgumentNullException(nameof(fileUploader));
-            this.mainMappingUploadRelativeUrl = queueContext.MainMappingUploadRelativeUrl;
-            this.secondaryMappingUploadRelativeUrl = queueContext.SecondaryMappingUploadRelativeUrl;
+            this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// The logger name.
         /// </summary>
@@ -92,7 +80,7 @@ namespace MappingUploadQueueProcessor
                 // set up aliases
                 if (this.QueueContext.Config.UploadToElasticSearch)
                 {
-                    this.fileUploader.SetupAlias(this.QueueContext.Config.Urls, this.QueueContext.Config.Index, this.QueueContext.Config.Alias).Wait();
+                    this.elasticSearchUploader.SetupAlias(this.QueueContext.Config.Urls, this.QueueContext.Config.Index, this.QueueContext.Config.Alias).Wait();
                 }
             }
         }
@@ -104,20 +92,6 @@ namespace MappingUploadQueueProcessor
         }
 
         /// <summary>
-        /// The upload single file.
-        /// </summary>
-        /// <param name="stream">
-        /// The stream.
-        /// </param>
-        /// <param name="relativeUrl">
-        /// The relative url.
-        /// </param>
-        private void UploadSingleFile(Stream stream, string relativeUrl)
-        {
-            this.fileUploader.SendStreamToHosts(this.Config.Urls, relativeUrl, 1, stream, doLogContent: true, doCompress: false).Wait();
-        }
-
-        /// <summary>
         /// The upload files.
         /// </summary>
         /// <param name="wt">
@@ -125,9 +99,14 @@ namespace MappingUploadQueueProcessor
         /// </param>
         private void UploadFiles(MappingUploadQueueItem wt)
         {
-            var relativeUrl = string.IsNullOrEmpty(wt.PropertyName) ? this.mainMappingUploadRelativeUrl : this.secondaryMappingUploadRelativeUrl;
-
-            this.UploadSingleFile(wt.Stream, relativeUrl);
+            if (string.IsNullOrEmpty(wt.PropertyName))
+            {
+                this.elasticSearchUploader.SendMainMappingFileToHosts(this.Config.Urls, this.Config.Index, 1, wt.Stream, doLogContent: true, doCompress: false).Wait();
+            }
+            else
+            {
+                this.elasticSearchUploader.SendNestedMappingFileToHosts(this.Config.Urls, this.Config.Index, this.Config.EntityType, 1, wt.Stream, doLogContent: true, doCompress: false).Wait();
+            }
 
             this.MyLogger.Verbose($"Uploaded mapping file: {wt.PropertyName} ");
         }

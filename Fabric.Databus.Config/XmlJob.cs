@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="XmlJob.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The job.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace Fabric.Databus.Config
 {
     using System.Runtime.Serialization;
@@ -13,6 +22,7 @@ namespace Fabric.Databus.Config
     [XmlType("Job")]
     public class XmlJob : IJob
     {
+        /// <inheritdoc />
         /// <summary>
         /// Gets or sets the config.
         /// </summary>
@@ -30,6 +40,7 @@ namespace Fabric.Databus.Config
             set => this.Config = value;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Gets or sets the data.
         /// </summary>

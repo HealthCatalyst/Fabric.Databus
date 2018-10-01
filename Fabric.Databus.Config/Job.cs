@@ -10,10 +10,10 @@
 namespace Fabric.Databus.Config
 {
     using System.Runtime.Serialization;
-    using System.Xml.Serialization;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
+    /// <inheritdoc />
     /// <summary>
     /// The job.
     /// </summary>

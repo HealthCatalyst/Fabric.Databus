@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\QueueItems\QueueItems.csproj" />
-    <ProjectReference Include="..\BaseQueueProcessor\BasePipelineStep.csproj" />
+    <ProjectReference Include="..\BasePipelineStep\BasePipelineStep.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,7 @@
     <ProjectReference Include="..\..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj" />
     <ProjectReference Include="..\..\Fabric.Databus.Schema\Fabric.Databus.Schema.csproj" />
     <ProjectReference Include="..\..\QueueItems\QueueItems.csproj" />
-    <ProjectReference Include="..\BaseQueueProcessor\BasePipelineStep.csproj" />
+    <ProjectReference Include="..\BasePipelineStep\BasePipelineStep.csproj" />
   </ItemGroup>
 
 </Project>

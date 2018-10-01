@@ -19,18 +19,18 @@
     <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
     <ProjectReference Include="..\Fabric.Databus.Schema\Fabric.Databus.Schema.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
-    <ProjectReference Include="..\QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\DummyMappingUploadQueueProcessor\DummyMappingUploadQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\FileSaveQueueProcessor\FileSaveQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\FileUploadQueueProcessor\FileUploadQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\MappingUploadQueueProcessor\MappingUploadQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\SaveBatchQueueProcessor\SaveBatchQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\SaveSchemaQueueProcessor\SaveSchemaQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\SqlBatchQueueProcessor\SqlBatchQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaQueueProcessor.csproj" />
-    <ProjectReference Include="..\QueueProcessors\SqlImportQueueProcessor\SqlImportQueueProcessor.csproj" />
+    <ProjectReference Include="..\PipelineSteps\ConvertDatabaseRowToJsonPipelineStep\ConvertDatabaseRowToJsonPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\CreateBatchItemsPipelineStep\CreateBatchItemsPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\DummyMappingUploadPipelineStep\DummyMappingUploadPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\FileSavePipelineStep\FileSavePipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\FileUploadPipelineStep\FileUploadPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\JsonDocumentMergerPipelineStep\JsonDocumentMergerPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\MappingUploadPipelineStep\MappingUploadPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\SaveBatchPipelineStep\SaveBatchPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\SaveSchemaPipelineStep\SaveSchemaPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\SqlBatchPipelineStep\SqlBatchPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\SqlGetSchemaPipelineStep\SqlGetSchemaPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\SqlImportPipelineStep\SqlImportPipelineStep.csproj" />
     <ProjectReference Include="..\ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj" />
   </ItemGroup>
 

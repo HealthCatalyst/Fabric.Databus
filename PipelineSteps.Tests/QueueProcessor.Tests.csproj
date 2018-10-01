@@ -7,8 +7,8 @@
     <ProjectGuid>{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>QueueProcessor.Tests</RootNamespace>
-    <AssemblyName>QueueProcessor.Tests</AssemblyName>
+    <RootNamespace>PipelineStep.Tests</RootNamespace>
+    <AssemblyName>PipelineStep.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -65,10 +65,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonDocumentMergerQueueProcessorTester.cs" />
+    <Compile Include="JsonDocumentMergerPipelineStepTester.cs" />
     <Compile Include="MockProgressMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CreateBatchItemsQueueProcessorTests.cs" />
+    <Compile Include="CreateBatchItemsPipelineStepTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ElasticSearchJsonWriter\ElasticSearchJsonWriter.csproj">
@@ -91,15 +91,15 @@
       <Project>{EFC37D49-40FA-4F53-B956-B63F7EB47244}</Project>
       <Name>QueueItems</Name>
     </ProjectReference>
-    <ProjectReference Include="..\QueueProcessors\BaseQueueProcessor\BasePipelineStep.csproj">
+    <ProjectReference Include="..\PipelineSteps\BasePipelineStep\BasePipelineStep.csproj">
       <Project>{CFD6967D-8547-42ED-8EED-CBAA607CDDED}</Project>
       <Name>BasePipelineStep</Name>
     </ProjectReference>
-    <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsPipelineStep.csproj">
+    <ProjectReference Include="..\PipelineSteps\CreateBatchItemsPipelineStep\CreateBatchItemsPipelineStep.csproj">
       <Project>{E6B53794-9D7D-4688-AC87-B229E49D681B}</Project>
       <Name>CreateBatchItemsPipelineStep</Name>
     </ProjectReference>
-    <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerPipelineStep.csproj">
+    <ProjectReference Include="..\PipelineSteps\JsonDocumentMergerPipelineStep\JsonDocumentMergerPipelineStep.csproj">
       <Project>{2D062F58-8DA2-4993-8EA5-D596544E1D72}</Project>
       <Name>JsonDocumentMergerPipelineStep</Name>
     </ProjectReference>

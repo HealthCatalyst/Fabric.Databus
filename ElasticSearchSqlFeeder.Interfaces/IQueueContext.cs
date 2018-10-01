@@ -11,8 +11,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
 {
     using System.Threading;
 
-    using QueueItems;
-
     /// <summary>
     /// The QueueContext interface.
     /// </summary>
@@ -22,11 +20,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
         /// Gets or sets the config.
         /// </summary>
         IQueryConfig Config { get; set; }
-
-        /// <summary>
-        /// Gets or sets the document dictionary.
-        /// </summary>
-        IMeteredConcurrentDictionary<string, IJsonObjectQueueItem> DocumentDictionary { get; set; }
 
         /// <summary>
         /// Gets or sets the cancellation token.

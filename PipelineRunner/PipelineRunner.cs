@@ -153,16 +153,15 @@ namespace PipelineRunner
                 FileSaveQueueProcessor.CleanOutputFolder(config.LocalSaveFolder);
             }
 
-            var documentDictionary =
-                new MeteredConcurrentDictionary<string, IJsonObjectQueueItem>(MaximumDocumentsInQueue);
+            var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
+
             var queueContext = new QueueContext
             {
                 Config = config,
-                DocumentDictionary = documentDictionary,
                 CancellationToken = this.cancellationTokenSource.Token
             };
 
@@ -170,6 +169,8 @@ namespace PipelineRunner
             this.container.RegisterInstance<IQueueManager>(queueManager);
             this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
             this.container.RegisterInstance<IQueueContext>(queueContext);
+            this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
+
             IElasticSearchUploaderFactory elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
             IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
             this.container.RegisterInstance(elasticSearchUploader);

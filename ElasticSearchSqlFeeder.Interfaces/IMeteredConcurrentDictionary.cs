@@ -1,8 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IMeteredConcurrentDictionary.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The MeteredConcurrentDictionary interface.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Interfaces
 {
+    using System;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// The MeteredConcurrentDictionary interface.
+    /// </summary>
+    /// <typeparam name="TKey">
+    /// </typeparam>
+    /// <typeparam name="TValue">
+    /// </typeparam>
     public interface IMeteredConcurrentDictionary<TKey, TValue>
     {
         bool ContainsKey(TKey id);

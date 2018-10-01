@@ -15,8 +15,6 @@ namespace ElasticSearchSqlFeeder.Shared
 
     using Fabric.Databus.Config;
 
-    using QueueItems;
-
     /// <inheritdoc />
     /// <summary>
     /// The queue context.
@@ -25,9 +23,6 @@ namespace ElasticSearchSqlFeeder.Shared
     {
         /// <inheritdoc />
         public IQueryConfig Config { get; set; }
-
-        /// <inheritdoc />
-        public IMeteredConcurrentDictionary<string, IJsonObjectQueueItem> DocumentDictionary { get; set; }
 
         /// <inheritdoc />
         public CancellationToken CancellationToken { get; set; }

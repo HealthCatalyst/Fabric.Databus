@@ -45,6 +45,11 @@ namespace JsonDocumentMergerQueueProcessor
         private static int currentBatchNumber = 0;
 
         /// <summary>
+        /// The document dictionary.
+        /// </summary>
+        private readonly IDocumentDictionary documentDictionary;
+
+        /// <summary>
         /// The _locks.
         /// </summary>
         private readonly ConcurrentDictionary<string, object> locks = new ConcurrentDictionary<string, object>();
@@ -60,16 +65,22 @@ namespace JsonDocumentMergerQueueProcessor
         private int numDocumentsModified;
 
         /// <inheritdoc />
-        public JsonDocumentMergerQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
+        public JsonDocumentMergerQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor, 
+            IDocumentDictionary documentDictionary)
             : base(queueContext, logger, queueManager, progressMonitor)
         {
+            this.documentDictionary = documentDictionary ?? throw new ArgumentNullException(nameof(documentDictionary));
             var configLocalSaveFolder = this.Config.LocalSaveFolder;
             if (configLocalSaveFolder == null)
             {
                 throw new ArgumentNullException(nameof(this.Config.LocalSaveFolder));
             }
 
-            this.folder = Path.Combine(configLocalSaveFolder, $"{UniqueId}-JsonDocumentMerge");
+            this.folder = Path.Combine(configLocalSaveFolder, $"{this.UniqueId}-JsonDocumentMerge");
         }
 
         /// <summary>
@@ -89,7 +100,7 @@ namespace JsonDocumentMergerQueueProcessor
             if (currentBatchNumber != workItem.BatchNumber)
             {
                 // find all items with old batch numbers and put them in the out queue
-                var list = this.QueueContext.DocumentDictionary.RemoveItems(item => item.Value.BatchNumber != workItem.BatchNumber);
+                var list = this.documentDictionary.RemoveAllItemsExceptFromBatchNumber(workItem.BatchNumber);
                 this.SendToOutputQueue(list);
 
                 currentBatchNumber = workItem.BatchNumber;
@@ -119,7 +130,7 @@ namespace JsonDocumentMergerQueueProcessor
         /// </param>
         protected override void Complete(string queryId, bool isLastThreadForThisTask)
         {
-            var list = this.QueueContext.DocumentDictionary.RemoveAll();
+            var list = this.documentDictionary.RemoveAll();
             this.SendToOutputQueue(list);
 
             SequenceBarrier.CompleteQuery(queryId);
@@ -201,7 +212,7 @@ namespace JsonDocumentMergerQueueProcessor
             lock (this.locks.GetOrAdd(id, s => new object()))
             {
                 JObject document;
-                if (!this.QueueContext.DocumentDictionary.ContainsKey(id))
+                if (!this.documentDictionary.ContainsKey(id))
                 {
                     document = new JObject { { this.Config.TopLevelKeyColumn, id } };
                     var jsonObjectCacheItem = new JsonObjectQueueItem
@@ -212,18 +223,18 @@ namespace JsonDocumentMergerQueueProcessor
                     };
 
 
-                    this.QueueContext.DocumentDictionary.Add(id, jsonObjectCacheItem);
+                    this.documentDictionary.Add(id, jsonObjectCacheItem);
 
                     Interlocked.Increment(ref this.numDocumentsModified);
 
-                    this.MyLogger.Verbose($"AddToJsonObject: id:{id} _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+                    this.MyLogger.Verbose($"AddToJsonObject: id:{id} _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.documentDictionary.Count:N0}");
                     JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
                 }
                 else
                 {
-                    document = this.QueueContext.DocumentDictionary[id].Document;
+                    document = this.documentDictionary.GetById(id).Document;
 
-                    this.MyLogger.Verbose($"UpdatedJsonObject: id:{id}  _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+                    this.MyLogger.Verbose($"UpdatedJsonObject: id:{id}  _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.documentDictionary.Count:N0}");
                     JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
                 }
 
@@ -263,7 +274,7 @@ namespace JsonDocumentMergerQueueProcessor
         /// </param>
         private void AddDocumentsToOutQueue(string min)
         {
-            var keys = this.QueueContext.DocumentDictionary.GetKeysLessThan(min);
+            var keys = this.documentDictionary.GetKeysLessThan(min);
 
             this.AddDocumentsToOutQueueByKeys(keys);
         }
@@ -291,10 +302,10 @@ namespace JsonDocumentMergerQueueProcessor
         private void AddDocumentToOutputQueueByKey(string key)
         {
             IJsonObjectQueueItem item;
-            if (this.QueueContext.DocumentDictionary.TryRemove(key, out item))
+            if (this.documentDictionary.TryRemove(key, out item))
             {
                 this.MyLogger.Verbose(
-                    $"Remove from Dictionary: _documentDictionary.Count={this.QueueContext.DocumentDictionary.Count:N0}");
+                    $"Remove from Dictionary: _documentDictionary.Count={this.documentDictionary.Count:N0}");
 
                 this.AddToOutputQueue(item);
             }
@@ -356,7 +367,7 @@ namespace JsonDocumentMergerQueueProcessor
                     {
                         propertiesToRemove =
                             properties.Where(
-                                    p => p.StartsWith(Config.TopLevelKeyColumn, StringComparison.OrdinalIgnoreCase))
+                                    p => p.StartsWith(this.Config.TopLevelKeyColumn, StringComparison.OrdinalIgnoreCase))
                                 .ToList();
 
                         foreach (var property in propertiesToRemove)

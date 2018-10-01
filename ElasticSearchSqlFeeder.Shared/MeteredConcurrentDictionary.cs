@@ -1,17 +1,33 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ElasticSearchSqlFeeder.Interfaces;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MeteredConcurrentDictionary.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the MeteredConcurrentDictionary type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Shared
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+
+    using ElasticSearchSqlFeeder.Interfaces;
+
     using Serilog;
     using Serilog.Core;
 
+    /// <inheritdoc />
+    /// <summary>
+    /// The metered concurrent dictionary.
+    /// </summary>
+    /// <typeparam name="TKey">type of key
+    /// </typeparam>
+    /// <typeparam name="TValue">type of value
+    /// </typeparam>
     public class MeteredConcurrentDictionary<TKey, TValue> : IMeteredConcurrentDictionary<TKey, TValue> where TKey : IComparable
     {
         // ReSharper disable once StaticMemberInGenericType

@@ -9,6 +9,8 @@
 
 namespace DummyMappingUploadQueueProcessor
 {
+    using System.Threading;
+
     using BaseQueueProcessor;
 
     using ElasticSearchSqlFeeder.Interfaces;
@@ -37,8 +39,14 @@ namespace DummyMappingUploadQueueProcessor
         /// The queue Manager.
         /// </param>
         /// <param name="progressMonitor"></param>
-        public DummyMappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
-            : base(queueContext, logger, queueManager, progressMonitor)
+        /// <param name="cancellationToken"></param>
+        public DummyMappingUploadQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken) 
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
         }
 

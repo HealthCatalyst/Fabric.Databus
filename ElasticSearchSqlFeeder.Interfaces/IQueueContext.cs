@@ -9,8 +9,6 @@
 
 namespace ElasticSearchSqlFeeder.Interfaces
 {
-    using System.Threading;
-
     /// <summary>
     /// The QueueContext interface.
     /// </summary>
@@ -20,10 +18,5 @@ namespace ElasticSearchSqlFeeder.Interfaces
         /// Gets or sets the config.
         /// </summary>
         IQueryConfig Config { get; set; }
-
-        /// <summary>
-        /// Gets or sets the cancellation token.
-        /// </summary>
-        CancellationToken CancellationToken { get; set; }
     }
 }

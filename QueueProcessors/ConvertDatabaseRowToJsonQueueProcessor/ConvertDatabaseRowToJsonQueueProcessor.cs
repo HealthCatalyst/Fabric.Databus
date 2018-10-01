@@ -14,6 +14,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -55,8 +56,14 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         /// </param>
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
-        public ConvertDatabaseRowToJsonQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
-            : base(queueContext, logger, queueManager, progressMonitor)
+        /// <param name="cancellationToken"></param>
+        public ConvertDatabaseRowToJsonQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor, 
+            CancellationToken cancellationToken)
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-ConvertToJson");
         }

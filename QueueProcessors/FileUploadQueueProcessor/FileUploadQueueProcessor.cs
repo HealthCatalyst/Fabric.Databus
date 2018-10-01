@@ -9,6 +9,8 @@
 
 namespace FileUploadQueueProcessor
 {
+    using System.Threading;
+
     using BaseQueueProcessor;
 
     using ElasticSearchSqlFeeder.Interfaces;
@@ -44,8 +46,15 @@ namespace FileUploadQueueProcessor
         /// The queue Manager.
         /// </param>
         /// <param name="progressMonitor"></param>
-        public FileUploadQueueProcessor(IQueueContext queueContext, IElasticSearchUploader elasticSearchUploader, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
-            : base(queueContext, logger, queueManager, progressMonitor)
+        /// <param name="cancellationToken"></param>
+        public FileUploadQueueProcessor(
+            IQueueContext queueContext, 
+            IElasticSearchUploader elasticSearchUploader, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken)
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader;
         }

@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.IO;
     using System.IO.Compression;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -34,8 +35,14 @@
         /// <param name="progressMonitor">
         /// The progress monitor.
         /// </param>
-        public FileSaveQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
-            : base(queueContext, logger, queueManager, progressMonitor)
+        /// <param name="cancellationToken"></param>
+        public FileSaveQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken)
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
         }
 

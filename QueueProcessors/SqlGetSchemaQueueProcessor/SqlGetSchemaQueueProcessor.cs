@@ -12,6 +12,7 @@ namespace SqlGetSchemaQueueProcessor
     using System;
     using System.IO;
     using System.Linq;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -46,8 +47,9 @@ namespace SqlGetSchemaQueueProcessor
             ILogger logger,
             IElasticSearchUploader elasticSearchUploader,
             IQueueManager queueManager, 
-            IProgressMonitor progressMonitor) 
-            : base(queueContext, logger, queueManager, progressMonitor)
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken) 
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");

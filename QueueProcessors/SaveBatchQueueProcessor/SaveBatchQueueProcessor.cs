@@ -24,8 +24,13 @@
         private static int _currentBatchFileNumber = 0;
 
         /// <inheritdoc />
-        public SaveBatchQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
-            : base(queueContext, logger, queueManager, progressMonitor)
+        public SaveBatchQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken) 
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
         }
 

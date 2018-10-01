@@ -16,6 +16,7 @@ namespace PipelineRunner
     using ElasticSearchSqlFeeder.Interfaces;
 
     using Unity;
+    using Unity.Resolution;
 
     /// <summary>
     /// The single threaded pipeline executor.
@@ -33,7 +34,10 @@ namespace PipelineRunner
         {
             foreach (var processor in processors)
             {
-                this.RunSync(() => (IBaseQueueProcessor)this.container.Resolve(processor.Type));
+                this.RunSync(
+                    () => (IBaseQueueProcessor)this.container.Resolve(
+                        processor.Type,
+                        new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token)));
             }
         }
 

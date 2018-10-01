@@ -13,6 +13,7 @@ namespace SqlImportQueueProcessor
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -57,8 +58,14 @@ namespace SqlImportQueueProcessor
         /// <param name="progressMonitor">
         /// The progress monitor
         /// </param>
-        public SqlImportQueueProcessor(IQueueContext queueContext, IDatabusSqlReader databusSqlReader, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
-            : base(queueContext, logger, queueManager, progressMonitor)
+        public SqlImportQueueProcessor(
+            IQueueContext queueContext, 
+            IDatabusSqlReader databusSqlReader, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken)
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
 

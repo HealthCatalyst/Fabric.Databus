@@ -14,6 +14,7 @@ namespace SqlJobQueueProcessor
     using System.Data;
     using System.Data.SqlClient;
     using System.Linq;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -46,8 +47,14 @@ namespace SqlJobQueueProcessor
         /// <param name="progressMonitor">
         /// The progress Monitor.
         /// </param>
-        public SqlJobQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
-            : base(queueContext, logger, queueManager, progressMonitor)
+        /// <param name="cancellationToken"></param>
+        public SqlJobQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken)
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
         }
 

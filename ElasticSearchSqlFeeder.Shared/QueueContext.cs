@@ -9,8 +9,6 @@
 
 namespace ElasticSearchSqlFeeder.Shared
 {
-    using System.Threading;
-
     using ElasticSearchSqlFeeder.Interfaces;
 
     using Fabric.Databus.Config;
@@ -23,8 +21,5 @@ namespace ElasticSearchSqlFeeder.Shared
     {
         /// <inheritdoc />
         public IQueryConfig Config { get; set; }
-
-        /// <inheritdoc />
-        public CancellationToken CancellationToken { get; set; }
     }
 }

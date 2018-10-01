@@ -12,6 +12,7 @@ namespace CreateBatchItemsQueueProcessor
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -33,8 +34,13 @@ namespace CreateBatchItemsQueueProcessor
         private readonly Queue<IJsonObjectQueueItem> temporaryCache = new Queue<IJsonObjectQueueItem>();
 
         /// <inheritdoc />
-        public CreateBatchItemsQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
-            : base(queueContext, logger, queueManager, progressMonitor)
+        public CreateBatchItemsQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor, 
+            CancellationToken cancellationToken) 
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             if (this.Config.EntitiesPerUploadFile < 1)
             {

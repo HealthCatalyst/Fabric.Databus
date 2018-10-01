@@ -162,7 +162,6 @@ namespace PipelineRunner
             var queueContext = new QueueContext
             {
                 Config = config,
-                CancellationToken = this.cancellationTokenSource.Token
             };
 
             var queueManager = new QueueManager();

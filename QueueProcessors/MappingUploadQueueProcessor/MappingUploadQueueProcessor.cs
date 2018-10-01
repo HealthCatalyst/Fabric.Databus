@@ -10,6 +10,7 @@
 namespace MappingUploadQueueProcessor
 {
     using System;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -43,13 +44,20 @@ namespace MappingUploadQueueProcessor
         /// <param name="elasticSearchUploader"></param>
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
-        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IElasticSearchUploader elasticSearchUploader, IQueueManager queueManager, IProgressMonitor progressMonitor)
-            : base(queueContext, logger, queueManager, progressMonitor)
+        /// <param name="cancellationToken"></param>
+        public MappingUploadQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IElasticSearchUploader elasticSearchUploader, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken)
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc />s
         /// <summary>
         /// The logger name.
         /// </summary>

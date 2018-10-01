@@ -11,6 +11,7 @@ namespace SqlBatchQueueProcessor
 {
     using System;
     using System.IO;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -43,8 +44,14 @@ namespace SqlBatchQueueProcessor
         /// </param>
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
-        public SqlBatchQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
-            : base(queueContext, logger, queueManager, progressMonitor)
+        /// <param name="cancellationToken"></param>
+        public SqlBatchQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken) 
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
         }

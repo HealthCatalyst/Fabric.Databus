@@ -12,6 +12,7 @@ namespace SaveSchemaQueueProcessor
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading;
 
     using BaseQueueProcessor;
 
@@ -49,8 +50,13 @@ namespace SaveSchemaQueueProcessor
         /// The queue Manager.
         /// </param>
         /// <param name="progressMonitor"></param>
-        public SaveSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
-            : base(queueContext, logger, queueManager, progressMonitor)
+        public SaveSchemaQueueProcessor(
+            IQueueContext queueContext, 
+            ILogger logger, 
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken) 
+            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.uploadUrl = this.Config.Urls.First();
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SingleThreadedPipelineExecutorFactory.cs" company="">
+// <copyright file="SingleThreadedPipelineExecutorFactory.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

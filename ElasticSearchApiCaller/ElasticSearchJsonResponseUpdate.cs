@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElasticSearchJsonResponseUpdate.cs" company="">
+// <copyright file="ElasticSearchJsonResponseUpdate.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

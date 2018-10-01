@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MeteredBlockingCollection.cs" company="">
+// <copyright file="MeteredBlockingCollection.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

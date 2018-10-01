@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SaveSchemaQueueItem.cs" company="">
+// <copyright file="SaveSchemaQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

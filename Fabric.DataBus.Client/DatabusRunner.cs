@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DatabusRunner.cs" company="">
+// <copyright file="DatabusRunner.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

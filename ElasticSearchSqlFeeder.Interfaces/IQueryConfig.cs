@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IQueryConfig.cs" company="">
+// <copyright file="IQueryConfig.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

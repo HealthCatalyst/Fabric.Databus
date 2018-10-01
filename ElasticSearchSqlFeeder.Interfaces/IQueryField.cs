@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IQueryField.cs" company="">
+// <copyright file="IQueryField.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

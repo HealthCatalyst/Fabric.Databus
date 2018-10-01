@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IImportRunner.cs" company="">
+// <copyright file="IImportRunner.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

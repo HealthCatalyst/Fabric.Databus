@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DatabusSqlReader.cs" company="">
+// <copyright file="DatabusSqlReader.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

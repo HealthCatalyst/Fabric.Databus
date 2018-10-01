@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DummyMappingUploadQueueProcessor.cs" company="">
+// <copyright file="DummyMappingUploadQueueProcessor.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDataSource.cs" company="">
+// <copyright file="IDataSource.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

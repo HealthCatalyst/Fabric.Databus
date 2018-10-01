@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="XmlJob.cs" company="">
+// <copyright file="XmlJob.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
@@ -14,6 +14,7 @@ namespace Fabric.Databus.Config
 
     using ElasticSearchSqlFeeder.Interfaces;
 
+    /// <inheritdoc />
     /// <summary>
     /// The job.
     /// </summary>

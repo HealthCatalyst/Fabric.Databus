@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlBatchQueueProcessor.cs" company="">
+// <copyright file="SqlBatchQueueProcessor.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

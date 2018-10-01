@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EndPointQueueItem.cs" company="">
+// <copyright file="EndPointQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

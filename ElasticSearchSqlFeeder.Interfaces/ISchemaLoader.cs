@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ISchemaLoader.cs" company="">
+// <copyright file="ISchemaLoader.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="QueueManager.cs" company="">
+// <copyright file="QueueManager.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

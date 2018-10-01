@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IQueueContext.cs" company="">
+// <copyright file="IQueueContext.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

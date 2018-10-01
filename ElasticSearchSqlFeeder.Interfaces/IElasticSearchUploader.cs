@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IElasticSearchUploader.cs" company="">
+// <copyright file="IElasticSearchUploader.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

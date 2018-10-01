@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConvertDatabaseToJsonQueueItem.cs" company="">
+// <copyright file="ConvertDatabaseToJsonQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

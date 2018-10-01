@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateBatchItemsQueueProcessorTests.cs" company="">
+// <copyright file="CreateBatchItemsQueueProcessorTests.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

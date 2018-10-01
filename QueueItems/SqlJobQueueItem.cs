@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlJobQueueItem.cs" company="">
+// <copyright file="SqlJobQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

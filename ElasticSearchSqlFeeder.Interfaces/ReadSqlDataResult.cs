@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReadSqlDataResult.cs" company="">
+// <copyright file="ReadSqlDataResult.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

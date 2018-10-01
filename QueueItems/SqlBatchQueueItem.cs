@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlBatchQueueItem.cs" company="">
+// <copyright file="SqlBatchQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElasticSearchTypes.cs" company="">
+// <copyright file="ElasticSearchTypes.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

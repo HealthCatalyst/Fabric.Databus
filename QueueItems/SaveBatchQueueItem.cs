@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SaveBatchQueueItem.cs" company="">
+// <copyright file="SaveBatchQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MeteredConcurrentDictionary.cs" company="">
+// <copyright file="MeteredConcurrentDictionary.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

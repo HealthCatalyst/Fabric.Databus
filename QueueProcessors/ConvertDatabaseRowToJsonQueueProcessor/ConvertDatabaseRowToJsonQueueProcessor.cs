@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConvertDatabaseRowToJsonQueueProcessor.cs" company="">
+// <copyright file="ConvertDatabaseRowToJsonQueueProcessor.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

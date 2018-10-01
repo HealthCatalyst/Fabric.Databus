@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="QueueProcessorInfo.cs" company="">
+// <copyright file="QueueProcessorInfo.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

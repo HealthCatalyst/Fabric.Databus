@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="JobData.cs" company="">
+// <copyright file="JobData.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

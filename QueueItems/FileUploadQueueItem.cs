@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FileUploadQueueItem.cs" company="">
+// <copyright file="FileUploadQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>

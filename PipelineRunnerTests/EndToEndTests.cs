@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EndToEndTests.cs" company="">
+// <copyright file="EndToEndTests.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
@@ -67,13 +67,13 @@ namespace PipelineRunnerTests
                 },
                 Data = new JobData
                 {
-                    DataSources = new List<DataSource>
+                    MyDataSources = new List<DataSource>
                                     {
                                        new DataSource
                                            {
                                                Sql = sql
                                            }
-                                    }.OfType<IDataSource>().ToList()
+                                    }
                 }
             };
 
@@ -192,13 +192,13 @@ namespace PipelineRunnerTests
                 },
                 Data = new JobData
                 {
-                    DataSources = new List<DataSource>
+                    MyDataSources = new List<DataSource>
                                     {
                                        new DataSource
                                            {
                                                Sql = sql
                                            }
-                                    }.OfType<IDataSource>().ToList()
+                                    }
                 }
             };
 

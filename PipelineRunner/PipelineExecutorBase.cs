@@ -52,6 +52,6 @@ namespace PipelineRunner
         }
 
         /// <inheritdoc />
-        public abstract void RunPipelineTasks(IQueryConfig config, IList<QueueProcessorInfo> processors, int timeoutInMilliseconds);
+        public abstract void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> processors, int timeoutInMilliseconds);
     }
 }

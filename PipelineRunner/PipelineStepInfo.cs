@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="QueueProcessorInfo.cs" company="Health Catalyst">
+// <copyright file="PipelineStepInfo.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the QueueProcessorInfo type.
+//   Defines the PipelineStepInfo type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace PipelineRunner
     /// <summary>
     /// The queue processor info.
     /// </summary>
-    public class QueueProcessorInfo
+    public class PipelineStepInfo
     {
         /// <summary>
         /// Gets or sets the type.

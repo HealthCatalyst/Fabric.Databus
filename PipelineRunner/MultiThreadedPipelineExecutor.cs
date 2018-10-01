@@ -16,23 +16,15 @@ namespace PipelineRunner
     using System.Threading;
     using System.Threading.Tasks;
 
-    using ConvertDatabaseRowToJsonQueueProcessor;
-
-    using CreateBatchItemsQueueProcessor;
-
     using ElasticSearchSqlFeeder.Interfaces;
 
-    using FileSaveQueueProcessor;
+    using FileSavePipelineStep;
 
-    using FileUploadQueueProcessor;
+    using FileUploadPipelineStep;
 
-    using JsonDocumentMergerQueueProcessor;
+    using SaveBatchPipelineStep;
 
-    using SaveBatchQueueProcessor;
-
-    using SqlBatchQueueProcessor;
-
-    using SqlImportQueueProcessor;
+    using SqlBatchPipelineStep;
 
     using Unity;
 
@@ -41,8 +33,9 @@ namespace PipelineRunner
     /// </summary>
     public class MultiThreadedPipelineExecutor : PipelineExecutorBase
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultiThreadedPipelineExecutor"/> class.
+        /// Initializes a new instance of the <see cref="T:PipelineRunner.MultiThreadedPipelineExecutor" /> class.
         /// </summary>
         /// <param name="container">
         /// The container.
@@ -55,25 +48,14 @@ namespace PipelineRunner
         {
         }
 
-        /// <summary>
-        /// The run pipeline tasks.
-        /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        /// <param name="processors">processors to run</param>
-        /// <param name="timeoutInMilliseconds">
-        /// The timeout in milliseconds.
-        /// </param>
-        /// <exception cref="AggregateException">exception thrown
-        /// </exception>
+        /// <inheritdoc />
         public override void RunPipelineTasks(
             IQueryConfig config,
-            IList<QueueProcessorInfo> processors,
+            IList<PipelineStepInfo> processors,
             int timeoutInMilliseconds)
         {
             var tasks = processors
-                .Select(processor => this.RunAsync(() => (IBaseQueueProcessor)this.container.Resolve(processor.Type), processor.Count))
+                .Select(processor => this.RunAsync(() => (IPipelineStep)this.container.Resolve(processor.Type), processor.Count))
                 .SelectMany(task => task)
                 .ToList();
 
@@ -91,7 +73,7 @@ namespace PipelineRunner
         /// <summary>
         /// The run async.
         /// </summary>
-        /// <param name="functionQueueProcessor">
+        /// <param name="functionPipelineStep">
         /// The fn queue processor.
         /// </param>
         /// <param name="count">
@@ -100,7 +82,7 @@ namespace PipelineRunner
         /// <returns>
         /// The <see cref="IList"/>.
         /// </returns>
-        private IList<Task> RunAsync(Func<IBaseQueueProcessor> functionQueueProcessor, int count)
+        private IList<Task> RunAsync(Func<IPipelineStep> functionPipelineStep, int count)
         {
             IList<Task> tasks = new List<Task>();
 
@@ -112,20 +94,20 @@ namespace PipelineRunner
 
             for (var i = 0; i < count; i++)
             {
-                var queueProcessor = functionQueueProcessor();
+                var PipelineStep = functionPipelineStep();
 
                 if (isFirst)
                 {
-                    queueProcessor.CreateOutQueue(thisStepNumber);
+                    PipelineStep.CreateOutQueue(thisStepNumber);
                     isFirst = false;
                 }
 
-                queueProcessor.InitializeWithStepNumber(thisStepNumber);
+                PipelineStep.InitializeWithStepNumber(thisStepNumber);
 
                 var task = Task.Factory.StartNew(
                     (o) =>
                     {
-                        queueProcessor.MonitorWorkQueue();
+                        PipelineStep.MonitorWorkQueue();
                         return 1;
                     },
                     thisStepNumber,
@@ -151,7 +133,7 @@ namespace PipelineRunner
                 {
                     if (!task.IsFaulted)
                     {
-                        functionQueueProcessor().MarkOutputQueueAsCompleted(thisStepNumber);
+                        functionPipelineStep().MarkOutputQueueAsCompleted(thisStepNumber);
                     }
                 });
 

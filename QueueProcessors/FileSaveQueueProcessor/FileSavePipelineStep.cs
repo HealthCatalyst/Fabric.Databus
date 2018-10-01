@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FileSaveQueueProcessor.cs" company="">
+// <copyright file="FileSavePipelineStep.cs" company="">
 //   
 // </copyright>
 // <summary>
@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FileSaveQueueProcessor
+namespace FileSavePipelineStep
 {
     using System;
     using System.Collections.Concurrent;
@@ -15,7 +15,7 @@ namespace FileSaveQueueProcessor
     using System.IO.Compression;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -27,8 +27,11 @@ namespace FileSaveQueueProcessor
     /// <summary>
     /// The file save queue processor.
     /// </summary>
-    public class FileSaveQueueProcessor : BaseQueueProcessor<FileUploadQueueItem, FileUploadQueueItem>
+    public class FileSavePipelineStep : BasePipelineStep<FileUploadQueueItem, FileUploadQueueItem>
     {
+        /// <summary>
+        /// The file writer.
+        /// </summary>
         private readonly IFileWriter fileWriter;
 
         /// <summary>
@@ -38,7 +41,7 @@ namespace FileSaveQueueProcessor
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:FileSaveQueueProcessor.FileSaveQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:FileSavePipelineStep.FileSavePipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -54,7 +57,7 @@ namespace FileSaveQueueProcessor
         /// </param>
         /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
-        public FileSaveQueueProcessor(
+        public FileSavePipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 

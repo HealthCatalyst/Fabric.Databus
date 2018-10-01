@@ -1,13 +1,13 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SaveSchemaQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="SaveSchemaPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the SaveSchemaQueueProcessor type.
+//   Defines the SaveSchemaPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SaveSchemaQueueProcessor
+namespace SaveSchemaPipelineStep
 {
     using System;
     using System.IO;
@@ -15,9 +15,7 @@ namespace SaveSchemaQueueProcessor
     using System.Text;
     using System.Threading;
 
-    using BaseQueueProcessor;
-
-    using ElasticSearchJsonWriter;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -31,7 +29,7 @@ namespace SaveSchemaQueueProcessor
     /// <summary>
     /// The save schema queue processor.
     /// </summary>
-    public class SaveSchemaQueueProcessor : BaseQueueProcessor<SaveSchemaQueueItem, MappingUploadQueueItem>
+    public class SaveSchemaPipelineStep : BasePipelineStep<SaveSchemaQueueItem, MappingUploadQueueItem>
     {
         /// <summary>
         /// The file writer.
@@ -45,7 +43,7 @@ namespace SaveSchemaQueueProcessor
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SaveSchemaQueueProcessor.SaveSchemaQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:SaveSchemaPipelineStep.SaveSchemaPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -60,7 +58,7 @@ namespace SaveSchemaQueueProcessor
         /// <param name="fileWriter"></param>
         /// <param name="entityJsonWriter"></param>
         /// <param name="cancellationToken"></param>
-        public SaveSchemaQueueProcessor(
+        public SaveSchemaPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 

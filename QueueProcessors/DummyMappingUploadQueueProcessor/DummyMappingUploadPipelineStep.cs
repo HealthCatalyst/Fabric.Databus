@@ -1,20 +1,19 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DummyMappingUploadQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="DummyMappingUploadPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the DummyMappingUploadQueueProcessor type.
+//   Defines the DummyMappingUploadPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace DummyMappingUploadQueueProcessor
+namespace DummyMappingUploadPipelineStep
 {
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
 
     using QueueItems;
 
@@ -23,11 +22,11 @@ namespace DummyMappingUploadQueueProcessor
     /// <summary>
     /// The dummy mapping upload queue processor.
     /// </summary>
-    public class DummyMappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, SqlJobQueueItem>
+    public class DummyMappingUploadPipelineStep : BasePipelineStep<MappingUploadQueueItem, SqlJobQueueItem>
     {
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:DummyMappingUploadQueueProcessor.DummyMappingUploadQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:DummyMappingUploadPipelineStep.DummyMappingUploadPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -40,7 +39,7 @@ namespace DummyMappingUploadQueueProcessor
         /// </param>
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
-        public DummyMappingUploadQueueProcessor(
+        public DummyMappingUploadPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 

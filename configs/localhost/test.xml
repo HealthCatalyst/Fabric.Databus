@@ -28,6 +28,7 @@
         ,[DateOfBirth]
         FROM [Patients]
       </Sql>
+
     </DataSource>
     <DataSource Path="diagnoses">
       <Sql>

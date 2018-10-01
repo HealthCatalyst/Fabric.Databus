@@ -13,7 +13,7 @@ namespace QueueProcessor.Tests
     using System.Linq;
     using System.Threading;
 
-    using CreateBatchItemsQueueProcessor;
+    using CreateBatchItemsPipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
@@ -58,7 +58,7 @@ namespace QueueProcessor.Tests
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                var createBatchItemsQueueProcessor = new CreateBatchItemsQueueProcessor(
+                var createBatchItemsQueueProcessor = new CreateBatchItemsPipelineStep(
                     job.Config,
                     logger,
                     queueManager,

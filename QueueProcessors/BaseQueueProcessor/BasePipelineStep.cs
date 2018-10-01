@@ -1,13 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BaseQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="BasePipelineStep.cs" company="Health Catalyst">
 //   2018
 // </copyright>
 // <summary>
-//   Defines the BaseQueueProcessor type.
+//   Defines the BasePipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace BaseQueueProcessor
+namespace BasePipelineStep
 {
     using System;
     using System.Diagnostics;
@@ -18,6 +18,7 @@ namespace BaseQueueProcessor
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The base queue processor.
     /// </summary>
@@ -27,7 +28,7 @@ namespace BaseQueueProcessor
     /// <typeparam name="TQueueOutItem">
     /// out item
     /// </typeparam>
-    public abstract class BaseQueueProcessor<TQueueInItem, TQueueOutItem> : IBaseQueueProcessor
+    public abstract class BasePipelineStep<TQueueInItem, TQueueOutItem> : IPipelineStep
         where TQueueInItem : IQueueItem
         where TQueueOutItem : IQueueItem
     {
@@ -109,7 +110,7 @@ namespace BaseQueueProcessor
         private int totalItemsProcessedByThisProcessor;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BaseQueueProcessor{TQueueInItem,TQueueOutItem}"/> class.
+        /// Initializes a new instance of the <see cref="BasePipelineStep{TQueueInItem,TQueueOutItem}"/> class.
         /// </summary>
         /// <param name="jobConfig">
         ///     The queue context.
@@ -126,7 +127,7 @@ namespace BaseQueueProcessor
         /// <param name="cancellationToken">
         ///     The cancellation Token.
         /// </param>
-        protected BaseQueueProcessor(
+        protected BasePipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,

@@ -1,13 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlImportQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="SqlImportPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlImportQueueProcessor type.
+//   Defines the SqlImportPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SqlImportQueueProcessor
+namespace SqlImportPipelineStep
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace SqlImportQueueProcessor
     using System.Linq;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
@@ -28,7 +28,7 @@ namespace SqlImportQueueProcessor
     /// <summary>
     /// The sql import queue processor.
     /// </summary>
-    public class SqlImportQueueProcessor : BaseQueueProcessor<SqlImportQueueItem, ConvertDatabaseToJsonQueueItem>
+    public class SqlImportPipelineStep : BasePipelineStep<SqlImportQueueItem, ConvertDatabaseToJsonQueueItem>
     {
         /// <summary>
         /// The folder.
@@ -47,7 +47,7 @@ namespace SqlImportQueueProcessor
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SqlImportQueueProcessor.SqlImportQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:SqlImportPipelineStep.SqlImportPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -70,7 +70,7 @@ namespace SqlImportQueueProcessor
         /// <param name="cancellationToken">
         /// cancellation token
         /// </param>
-        public SqlImportQueueProcessor(
+        public SqlImportPipelineStep(
             IJobConfig jobConfig, 
             IDatabusSqlReader databusSqlReader, 
             ILogger logger, 

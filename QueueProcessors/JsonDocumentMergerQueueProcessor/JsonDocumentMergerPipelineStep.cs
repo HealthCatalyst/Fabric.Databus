@@ -1,27 +1,24 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="JsonDocumentMergerQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="JsonDocumentMergerPipelineStep.cs" company="Health Catalyst">
 //   2018
 // </copyright>
 // <summary>
-//   Defines the JsonDocumentMergerQueueProcessor type.
+//   Defines the JsonDocumentMergerPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace JsonDocumentMergerQueueProcessor
+namespace JsonDocumentMergerPipelineStep
 {
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
-
-    using Fabric.Shared;
 
     using Newtonsoft.Json.Linq;
 
@@ -32,7 +29,7 @@ namespace JsonDocumentMergerQueueProcessor
     /// <summary>
     /// The json document merger queue processor.
     /// </summary>
-    public class JsonDocumentMergerQueueProcessor : BaseQueueProcessor<JsonDocumentMergerQueueItem, IJsonObjectQueueItem>
+    public class JsonDocumentMergerPipelineStep : BasePipelineStep<JsonDocumentMergerQueueItem, IJsonObjectQueueItem>
     {
         /// <summary>
         /// The sequence barrier.
@@ -75,7 +72,7 @@ namespace JsonDocumentMergerQueueProcessor
         private int numDocumentsModified;
 
         /// <inheritdoc />
-        public JsonDocumentMergerQueueProcessor(
+        public JsonDocumentMergerPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,

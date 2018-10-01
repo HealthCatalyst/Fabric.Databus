@@ -91,17 +91,17 @@
       <Project>{EFC37D49-40FA-4F53-B956-B63F7EB47244}</Project>
       <Name>QueueItems</Name>
     </ProjectReference>
-    <ProjectReference Include="..\QueueProcessors\BaseQueueProcessor\BaseQueueProcessor.csproj">
+    <ProjectReference Include="..\QueueProcessors\BaseQueueProcessor\BasePipelineStep.csproj">
       <Project>{CFD6967D-8547-42ED-8EED-CBAA607CDDED}</Project>
-      <Name>BaseQueueProcessor</Name>
+      <Name>BasePipelineStep</Name>
     </ProjectReference>
-    <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj">
+    <ProjectReference Include="..\QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsPipelineStep.csproj">
       <Project>{E6B53794-9D7D-4688-AC87-B229E49D681B}</Project>
-      <Name>CreateBatchItemsQueueProcessor</Name>
+      <Name>CreateBatchItemsPipelineStep</Name>
     </ProjectReference>
-    <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj">
+    <ProjectReference Include="..\QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerPipelineStep.csproj">
       <Project>{2D062F58-8DA2-4993-8EA5-D596544E1D72}</Project>
-      <Name>JsonDocumentMergerQueueProcessor</Name>
+      <Name>JsonDocumentMergerPipelineStep</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

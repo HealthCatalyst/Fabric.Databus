@@ -1,20 +1,20 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlGetSchemaQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="SqlGetSchemaPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlGetSchemaQueueProcessor type.
+//   Defines the SqlGetSchemaPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SqlGetSchemaQueueProcessor
+namespace SqlGetSchemaPipelineStep
 {
     using System;
     using System.IO;
     using System.Linq;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -28,7 +28,7 @@ namespace SqlGetSchemaQueueProcessor
     /// <summary>
     /// The sql get schema queue processor.
     /// </summary>
-    public class SqlGetSchemaQueueProcessor : BaseQueueProcessor<SqlJobQueueItem, SaveSchemaQueueItem>
+    public class SqlGetSchemaPipelineStep : BasePipelineStep<SqlJobQueueItem, SaveSchemaQueueItem>
     {
         /// <summary>
         /// The file uploader.
@@ -51,7 +51,7 @@ namespace SqlGetSchemaQueueProcessor
         private readonly string folder;
 
         /// <inheritdoc />
-        public SqlGetSchemaQueueProcessor(
+        public SqlGetSchemaPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IElasticSearchUploader elasticSearchUploader,

@@ -1,20 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateBatchItemsQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="CreateBatchItemsPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the CreateBatchItemsQueueProcessor type.
+//   Defines the CreateBatchItemsPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CreateBatchItemsQueueProcessor
+namespace CreateBatchItemsPipelineStep
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -26,7 +26,7 @@ namespace CreateBatchItemsQueueProcessor
     /// <summary>
     /// The create batch items queue processor.
     /// </summary>
-    public class CreateBatchItemsQueueProcessor : BaseQueueProcessor<IJsonObjectQueueItem, SaveBatchQueueItem>
+    public class CreateBatchItemsPipelineStep : BasePipelineStep<IJsonObjectQueueItem, SaveBatchQueueItem>
     {
         /// <summary>
         /// The temporary cache.
@@ -34,7 +34,7 @@ namespace CreateBatchItemsQueueProcessor
         private readonly Queue<IJsonObjectQueueItem> temporaryCache = new Queue<IJsonObjectQueueItem>();
 
         /// <inheritdoc />
-        public CreateBatchItemsQueueProcessor(
+        public CreateBatchItemsPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 

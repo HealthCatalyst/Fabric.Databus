@@ -1,20 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConvertDatabaseRowToJsonQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="ConvertDatabaseRowToJsonPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the ConvertDatabaseRowToJsonQueueProcessor type.
+//   Defines the ConvertDatabaseRowToJsonPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConvertDatabaseRowToJsonQueueProcessor
+namespace ConvertDatabaseRowToJsonPipelineStep
 {
     using System;
     using System.IO;
     using System.Text;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
@@ -27,7 +27,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
     /// <summary>
     /// The convert database row to json queue processor.
     /// </summary>
-    public class ConvertDatabaseRowToJsonQueueProcessor : BaseQueueProcessor<ConvertDatabaseToJsonQueueItem, JsonDocumentMergerQueueItem>
+    public class ConvertDatabaseRowToJsonPipelineStep : BasePipelineStep<ConvertDatabaseToJsonQueueItem, JsonDocumentMergerQueueItem>
     {
         /// <summary>
         /// The sequence barrier.
@@ -48,7 +48,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:ConvertDatabaseRowToJsonQueueProcessor.ConvertDatabaseRowToJsonQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:ConvertDatabaseRowToJsonPipelineStep.ConvertDatabaseRowToJsonPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -61,7 +61,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         /// <param name="entityJsonWriter"></param>
         /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
-        public ConvertDatabaseRowToJsonQueueProcessor(
+        public ConvertDatabaseRowToJsonPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 

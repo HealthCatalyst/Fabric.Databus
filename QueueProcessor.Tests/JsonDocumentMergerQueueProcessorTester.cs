@@ -9,21 +9,7 @@
 
 namespace QueueProcessor.Tests
 {
-    using System.Collections.Generic;
-    using System.IO;
-
-    using ElasticSearchJsonWriter;
-
-    using ElasticSearchSqlFeeder.Shared;
-    using Fabric.Databus.Config;
-
-    using JsonDocumentMergerQueueProcessor;
-
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using QueueItems;
-
-    using Serilog;
 
     /// <summary>
     /// The json document merger queue processor tester.

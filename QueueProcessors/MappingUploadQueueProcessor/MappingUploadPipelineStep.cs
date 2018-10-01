@@ -1,18 +1,18 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MappingUploadQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="MappingUploadPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the MappingUploadQueueProcessor type.
+//   Defines the MappingUploadPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace MappingUploadQueueProcessor
+namespace MappingUploadPipelineStep
 {
     using System;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -24,7 +24,7 @@ namespace MappingUploadQueueProcessor
     /// <summary>
     /// The mapping upload queue processor.
     /// </summary>
-    public class MappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, SqlJobQueueItem>
+    public class MappingUploadPipelineStep : BasePipelineStep<MappingUploadQueueItem, SqlJobQueueItem>
     {
         /// <summary>
         /// The file uploader.
@@ -33,7 +33,7 @@ namespace MappingUploadQueueProcessor
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:MappingUploadQueueProcessor.MappingUploadQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:MappingUploadPipelineStep.MappingUploadPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -45,7 +45,7 @@ namespace MappingUploadQueueProcessor
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
-        public MappingUploadQueueProcessor(
+        public MappingUploadPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IElasticSearchUploader elasticSearchUploader,

@@ -30,12 +30,12 @@ namespace PipelineRunner
         }
 
         /// <inheritdoc />
-        public override void RunPipelineTasks(IQueryConfig config, IList<QueueProcessorInfo> processors, int timeoutInMilliseconds)
+        public override void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> processors, int timeoutInMilliseconds)
         {
             foreach (var processor in processors)
             {
                 this.RunSync(
-                    () => (IBaseQueueProcessor)this.container.Resolve(
+                    () => (IPipelineStep)this.container.Resolve(
                         processor.Type,
                         new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token)));
             }
@@ -47,7 +47,7 @@ namespace PipelineRunner
         /// <param name="functionQueueProcessor">
         /// The fn queue processor.
         /// </param>
-        private void RunSync(Func<IBaseQueueProcessor> functionQueueProcessor)
+        private void RunSync(Func<IPipelineStep> functionQueueProcessor)
         {
             this.stepNumber++;
 

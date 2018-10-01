@@ -1,17 +1,17 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FileUploadQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="FileUploadPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the FileUploadQueueProcessor type.
+//   Defines the FileUploadPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace FileUploadQueueProcessor
+namespace FileUploadPipelineStep
 {
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -22,7 +22,7 @@ namespace FileUploadQueueProcessor
     /// <summary>
     /// The file upload queue processor.
     /// </summary>
-    public class FileUploadQueueProcessor : BaseQueueProcessor<FileUploadQueueItem, EndPointQueueItem>
+    public class FileUploadPipelineStep : BasePipelineStep<FileUploadQueueItem, EndPointQueueItem>
     {
         /// <summary>
         /// The file uploader.
@@ -31,7 +31,7 @@ namespace FileUploadQueueProcessor
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:FileUploadQueueProcessor.FileUploadQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:FileUploadPipelineStep.FileUploadPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -47,7 +47,7 @@ namespace FileUploadQueueProcessor
         /// </param>
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
-        public FileUploadQueueProcessor(
+        public FileUploadPipelineStep(
             IJobConfig jobConfig, 
             IElasticSearchUploader elasticSearchUploader, 
             ILogger logger, 

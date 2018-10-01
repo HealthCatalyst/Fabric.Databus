@@ -1,22 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlJobQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="SqlJobPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlJobQueueProcessor type.
+//   Defines the SqlJobPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SqlJobQueueProcessor
+namespace SqlJobPipelineStep
 {
     using System;
     using System.Collections.Generic;
-    using System.Data;
-    using System.Data.SqlClient;
     using System.Linq;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -26,16 +24,20 @@ namespace SqlJobQueueProcessor
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The sql job queue processor.
     /// </summary>
-    public class SqlJobQueueProcessor : BaseQueueProcessor<SqlJobQueueItem, SqlBatchQueueItem>
+    public class SqlJobPipelineStep : BasePipelineStep<SqlJobQueueItem, SqlBatchQueueItem>
     {
+        /// <summary>
+        /// The databus sql reader.
+        /// </summary>
         private readonly IDatabusSqlReader databusSqlReader;
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SqlJobQueueProcessor.SqlJobQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:SqlJobPipelineStep.SqlJobPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -51,7 +53,7 @@ namespace SqlJobQueueProcessor
         /// </param>
         /// <param name="databusSqlReader"></param>
         /// <param name="cancellationToken"></param>
-        public SqlJobQueueProcessor(
+        public SqlJobPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
@@ -89,7 +91,7 @@ namespace SqlJobQueueProcessor
             }
             else
             {
-                var ranges = CalculateRanges(workItem.Job);
+                var ranges = this.CalculateRanges(workItem.Job);
 
                 int currentBatchNumber = 1;
 

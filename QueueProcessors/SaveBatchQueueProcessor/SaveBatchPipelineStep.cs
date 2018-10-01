@@ -1,4 +1,13 @@
-﻿namespace SaveBatchQueueProcessor
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SaveBatchPipelineStep.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SaveBatchPipelineStep type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace SaveBatchPipelineStep
 {
     using System.Collections.Generic;
     using System.IO;
@@ -6,25 +15,26 @@
     using System.Text;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchJsonWriter;
 
     using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+
     using QueueItems;
 
     using Serilog;
 
-    public class SaveBatchQueueProcessor : BaseQueueProcessor<SaveBatchQueueItem, FileUploadQueueItem>
+    /// <inheritdoc />
+    public class SaveBatchPipelineStep : BasePipelineStep<SaveBatchQueueItem, FileUploadQueueItem>
     {
         private static int _currentBatchFileNumber = 0;
 
         /// <inheritdoc />
-        public SaveBatchQueueProcessor(
+        public SaveBatchPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
@@ -64,7 +74,7 @@
             {
                 foreach (var doc in docs)
                 {
-                    var entityId = doc[Config.TopLevelKeyColumn].Value<string>();
+                    var entityId = doc[this.Config.TopLevelKeyColumn].Value<string>();
 
                     writer.WriteStartObject();
                     using (new JsonPropertyWrapper(writer, "update"))
@@ -96,7 +106,7 @@
 
             var batchNumber = Interlocked.Increment(ref _currentBatchFileNumber);
 
-            AddToOutputQueue(new FileUploadQueueItem
+            this.AddToOutputQueue(new FileUploadQueueItem
             {
                 BatchNumber = batchNumber,
                 Stream = stream

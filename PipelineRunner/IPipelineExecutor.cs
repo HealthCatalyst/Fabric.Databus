@@ -21,7 +21,7 @@
         /// </exception>
         void RunPipelineTasks(
             IQueryConfig config,
-            IList<QueueProcessorInfo> processors,
+            IList<PipelineStepInfo> processors,
             int timeoutInMilliseconds);
     }
 }

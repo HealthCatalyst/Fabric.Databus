@@ -73,35 +73,35 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueueProcessor.Tests", "Que
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.Tests", "Fabric.Shared.Tests\Fabric.Shared.Tests.csproj", "{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QueueProcessors", "QueueProcessors", "{E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PipelineSteps", "PipelineSteps", "{E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlBatchQueueProcessor", "QueueProcessors\SqlBatchQueueProcessor\SqlBatchQueueProcessor.csproj", "{D6AC0664-F085-4228-980E-0DCE58E1CF35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlBatchPipelineStep", "QueueProcessors\SqlBatchQueueProcessor\SqlBatchPipelineStep.csproj", "{D6AC0664-F085-4228-980E-0DCE58E1CF35}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueueItems", "QueueItems\QueueItems.csproj", "{EFC37D49-40FA-4F53-B956-B63F7EB47244}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlImportQueueProcessor", "QueueProcessors\SqlImportQueueProcessor\SqlImportQueueProcessor.csproj", "{006D43E7-A1EB-4C7A-B200-E5AEB77F3DAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlImportPipelineStep", "QueueProcessors\SqlImportQueueProcessor\SqlImportPipelineStep.csproj", "{006D43E7-A1EB-4C7A-B200-E5AEB77F3DAC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertDatabaseRowToJsonQueueProcessor", "QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonQueueProcessor.csproj", "{F2250C96-197D-42EB-8E37-22255C8F81B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertDatabaseRowToJsonPipelineStep", "QueueProcessors\ConvertDatabaseRowToJsonQueueProcessor\ConvertDatabaseRowToJsonPipelineStep.csproj", "{F2250C96-197D-42EB-8E37-22255C8F81B5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileUploadQueueProcessor", "QueueProcessors\FileUploadQueueProcessor\FileUploadQueueProcessor.csproj", "{7B4B18B6-4657-4627-9546-45F567596015}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileUploadPipelineStep", "QueueProcessors\FileUploadQueueProcessor\FileUploadPipelineStep.csproj", "{7B4B18B6-4657-4627-9546-45F567596015}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingUploadQueueProcessor", "QueueProcessors\MappingUploadQueueProcessor\MappingUploadQueueProcessor.csproj", "{83F19C59-C1D6-4D70-9C76-CF36B5B1F423}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MappingUploadPipelineStep", "QueueProcessors\MappingUploadQueueProcessor\MappingUploadPipelineStep.csproj", "{83F19C59-C1D6-4D70-9C76-CF36B5B1F423}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateBatchItemsQueueProcessor", "QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsQueueProcessor.csproj", "{E6B53794-9D7D-4688-AC87-B229E49D681B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreateBatchItemsPipelineStep", "QueueProcessors\CreateBatchItemsQueueProcessor\CreateBatchItemsPipelineStep.csproj", "{E6B53794-9D7D-4688-AC87-B229E49D681B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyMappingUploadQueueProcessor", "QueueProcessors\DummyMappingUploadQueueProcessor\DummyMappingUploadQueueProcessor.csproj", "{B8712B8C-A76D-496C-AD15-BC13EA3BA870}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyMappingUploadPipelineStep", "QueueProcessors\DummyMappingUploadQueueProcessor\DummyMappingUploadPipelineStep.csproj", "{B8712B8C-A76D-496C-AD15-BC13EA3BA870}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSaveQueueProcessor", "QueueProcessors\FileSaveQueueProcessor\FileSaveQueueProcessor.csproj", "{C9A27F6C-DE16-4699-8623-0C5169FC4128}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileSavePipelineStep", "QueueProcessors\FileSaveQueueProcessor\FileSavePipelineStep.csproj", "{C9A27F6C-DE16-4699-8623-0C5169FC4128}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonDocumentMergerQueueProcessor", "QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerQueueProcessor.csproj", "{2D062F58-8DA2-4993-8EA5-D596544E1D72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonDocumentMergerPipelineStep", "QueueProcessors\JsonDocumentMergerQueueProcessor\JsonDocumentMergerPipelineStep.csproj", "{2D062F58-8DA2-4993-8EA5-D596544E1D72}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveBatchQueueProcessor", "QueueProcessors\SaveBatchQueueProcessor\SaveBatchQueueProcessor.csproj", "{C2E36B66-0231-4952-945D-252B58CD0BA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveBatchPipelineStep", "QueueProcessors\SaveBatchQueueProcessor\SaveBatchPipelineStep.csproj", "{C2E36B66-0231-4952-945D-252B58CD0BA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveSchemaQueueProcessor", "QueueProcessors\SaveSchemaQueueProcessor\SaveSchemaQueueProcessor.csproj", "{939E622B-F7D7-4C51-9878-C62939FBF5B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveSchemaPipelineStep", "QueueProcessors\SaveSchemaQueueProcessor\SaveSchemaPipelineStep.csproj", "{939E622B-F7D7-4C51-9878-C62939FBF5B4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlGetSchemaQueueProcessor", "QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaQueueProcessor.csproj", "{51002114-0F10-403E-AE3E-2A55C27590B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlGetSchemaPipelineStep", "QueueProcessors\SqlGetSchemaQueueProcessor\SqlGetSchemaPipelineStep.csproj", "{51002114-0F10-403E-AE3E-2A55C27590B4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseQueueProcessor", "QueueProcessors\BaseQueueProcessor\BaseQueueProcessor.csproj", "{CFD6967D-8547-42ED-8EED-CBAA607CDDED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasePipelineStep", "QueueProcessors\BaseQueueProcessor\BasePipelineStep.csproj", "{CFD6967D-8547-42ED-8EED-CBAA607CDDED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.DataBus.Client", "Fabric.DataBus.Client\Fabric.DataBus.Client.csproj", "{CA8ABDC1-A834-4C57-BC3A-E7C6D3BA0AD0}"
 EndProject
@@ -109,7 +109,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PipelineRunner", "PipelineR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineRunnerTests", "PipelineRunnerTests\PipelineRunnerTests.csproj", "{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlJobQueueProcessor", "QueueProcessors\SqlJobQueueProcessor\SqlJobQueueProcessor.csproj", "{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlJobPipelineStep", "QueueProcessors\SqlJobQueueProcessor\SqlJobPipelineStep.csproj", "{5B02967E-E834-4ABD-A2FF-80EE5A17B0B5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sql", "Sql", "{2BA682DB-D121-49E3-A577-DD819BC341F7}"
 	ProjectSection(SolutionItems) = preProject

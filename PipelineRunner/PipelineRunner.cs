@@ -15,11 +15,11 @@ namespace PipelineRunner
     using System.Linq;
     using System.Threading;
 
-    using ConvertDatabaseRowToJsonQueueProcessor;
+    using ConvertDatabaseRowToJsonPipelineStep;
 
-    using CreateBatchItemsQueueProcessor;
+    using CreateBatchItemsPipelineStep;
 
-    using DummyMappingUploadQueueProcessor;
+    using DummyMappingUploadPipelineStep;
 
     using ElasticSearchJsonWriter;
 
@@ -31,27 +31,27 @@ namespace PipelineRunner
     using Fabric.Databus.Domain.Jobs;
     using Fabric.Databus.Schema;
 
-    using FileSaveQueueProcessor;
+    using FileSavePipelineStep;
 
-    using FileUploadQueueProcessor;
+    using FileUploadPipelineStep;
 
-    using JsonDocumentMergerQueueProcessor;
+    using JsonDocumentMergerPipelineStep;
 
-    using MappingUploadQueueProcessor;
+    using MappingUploadPipelineStep;
 
     using QueueItems;
 
-    using SaveBatchQueueProcessor;
+    using SaveBatchPipelineStep;
 
-    using SaveSchemaQueueProcessor;
+    using SaveSchemaPipelineStep;
 
-    using SqlBatchQueueProcessor;
+    using SqlBatchPipelineStep;
 
-    using SqlGetSchemaQueueProcessor;
+    using SqlGetSchemaPipelineStep;
 
-    using SqlImportQueueProcessor;
+    using SqlImportPipelineStep;
 
-    using SqlJobQueueProcessor;
+    using SqlJobPipelineStep;
 
     using Unity;
 
@@ -178,51 +178,51 @@ namespace PipelineRunner
 
             sqlJobQueue.CompleteAdding();
 
-            var processors = new List<QueueProcessorInfo>();
+            var processors = new List<PipelineStepInfo>();
 
             if (config.DropAndReloadIndex)
             {
                 processors.AddRange(
-                    new List<QueueProcessorInfo>
+                    new List<PipelineStepInfo>
                         {
-                            new QueueProcessorInfo { Type = typeof(SqlGetSchemaQueueProcessor), Count = 1 },
-                            new QueueProcessorInfo { Type = typeof(SaveSchemaQueueProcessor), Count = 1 },
-                            new QueueProcessorInfo
+                            new PipelineStepInfo { Type = typeof(SqlGetSchemaPipelineStep), Count = 1 },
+                            new PipelineStepInfo { Type = typeof(SaveSchemaPipelineStep), Count = 1 },
+                            new PipelineStepInfo
                                 {
                                     Type = config.UploadToElasticSearch
-                                               ? typeof(MappingUploadQueueProcessor)
-                                               : typeof(DummyMappingUploadQueueProcessor),
+                                               ? typeof(MappingUploadPipelineStep)
+                                               : typeof(DummyMappingUploadPipelineStep),
                                     Count = 1
                                 }
                         });
             }
 
             processors.AddRange(
-                new List<QueueProcessorInfo>
+                new List<PipelineStepInfo>
                     {
-                        new QueueProcessorInfo { Type = typeof(SqlJobQueueProcessor), Count = 1 },
-                        new QueueProcessorInfo { Type = typeof(SqlBatchQueueProcessor), Count = 1 },
-                        new QueueProcessorInfo { Type = typeof(SqlImportQueueProcessor), Count = 1 },
-                        new QueueProcessorInfo { Type = typeof(ConvertDatabaseRowToJsonQueueProcessor), Count = 1 },
-                        new QueueProcessorInfo { Type = typeof(JsonDocumentMergerQueueProcessor), Count = 1 },
-                        new QueueProcessorInfo { Type = typeof(CreateBatchItemsQueueProcessor), Count = 1 },
-                        new QueueProcessorInfo { Type = typeof(SaveBatchQueueProcessor), Count = 1 }
+                        new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(CreateBatchItemsPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }
                     });
 
             if (config.WriteTemporaryFilesToDisk)
             {
-                processors.Add(new QueueProcessorInfo
+                processors.Add(new PipelineStepInfo
                 {
-                    Type = typeof(FileSaveQueueProcessor),
+                    Type = typeof(FileSavePipelineStep),
                     Count = 1
                 });
             }
 
             if (config.UploadToElasticSearch)
             {
-                processors.Add(new QueueProcessorInfo
+                processors.Add(new PipelineStepInfo
                                    {
-                                       Type = typeof(FileUploadQueueProcessor),
+                                       Type = typeof(FileUploadPipelineStep),
                                        Count = 1
                                    });
             }

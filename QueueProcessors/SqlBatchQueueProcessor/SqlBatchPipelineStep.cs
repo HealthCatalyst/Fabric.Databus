@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlBatchQueueProcessor.cs" company="Health Catalyst">
+// <copyright file="SqlBatchPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace SqlBatchQueueProcessor
+namespace SqlBatchPipelineStep
 {
     using System;
     using System.IO;
     using System.Threading;
 
-    using BaseQueueProcessor;
+    using BasePipelineStep;
 
     using ElasticSearchSqlFeeder.Interfaces;
 
@@ -25,7 +25,7 @@ namespace SqlBatchQueueProcessor
     /// <summary>
     /// The sql batch queue processor.
     /// </summary>
-    public class SqlBatchQueueProcessor : BaseQueueProcessor<SqlBatchQueueItem, SqlImportQueueItem>
+    public class SqlBatchPipelineStep : BasePipelineStep<SqlBatchQueueItem, SqlImportQueueItem>
     {
         /// <summary>
         /// The file writer.
@@ -39,7 +39,7 @@ namespace SqlBatchQueueProcessor
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SqlBatchQueueProcessor.SqlBatchQueueProcessor" /> class.
+        /// Initializes a new instance of the <see cref="T:SqlBatchPipelineStep.SqlBatchPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -51,7 +51,7 @@ namespace SqlBatchQueueProcessor
         /// <param name="progressMonitor"></param>
         /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
-        public SqlBatchQueueProcessor(
+        public SqlBatchPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 

@@ -49,6 +49,8 @@ namespace JsonDocumentMergerQueueProcessor
         /// </summary>
         private readonly IDocumentDictionary documentDictionary;
 
+        private readonly IEntityJsonWriter entityJsonWriter;
+
         /// <summary>
         /// The _locks.
         /// </summary>
@@ -71,10 +73,12 @@ namespace JsonDocumentMergerQueueProcessor
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor, 
             IDocumentDictionary documentDictionary,
+            IEntityJsonWriter entityJsonWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.documentDictionary = documentDictionary ?? throw new ArgumentNullException(nameof(documentDictionary));
+            this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
             var configLocalSaveFolder = this.Config.LocalSaveFolder;
             if (configLocalSaveFolder == null)
             {
@@ -229,35 +233,19 @@ namespace JsonDocumentMergerQueueProcessor
                     Interlocked.Increment(ref this.numDocumentsModified);
 
                     this.MyLogger.Verbose($"AddToJsonObject: id:{id} _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.documentDictionary.Count:N0}");
-                    JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
+                    this.entityJsonWriter.SetPropertiesByMerge(propertyName, newJObjects, document);
                 }
                 else
                 {
                     document = this.documentDictionary.GetById(id).Document;
 
                     this.MyLogger.Verbose($"UpdatedJsonObject: id:{id}  _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.documentDictionary.Count:N0}");
-                    JsonHelper.SetPropertiesByMerge(propertyName, newJObjects, document);
+                    this.entityJsonWriter.SetPropertiesByMerge(propertyName, newJObjects, document);
                 }
 
             }
 
             var minimum = SequenceBarrier.UpdateMinimumEntityIdProcessed(queryId, id);
-
-            // QueueContext.
-            //    ProgressMonitor.SetProgressItem(new ProgressMonitorItem
-            //    {
-            //        LoggerName = LoggerName,
-            //        Id = id,
-            //        StepNumber = _stepNumber,
-            //        //QueryId = queryId,
-            //        InQueueCount = _inQueue.Count,
-            //        Minimum = minimum,
-            //        TimeElapsed = TimeSpan.Zero,
-            //        LastCompletedEntityIdForEachQuery = SequenceBarrier.LastCompletedEntityIdForEachQuery.ToList(),
-            //        DocumentDictionaryCount = _documentDictionary.Count,
-            //        TotalItemsProcessed = _totalItemsProcessed,
-            //        TotalItemsAddedToOutputQueue = _totalItemsAddedToOutputQueue,
-            //    });
 
             // Console.Write($"\r{LoggerName} Id:{id} Remaining: {_inQueue.Count:N0} queryId:{queryId} Minimum id:{minimum}");
             this.MyLogger.Verbose($"Processed id: {id} for queryId:{queryId} Minimum id:{minimum}");

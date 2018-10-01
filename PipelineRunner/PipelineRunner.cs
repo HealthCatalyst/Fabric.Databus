@@ -21,6 +21,8 @@ namespace PipelineRunner
 
     using DummyMappingUploadQueueProcessor;
 
+    using ElasticSearchJsonWriter;
+
     using ElasticSearchSqlFeeder.Interfaces;
     using ElasticSearchSqlFeeder.Shared;
 
@@ -277,6 +279,8 @@ namespace PipelineRunner
 
             var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn);
             this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
+
+            this.container.RegisterType<IEntityJsonWriter, EntityJsonWriter>();
         }
     }
 }

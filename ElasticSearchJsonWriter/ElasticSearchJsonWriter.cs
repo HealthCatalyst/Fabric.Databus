@@ -1,13 +1,18 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using ElasticSearchSqlFeeder.Interfaces;
-
-namespace ElasticSearchJsonWriter
+﻿namespace ElasticSearchJsonWriter
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
+    using ElasticSearchSqlFeeder.Interfaces;
+
+    using Newtonsoft.Json;
+
+    /// <summary>
+    /// The es json writer.
+    /// </summary>
     public class EsJsonWriter
     {
         //const string folder = @"c:\Catalyst\demodata\patientjson";

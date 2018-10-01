@@ -23,7 +23,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="T:FileSaveQueueProcessor.FileSaveQueueProcessor" /> class.
         /// </summary>
-        /// <param name="queueContext">
+        /// <param name="jobConfig">
         /// The queue context.
         /// </param>
         /// <param name="logger">
@@ -37,12 +37,12 @@
         /// </param>
         /// <param name="cancellationToken"></param>
         public FileSaveQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             CancellationToken cancellationToken)
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
         }
 

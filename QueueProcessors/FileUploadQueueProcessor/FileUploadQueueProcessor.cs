@@ -33,7 +33,7 @@ namespace FileUploadQueueProcessor
         /// <summary>
         /// Initializes a new instance of the <see cref="T:FileUploadQueueProcessor.FileUploadQueueProcessor" /> class.
         /// </summary>
-        /// <param name="queueContext">
+        /// <param name="jobConfig">
         /// The queue context.
         /// </param>
         /// <param name="elasticSearchUploader">
@@ -48,13 +48,13 @@ namespace FileUploadQueueProcessor
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
         public FileUploadQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             IElasticSearchUploader elasticSearchUploader, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             CancellationToken cancellationToken)
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader;
         }
@@ -75,7 +75,7 @@ namespace FileUploadQueueProcessor
         {
             if (isFirstThreadForThisTask)
             {
-                this.elasticSearchUploader.StartUpload(Config.Urls, Config.Index, Config.Alias).Wait();
+                this.elasticSearchUploader.StartUpload().Wait();
             }
         }
 
@@ -92,7 +92,7 @@ namespace FileUploadQueueProcessor
         {
             if (isLastThreadForThisTask)
             {
-                this.elasticSearchUploader.FinishUpload(this.Config.Urls, this.Config.Index, this.Config.Alias).Wait();
+                this.elasticSearchUploader.FinishUpload().Wait();
             }
         }
 
@@ -119,9 +119,6 @@ namespace FileUploadQueueProcessor
         private void UploadFile(FileUploadQueueItem wt)
         {
             this.elasticSearchUploader.SendDataToHosts(
-                    this.Config.Urls,
-                    this.Config.Index,
-                    this.Config.EntityType,
                     wt.BatchNumber,
                     wt.Stream,
                     doLogContent: false,

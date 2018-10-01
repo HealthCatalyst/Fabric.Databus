@@ -31,11 +31,13 @@ namespace SqlJobQueueProcessor
     /// </summary>
     public class SqlJobQueueProcessor : BaseQueueProcessor<SqlJobQueueItem, SqlBatchQueueItem>
     {
+        private readonly IDatabusSqlReader databusSqlReader;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:SqlJobQueueProcessor.SqlJobQueueProcessor" /> class.
         /// </summary>
-        /// <param name="queueContext">
+        /// <param name="jobConfig">
         /// The queue context.
         /// </param>
         /// <param name="logger">
@@ -47,15 +49,18 @@ namespace SqlJobQueueProcessor
         /// <param name="progressMonitor">
         /// The progress Monitor.
         /// </param>
+        /// <param name="databusSqlReader"></param>
         /// <param name="cancellationToken"></param>
         public SqlJobQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
+            IDatabusSqlReader databusSqlReader,
             CancellationToken cancellationToken)
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
+            this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
         }
 
         /// <inheritdoc />
@@ -72,7 +77,7 @@ namespace SqlJobQueueProcessor
         /// </exception>
         protected override void Handle(SqlJobQueueItem workItem)
         {
-            if (this.QueueContext.Config.EntitiesPerBatch <= 0)
+            if (this.Config.EntitiesPerBatch <= 0)
             {
                 this.AddToOutputQueue(new SqlBatchQueueItem
                                       {
@@ -84,7 +89,7 @@ namespace SqlJobQueueProcessor
             }
             else
             {
-                var ranges = CalculateRanges(this.QueueContext.Config, workItem.Job);
+                var ranges = CalculateRanges(workItem.Job);
 
                 int currentBatchNumber = 1;
 
@@ -150,18 +155,18 @@ namespace SqlJobQueueProcessor
         /// <summary>
         /// The calculate ranges.
         /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
         /// <param name="job">
         /// The job.
         /// </param>
         /// <returns>
         /// The <see cref="IEnumerable"/>.
         /// </returns>
-        private static IEnumerable<Tuple<string, string>> CalculateRanges(IQueryConfig config, IJob job)
+        private IEnumerable<Tuple<string, string>> CalculateRanges(IJob job)
         {
-            var list = GetListOfEntityKeys(config, job);
+            var list = this.databusSqlReader.GetListOfEntityKeys(
+                this.Config.TopLevelKeyColumn,
+                this.Config.MaximumEntitiesToLoad,
+                job.Data.DataSources.First(d => d.Path == null));
 
             var itemsLeft = list.Count;
 
@@ -171,7 +176,7 @@ namespace SqlJobQueueProcessor
 
             while (itemsLeft > 0)
             {
-                var end = start + (itemsLeft > config.EntitiesPerBatch ? config.EntitiesPerBatch : itemsLeft) - 1;
+                var end = start + (itemsLeft > this.Config.EntitiesPerBatch ? this.Config.EntitiesPerBatch : itemsLeft) - 1;
                 ranges.Add(new Tuple<string, string>(list[start - 1], list[end - 1]));
                 itemsLeft = list.Count - end;
                 start = end + 1;
@@ -180,50 +185,5 @@ namespace SqlJobQueueProcessor
             return ranges;
         }
 
-        /// <summary>
-        /// The get list of entity keys.
-        /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        /// <param name="job">
-        /// The job.
-        /// </param>
-        /// <returns>
-        /// The <see cref="List"/>.
-        /// </returns>
-        private static List<string> GetListOfEntityKeys(IQueryConfig config, IJob job)
-        {
-            var load = job.Data.DataSources.First(c => c.Path == null);
-
-            using (var conn = new SqlConnection(config.ConnectionString))
-            {
-                conn.Open();
-                var cmd = conn.CreateCommand();
-
-                if (job.Config.SqlCommandTimeoutInSeconds != 0)
-                {
-                    cmd.CommandTimeout = job.Config.SqlCommandTimeoutInSeconds;
-                }
-
-                cmd.CommandText = config.MaximumEntitiesToLoad > 0
-                                      ? $";WITH CTE AS ( {load.Sql} )  SELECT TOP {config.MaximumEntitiesToLoad} {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;"
-                                      : $";WITH CTE AS ( {load.Sql} )  SELECT {config.TopLevelKeyColumn} from CTE ORDER BY {config.TopLevelKeyColumn} ASC;";
-
-                // Logger.Verbose($"Start: {cmd.CommandText}");
-                var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-
-                var list = new List<string>();
-
-                while (reader.Read())
-                {
-                    var obj = reader.GetValue(0);
-                    list.Add(Convert.ToString(obj));
-                }
-
-                // Logger.Verbose($"Finish: {cmd.CommandText}");
-                return list;
-            }
-        }
     }
 }

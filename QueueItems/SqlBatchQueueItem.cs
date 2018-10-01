@@ -43,7 +43,7 @@ namespace QueueItems
         /// <summary>
         /// Gets or sets the loads.
         /// </summary>
-        public List<DataSource> Loads { get; set; }
+        public IList<IDataSource> Loads { get; set; }
 
         /// <summary>
         /// Gets or sets the batch number.

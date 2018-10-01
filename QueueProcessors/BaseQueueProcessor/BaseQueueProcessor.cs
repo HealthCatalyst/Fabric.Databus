@@ -32,36 +32,6 @@ namespace BaseQueueProcessor
         where TQueueOutItem : IQueueItem
     {
         /// <summary>
-        /// The queue context.
-        /// </summary>
-        protected readonly IQueueContext QueueContext;
-
-        /// <summary>
-        /// The my logger.
-        /// </summary>
-        protected ILogger MyLogger;
-
-        /// <summary>
-        /// The _in queue.
-        /// </summary>
-        protected IMeteredBlockingCollection<TQueueInItem> InQueue;
-
-        /// <summary>
-        /// The queue manager.
-        /// </summary>
-        private readonly IQueueManager queueManager;
-
-        /// <summary>
-        /// The progress monitor.
-        /// </summary>
-        private readonly IProgressMonitor progressMonitor;
-
-        /// <summary>
-        /// The cancellation token.
-        /// </summary>
-        private readonly CancellationToken cancellationToken;
-
-        /// <summary>
         /// The _total items processed.
         /// </summary>
         // ReSharper disable once StaticMemberInGenericType
@@ -103,8 +73,24 @@ namespace BaseQueueProcessor
         // ReSharper disable once StaticMemberInGenericType
         private static string errorText;
 
-        // intentionally want a different id for each derived class
-        // ReSharper disable once StaticMemberInGenericType
+        /// <summary>
+        /// The queue manager.
+        /// </summary>
+        private readonly IQueueManager queueManager;
+
+        /// <summary>
+        /// The progress monitor.
+        /// </summary>
+        private readonly IProgressMonitor progressMonitor;
+
+        /// <summary>
+        /// The cancellation token.
+        /// </summary>
+        private readonly CancellationToken cancellationToken;
+
+        /// <summary>
+        /// The id.
+        /// </summary>
         private readonly int id = 0;
 
         /// <summary>
@@ -125,29 +111,33 @@ namespace BaseQueueProcessor
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseQueueProcessor{TQueueInItem,TQueueOutItem}"/> class.
         /// </summary>
-        /// <param name="queueContext">
-        /// The queue context.
+        /// <param name="jobConfig">
+        ///     The queue context.
         /// </param>
         /// <param name="logger">
-        /// The logger
+        ///     The logger
         /// </param>
         /// <param name="queueManager">
-        /// The queue manager
+        ///     The queue manager
         /// </param>
         /// <param name="progressMonitor">
-        /// The progress Monitor.
+        ///     The progress Monitor.
         /// </param>
         /// <param name="cancellationToken">
-        /// The cancellation Token.
+        ///     The cancellation Token.
         /// </param>
-        protected BaseQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor, CancellationToken cancellationToken)
+        protected BaseQueueProcessor(
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken)
         {
-            this.QueueContext = queueContext ?? throw new ArgumentNullException(nameof(queueContext));
-            this.queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueContext));
+            this.queueManager = queueManager ?? throw new ArgumentNullException(nameof(jobConfig));
             this.progressMonitor = progressMonitor ?? throw new ArgumentNullException(nameof(progressMonitor));
             this.cancellationToken = cancellationToken;
 
-            this.Config = queueContext.Config;
+            this.Config = jobConfig;
             if (this.Config == null)
             {
                 throw new ArgumentNullException(nameof(this.Config));
@@ -159,9 +149,19 @@ namespace BaseQueueProcessor
         }
 
         /// <summary>
+        /// Gets the my logger.
+        /// </summary>
+        protected ILogger MyLogger { get; }
+
+        /// <summary>
+        /// Gets or sets the in queue.
+        /// </summary>
+        protected IMeteredBlockingCollection<TQueueInItem> InQueue { get; set; }
+
+        /// <summary>
         /// Gets or sets the config.
         /// </summary>
-        public IQueryConfig Config { get; set; }
+        public IJobConfig Config { get; set; }
 
         /// <summary>
         /// Gets the logger name.

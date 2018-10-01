@@ -27,6 +27,7 @@ namespace PipelineRunner
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Importers;
     using Fabric.Databus.Domain.Jobs;
+    using Fabric.Databus.Schema;
 
     using FileSaveQueueProcessor;
 
@@ -146,34 +147,16 @@ namespace PipelineRunner
             }
 
             var config = job.Config;
-
+            this.InitContainer(progressMonitor, config);
 
             if (config.WriteTemporaryFilesToDisk)
             {
                 FileSaveQueueProcessor.CleanOutputFolder(config.LocalSaveFolder);
             }
 
-            var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
-
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-
-            var queueContext = new QueueContext
-            {
-                Config = config,
-            };
-
-            var queueManager = new QueueManager();
-            this.container.RegisterInstance<IQueueManager>(queueManager);
-            this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
-            this.container.RegisterInstance<IQueueContext>(queueContext);
-            this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
-
-            IElasticSearchUploaderFactory elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
-            IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
-            this.container.RegisterInstance(elasticSearchUploader);
-           
             int loadNumber = 0;
 
             // add sequence number to every load
@@ -183,7 +166,7 @@ namespace PipelineRunner
             }
 
             // add job to the first queue
-            var sqlJobQueue = queueManager
+            var sqlJobQueue = this.container.Resolve<IQueueManager>()
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
 
             sqlJobQueue.Add(new SqlJobQueueItem
@@ -251,6 +234,49 @@ namespace PipelineRunner
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
             Console.WriteLine(stopwatchElapsed);
+        }
+
+        /// <summary>
+        /// The init container.
+        /// </summary>
+        /// <param name="progressMonitor">
+        /// The progress monitor.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        private void InitContainer(
+            IProgressMonitor progressMonitor,
+            IQueryConfig config)
+        {
+            var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
+
+            var queueContext = new QueueContext
+                                   {
+                                       Config = config
+                                   };
+
+            var queueManager = new QueueManager();
+            this.container.RegisterInstance<IQueueManager>(queueManager);
+            this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
+            this.container.RegisterInstance<IQueueContext>(queueContext);
+            this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
+            this.container.RegisterInstance<IJobConfig>(config);
+
+            IElasticSearchUploaderFactory elasticSearchUploaderFactory =
+                this.container.Resolve<IElasticSearchUploaderFactory>();
+            IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(
+                config.ElasticSearchUserName,
+                config.ElasticSearchPassword,
+                false,
+                config.Urls,
+                config.Index,
+                config.Alias,
+                config.EntityType);
+            this.container.RegisterInstance(elasticSearchUploader);
+
+            var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn);
+            this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
         }
     }
 }

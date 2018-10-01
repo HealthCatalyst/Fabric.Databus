@@ -1,24 +1,72 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using ElasticSearchSqlFeeder.Interfaces;
-using ElasticSearchSqlFeeder.Shared;
-using Fabric.Databus.Config;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SchemaLoader.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SchemaLoader type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.Schema
 {
-    public class SchemaLoader
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Data.SqlClient;
+    using System.Linq;
+
+    using ElasticSearchSqlFeeder.Interfaces;
+    using ElasticSearchSqlFeeder.Shared;
+
+    using Fabric.Databus.Config;
+
+    /// <inheritdoc />
+    public class SchemaLoader : ISchemaLoader
     {
-        public static List<MappingItem> GetSchemasForLoads(List<DataSource> workitemLoads, string connectionString,
-            string topLevelKeyColumn)
+        /// <summary>
+        /// The connection string.
+        /// </summary>
+        private readonly string connectionString;
+
+        /// <summary>
+        /// The top level key column.
+        /// </summary>
+        private readonly string topLevelKeyColumn;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SchemaLoader"/> class.
+        /// </summary>
+        /// <param name="connectionString">
+        /// The connection string.
+        /// </param>
+        /// <param name="topLevelKeyColumn">
+        /// The top Level Key Column.
+        /// </param>
+        public SchemaLoader(string connectionString, string topLevelKeyColumn)
+        {
+            this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            this.topLevelKeyColumn = topLevelKeyColumn ?? throw new ArgumentNullException(nameof(topLevelKeyColumn));
+        }
+
+        /// <summary>
+        /// The get schemas for loads.
+        /// </summary>
+        /// <param name="workitemLoads">
+        /// The workitem loads.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">exception thrown
+        /// </exception>
+        public IList<MappingItem> GetSchemasForLoads(
+            IList<IDataSource> workitemLoads)
         {
             var dictionary = new List<MappingItem>();
 
             foreach (var load in workitemLoads)
             {
-                using (var conn = new SqlConnection(connectionString))
+                using (var conn = new SqlConnection(this.connectionString))
                 {
                     conn.Open();
                     var cmd = conn.CreateCommand();
@@ -45,7 +93,7 @@ namespace Fabric.Databus.Schema
                             {
                                 index = columnNumber,
                                 Name = columnName,
-                                IsJoinColumn = columnName.Equals(topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
+                                IsJoinColumn = columnName.Equals(this.topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
                                 SqlColumnType = columnType?.FullName,
                                 ElasticSearchType = SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
                                 IsCalculated = false,
@@ -60,8 +108,8 @@ namespace Fabric.Databus.Schema
                             {
                                 sourceIndex =
                                     columnList.FirstOrDefault(
-                                            c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?
-                                        .index,
+                                            c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))
+                                        ?.index,
                                 index = numberOfColumns++,
                                 Name = f.Destination,
                                 ElasticSearchType = f.DestinationType.ToString(),
@@ -92,5 +140,4 @@ namespace Fabric.Databus.Schema
         }
 
     }
-
 }

@@ -9,6 +9,8 @@
 
 namespace ElasticSearchSqlFeeder.Interfaces
 {
+    using System.Collections.Generic;
+
     using Serilog;
 
     /// <summary>
@@ -28,9 +30,21 @@ namespace ElasticSearchSqlFeeder.Interfaces
         /// <param name="keepIndexOnline">
         /// The config keep index online.
         /// </param>
+        /// <param name="urls">
+        /// The config Urls.
+        /// </param>
+        /// <param name="index">
+        /// The config Index.
+        /// </param>
+        /// <param name="alias">
+        /// The config Alias.
+        /// </param>
+        /// <param name="entityType">
+        /// The entity Type.
+        /// </param>
         /// <returns>
         /// The <see cref="FileUploader"/>.
         /// </returns>
-        IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline);
+        IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline, List<string> urls, string index, string alias, string entityType);
     }
 }

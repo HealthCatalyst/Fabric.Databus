@@ -31,7 +31,7 @@ namespace QueueItems
         /// <summary>
         /// Gets or sets the data source.
         /// </summary>
-        public DataSource DataSource { get; set; }
+        public IDataSource DataSource { get; set; }
 
         /// <summary>
         /// Gets or sets the seed.

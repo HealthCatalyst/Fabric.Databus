@@ -12,6 +12,7 @@ namespace PipelineRunnerTests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -72,7 +73,7 @@ namespace PipelineRunnerTests
                                            {
                                                Sql = sql
                                            }
-                                    }
+                                    }.OfType<IDataSource>().ToList()
                 }
             };
 
@@ -80,11 +81,11 @@ namespace PipelineRunnerTests
             var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
             mockDatabusSqlReader.Setup(
                 service => service.ReadDataFromQuery(
-                    It.IsAny<IQueryConfig>(),
                     It.IsAny<IDataSource>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
-                    It.IsAny<ILogger>())).Returns(
+                    It.IsAny<ILogger>(),
+                    It.IsAny<string>())).Returns(
                 new ReadSqlDataResult
                 {
                     ColumnList = new List<ColumnInfo>
@@ -109,12 +110,11 @@ namespace PipelineRunnerTests
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
-                .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(mockFileUploader.Object);
 
             mockFileUploader.Setup(
                 service => service.SendStreamToHosts(
-                    It.IsAny<List<string>>(),
                     It.IsAny<string>(),
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),
@@ -122,7 +122,7 @@ namespace PipelineRunnerTests
                     It.IsAny<bool>())).Returns(Task.CompletedTask);
 
             mockFileUploader
-                .Setup(service => service.StartUpload(It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(service => service.StartUpload())
                 .Returns(Task.CompletedTask);
 
             ILogger logger = new LoggerConfiguration()
@@ -198,7 +198,7 @@ namespace PipelineRunnerTests
                                            {
                                                Sql = sql
                                            }
-                                    }
+                                    }.OfType<IDataSource>().ToList()
                 }
             };
 
@@ -206,11 +206,11 @@ namespace PipelineRunnerTests
             var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
             mockDatabusSqlReader.Setup(
                 service => service.ReadDataFromQuery(
-                    It.IsAny<IQueryConfig>(),
                     It.IsAny<IDataSource>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
-                    It.IsAny<ILogger>())).Returns(
+                    It.IsAny<ILogger>(),
+                    It.IsAny<string>())).Returns(
                 new ReadSqlDataResult
                 {
                     ColumnList = new List<ColumnInfo>
@@ -235,12 +235,11 @@ namespace PipelineRunnerTests
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
-                .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(mockFileUploader.Object);
 
             mockFileUploader.Setup(
                 service => service.SendStreamToHosts(
-                    It.IsAny<List<string>>(),
                     It.IsAny<string>(),
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),
@@ -248,7 +247,7 @@ namespace PipelineRunnerTests
                     It.IsAny<bool>())).Returns(Task.CompletedTask);
 
             mockFileUploader
-                .Setup(service => service.StartUpload(It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(service => service.StartUpload())
                 .Returns(Task.CompletedTask);
 
             ILogger logger = new LoggerConfiguration()

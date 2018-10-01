@@ -11,6 +11,8 @@ namespace Fabric.Databus.Config
 {
     using System.Collections.Generic;
 
+    using ElasticSearchSqlFeeder.Interfaces;
+
     /// <summary>
     /// The JobData interface.
     /// </summary>
@@ -24,6 +26,6 @@ namespace Fabric.Databus.Config
         /// <summary>
         /// Gets or sets the data sources.
         /// </summary>
-        List<DataSource> DataSources { get; set; }
+        IList<IDataSource> DataSources { get; set; }
     }
 }

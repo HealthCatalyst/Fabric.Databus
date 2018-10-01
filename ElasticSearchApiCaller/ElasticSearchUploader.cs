@@ -44,6 +44,26 @@ namespace ElasticSearchApiCaller
         private readonly ILogger logger;
 
         /// <summary>
+        /// The hosts.
+        /// </summary>
+        private readonly List<string> hosts;
+
+        /// <summary>
+        /// The index.
+        /// </summary>
+        private readonly string index;
+
+        /// <summary>
+        /// The alias.
+        /// </summary>
+        private readonly string @alias;
+
+        /// <summary>
+        /// The entity type.
+        /// </summary>
+        private readonly string entityType;
+
+        /// <summary>
         /// The stopwatch.
         /// </summary>
         private readonly Stopwatch stopwatch = new Stopwatch();
@@ -92,61 +112,73 @@ namespace ElasticSearchApiCaller
         /// Initializes a new instance of the <see cref="ElasticSearchUploader"/> class.
         /// </summary>
         /// <param name="username">
-        /// The username.
+        ///     The username.
         /// </param>
         /// <param name="password">
-        /// The password.
+        ///     The password.
         /// </param>
         /// <param name="keepIndexOnline">
-        /// The keep index online.
+        ///     The keep index online.
         /// </param>
         /// <param name="logger">
-        /// The logger.
+        ///     The logger.
         /// </param>
-        public ElasticSearchUploader(string username, string password, bool keepIndexOnline, ILogger logger)
+        /// <param name="hosts">
+        ///     The hosts.
+        /// </param>
+        /// <param name="index">
+        ///     The index.
+        /// </param>
+        /// <param name="alias">
+        ///     The alias.
+        /// </param>
+        /// <param name="entityType">
+        /// The entity type
+        /// </param>
+        public ElasticSearchUploader(
+            string username,
+            string password,
+            bool keepIndexOnline,
+            ILogger logger,
+            List<string> hosts,
+            string index,
+            string alias,
+            string entityType)
         {
             this.username = username;
             this.password = password;
             this.keepIndexOnline = keepIndexOnline;
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.hosts = hosts ?? throw new ArgumentNullException(nameof(hosts));
+            this.index = index ?? throw new ArgumentNullException(nameof(index));
+            this.alias = alias ?? throw new ArgumentNullException(nameof(alias));
+            this.entityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
         }
 
         /// <summary>
         /// The create index and mappings.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="index">
-        /// The index.
-        /// </param>
-        /// <param name="alias">
-        /// The alias.
-        /// </param>
-        /// <param name="entity">
-        /// The entity.
-        /// </param>
         /// <param name="folder">
         /// The folder.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task CreateIndexAndMappings(List<string> hosts, string index, string alias, string entity, string folder)
+        public async Task CreateIndexAndMappings(string folder)
         {
             using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
-                var host = hosts.First();
+                var host = this.hosts.First();
 
                 this.AddAuthorizationToken(client);
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await client.PostAsyncString(
                     host + "/_aliases?pretty",
-                    "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias
+                    "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + this.index + "\", \"alias\" : \"" + this.alias
                     + "\" } }]}");
 
-                var requestUri = host + $"/{index}";
+                var requestUri = host + $"/{this.index}";
 
                 await client.DeleteAsync(requestUri);
 
@@ -155,22 +187,21 @@ namespace ElasticSearchApiCaller
 
                 await client.PutAsyncFile(requestUri, folder + @"\mainmapping.json");
 
-                await this.InternalUploadAllFilesInFolder(hosts, "mapping*", $"/{index}/_mapping/{entity}", folder);
+                await this.InternalUploadAllFilesInFolder("mapping*", $"/{this.index}/_mapping/{this.entityType}", folder);
 
                 // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"-1\" } }"
 
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-indexing-speed.html
 
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-codec
-
                 if (!this.keepIndexOnline)
                 {
                     await client.PutAsyncString(
-                        host + "/" + index + "/_settings",
+                        host + "/" + this.index + "/_settings",
                         "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
 
                     await client.PutAsyncString(
-                        host + "/" + index + "/_settings",
+                        host + "/" + this.index + "/_settings",
                         "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
                 }
             }
@@ -179,31 +210,22 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The delete index.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="index">
-        /// The index.
-        /// </param>
-        /// <param name="alias">
-        /// The alias.
-        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task DeleteIndex(List<string> hosts, string index, string alias)
+        public async Task DeleteIndex()
         {
-            var relativeUrl = $"/{index}";
+            var relativeUrl = $"/{this.index}";
             using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
-                var host = hosts.First();
+                var host = this.hosts.First();
 
                 this.AddAuthorizationToken(client);
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await client.PostAsyncString(
                     host + "/_aliases?pretty",
-                    "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias
+                    "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + this.index + "\", \"alias\" : \"" + this.alias
                     + "\" } }]}");
 
                 var requestUri = host + relativeUrl;
@@ -213,7 +235,7 @@ namespace ElasticSearchApiCaller
                 // now also delete the alias in case it was pointing to some other index
 
                 // DELETE /logs_20162801/_alias/current_day
-                await client.DeleteAsync(host + "/_all/_alias/" + alias);
+                await client.DeleteAsync(host + "/_all/_alias/" + this.alias);
 
             }
         }
@@ -221,25 +243,16 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The start upload.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="index">
-        /// The index.
-        /// </param>
-        /// <param name="alias">
-        /// The alias.
-        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task StartUpload(List<string> hosts, string index, string alias)
+        public async Task StartUpload()
         {
             if (!this.keepIndexOnline)
             {
                 using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
                 {
-                    var host = hosts.First() ?? throw new ArgumentNullException("hosts.First()");
+                    var host = this.hosts.First() ?? throw new ArgumentNullException("hosts.First()");
 
                     this.AddAuthorizationToken(client);
 
@@ -248,11 +261,11 @@ namespace ElasticSearchApiCaller
 
                     // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-codec
                     await client.PutAsyncString(
-                        host + "/" + index + "/_settings",
+                        host + "/" + this.index + "/_settings",
                         "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
 
                     await client.PutAsyncString(
-                        host + "/" + index + "/_settings",
+                        host + "/" + this.index + "/_settings",
                         "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
                 }
             }
@@ -261,77 +274,59 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The finish upload.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="index">
-        /// The index.
-        /// </param>
-        /// <param name="alias">
-        /// The alias.
-        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task FinishUpload(List<string> hosts, string index, string alias)
+        public async Task FinishUpload()
         {
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
             using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
-                var host = hosts.First();
+                var host = this.hosts.First();
 
                 this.AddAuthorizationToken(client);
 
                 if (!this.keepIndexOnline)
                 {
                     await client.PutAsyncString(
-                        host + "/" + index + "/_settings",
+                        host + "/" + this.index + "/_settings",
                         "{ \"index\" : {\"number_of_replicas\" : \"1\" } }");
 
                     await client.PutAsyncString(
-                        host + "/" + index + "/_settings",
+                        host + "/" + this.index + "/_settings",
                         "{ \"index\" : {\"refresh_interval\" : \"1s\" } }");
 
                     // curl -XPOST %ESURL%/patients2/_forcemerge?max_num_segments=5
-                    await client.PostAsync(host + "/" + index + "/_forcemerge?max_num_segments=5", null);
+                    await client.PostAsync(host + "/" + this.index + "/_forcemerge?max_num_segments=5", null);
 
                     // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                     // await
-                    //    client.PostAsyncString(host + "/_aliases?pretty",
-                    //        "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
+                    // client.PostAsyncString(host + "/_aliases?pretty",
+                    // "{\"actions\" : [{ \"remove\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
                 }
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"add\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 await client.PostAsyncString(
                     host + "/_aliases?pretty",
-                    "{\"actions\" : [{ \"add\" : { \"index\" : \"" + index + "\", \"alias\" : \"" + alias + "\" } }]}");
+                    "{\"actions\" : [{ \"add\" : { \"index\" : \"" + this.index + "\", \"alias\" : \"" + this.alias + "\" } }]}");
             }
         }
 
         /// <summary>
         /// The setup alias.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="indexName">
-        /// The index name.
-        /// </param>
-        /// <param name="aliasName">
-        /// The alias name.
-        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task SetupAlias(List<string> hosts, string indexName, string aliasName)
+        public async Task SetupAlias()
         {
             using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
-                var host = hosts.First();
+                var host = this.hosts.First();
                 this.AddAuthorizationToken(client);
                 await client.PostAsyncString(
                     host + "/_aliases?pretty",
-                    "{\"actions\" : [{ \"add\" : { \"index\" : \"" + indexName + "\", \"alias\" : \"" + aliasName
+                    "{\"actions\" : [{ \"add\" : { \"index\" : \"" + this.index + "\", \"alias\" : \"" + this.alias
                     + "\" } }]}");
             }
         }
@@ -339,48 +334,27 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The upload all files in folder.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="index">
-        /// The index.
-        /// </param>
-        /// <param name="alias">
-        /// The alias.
-        /// </param>
-        /// <param name="entity">
-        /// The entity.
-        /// </param>
         /// <param name="folder">
         /// The folder.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task UploadAllFilesInFolder(List<string> hosts, string index, string alias, string entity, string folder)
+        public async Task UploadAllFilesInFolder(string folder)
         {
             // https://www.elastic.co/guide/en/elasticsearch/reference/current/tune-for-indexing-speed.html
-            await this.CreateIndexAndMappings(hosts, index, alias, entity, folder);
+            await this.CreateIndexAndMappings(folder);
 
-            await this.InternalUploadAllFilesInFolder(hosts, index + "-*", $"/{index}/{entity}/_bulk?pretty", folder);
+            await this.InternalUploadAllFilesInFolder(this.index + "-*", $"/{this.index}/{this.entityType}/_bulk?pretty", folder);
 
             // await InternalUploadAllFilesInFolder(hosts, "patients2-Diagnoses*", @"/patients/_bulk?pretty");
-            await this.FinishUpload(hosts, index, alias);
+            await this.FinishUpload();
         }
 
         /// <inheritdoc />
         /// <summary>
         /// The send data to hosts.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="indexName">
-        /// The index name.
-        /// </param>
-        /// <param name="entityType">
-        /// The entity type.
-        /// </param>
         /// <param name="batch">
         /// The batch.
         /// </param>
@@ -397,28 +371,19 @@ namespace ElasticSearchApiCaller
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
         public async Task SendDataToHosts(
-            List<string> hosts,
-            string indexName,
-            string entityType,
             int batch,
             Stream stream,
             bool doLogContent,
             bool doCompress)
         {
-            var relativeUrl = $"/{indexName}/{entityType}/_bulk?pretty";
-            await this.SendStreamToHosts(hosts, relativeUrl, batch, stream, doLogContent, doCompress);
+            var relativeUrl = $"/{this.index}/{entityType}/_bulk?pretty";
+            await this.SendStreamToHosts(relativeUrl, batch, stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
         /// <summary>
         /// The send main mapping file to hosts.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="indexName">
-        /// The index name.
-        /// </param>
         /// <param name="batch">
         /// The batch.
         /// </param>
@@ -435,30 +400,19 @@ namespace ElasticSearchApiCaller
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
         public async Task SendMainMappingFileToHosts(
-            List<string> hosts,
-            string indexName,
             int batch,
             Stream stream,
             bool doLogContent,
             bool doCompress)
         {
-            var relativeUrl = $"/{indexName}";
-            await this.SendStreamToHosts(hosts, relativeUrl, batch, stream, doLogContent, doCompress);
+            var relativeUrl = $"/{this.index}";
+            await this.SendStreamToHosts(relativeUrl, batch, stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
         /// <summary>
         /// The send nested mapping file to hosts.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="indexName">
-        /// The index name.
-        /// </param>
-        /// <param name="entityType">
-        /// The entity type.
-        /// </param>
         /// <param name="batch">
         /// The batch.
         /// </param>
@@ -475,24 +429,18 @@ namespace ElasticSearchApiCaller
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
         public async Task SendNestedMappingFileToHosts(
-            List<string> hosts,
-            string indexName,
-            string entityType,
             int batch,
             Stream stream,
             bool doLogContent,
             bool doCompress)
         {
-            var relativeUrl = $"/{indexName}/_mapping/{entityType}";
-            await this.SendStreamToHosts(hosts, relativeUrl, batch, stream, doLogContent, doCompress);
+            var relativeUrl = $"/{this.index}/_mapping/{this.entityType}";
+            await this.SendStreamToHosts(relativeUrl, batch, stream, doLogContent, doCompress);
         }
 
         /// <summary>
         /// The send stream to hosts.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
         /// <param name="relativeUrl">
         /// The relative url.
         /// </param>
@@ -511,11 +459,11 @@ namespace ElasticSearchApiCaller
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task SendStreamToHosts(List<string> hosts, string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
+        public async Task SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
-            var hostNumber = batch % hosts.Count;
+            var hostNumber = batch % this.hosts.Count;
 
-            var url = hosts[hostNumber] + relativeUrl;
+            var url = this.hosts[hostNumber] + relativeUrl;
 
             await this.SendStreamToUrl(url, batch, stream, doLogContent, doCompress);
         }
@@ -523,17 +471,14 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The test elastic search connection.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<string> TestElasticSearchConnection(List<string> hosts)
+        public async Task<string> TestElasticSearchConnection()
         {
             using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
-                var host = hosts.First();
+                var host = this.hosts.First();
 
                 this.AddAuthorizationToken(client);
 
@@ -545,19 +490,10 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The refresh index.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
-        /// <param name="index">
-        /// The index.
-        /// </param>
-        /// <param name="alias">
-        /// The alias.
-        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task RefreshIndex(List<string> hosts, string index, string alias)
+        public async Task RefreshIndex()
         {
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
             using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
@@ -569,7 +505,7 @@ namespace ElasticSearchApiCaller
                 if (!this.keepIndexOnline)
                 {
                     await
-                        client.PostAsyncString(host + "/" + index + "/_refresh",null);
+                        client.PostAsyncString(host + "/" + index + "/_refresh", null);
                 }
             }
         }
@@ -663,7 +599,7 @@ namespace ElasticSearchApiCaller
                             }
                             else
                             {
-                                logger.Verbose($"Finished: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+                                this.logger.Verbose($"Finished: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
                             }
 
                         }
@@ -676,7 +612,7 @@ namespace ElasticSearchApiCaller
 
                             this.logger.Error(responseJson);
 
-                            //logger.Verbose("========= Error =================");
+                            // logger.Verbose("========= Error =================");
                         }
                     }
                 }
@@ -719,7 +655,6 @@ namespace ElasticSearchApiCaller
                         // var fileContent = new FileContent(filepath);
 
                         // logger.Verbose("posting file" + filepath);
-
                         Interlocked.Increment(ref this.currentRequests);
                         var requestStartTimeMillisecs = this.stopwatch.ElapsedMilliseconds;
 
@@ -790,16 +725,13 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The run files.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
         /// <param name="relativeUrl">
         /// The relative url.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task RunFiles(List<string> hosts, string relativeUrl)
+        private async Task RunFiles(string relativeUrl)
         {
             if (!this.queuedFiles.IsEmpty)
             {
@@ -821,7 +753,7 @@ namespace ElasticSearchApiCaller
 
                         var url = hosts[hostNumber] + relativeUrl;
 
-                        //var url = hosts.First() + @"/_cluster/health?pretty";
+                        // var url = hosts.First() + @"/_cluster/health?pretty";
                         await this.SendFileToUrl(url, filename);
                     }
                     finally
@@ -835,26 +767,20 @@ namespace ElasticSearchApiCaller
         /// <summary>
         /// The upload files.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
         /// <param name="relativeUrl">
         /// The relative url.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task UploadFiles(List<string> hosts, string relativeUrl)
+        private async Task UploadFiles(string relativeUrl)
         {
-            await this.RunFiles(hosts, relativeUrl);
+            await this.RunFiles(relativeUrl);
         }
 
         /// <summary>
         /// The internal upload all files in folder.
         /// </summary>
-        /// <param name="hosts">
-        /// The hosts.
-        /// </param>
         /// <param name="searchPattern">
         /// The search pattern.
         /// </param>
@@ -867,7 +793,7 @@ namespace ElasticSearchApiCaller
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task InternalUploadAllFilesInFolder(List<string> hosts, string searchPattern, string relativeUrl, string folder)
+        private async Task InternalUploadAllFilesInFolder(string searchPattern, string relativeUrl, string folder)
         {
             this.currentRequests = 0;
             this.stopwatch.Reset();
@@ -880,7 +806,7 @@ namespace ElasticSearchApiCaller
 
             this.totalFiles = fileList.Count;
 
-            await this.UploadFiles(hosts, relativeUrl);
+            await this.UploadFiles(relativeUrl);
 
             this.stopwatch.Stop();
 

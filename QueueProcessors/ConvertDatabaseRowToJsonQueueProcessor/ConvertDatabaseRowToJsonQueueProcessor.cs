@@ -48,7 +48,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         /// <summary>
         /// Initializes a new instance of the <see cref="T:ConvertDatabaseRowToJsonQueueProcessor.ConvertDatabaseRowToJsonQueueProcessor" /> class.
         /// </summary>
-        /// <param name="queueContext">
+        /// <param name="jobConfig">
         /// The queue context.
         /// </param>
         /// <param name="logger">
@@ -58,12 +58,12 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
         public ConvertDatabaseRowToJsonQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor, 
             CancellationToken cancellationToken)
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-ConvertToJson");
         }
@@ -270,7 +270,7 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
 
             var minimumEntityIdProcessed = SequenceBarrier.UpdateMinimumEntityIdProcessed(wt.QueryId, id);
 
-            MyLogger.Verbose($"Add to queue: {id}");
+            this.MyLogger.Verbose($"Add to queue: {id}");
 
             this.CleanListIfNeeded(wt.QueryId, minimumEntityIdProcessed);
         }

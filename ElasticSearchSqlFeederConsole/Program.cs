@@ -75,7 +75,8 @@ namespace ElasticSearchSqlFeederConsole
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
                     var container = new UnityContainer();
-                    container.RegisterType<IDatabusSqlReader, DatabusSqlReader>();
+                    var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
+                    container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
                     container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
                     container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
                     container.RegisterInstance(logger);

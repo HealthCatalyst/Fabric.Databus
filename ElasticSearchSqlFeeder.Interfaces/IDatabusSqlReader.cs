@@ -10,6 +10,7 @@
 namespace ElasticSearchSqlFeeder.Interfaces
 {
     using System;
+    using System.Collections.Generic;
 
     using Serilog;
 
@@ -21,9 +22,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
         /// <summary>
         /// The read data from query.
         /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
         /// <param name="load">
         /// The load.
         /// </param>
@@ -36,11 +34,32 @@ namespace ElasticSearchSqlFeeder.Interfaces
         /// <param name="logger">
         /// The logger.
         /// </param>
+        /// <param name="topLevelKeyColumn">
+        /// The top Level Key Column.
+        /// </param>
         /// <returns>
         /// The <see cref="ReadSqlDataResult"/>ReadSqlDataResult
         /// </returns>
-        /// <exception cref="ArgumentNullException">exception thrown
+        /// <exception cref="ArgumentNullException">
+        /// exception thrown
         /// </exception>
-        ReadSqlDataResult ReadDataFromQuery(IQueryConfig config, IDataSource load, string start, string end, ILogger logger);
+        ReadSqlDataResult ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn);
+
+        /// <summary>
+        /// The get list of entity keys.
+        /// </summary>
+        /// <param name="topLevelKeyColumn">
+        /// The top level key column.
+        /// </param>
+        /// <param name="maximumEntitiesToLoad">
+        /// The maximum entities to load.
+        /// </param>
+        /// <param name="dataSource">
+        /// The data source.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
+        IList<string> GetListOfEntityKeys(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource);
     }
 }

@@ -35,12 +35,12 @@ namespace CreateBatchItemsQueueProcessor
 
         /// <inheritdoc />
         public CreateBatchItemsQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor, 
             CancellationToken cancellationToken) 
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             if (this.Config.EntitiesPerUploadFile < 1)
             {
@@ -92,7 +92,7 @@ namespace CreateBatchItemsQueueProcessor
         private void FlushDocumentsIfBatchSizeReached()
         {
             // see if there are enough to create a batch
-            if (this.temporaryCache.Count > Config.EntitiesPerUploadFile)
+            if (this.temporaryCache.Count > this.Config.EntitiesPerUploadFile)
             {
                 this.FlushDocuments();
             }

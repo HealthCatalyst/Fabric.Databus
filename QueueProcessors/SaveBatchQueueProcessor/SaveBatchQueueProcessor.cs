@@ -25,12 +25,12 @@
 
         /// <inheritdoc />
         public SaveBatchQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             CancellationToken cancellationToken) 
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
         }
 
@@ -102,7 +102,7 @@
                 Stream = stream
             });
 
-            MyLogger.Verbose($"Wrote batch: {batchNumber}");
+            this.MyLogger.Verbose($"Wrote batch: {batchNumber}");
         }
 
         protected override string LoggerName => "SaveBatch";

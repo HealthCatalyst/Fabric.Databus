@@ -66,13 +66,13 @@ namespace JsonDocumentMergerQueueProcessor
 
         /// <inheritdoc />
         public JsonDocumentMergerQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor, 
             IDocumentDictionary documentDictionary,
             CancellationToken cancellationToken)
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.documentDictionary = documentDictionary ?? throw new ArgumentNullException(nameof(documentDictionary));
             var configLocalSaveFolder = this.Config.LocalSaveFolder;

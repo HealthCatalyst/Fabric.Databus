@@ -35,7 +35,7 @@ namespace MappingUploadQueueProcessor
         /// <summary>
         /// Initializes a new instance of the <see cref="T:MappingUploadQueueProcessor.MappingUploadQueueProcessor" /> class.
         /// </summary>
-        /// <param name="queueContext">
+        /// <param name="jobConfig">
         /// The queue context.
         /// </param>
         /// <param name="logger">
@@ -46,13 +46,13 @@ namespace MappingUploadQueueProcessor
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
         public MappingUploadQueueProcessor(
-            IQueueContext queueContext, 
-            ILogger logger, 
-            IElasticSearchUploader elasticSearchUploader, 
-            IQueueManager queueManager, 
+            IJobConfig jobConfig,
+            ILogger logger,
+            IElasticSearchUploader elasticSearchUploader,
+            IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             CancellationToken cancellationToken)
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
         }
@@ -88,10 +88,7 @@ namespace MappingUploadQueueProcessor
             if (isLastThreadForThisTask)
             {
                 // set up aliases
-                if (this.QueueContext.Config.UploadToElasticSearch)
-                {
-                    this.elasticSearchUploader.SetupAlias(this.QueueContext.Config.Urls, this.QueueContext.Config.Index, this.QueueContext.Config.Alias).Wait();
-                }
+                this.elasticSearchUploader.SetupAlias().Wait();
             }
         }
 
@@ -111,11 +108,11 @@ namespace MappingUploadQueueProcessor
         {
             if (string.IsNullOrEmpty(wt.PropertyName))
             {
-                this.elasticSearchUploader.SendMainMappingFileToHosts(this.Config.Urls, this.Config.Index, 1, wt.Stream, doLogContent: true, doCompress: false).Wait();
+                this.elasticSearchUploader.SendMainMappingFileToHosts(1, wt.Stream, doLogContent: true, doCompress: false).Wait();
             }
             else
             {
-                this.elasticSearchUploader.SendNestedMappingFileToHosts(this.Config.Urls, this.Config.Index, this.Config.EntityType, 1, wt.Stream, doLogContent: true, doCompress: false).Wait();
+                this.elasticSearchUploader.SendNestedMappingFileToHosts(1, wt.Stream, doLogContent: true, doCompress: false).Wait();
             }
 
             this.MyLogger.Verbose($"Uploaded mapping file: {wt.PropertyName} ");

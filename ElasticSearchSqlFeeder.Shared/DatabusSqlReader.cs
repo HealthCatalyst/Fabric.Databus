@@ -13,6 +13,7 @@ namespace ElasticSearchSqlFeeder.Shared
     using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
+    using System.Diagnostics;
     using System.Linq;
 
     using ElasticSearchSqlFeeder.Interfaces;
@@ -27,11 +28,41 @@ namespace ElasticSearchSqlFeeder.Shared
     public class DatabusSqlReader : IDatabusSqlReader
     {
         /// <summary>
+        /// The connection string.
+        /// </summary>
+        private readonly string connectionString;
+
+        /// <summary>
+        /// The sql command timeout in seconds.
+        /// </summary>
+        private readonly int sqlCommandTimeoutInSeconds;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DatabusSqlReader"/> class.
+        /// </summary>
+        /// <param name="connectionString">
+        /// The connection string.
+        /// </param>
+        /// <param name="sqlCommandTimeoutInSeconds">
+        /// The sql Command Timeout In Seconds.
+        /// </param>
+        /// <exception cref="NotImplementedException">
+        /// exception thrown
+        /// </exception>
+        public DatabusSqlReader(string connectionString, int sqlCommandTimeoutInSeconds)
+        {
+            if (sqlCommandTimeoutInSeconds < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(sqlCommandTimeoutInSeconds));
+            }
+
+            this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
+            this.sqlCommandTimeoutInSeconds = sqlCommandTimeoutInSeconds;
+        }
+
+        /// <summary>
         /// The read data from query.
         /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
         /// <param name="load">
         /// The load.
         /// </param>
@@ -44,40 +75,36 @@ namespace ElasticSearchSqlFeeder.Shared
         /// <param name="logger">
         /// The logger.
         /// </param>
+        /// <param name="topLevelKeyColumn">
+        /// The top Level Key Column.
+        /// </param>
         /// <returns>
         /// The <see cref="ReadSqlDataResult"/>ReadSqlDataResult
         /// </returns>
-        /// <exception cref="ArgumentNullException">exception thrown
+        /// <exception cref="ArgumentNullException">
+        /// exception thrown
         /// </exception>
-        public ReadSqlDataResult ReadDataFromQuery(IQueryConfig config, IDataSource load, string start, string end, ILogger logger)
+        public ReadSqlDataResult ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-
-            if (config.ConnectionString == null)
-            {
-                throw new ArgumentNullException(nameof(config.ConnectionString));
-            }
-
-            using (var conn = new SqlConnection(config.ConnectionString))
+            using (var conn = new SqlConnection(this.connectionString))
             {
                 conn.Open();
                 var cmd = conn.CreateCommand();
 
-                if (config.SqlCommandTimeoutInSeconds != 0)
-                    cmd.CommandTimeout = config.SqlCommandTimeoutInSeconds;
+                if (this.sqlCommandTimeoutInSeconds != 0)
+                {
+                    cmd.CommandTimeout = this.sqlCommandTimeoutInSeconds;
+                }
 
                 if (start == null)
                 {
                     cmd.CommandText =
-                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE ORDER BY {config.TopLevelKeyColumn} ASC;";
+                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE ORDER BY {topLevelKeyColumn} ASC;";
                 }
                 else
                 {
                     cmd.CommandText =
-                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {config.TopLevelKeyColumn} BETWEEN '{start}' AND '{end}' ORDER BY {config.TopLevelKeyColumn} ASC;";
+                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {topLevelKeyColumn} BETWEEN '{start}' AND '{end}' ORDER BY {topLevelKeyColumn} ASC;";
                 }
 
                 logger.Verbose($"Start: {cmd.CommandText}");
@@ -98,13 +125,16 @@ namespace ElasticSearchSqlFeeder.Shared
                     {
                         index = columnNumber,
                         Name = columnName,
-                        IsJoinColumn = columnName.Equals(config.TopLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
+                        IsJoinColumn = columnName.Equals(topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
                         ElasticSearchType = SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
                         IsCalculated = false,
                     });
                 }
 
-                var joinColumnIndex = columnList.FirstOrDefault(c => c.IsJoinColumn).index;
+                var joinColumn = columnList.FirstOrDefault(c => c.IsJoinColumn);
+                Debug.Assert(joinColumn != null, nameof(joinColumn) + " != null");
+
+                var joinColumnIndex = joinColumn.index;
 
                 // add any calculated fields
                 var calculatedFields = load.Fields.Where(f => f.Destination != null)
@@ -176,6 +206,55 @@ namespace ElasticSearchSqlFeeder.Shared
                 logger.Verbose($"Finish: {cmd.CommandText} rows={rows}");
 
                 return new ReadSqlDataResult { Data = data, ColumnList = columnList };
+            }
+        }
+
+        /// <summary>
+        /// The get list of entity keys.
+        /// </summary>
+        /// <param name="topLevelKeyColumn">
+        /// The top level key column.
+        /// </param>
+        /// <param name="maximumEntitiesToLoad">
+        /// The maximum entities to load.
+        /// </param>
+        /// <param name="dataSource">
+        /// The data source.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList"/>.
+        /// </returns>
+        public IList<string> GetListOfEntityKeys(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource)
+        {
+            var load = dataSource;
+
+            using (var conn = new SqlConnection(this.connectionString))
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+
+                if (this.sqlCommandTimeoutInSeconds != 0)
+                {
+                    cmd.CommandTimeout = this.sqlCommandTimeoutInSeconds;
+                }
+
+                cmd.CommandText = maximumEntitiesToLoad > 0
+                                      ? $";WITH CTE AS ( {load.Sql} )  SELECT TOP {maximumEntitiesToLoad} {topLevelKeyColumn} from CTE ORDER BY {topLevelKeyColumn} ASC;"
+                                      : $";WITH CTE AS ( {load.Sql} )  SELECT {topLevelKeyColumn} from CTE ORDER BY {topLevelKeyColumn} ASC;";
+
+                // Logger.Verbose($"Start: {cmd.CommandText}");
+                var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
+
+                var list = new List<string>();
+
+                while (reader.Read())
+                {
+                    var obj = reader.GetValue(0);
+                    list.Add(Convert.ToString(obj));
+                }
+
+                // Logger.Verbose($"Finish: {cmd.CommandText}");
+                return list;
             }
         }
     }

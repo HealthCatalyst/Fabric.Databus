@@ -31,16 +31,11 @@ namespace SaveSchemaQueueProcessor
     /// </summary>
     public class SaveSchemaQueueProcessor : BaseQueueProcessor<SaveSchemaQueueItem, MappingUploadQueueItem>
     {
-        /// <summary>
-        /// The upload url.
-        /// </summary>
-        private readonly string uploadUrl;
-
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:SaveSchemaQueueProcessor.SaveSchemaQueueProcessor" /> class.
         /// </summary>
-        /// <param name="queueContext">
+        /// <param name="jobConfig">
         /// The queue context.
         /// </param>
         /// <param name="logger">
@@ -50,20 +45,15 @@ namespace SaveSchemaQueueProcessor
         /// The queue Manager.
         /// </param>
         /// <param name="progressMonitor"></param>
+        /// <param name="cancellationToken"></param>
         public SaveSchemaQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             CancellationToken cancellationToken) 
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
-            this.uploadUrl = this.Config.Urls.First();
-
-            if (this.uploadUrl.Last() == '/')
-            {
-                this.uploadUrl = this.uploadUrl.Substring(1, this.uploadUrl.Length - 1);
-            }
         }
 
         /// <inheritdoc />
@@ -132,7 +122,8 @@ namespace SaveSchemaQueueProcessor
 
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             {
-                EsJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, this.Config.EntityType);
+                // TOD: Imran
+                // EsJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, this.Config.EntityType);
             }
 
             this.AddToOutputQueue(new MappingUploadQueueItem

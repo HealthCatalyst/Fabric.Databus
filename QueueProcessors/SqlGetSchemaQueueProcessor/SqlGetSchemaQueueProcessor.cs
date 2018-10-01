@@ -36,6 +36,8 @@ namespace SqlGetSchemaQueueProcessor
         /// </summary>
         private readonly IElasticSearchUploader elasticSearchUploader;
 
+        private readonly ISchemaLoader schemaLoader;
+
         /// <summary>
         /// The folder.
         /// </summary>
@@ -43,15 +45,17 @@ namespace SqlGetSchemaQueueProcessor
 
         /// <inheritdoc />
         public SqlGetSchemaQueueProcessor(
-            IQueueContext queueContext,
+            IJobConfig jobConfig,
             ILogger logger,
             IElasticSearchUploader elasticSearchUploader,
-            IQueueManager queueManager, 
+            IQueueManager queueManager,
             IProgressMonitor progressMonitor,
-            CancellationToken cancellationToken) 
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            ISchemaLoader schemaLoader,
+            CancellationToken cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
+            this.schemaLoader = schemaLoader ?? throw new ArgumentNullException(nameof(schemaLoader));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");
             if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {
@@ -75,7 +79,7 @@ namespace SqlGetSchemaQueueProcessor
         {
             var workItemLoads = workItem.Job.Data.DataSources;
 
-            var dictionary = SchemaLoader.GetSchemasForLoads(workItemLoads, this.Config.ConnectionString, this.Config.TopLevelKeyColumn);
+            var dictionary = this.schemaLoader.GetSchemasForLoads(workItemLoads);
 
             var mappingItems = dictionary.ToList();
 
@@ -106,14 +110,7 @@ namespace SqlGetSchemaQueueProcessor
         {
             if (isFirstThreadForThisTask)
             {
-                var config = this.QueueContext.Config;
-                if (config.UploadToElasticSearch && config.DropAndReloadIndex)
-                {
-                    this.elasticSearchUploader.DeleteIndex(
-                        config.Urls,
-                        config.Index,
-                        config.Alias).Wait();
-                }
+                this.elasticSearchUploader.DeleteIndex().Wait();
             }
         }
 

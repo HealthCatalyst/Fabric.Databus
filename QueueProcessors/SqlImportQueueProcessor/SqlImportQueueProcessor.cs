@@ -43,7 +43,7 @@ namespace SqlImportQueueProcessor
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlImportQueueProcessor"/> class.
         /// </summary>
-        /// <param name="queueContext">
+        /// <param name="jobConfig">
         /// The queue context.
         /// </param>
         /// <param name="databusSqlReader">
@@ -58,14 +58,17 @@ namespace SqlImportQueueProcessor
         /// <param name="progressMonitor">
         /// The progress monitor
         /// </param>
+        /// <param name="cancellationToken">
+        /// cancellation token
+        /// </param>
         public SqlImportQueueProcessor(
-            IQueueContext queueContext, 
+            IJobConfig jobConfig, 
             IDatabusSqlReader databusSqlReader, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             CancellationToken cancellationToken)
-            : base(queueContext, logger, queueManager, progressMonitor, cancellationToken)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
 
@@ -145,7 +148,11 @@ namespace SqlImportQueueProcessor
         /// <param name="workItemBatchNumber">
         /// The workItem batch number.
         /// </param>
-        /// <exception cref="Exception"> exception thrown
+        /// <param name="propertyTypes">
+        /// The property Types.
+        /// </param>
+        /// <exception cref="Exception">
+        /// exception thrown
         /// </exception>
         private void ReadOneQueryFromDatabase(string queryId, IDataSource load, int seed, string start, string end, int workItemBatchNumber, IDictionary<string, string> propertyTypes)
         {
@@ -165,7 +172,7 @@ namespace SqlImportQueueProcessor
                     File.AppendAllText(filepath, e.ToString());
                 }
 
-                throw new Exception($"Connection String: {this.Config.ConnectionString}", e);
+                throw;
             }
         }
 
@@ -187,11 +194,14 @@ namespace SqlImportQueueProcessor
         /// <param name="batchNumber">
         /// The batch number.
         /// </param>
+        /// <param name="propertyTypes">
+        /// The property Types.
+        /// </param>
         private void InternalReadOneQueryFromDatabase(string queryId, IDataSource load, string start, string end, int batchNumber, IDictionary<string, string> propertyTypes)
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
-            var result = this.databusSqlReader.ReadDataFromQuery(this.Config, load, start, end, this.MyLogger);
+            var result = this.databusSqlReader.ReadDataFromQuery(load, start, end, this.MyLogger, this.Config.TopLevelKeyColumn);
 
             if (this.Config.WriteDetailedTemporaryFilesToDisk)
             {

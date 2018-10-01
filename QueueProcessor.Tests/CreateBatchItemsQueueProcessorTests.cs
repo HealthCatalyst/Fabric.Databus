@@ -52,11 +52,6 @@ namespace QueueProcessor.Tests
 
             var queueManager = new QueueManager();
 
-            var queueContext = new QueueContext
-            {
-                Config = job.Config,
-            };
-
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .CreateLogger();
@@ -64,7 +59,7 @@ namespace QueueProcessor.Tests
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
                 var createBatchItemsQueueProcessor = new CreateBatchItemsQueueProcessor(
-                    queueContext,
+                    job.Config,
                     logger,
                     queueManager,
                     new MockProgressMonitor(),

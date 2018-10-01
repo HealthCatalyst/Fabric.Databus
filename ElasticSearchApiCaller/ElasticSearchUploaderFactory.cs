@@ -9,6 +9,8 @@
 
 namespace ElasticSearchApiCaller
 {
+    using System.Collections.Generic;
+
     using ElasticSearchSqlFeeder.Interfaces;
 
     using Serilog;
@@ -36,9 +38,9 @@ namespace ElasticSearchApiCaller
         }
 
         /// <inheritdoc />
-        public IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline)
+        public IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline, List<string> urls, string index, string alias, string entityType)
         {
-            return new ElasticSearchUploader(userName, password, keepIndexOnline, this.logger);
+            return new ElasticSearchUploader(userName, password, keepIndexOnline, this.logger, urls, index, alias, entityType);
         }
     }
 }

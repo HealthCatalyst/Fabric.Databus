@@ -16,40 +16,38 @@ namespace Fabric.Databus.Config
 
     using ElasticSearchSqlFeeder.Interfaces;
 
+    /// <inheritdoc />
     /// <summary>
     /// The job data.
     /// </summary>
     [DataContract(Name = "JobData", Namespace = "")]
     public class JobData : IJobData
     {
+        /// <inheritdoc />
         /// <summary>
         /// Gets or sets the data model.
         /// </summary>
         [DataMember]
         public string DataModel { get; set; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Gets or sets the data sources.
         /// </summary>
         [XmlIgnore]
-        public IList<IDataSource> DataSources { get; set; }
-
-        /// <summary>
-        /// Gets or sets the my data sources.
-        /// </summary>
-        [DataMember(Name = "DataSources")]
-        [XmlElement("DataSource")]
-        public List<DataSource> MyDataSources
+        public IList<IDataSource> DataSources
         {
             get
             {
-                return this.DataSources?.Cast<DataSource>().ToList();
-            }
-
-            set
-            {
-                this.DataSources = value.Cast<IDataSource>().ToList();
+                return this.MyDataSources.Cast<IDataSource>().ToList();
             }
         }
+
+        /// <summary>
+        /// Gets or sets the data sources.
+        /// </summary>
+        [DataMember(Name = "DataSources")]
+        [XmlElement("DataSource")]
+        public List<DataSource> MyDataSources { get; set; }
     }
 }

@@ -19,13 +19,18 @@ namespace Fabric.Databus.Config
     /// The data source.
     /// </summary>
     [DataContract(Name = "DataSource", Namespace = "")]
+    [XmlType("DataSource")]
     public class DataSource : IDataSource
     {
         /// <summary>
         /// Gets or sets the sql.
         /// </summary>
         [DataMember]
-        public string Sql { get; set; }
+        public string Sql
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Gets or sets the path.

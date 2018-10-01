@@ -24,8 +24,8 @@ namespace Fabric.Databus.Config
         string DataModel { get; set; }
 
         /// <summary>
-        /// Gets or sets the data sources.
+        /// Gets the data sources.
         /// </summary>
-        IList<IDataSource> DataSources { get; set; }
+        IList<IDataSource> DataSources { get; }
     }
 }

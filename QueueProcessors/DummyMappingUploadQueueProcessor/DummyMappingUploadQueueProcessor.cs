@@ -36,8 +36,9 @@ namespace DummyMappingUploadQueueProcessor
         /// <param name="queueManager">
         /// The queue Manager.
         /// </param>
-        public DummyMappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager) 
-            : base(queueContext, logger, queueManager)
+        /// <param name="progressMonitor"></param>
+        public DummyMappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
         }
 

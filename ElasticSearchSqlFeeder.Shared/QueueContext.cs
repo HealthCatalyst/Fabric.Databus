@@ -24,9 +24,6 @@ namespace ElasticSearchSqlFeeder.Shared
     public class QueueContext : IQueueContext
     {
         /// <inheritdoc />
-        public IProgressMonitor ProgressMonitor { get; set; }
-
-        /// <inheritdoc />
         public IQueryConfig Config { get; set; }
 
         /// <inheritdoc />

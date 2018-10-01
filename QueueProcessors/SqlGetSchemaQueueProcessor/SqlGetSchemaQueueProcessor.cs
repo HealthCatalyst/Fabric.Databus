@@ -45,7 +45,9 @@ namespace SqlGetSchemaQueueProcessor
             IQueueContext queueContext,
             ILogger logger,
             IElasticSearchUploader elasticSearchUploader,
-            IQueueManager queueManager) : base(queueContext, logger, queueManager)
+            IQueueManager queueManager, 
+            IProgressMonitor progressMonitor) 
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");

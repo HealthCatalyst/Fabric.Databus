@@ -162,13 +162,13 @@ namespace PipelineRunner
             var queueContext = new QueueContext
             {
                 Config = config,
-                ProgressMonitor = progressMonitor,
                 DocumentDictionary = documentDictionary,
                 CancellationToken = this.cancellationTokenSource.Token
             };
 
             var queueManager = new QueueManager();
             this.container.RegisterInstance<IQueueManager>(queueManager);
+            this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
             this.container.RegisterInstance<IQueueContext>(queueContext);
             IElasticSearchUploaderFactory elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
             IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);

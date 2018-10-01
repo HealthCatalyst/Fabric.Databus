@@ -42,7 +42,9 @@ namespace SqlBatchQueueProcessor
         /// The logger.
         /// </param>
         /// <param name="queueManager"></param>
-        public SqlBatchQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager) : base(queueContext, logger, queueManager)
+        /// <param name="progressMonitor"></param>
+        public SqlBatchQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
         }

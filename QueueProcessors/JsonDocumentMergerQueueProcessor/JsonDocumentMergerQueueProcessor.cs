@@ -60,8 +60,8 @@ namespace JsonDocumentMergerQueueProcessor
         private int numDocumentsModified;
 
         /// <inheritdoc />
-        public JsonDocumentMergerQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager)
-            : base(queueContext, logger, queueManager)
+        public JsonDocumentMergerQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
             var configLocalSaveFolder = this.Config.LocalSaveFolder;
             if (configLocalSaveFolder == null)

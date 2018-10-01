@@ -30,8 +30,9 @@ namespace SqlJobQueueProcessor
     /// </summary>
     public class SqlJobQueueProcessor : BaseQueueProcessor<SqlJobQueueItem, SqlBatchQueueItem>
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlJobQueueProcessor"/> class.
+        /// Initializes a new instance of the <see cref="T:SqlJobQueueProcessor.SqlJobQueueProcessor" /> class.
         /// </summary>
         /// <param name="queueContext">
         /// The queue context.
@@ -42,8 +43,11 @@ namespace SqlJobQueueProcessor
         /// <param name="queueManager">
         /// The queue Manager.
         /// </param>
-        public SqlJobQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager)
-            : base(queueContext, logger, queueManager)
+        /// <param name="progressMonitor">
+        /// The progress Monitor.
+        /// </param>
+        public SqlJobQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
         }
 

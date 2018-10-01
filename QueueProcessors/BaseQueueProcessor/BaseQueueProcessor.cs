@@ -47,6 +47,8 @@ namespace BaseQueueProcessor
 
         private readonly IQueueManager queueManager;
 
+        private readonly IProgressMonitor progressMonitor;
+
         /// <summary>
         /// The _in queue.
         /// </summary>
@@ -113,14 +115,22 @@ namespace BaseQueueProcessor
         /// Initializes a new instance of the <see cref="BaseQueueProcessor{TQueueInItem,TQueueOutItem}"/> class.
         /// </summary>
         /// <param name="queueContext">
-        ///     The queue context.
+        /// The queue context.
         /// </param>
-        /// <param name="logger">The logger</param>
-        /// <param name="queueManager">The queue manager</param>
-        protected BaseQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager)
+        /// <param name="logger">
+        /// The logger
+        /// </param>
+        /// <param name="queueManager">
+        /// The queue manager
+        /// </param>
+        /// <param name="progressMonitor">
+        /// The progress Monitor.
+        /// </param>
+        protected BaseQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
         {
             this.QueueContext = queueContext ?? throw new ArgumentNullException(nameof(queueContext));
             this.queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueContext));
+            this.progressMonitor = progressMonitor ?? throw new ArgumentNullException(nameof(progressMonitor));
 
             this.Config = queueContext.Config;
             if (this.Config == null)
@@ -134,14 +144,19 @@ namespace BaseQueueProcessor
         }
 
         /// <summary>
-        /// The unique id.
-        /// </summary>
-        protected int UniqueId => this.id;
-
-        /// <summary>
         /// Gets or sets the config.
         /// </summary>
         public IQueryConfig Config { get; set; }
+
+        /// <summary>
+        /// Gets the logger name.
+        /// </summary>
+        protected abstract string LoggerName { get; }
+
+        /// <summary>
+        /// The unique id.
+        /// </summary>
+        protected int UniqueId => this.id;
 
         /// <summary>
         /// The monitor work queue.
@@ -222,25 +237,25 @@ namespace BaseQueueProcessor
         /// <summary>
         /// The mark output queue as completed.
         /// </summary>
-        /// <param name="stepNumber">
+        /// <param name="stepNumber1">
         /// The step number.
         /// </param>
-        public void MarkOutputQueueAsCompleted(int stepNumber)
+        public void MarkOutputQueueAsCompleted(int stepNumber1)
         {
-            this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber).CompleteAdding();
+            this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber1).CompleteAdding();
         }
 
         /// <summary>
         /// The initialize with step number.
         /// </summary>
-        /// <param name="stepNumber">
+        /// <param name="stepNumber1">
         /// The step number.
         /// </param>
-        public void InitializeWithStepNumber(int stepNumber)
+        public void InitializeWithStepNumber(int stepNumber1)
         {
-            this.stepNumber = stepNumber;
-            this.InQueue = this.queueManager.GetInputQueue<TQueueInItem>(stepNumber);
-            this.outQueue = this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber);
+            this.stepNumber = stepNumber1;
+            this.InQueue = this.queueManager.GetInputQueue<TQueueInItem>(stepNumber1);
+            this.outQueue = this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber1);
         }
 
         /// <summary>
@@ -344,11 +359,6 @@ namespace BaseQueueProcessor
         protected abstract string GetId(TQueueInItem workItem);
 
         /// <summary>
-        /// Gets the logger name.
-        /// </summary>
-        protected abstract string LoggerName { get; }
-
-        /// <summary>
         /// The log to console.
         /// </summary>
         /// <param name="id">
@@ -356,7 +366,7 @@ namespace BaseQueueProcessor
         /// </param>
         private void LogToConsole(string id)
         {
-            this.QueueContext.ProgressMonitor.SetProgressItem(new ProgressMonitorItem
+            this.progressMonitor.SetProgressItem(new ProgressMonitorItem
             {
                 StepNumber = this.stepNumber,
                 LoggerName = this.LoggerName,

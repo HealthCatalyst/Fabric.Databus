@@ -48,7 +48,9 @@ namespace SaveSchemaQueueProcessor
         /// <param name="queueManager">
         /// The queue Manager.
         /// </param>
-        public SaveSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager) : base(queueContext, logger, queueManager)
+        /// <param name="progressMonitor"></param>
+        public SaveSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor) 
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
             this.uploadUrl = this.Config.Urls.First();
 

@@ -19,11 +19,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
     public interface IQueueContext
     {
         /// <summary>
-        /// Gets or sets the progress monitor.
-        /// </summary>
-        IProgressMonitor ProgressMonitor { get; set; }
-
-        /// <summary>
         /// Gets or sets the config.
         /// </summary>
         IQueryConfig Config { get; set; }

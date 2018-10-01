@@ -43,8 +43,9 @@ namespace FileUploadQueueProcessor
         /// <param name="queueManager">
         /// The queue Manager.
         /// </param>
-        public FileUploadQueueProcessor(IQueueContext queueContext, IElasticSearchUploader elasticSearchUploader, ILogger logger, IQueueManager queueManager)
-            : base(queueContext, logger, queueManager)
+        /// <param name="progressMonitor"></param>
+        public FileUploadQueueProcessor(IQueueContext queueContext, IElasticSearchUploader elasticSearchUploader, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
             this.elasticSearchUploader = elasticSearchUploader;
         }

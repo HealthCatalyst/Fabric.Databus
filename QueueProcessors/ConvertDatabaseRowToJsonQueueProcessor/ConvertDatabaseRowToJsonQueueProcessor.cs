@@ -54,8 +54,9 @@ namespace ConvertDatabaseRowToJsonQueueProcessor
         /// The logger.
         /// </param>
         /// <param name="queueManager"></param>
-        public ConvertDatabaseRowToJsonQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager)
-            : base(queueContext, logger, queueManager)
+        /// <param name="progressMonitor"></param>
+        public ConvertDatabaseRowToJsonQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor)
+            : base(queueContext, logger, queueManager, progressMonitor)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-ConvertToJson");
         }

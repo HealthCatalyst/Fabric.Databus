@@ -41,7 +41,11 @@ namespace SqlGetSchemaQueueProcessor
         private readonly string folder;
 
         /// <inheritdoc />
-        public SqlGetSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IElasticSearchUploader elasticSearchUploader) : base(queueContext, logger)
+        public SqlGetSchemaQueueProcessor(
+            IQueueContext queueContext,
+            ILogger logger,
+            IElasticSearchUploader elasticSearchUploader,
+            IQueueManager queueManager) : base(queueContext, logger, queueManager)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");

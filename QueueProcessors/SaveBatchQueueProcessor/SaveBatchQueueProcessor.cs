@@ -23,7 +23,7 @@
     {
         private static int _currentBatchFileNumber = 0;
 
-        public SaveBatchQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
+        public SaveBatchQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager) : base(queueContext, logger, queueManager)
         {
         }
 

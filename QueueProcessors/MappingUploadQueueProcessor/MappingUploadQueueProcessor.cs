@@ -41,8 +41,9 @@ namespace MappingUploadQueueProcessor
         /// The logger.
         /// </param>
         /// <param name="elasticSearchUploader"></param>
-        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IElasticSearchUploader elasticSearchUploader)
-            : base(queueContext, logger)
+        /// <param name="queueManager"></param>
+        public MappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IElasticSearchUploader elasticSearchUploader, IQueueManager queueManager)
+            : base(queueContext, logger, queueManager)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
         }

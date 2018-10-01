@@ -27,8 +27,9 @@ namespace FileUploadQueueProcessor
         /// </summary>
         private readonly IElasticSearchUploader elasticSearchUploader;
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileUploadQueueProcessor"/> class.
+        /// Initializes a new instance of the <see cref="T:FileUploadQueueProcessor.FileUploadQueueProcessor" /> class.
         /// </summary>
         /// <param name="queueContext">
         /// The queue context.
@@ -39,8 +40,11 @@ namespace FileUploadQueueProcessor
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public FileUploadQueueProcessor(IQueueContext queueContext, IElasticSearchUploader elasticSearchUploader, ILogger logger)
-            : base(queueContext, logger)
+        /// <param name="queueManager">
+        /// The queue Manager.
+        /// </param>
+        public FileUploadQueueProcessor(IQueueContext queueContext, IElasticSearchUploader elasticSearchUploader, ILogger logger, IQueueManager queueManager)
+            : base(queueContext, logger, queueManager)
         {
             this.elasticSearchUploader = elasticSearchUploader;
         }

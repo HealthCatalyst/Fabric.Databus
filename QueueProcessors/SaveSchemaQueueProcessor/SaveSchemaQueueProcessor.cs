@@ -35,8 +35,9 @@ namespace SaveSchemaQueueProcessor
         /// </summary>
         private readonly string uploadUrl;
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="SaveSchemaQueueProcessor"/> class.
+        /// Initializes a new instance of the <see cref="T:SaveSchemaQueueProcessor.SaveSchemaQueueProcessor" /> class.
         /// </summary>
         /// <param name="queueContext">
         /// The queue context.
@@ -44,7 +45,10 @@ namespace SaveSchemaQueueProcessor
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public SaveSchemaQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
+        /// <param name="queueManager">
+        /// The queue Manager.
+        /// </param>
+        public SaveSchemaQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager) : base(queueContext, logger, queueManager)
         {
             this.uploadUrl = this.Config.Urls.First();
 

@@ -18,8 +18,8 @@
     {
         private readonly ConcurrentDictionary<string, object> _locks = new ConcurrentDictionary<string, object>();
 
-        public FileSaveQueueProcessor(IQueueContext queueContext, ILogger logger)
-            : base(queueContext, logger)
+        public FileSaveQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager)
+            : base(queueContext, logger, queueManager)
         {
         }
 

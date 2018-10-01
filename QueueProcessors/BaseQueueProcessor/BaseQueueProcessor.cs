@@ -45,6 +45,8 @@ namespace BaseQueueProcessor
         /// </summary>
         protected ILogger MyLogger;
 
+        private readonly IQueueManager queueManager;
+
         /// <summary>
         /// The _in queue.
         /// </summary>
@@ -114,9 +116,11 @@ namespace BaseQueueProcessor
         ///     The queue context.
         /// </param>
         /// <param name="logger">The logger</param>
-        protected BaseQueueProcessor(IQueueContext queueContext, ILogger logger)
+        /// <param name="queueManager">The queue manager</param>
+        protected BaseQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager)
         {
             this.QueueContext = queueContext ?? throw new ArgumentNullException(nameof(queueContext));
+            this.queueManager = queueManager ?? throw new ArgumentNullException(nameof(queueContext));
 
             this.Config = queueContext.Config;
             if (this.Config == null)
@@ -124,7 +128,7 @@ namespace BaseQueueProcessor
                 throw new ArgumentNullException(nameof(this.Config));
             }
 
-            this.id = queueContext.QueueManager.GetUniqueId();
+            this.id = queueManager.GetUniqueId();
 
             this.MyLogger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -223,7 +227,7 @@ namespace BaseQueueProcessor
         /// </param>
         public void MarkOutputQueueAsCompleted(int stepNumber)
         {
-            this.QueueContext.QueueManager.GetOutputQueue<TQueueOutItem>(stepNumber).CompleteAdding();
+            this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber).CompleteAdding();
         }
 
         /// <summary>
@@ -235,19 +239,19 @@ namespace BaseQueueProcessor
         public void InitializeWithStepNumber(int stepNumber)
         {
             this.stepNumber = stepNumber;
-            this.InQueue = this.QueueContext.QueueManager.GetInputQueue<TQueueInItem>(stepNumber);
-            this.outQueue = this.QueueContext.QueueManager.GetOutputQueue<TQueueOutItem>(stepNumber);
+            this.InQueue = this.queueManager.GetInputQueue<TQueueInItem>(stepNumber);
+            this.outQueue = this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber);
         }
 
         /// <summary>
         /// The create out queue.
         /// </summary>
-        /// <param name="stepNumber">
+        /// <param name="stepNumber1">
         /// The step number.
         /// </param>
-        public void CreateOutQueue(int stepNumber)
+        public void CreateOutQueue(int stepNumber1)
         {
-            this.QueueContext.QueueManager.CreateOutputQueue<TQueueOutItem>(stepNumber);
+            this.queueManager.CreateOutputQueue<TQueueOutItem>(stepNumber1);
         }
 
         /// <summary>

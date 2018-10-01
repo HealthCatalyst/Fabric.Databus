@@ -39,8 +39,11 @@ namespace SqlJobQueueProcessor
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public SqlJobQueueProcessor(IQueueContext queueContext, ILogger logger)
-            : base(queueContext, logger)
+        /// <param name="queueManager">
+        /// The queue Manager.
+        /// </param>
+        public SqlJobQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager)
+            : base(queueContext, logger, queueManager)
         {
         }
 

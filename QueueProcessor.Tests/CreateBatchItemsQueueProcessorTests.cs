@@ -54,7 +54,6 @@ namespace QueueProcessor.Tests
             var queueContext = new QueueContext
                                    {
                                        Config = job.Config,
-                                       QueueManager = queueManager,
                                        ProgressMonitor = new MockProgressMonitor(),
                                    };
 
@@ -62,7 +61,7 @@ namespace QueueProcessor.Tests
                 .WriteTo.Console()
                 .CreateLogger();
 
-            var createBatchItemsQueueProcessor = new CreateBatchItemsQueueProcessor(queueContext, logger);
+            var createBatchItemsQueueProcessor = new CreateBatchItemsQueueProcessor(queueContext, logger, queueManager);
 
             var stepNumber = 1;
             queueManager.CreateInputQueue<IJsonObjectQueueItem>(stepNumber);

@@ -51,8 +51,11 @@ namespace SqlImportQueueProcessor
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public SqlImportQueueProcessor(IQueueContext queueContext, IDatabusSqlReader databusSqlReader, ILogger logger)
-            : base(queueContext, logger)
+        /// <param name="queueManager">
+        /// The queue Manager.
+        /// </param>
+        public SqlImportQueueProcessor(IQueueContext queueContext, IDatabusSqlReader databusSqlReader, ILogger logger, IQueueManager queueManager)
+            : base(queueContext, logger, queueManager)
         {
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
 

@@ -162,12 +162,13 @@ namespace PipelineRunner
             var queueContext = new QueueContext
             {
                 Config = config,
-                QueueManager = new QueueManager(),
                 ProgressMonitor = progressMonitor,
                 DocumentDictionary = documentDictionary,
                 CancellationToken = this.cancellationTokenSource.Token
             };
 
+            var queueManager = new QueueManager();
+            this.container.RegisterInstance<IQueueManager>(queueManager);
             this.container.RegisterInstance<IQueueContext>(queueContext);
             IElasticSearchUploaderFactory elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
             IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, false);
@@ -182,7 +183,7 @@ namespace PipelineRunner
             }
 
             // add job to the first queue
-            var sqlJobQueue = queueContext.QueueManager
+            var sqlJobQueue = queueManager
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
 
             sqlJobQueue.Add(new SqlJobQueueItem

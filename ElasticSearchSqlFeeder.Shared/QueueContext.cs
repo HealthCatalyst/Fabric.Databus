@@ -27,9 +27,6 @@ namespace ElasticSearchSqlFeeder.Shared
         public IProgressMonitor ProgressMonitor { get; set; }
 
         /// <inheritdoc />
-        public IQueueManager QueueManager { get; set; }
-
-        /// <inheritdoc />
         public IQueryConfig Config { get; set; }
 
         /// <inheritdoc />

@@ -24,11 +24,6 @@ namespace ElasticSearchSqlFeeder.Interfaces
         IProgressMonitor ProgressMonitor { get; set; }
 
         /// <summary>
-        /// Gets or sets the queue manager.
-        /// </summary>
-        IQueueManager QueueManager { get; set; }
-
-        /// <summary>
         /// Gets or sets the config.
         /// </summary>
         IQueryConfig Config { get; set; }

@@ -23,8 +23,9 @@ namespace DummyMappingUploadQueueProcessor
     /// </summary>
     public class DummyMappingUploadQueueProcessor : BaseQueueProcessor<MappingUploadQueueItem, SqlJobQueueItem>
     {
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="DummyMappingUploadQueueProcessor"/> class.
+        /// Initializes a new instance of the <see cref="T:DummyMappingUploadQueueProcessor.DummyMappingUploadQueueProcessor" /> class.
         /// </summary>
         /// <param name="queueContext">
         /// The queue context.
@@ -32,7 +33,11 @@ namespace DummyMappingUploadQueueProcessor
         /// <param name="logger">
         /// The logger.
         /// </param>
-        public DummyMappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger) : base(queueContext, logger)
+        /// <param name="queueManager">
+        /// The queue Manager.
+        /// </param>
+        public DummyMappingUploadQueueProcessor(IQueueContext queueContext, ILogger logger, IQueueManager queueManager) 
+            : base(queueContext, logger, queueManager)
         {
         }
 

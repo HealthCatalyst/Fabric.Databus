@@ -62,7 +62,7 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public async Task<ReadSqlDataResult> ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn)
+        public async Task<ReadSqlDataResult> ReadDataFromQueryAsync(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn)
         {
             using (var conn = new SqlConnection(this.connectionString))
             {

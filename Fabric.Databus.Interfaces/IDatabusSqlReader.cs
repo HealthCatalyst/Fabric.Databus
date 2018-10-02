@@ -44,7 +44,7 @@ namespace Fabric.Databus.Interfaces
         /// <exception cref="ArgumentNullException">
         /// exception thrown
         /// </exception>
-        Task<ReadSqlDataResult> ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn);
+        Task<ReadSqlDataResult> ReadDataFromQueryAsync(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn);
 
         /// <summary>
         /// The get list of entity keys.

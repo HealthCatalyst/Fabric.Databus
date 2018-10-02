@@ -93,7 +93,14 @@ namespace SqlImportPipelineStep
         /// <inheritdoc />
         protected override async System.Threading.Tasks.Task HandleAsync(SqlImportQueueItem workItem)
         {
-            await this.ReadOneQueryFromDatabaseAsync(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber, workItem.PropertyTypes);
+            await this.ReadOneQueryFromDatabaseAsync(
+                workItem.QueryId,
+                workItem.DataSource,
+                workItem.Seed,
+                workItem.Start,
+                workItem.End,
+                workItem.BatchNumber,
+                workItem.PropertyTypes);
         }
 
         /// <inheritdoc />
@@ -129,7 +136,10 @@ namespace SqlImportPipelineStep
         /// <exception cref="Exception">
         /// exception thrown
         /// </exception>
-        private async System.Threading.Tasks.Task ReadOneQueryFromDatabaseAsync(
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task ReadOneQueryFromDatabaseAsync(
             string queryId,
             IDataSource load,
             int seed,
@@ -176,6 +186,9 @@ namespace SqlImportPipelineStep
         /// <param name="propertyTypes">
         /// The property Types.
         /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         private async Task InternalReadOneQueryFromDatabase(
             string queryId,
             IDataSource load,
@@ -186,7 +199,7 @@ namespace SqlImportPipelineStep
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
-            var result = await this.databusSqlReader.ReadDataFromQuery(
+            var result = await this.databusSqlReader.ReadDataFromQueryAsync(
                 load,
                 start,
                 end,
@@ -245,10 +258,10 @@ namespace SqlImportPipelineStep
 
             untransformedFields.ForEach(f => { });
 
-            //EsJsonWriter.WriteRawDataToJson(data, columnList, seed, load.PropertyPath, 
+            // EsJsonWriter.WriteRawDataToJson(data, columnList, seed, load.PropertyPath, 
             //    new SqlJsonValueWriter(), load.Index, load.EntityType);
 
-            //esJsonWriter.WriteRawObjectsToJson(data, columnList, seed, load.PropertyPath, 
+            // esJsonWriter.WriteRawObjectsToJson(data, columnList, seed, load.PropertyPath, 
             //    new SqlJsonValueWriter(), load.Index, load.EntityType);
 
             this.MyLogger.Verbose($"Finished reading rows for {queryId}");

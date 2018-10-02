@@ -97,18 +97,7 @@ namespace PipelineRunner
             this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         }
 
-        /// <summary>
-        /// The run pipeline.
-        /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        /// <param name="progressMonitor">
-        /// The progress monitor.
-        /// </param>
-        /// <param name="jobStatusTracker">
-        /// The job status tracker.
-        /// </param>
+        /// <inheritdoc />
         public void RunPipeline(IJob config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker)
         {
             jobStatusTracker.TrackStart();
@@ -199,8 +188,8 @@ namespace PipelineRunner
                     {
                         new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 15 },
+                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 5 },
                         new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(CreateBatchItemsPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }

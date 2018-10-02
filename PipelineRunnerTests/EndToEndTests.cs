@@ -77,7 +77,7 @@ namespace PipelineRunnerTests
             var mockRepository = new MockRepository(MockBehavior.Strict);
             var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
             mockDatabusSqlReader.Setup(
-                service => service.ReadDataFromQuery(
+                service => service.ReadDataFromQueryAsync(
                     It.IsAny<IDataSource>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
@@ -202,7 +202,7 @@ namespace PipelineRunnerTests
             var mockRepository = new MockRepository(MockBehavior.Strict);
             var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
             mockDatabusSqlReader.Setup(
-                service => service.ReadDataFromQuery(
+                service => service.ReadDataFromQueryAsync(
                     It.IsAny<IDataSource>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),

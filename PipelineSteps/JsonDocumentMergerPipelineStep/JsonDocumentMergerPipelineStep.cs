@@ -101,7 +101,7 @@ namespace JsonDocumentMergerPipelineStep
         protected override string LoggerName => "JsonDocumentMerger";
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task HandleAsync(JsonDocumentMergerQueueItem workItem)
+        protected override async Task HandleAsync(JsonDocumentMergerQueueItem workItem)
         {
             // if work item batch number is newer than the last one we saw that we can flush anything related to the old batch
             if (currentBatchNumber != workItem.BatchNumber)
@@ -199,8 +199,8 @@ namespace JsonDocumentMergerPipelineStep
             }
             finally
             {
-                //When the task is ready, release the semaphore. It is vital to ALWAYS release the semaphore when we are ready, or else we will end up with a Semaphore that is forever locked.
-                //This is why it is important to do the Release within a try...finally clause; program execution may crash or take a different path, this way you are guaranteed execution
+                // When the task is ready, release the semaphore. It is vital to ALWAYS release the semaphore when we are ready, or else we will end up with a Semaphore that is forever locked.
+                // This is why it is important to do the Release within a try...finally clause; program execution may crash or take a different path, this way you are guaranteed execution
                 semaphoreSlim.Release();
             }
 

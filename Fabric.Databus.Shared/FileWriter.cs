@@ -42,6 +42,12 @@ namespace Fabric.Databus.Shared
         /// <inheritdoc />
         public Stream CreateFile(string path)
         {
+            var directoryName = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directoryName))
+            {
+                this.CreateDirectory(directoryName);
+            }
+
             return File.Create(path);
         }
 
@@ -69,14 +75,12 @@ namespace Fabric.Databus.Shared
         /// </exception>
         public void DeleteDirectory(string folder)
         {
-            if (!Directory.Exists(folder))
+            if (Directory.Exists(folder))
             {
-                throw new Exception($"Folder {folder} does not exist");
+                Directory.Delete(folder, true);
+
+                Directory.CreateDirectory(folder);
             }
-
-            Directory.Delete(folder, true);
-
-            Directory.CreateDirectory(folder);
         }
     }
 }

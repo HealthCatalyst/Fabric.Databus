@@ -199,6 +199,11 @@ namespace BasePipelineStep
 
                     var wt = this.InQueue.Take();
 
+                    if (wt == null)
+                    {
+                        break;
+                    }
+
                     blockedTime = blockedTime.Add(stopWatch.Elapsed);
 
                     queryId = wt.QueryId;
@@ -220,17 +225,6 @@ namespace BasePipelineStep
 
                     this.MyLogger.Verbose(
                         $"Processing: {wt.QueryId} {this.GetId(wt)}, Queue Length: {this.outQueue.Count:N0}, Processed: {totalItemsProcessed:N0}, ByThisProcessor: {this.totalItemsProcessedByThisProcessor:N0}");
-
-                }
-                catch (InvalidOperationException e)
-                {
-                    if (e.Source == "System.Collections.Concurrent"
-                        || e.Message?.Contains("The collection argument is empty") == true)
-                    {
-                        break;
-                    }
-
-                    throw;
                 }
                 catch (Exception e)
                 {

@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.Shared
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Linq;
 
@@ -20,62 +21,138 @@ namespace Fabric.Databus.Shared
     /// <summary>
     /// The simple blocking collection.
     /// </summary>
-    /// <typeparam name="T">
+    /// <typeparam name="T">type of item
     /// </typeparam>
     public class SimpleBlockingCollection<T> : IMeteredBlockingCollection<T>
     {
         // ReSharper disable once StaticMemberInGenericType
         private static readonly Logger Logger = new LoggerConfiguration().CreateLogger();
 
-        private readonly BlockingCollection<T> _blockingCollection;
+        /// <summary>
+        /// The blocking collection.
+        /// </summary>
+        private readonly BlockingCollection<T> blockingCollection;
 
-        private readonly string _name;
+        /// <summary>
+        /// The name.
+        /// </summary>
+        private readonly string name;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleBlockingCollection{T}"/> class.
+        /// </summary>
+        /// <param name="concurrentQueue">
+        /// The concurrent queue.
+        /// </param>
+        /// <param name="name">
+        /// The name.
+        /// </param>
         public SimpleBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name)
         {
-            this._blockingCollection = new BlockingCollection<T>(concurrentQueue);
-            this._name = name;
+            this.blockingCollection = new BlockingCollection<T>(concurrentQueue);
+            this.name = name;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleBlockingCollection{T}"/> class.
+        /// </summary>
+        /// <param name="concurrentQueue">
+        /// The concurrent queue.
+        /// </param>
+        /// <param name="name">
+        /// The name.
+        /// </param>
+        /// <param name="maxItems">
+        /// The max items.
+        /// </param>
         public SimpleBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name, int maxItems)
             : this(concurrentQueue, name)
         {
         }
 
+        /// <summary>
+        /// The take.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="T"/>.
+        /// </returns>
+        [System.Diagnostics.DebuggerNonUserCode]
+        [System.Diagnostics.DebuggerHidden]
         public T Take()
         {
-            var item = this._blockingCollection.Take();
+            try
+            {
+                var item = this.blockingCollection.Take();
 
-            return item;
+                return item;
+            }
+            catch (InvalidOperationException)
+            {
+                // this is thrown when the collection is marked as completed
+            }
+
+            return default(T);
         }
 
+        /// <summary>
+        /// The add.
+        /// </summary>
+        /// <param name="item">
+        /// The item.
+        /// </param>
         public void Add(T item)
         {
-            this._blockingCollection.Add(item);
+            this.blockingCollection.Add(item);
         }
 
-
+        /// <summary>
+        /// The any.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public bool Any()
         {
-            return this._blockingCollection.Any();
+            return this.blockingCollection.Any();
         }
 
+        /// <summary>
+        /// The try take.
+        /// </summary>
+        /// <param name="cacheItem">
+        /// The cache item.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public bool TryTake(out T cacheItem)
         {
-            var result = this._blockingCollection.TryTake(out cacheItem);
+            var result = this.blockingCollection.TryTake(out cacheItem);
 
             return result;
         }
 
-        public int Count => this._blockingCollection.Count;
-        public bool IsCompleted => this._blockingCollection.IsCompleted;
+        /// <summary>
+        /// The count.
+        /// </summary>
+        public int Count => this.blockingCollection.Count;
 
+        /// <summary>
+        /// The is completed.
+        /// </summary>
+        public bool IsCompleted => this.blockingCollection.IsCompleted;
+
+        /// <summary>
+        /// The complete adding.
+        /// </summary>
         public void CompleteAdding()
         {
-            this._blockingCollection.CompleteAdding();
+            this.blockingCollection.CompleteAdding();
         }
 
-        // ReSharper disable once ConvertToAutoProperty
-        public string Name => this._name;
+        /// <summary>
+        /// The name.
+        /// </summary>
+        public string Name => this.name;
     }
 }

@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueProcessor.Tests
+namespace PipelineStep.Tests
 {
     using System.IO;
     using System.Linq;
@@ -15,10 +15,9 @@ namespace QueueProcessor.Tests
 
     using CreateBatchItemsPipelineStep;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
     using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

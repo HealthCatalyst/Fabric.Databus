@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueProcessor.Tests
+namespace PipelineStep.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

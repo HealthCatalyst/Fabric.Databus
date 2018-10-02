@@ -65,21 +65,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JsonDocumentMergerPipelineStepTester.cs" />
+    <Compile Include="CreateBatchItemsQueueProcessorTests.cs" />
+    <Compile Include="JsonDocumentMergerQueueProcessorTester.cs" />
     <Compile Include="MockProgressMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CreateBatchItemsPipelineStepTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ElasticSearchJsonWriter\ElasticSearchJsonWriter.csproj">
+    <ProjectReference Include="..\Fabric.Databus.Json\Fabric.Databus.Json.csproj">
       <Project>{FC8CF81F-9790-4A46-9FD8-AFB220C4EF81}</Project>
       <Name>ElasticSearchJsonWriter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\ElasticSearchSqlFeeder.Interfaces.csproj">
+    <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj">
       <Project>{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}</Project>
       <Name>ElasticSearchSqlFeeder.Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj">
+    <ProjectReference Include="..\Fabric.Databus.Shared\Fabric.Databus.Shared.csproj">
       <Project>{ADE06C2E-4DD9-4C82-ACE2-BFEB881F74EF}</Project>
       <Name>ElasticSearchSqlFeeder.Shared</Name>
     </ProjectReference>
@@ -105,13 +105,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Databus.mdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Databus_log.ldf">
-      <DependentUpon>Databus.mdf</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Test1.xml" />
   </ItemGroup>
   <ItemGroup>

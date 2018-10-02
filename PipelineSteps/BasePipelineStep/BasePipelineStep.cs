@@ -298,7 +298,7 @@ namespace BasePipelineStep
         /// <param name="wt">
         /// The wt.
         /// </param>
-        internal void InternalHandle(TQueueInItem wt)
+        public void InternalHandle(TQueueInItem wt)
         {
             this.Handle(wt);
         }

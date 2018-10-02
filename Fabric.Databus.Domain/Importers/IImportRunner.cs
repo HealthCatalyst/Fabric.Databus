@@ -9,10 +9,9 @@
 
 namespace Fabric.Databus.Domain.Importers
 {
-    using ElasticSearchSqlFeeder.Interfaces;
-
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Jobs;
+    using Fabric.Databus.Interfaces;
 
     /// <summary>
     /// The ImportRunner interface.

@@ -12,11 +12,10 @@ namespace Fabric.DataBus.Client
     using System.Diagnostics;
     using System.Threading;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
 
     using PipelineRunner;
 

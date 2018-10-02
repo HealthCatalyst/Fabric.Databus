@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
-
-namespace ElasticSearchSqlFeeder.ProgressMonitor
+namespace Fabric.Databus.Interfaces
 {
+    using System;
+    using System.Collections.Generic;
+
     public class ProgressMonitorItem
     {
         public string QueryId { get; set; }
@@ -12,8 +12,8 @@ namespace ElasticSearchSqlFeeder.ProgressMonitor
         public string Minimum { get; set; }
         public TimeSpan TimeElapsedProcessing { get; set; }
         public TimeSpan TimeElapsedBlocked { get; set; }
-        public string TimeElapsedProcessingAsText => TimeElapsedProcessing.ToString("g");
-        public string TimeElapsedBlockedAsText => TimeElapsedBlocked.ToString("g");
+        public string TimeElapsedProcessingAsText => this.TimeElapsedProcessing.ToString("g");
+        public string TimeElapsedBlockedAsText => this.TimeElapsedBlocked.ToString("g");
 
         public List<KeyValuePair<string, string>> LastCompletedEntityIdForEachQuery { get; set; }
         public int DocumentDictionaryCount { get; set; }

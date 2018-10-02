@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ElasticSearchSqlFeeder.Shared;
+
 using Fabric.Databus.Domain.Configuration;
 using Nest;
 using Serilog;
 
 namespace Fabric.Databus.Domain.Jobs
 {
+    using Fabric.Databus.Shared;
+
     public class ElasticSearchJobHistoryStore : IJobHistoryStore
     {
         private readonly ElasticClient _client;

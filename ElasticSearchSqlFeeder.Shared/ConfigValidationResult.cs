@@ -1,7 +1,19 @@
-using System.Collections.Generic;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ConfigValidationResult.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the ConfigValidationResult type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// The config validation result.
+    /// </summary>
     public class ConfigValidationResult
     {
         public bool Success { get; set; }

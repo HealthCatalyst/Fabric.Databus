@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace ElasticSearchSqlFeeder.Interfaces
+﻿namespace Fabric.Databus.Interfaces
 {
+    using System.Collections.Generic;
+
     public class MappingItem
     {
         public List<ColumnInfo> Columns { get; set; }

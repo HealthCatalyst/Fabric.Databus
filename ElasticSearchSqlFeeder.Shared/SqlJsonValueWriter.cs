@@ -1,13 +1,20 @@
-﻿namespace ElasticSearchSqlFeeder.Shared
-{
-    using ElasticSearchSqlFeeder.Interfaces;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SqlJsonValueWriter.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SqlJsonValueWriter type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
-    using Fabric.Databus.Config;
+namespace Fabric.Databus.Shared
+{
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.ZipCodeToGeoCode;
 
     using Newtonsoft.Json;
 
-    using ZipCodeToGeoCodeConverter;
-
+    /// <inheritdoc />
     public class SqlJsonValueWriter : IJsonValueWriter
     {
         private static readonly string GeocodeType = ElasticSearchTypes.geo_point.ToString();

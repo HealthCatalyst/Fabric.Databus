@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ElasticSearchSqlFeeder.Shared
+﻿namespace Fabric.Databus.Shared
 {
+    using System;
+
     public static class SqlTypeToElasticSearchTypeConvertor
     {
         public static string GetElasticSearchType(Type type)

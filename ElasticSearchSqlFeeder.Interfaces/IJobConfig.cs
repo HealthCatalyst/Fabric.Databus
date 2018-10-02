@@ -1,4 +1,4 @@
-namespace ElasticSearchSqlFeeder.Interfaces
+namespace Fabric.Databus.Interfaces
 {
     public interface IJobConfig
     {

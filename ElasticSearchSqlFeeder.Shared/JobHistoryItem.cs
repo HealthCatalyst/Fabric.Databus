@@ -1,12 +1,25 @@
-using System;
-using System.Collections.Generic;
-using ElasticSearchSqlFeeder.Interfaces;
-using ElasticSearchSqlFeeder.ProgressMonitor;
-using Fabric.Databus.Config;
-using Newtonsoft.Json;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="JobHistoryItem.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the JobHistoryItem type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces;
+
+    using Newtonsoft.Json;
+
+    /// <summary>
+    /// The job history item.
+    /// </summary>
     public class JobHistoryItem
     {
         public const string CompletedStatus = "Completed";
@@ -20,7 +33,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public string Status { get; set; }
 
-        public bool IsComplete => Status == CompletedStatus;
+        public bool IsComplete => this.Status == CompletedStatus;
 
         public Job ExecutedQuery { get; set; }
 

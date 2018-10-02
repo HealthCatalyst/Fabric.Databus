@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchApiCaller
+namespace Fabric.Databus.ElasticSearch
 {
     using System.Collections.Generic;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     using Serilog;
 

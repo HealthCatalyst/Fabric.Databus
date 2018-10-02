@@ -1,5 +1,4 @@
 using System;
-using ElasticSearchSqlFeeder.Shared;
 
 namespace Fabric.Databus.Domain.Jobs
 {

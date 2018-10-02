@@ -16,8 +16,8 @@ namespace ConvertDatabaseRowToJsonPipelineStep
 
     using BasePipelineStep;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
 
     using QueueItems;
 

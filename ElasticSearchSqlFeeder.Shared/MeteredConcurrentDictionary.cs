@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
     using System;
     using System.Collections;
@@ -15,7 +15,7 @@ namespace ElasticSearchSqlFeeder.Shared
     using System.Linq;
     using System.Threading;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     using Serilog;
     using Serilog.Core;
@@ -43,7 +43,7 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public MeteredConcurrentDictionary(int maxItems)
         {
-            _maxItems = maxItems;
+            this._maxItems = maxItems;
         }
         public bool ContainsKey(TKey id)
         {
@@ -74,19 +74,19 @@ namespace ElasticSearchSqlFeeder.Shared
 
         private void BlockIfNeeded(TKey id)
         {
-            if (_maxItems > 0)
+            if (this._maxItems > 0)
             {
                 // if we have enough items in the queue then block
                 // http://www.albahari.com/threading/part4.aspx#_Signaling_with_Wait_and_Pulse
-                lock (_locker)
+                lock (this._locker)
                 {
-                    while (Count > _maxItems)
+                    while (this.Count > this._maxItems)
                     {
-                        Logger.Verbose($"MeteredDictionary.Block id={id} Count={Count:N0}");
-                        Monitor.Wait(_locker); // Lock is released while we’re waiting
+                        Logger.Verbose($"MeteredDictionary.Block id={id} Count={this.Count:N0}");
+                        Monitor.Wait(this._locker); // Lock is released while we’re waiting
 
                     }
-                    Logger.Verbose($"MeteredDictionary.Released id={id} Count={Count:N0}");
+                    Logger.Verbose($"MeteredDictionary.Released id={id} Count={this.Count:N0}");
                 }
             }
         }
@@ -119,11 +119,11 @@ namespace ElasticSearchSqlFeeder.Shared
 
                 if (result)
                 {
-                    if (_maxItems > 0)
+                    if (this._maxItems > 0)
                     {
-                        lock (_locker) // Let's now wake up the thread by
+                        lock (this._locker) // Let's now wake up the thread by
                         {
-                            if (Count <= _maxItems)
+                            if (this.Count <= this._maxItems)
                             {
                                 //Console.WriteLine($"MeteredDictionary.ReleaseAll id={id}");
 

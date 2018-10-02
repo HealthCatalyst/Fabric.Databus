@@ -173,29 +173,29 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ElasticSearchApiCaller\ElasticSearchApiCaller.csproj">
+    <ProjectReference Include="..\ElasticSearchApiCaller\Fabric.Databus.ElasticSearch.csproj">
       <Project>{3bbf6cf0-197f-4980-bdaf-1418e473c014}</Project>
-      <Name>ElasticSearchApiCaller</Name>
+      <Name>Fabric.Databus.ElasticSearch</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchJsonWriter\ElasticSearchJsonWriter.csproj">
+    <ProjectReference Include="..\ElasticSearchJsonWriter\Fabric.Databus.Json.csproj">
       <Project>{fc8cf81f-9790-4a46-9fd8-afb220c4ef81}</Project>
-      <Name>ElasticSearchJsonWriter</Name>
+      <Name>Fabric.Databus.Json</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\ElasticSearchSqlFeeder.Interfaces.csproj">
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\Fabric.Databus.Interfaces.csproj">
       <Project>{a6c96bfb-24c4-482a-a3da-54c2bb5a2b4f}</Project>
-      <Name>ElasticSearchSqlFeeder.Interfaces</Name>
+      <Name>Fabric.Databus.Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.ProgressMonitor\ElasticSearchSqlFeeder.ProgressMonitor.csproj">
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.ProgressMonitor\Fabric.Databus.ProgressMonitors.csproj">
       <Project>{6b54f568-e193-4b5e-b3a6-827b1d2acd2e}</Project>
-      <Name>ElasticSearchSqlFeeder.ProgressMonitor</Name>
+      <Name>Fabric.Databus.ProgressMonitors</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Queues\ElasticSearchSqlFeeder.Queues.csproj">
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Queues\Fabric.Databus.Queues.csproj">
       <Project>{623deca8-87ee-4c04-b245-3f2daa152289}</Project>
-      <Name>ElasticSearchSqlFeeder.Queues</Name>
+      <Name>Fabric.Databus.Queues</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj">
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\Fabric.Databus.Shared.csproj">
       <Project>{ade06c2e-4dd9-4c82-ace2-bfeb881f74ef}</Project>
-      <Name>ElasticSearchSqlFeeder.Shared</Name>
+      <Name>Fabric.Databus.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj">
       <Project>{c0ed4050-e7fb-4c68-adf1-6c8e290a2950}</Project>
@@ -205,17 +205,17 @@
       <Project>{dc1c2dff-2458-4396-a872-e44fef249de1}</Project>
       <Name>Fabric.Databus.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\JsonSchemaValidator\JsonSchemaValidator.csproj">
+    <ProjectReference Include="..\JsonSchemaValidator\Fabric.Databus.JsonSchema.csproj">
       <Project>{df401a17-f37b-4db4-85f3-113da9906305}</Project>
-      <Name>JsonSchemaValidator</Name>
+      <Name>Fabric.Databus.JsonSchema</Name>
     </ProjectReference>
     <ProjectReference Include="..\PipelineRunner\PipelineRunner.csproj">
       <Project>{AF1ADF05-EC10-43EA-877E-AD504A113B58}</Project>
       <Name>PipelineRunner</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ZipCodeToGeoCodeConverter\ZipCodeToGeoCodeConverter.csproj">
+    <ProjectReference Include="..\ZipCodeToGeoCodeConverter\Fabric.Databus.ZipCodeToGeoCode.csproj">
       <Project>{5ba49a86-b7fa-4504-92d1-db7ac5695b09}</Project>
-      <Name>ZipCodeToGeoCodeConverter</Name>
+      <Name>Fabric.Databus.ZipCodeToGeoCode</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

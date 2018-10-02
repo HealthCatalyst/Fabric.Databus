@@ -1,4 +1,4 @@
-﻿namespace ElasticSearchJsonWriter
+﻿namespace Fabric.Databus.Json
 {
     using System;
 

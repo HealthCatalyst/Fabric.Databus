@@ -7,14 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Threading;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     /// <summary>
     /// The queue manager.

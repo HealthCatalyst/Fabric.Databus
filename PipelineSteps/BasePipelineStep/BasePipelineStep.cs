@@ -13,8 +13,7 @@ namespace BasePipelineStep
     using System.Diagnostics;
     using System.Threading;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.ProgressMonitor;
+    using Fabric.Databus.Interfaces;
 
     using Serilog;
 

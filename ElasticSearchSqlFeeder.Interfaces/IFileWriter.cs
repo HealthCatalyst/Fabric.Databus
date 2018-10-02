@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Interfaces
+namespace Fabric.Databus.Interfaces
 {
     using System;
     using System.IO;

@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchApiCaller
+namespace Fabric.Databus.ElasticSearch
 {
     using System.Collections.Generic;
 

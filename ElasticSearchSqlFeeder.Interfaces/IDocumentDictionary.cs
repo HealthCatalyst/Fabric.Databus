@@ -7,12 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Interfaces
+namespace Fabric.Databus.Interfaces
 {
     using System;
     using System.Collections.Generic;
-
-    using QueueItems;
 
     /// <summary>
     /// The DocumentDictionary interface.

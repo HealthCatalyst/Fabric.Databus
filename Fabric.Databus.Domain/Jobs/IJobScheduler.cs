@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ElasticSearchSqlFeeder.Shared;
+
 using Fabric.Databus.Config;
 
 namespace Fabric.Databus.Domain.Jobs
 {
+    using Fabric.Databus.Shared;
+
     public interface IJobScheduler
     {
         void ScheduleJob(QueryConfig queryConfig, string jobName);

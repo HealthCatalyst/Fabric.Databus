@@ -15,13 +15,12 @@ namespace ElasticSearchSqlFeederConsole
     using System.Linq;
     using System.Threading;
 
-    using ElasticSearchApiCaller;
-
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.ElasticSearch;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.JsonSchema;
+    using Fabric.Databus.Shared;
 
     using PipelineRunner;
     using Serilog;
@@ -43,16 +42,21 @@ namespace ElasticSearchSqlFeederConsole
         /// </exception>
         public static void Main(string[] args)
         {
-            if (!args.Any()) throw new Exception("Please pass the job.xml file as a parameter");
+            if (!args.Any())
+            {
+                throw new Exception("Please pass the job.xml file as a parameter");
+            }
 
             if (args[0] == "-generateschema")
             {
-                if (args.Length < 2 || string.IsNullOrEmpty(args[1])) throw new Exception("You must specify a valid filename to write the schema to.");
+                if (args.Length < 2 || string.IsNullOrEmpty(args[1]))
+                {
+                    throw new Exception("You must specify a valid filename to write the schema to.");
+                }
 
                 var filename = args[1];
 
-                JsonSchemaValidator.JsonSchemaGenerator.WriteSchemaToFile(typeof(QueryConfig), 
-                    filename);
+                JsonSchemaGenerator.WriteSchemaToFile(typeof(QueryConfig), filename);
 
                 Console.WriteLine($"Written schema to {filename}");
                 return;

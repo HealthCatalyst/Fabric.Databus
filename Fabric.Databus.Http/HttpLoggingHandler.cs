@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace ElasticSearchApiCaller
+﻿namespace Fabric.Databus.Http
 {
+    using System;
+    using System.Net.Http;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     using Serilog;
     using Serilog.Core;
 
@@ -17,7 +17,7 @@ namespace ElasticSearchApiCaller
         public HttpLoggingHandler(HttpMessageHandler innerHandler, bool doLogContent)
             : base(innerHandler)
         {
-            _doLogContent = doLogContent;
+            this._doLogContent = doLogContent;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -32,9 +32,9 @@ namespace ElasticSearchApiCaller
 
                 HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
-                if (_doLogContent)
+                if (this._doLogContent)
                 {
-                    if (_doLogContent && request.Content != null)
+                    if (this._doLogContent && request.Content != null)
                     {
                         sb.AppendLine(await request.Content.ReadAsStringAsync());
                     }

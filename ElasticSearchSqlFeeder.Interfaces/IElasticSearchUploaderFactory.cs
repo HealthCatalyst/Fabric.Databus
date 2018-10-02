@@ -7,11 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Interfaces
+namespace Fabric.Databus.Interfaces
 {
     using System.Collections.Generic;
-
-    using Serilog;
 
     /// <summary>
     /// The FileUploaderFactory interface.

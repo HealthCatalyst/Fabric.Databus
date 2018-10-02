@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchApiCaller
+namespace Fabric.Databus.ElasticSearch
 {
     using System;
     using System.Collections.Concurrent;
@@ -21,7 +21,8 @@ namespace ElasticSearchApiCaller
     using System.Threading;
     using System.Threading.Tasks;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Http;
+    using Fabric.Databus.Interfaces;
 
     using Newtonsoft.Json;
 
@@ -376,7 +377,7 @@ namespace ElasticSearchApiCaller
             bool doLogContent,
             bool doCompress)
         {
-            var relativeUrl = $"/{this.index}/{entityType}/_bulk?pretty";
+            var relativeUrl = $"/{this.index}/{this.entityType}/_bulk?pretty";
             await this.SendStreamToHosts(relativeUrl, batch, stream, doLogContent, doCompress);
         }
 
@@ -498,14 +499,14 @@ namespace ElasticSearchApiCaller
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
             using (var client = new HttpClient(new HttpLoggingHandler(new HttpClientHandler(), doLogContent: true)))
             {
-                var host = hosts.First();
+                var host = this.hosts.First();
 
                 this.AddAuthorizationToken(client);
 
                 if (!this.keepIndexOnline)
                 {
                     await
-                        client.PostAsyncString(host + "/" + index + "/_refresh", null);
+                        client.PostAsyncString(host + "/" + this.index + "/_refresh", null);
                 }
             }
         }
@@ -749,9 +750,9 @@ namespace ElasticSearchApiCaller
                         }
 
                         // find url to use
-                        var hostNumber = this.queuedFiles.Count % hosts.Count;
+                        var hostNumber = this.queuedFiles.Count % this.hosts.Count;
 
-                        var url = hosts[hostNumber] + relativeUrl;
+                        var url = this.hosts[hostNumber] + relativeUrl;
 
                         // var url = hosts.First() + @"/_cluster/health?pretty";
                         await this.SendFileToUrl(url, filename);

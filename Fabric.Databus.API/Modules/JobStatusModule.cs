@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using ElasticSearchSqlFeeder.Shared;
+
 using Fabric.Databus.API.Configuration;
 using Fabric.Databus.Domain.Jobs;
 using Nancy;
@@ -9,7 +9,9 @@ using Serilog;
 
 namespace Fabric.Databus.API.Modules
 {
-		public class JobStatusModule : NancyModule
+    using Fabric.Databus.Shared;
+
+    public class JobStatusModule : NancyModule
 		{
 				public JobStatusModule(ILogger logger, IJobScheduler jobScheduler, IAppConfiguration configuration) : base("/jobstatus")
 				{

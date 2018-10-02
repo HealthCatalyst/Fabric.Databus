@@ -15,10 +15,9 @@ namespace Fabric.Databus.Schema
     using System.Data.SqlClient;
     using System.Linq;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
     using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
 
     /// <inheritdoc />
     public class SchemaLoader : ISchemaLoader

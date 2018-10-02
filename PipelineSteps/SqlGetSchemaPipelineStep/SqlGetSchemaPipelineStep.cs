@@ -16,8 +16,7 @@ namespace SqlGetSchemaPipelineStep
 
     using BasePipelineStep;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-
+    using Fabric.Databus.Interfaces;
     using Fabric.Shared;
 
     using QueueItems;

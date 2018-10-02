@@ -17,9 +17,8 @@ namespace SaveSchemaPipelineStep
 
     using BasePipelineStep;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-
     using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces;
 
     using QueueItems;
 

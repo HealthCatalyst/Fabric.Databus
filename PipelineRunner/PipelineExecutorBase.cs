@@ -12,7 +12,7 @@ namespace PipelineRunner
     using System.Collections.Generic;
     using System.Threading;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     using Unity;
 

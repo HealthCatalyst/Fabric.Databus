@@ -1,7 +1,19 @@
-namespace ElasticSearchSqlFeeder.Shared
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="TestConsoleProgressLogger.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the TestConsoleProgressLogger type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace Fabric.Databus.Shared
 {
     using System;
 
+    /// <summary>
+    /// The test console progress logger.
+    /// </summary>
     public class TestConsoleProgressLogger : AbstractTextProgressLogger
     {
         public override void Reset()

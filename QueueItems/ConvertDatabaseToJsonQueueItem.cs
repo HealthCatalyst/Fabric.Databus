@@ -11,8 +11,8 @@ namespace QueueItems
 {
     using System.Collections.Generic;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
 
     /// <summary>
     /// The convert database to json queue item.

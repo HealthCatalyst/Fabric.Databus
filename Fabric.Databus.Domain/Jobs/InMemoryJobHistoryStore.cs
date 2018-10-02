@@ -2,10 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using ElasticSearchSqlFeeder.Shared;
 
 namespace Fabric.Databus.Domain.Jobs
 {
+    using Fabric.Databus.Shared;
 
     public class InMemoryJobHistoryStore : IJobHistoryStore
     {

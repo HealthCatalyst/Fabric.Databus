@@ -11,7 +11,7 @@ namespace QueueItems
 {
     using System.IO;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     using Newtonsoft.Json;
 

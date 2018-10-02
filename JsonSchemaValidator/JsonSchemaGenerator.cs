@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace JsonSchemaValidator
+namespace Fabric.Databus.JsonSchema
 {
     using System;
 

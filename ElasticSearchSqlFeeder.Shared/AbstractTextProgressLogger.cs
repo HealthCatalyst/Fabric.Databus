@@ -1,12 +1,26 @@
-using System;
-using System.Collections.Generic;
-using ElasticSearchSqlFeeder.Interfaces;
-using ElasticSearchSqlFeeder.ProgressMonitor;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="AbstractTextProgressLogger.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the AbstractTextProgressLogger type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
+    using System;
+
+    using Fabric.Databus.Interfaces;
+
+    /// <summary>
+    /// The abstract text progress logger.
+    /// </summary>
     public abstract class AbstractTextProgressLogger : IProgressLogger
     {
+        /// <summary>
+        /// The reset.
+        /// </summary>
         public abstract void Reset();
         public abstract void AppendLine(string formattableString);
         public abstract string GetLog();
@@ -42,7 +56,7 @@ namespace ElasticSearchSqlFeeder.Shared
             formattableString += $" Out: {progressMonitorItem.TotalItemsAddedToOutputQueue,10:N0}";
             formattableString += $"{isQueueCompleted,3}";
 
-            AppendLine(formattableString);
+            this.AppendLine(formattableString);
         }
 
     }

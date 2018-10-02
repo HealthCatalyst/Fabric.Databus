@@ -21,15 +21,13 @@ namespace PipelineRunner
 
     using DummyMappingUploadPipelineStep;
 
-    using ElasticSearchJsonWriter;
-
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Importers;
     using Fabric.Databus.Domain.Jobs;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Json;
     using Fabric.Databus.Schema;
+    using Fabric.Databus.Shared;
 
     using FileSavePipelineStep;
 

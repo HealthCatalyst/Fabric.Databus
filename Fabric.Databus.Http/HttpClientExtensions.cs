@@ -1,13 +1,13 @@
-﻿using System.IO;
-using System.IO.Compression;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElasticSearchApiCaller
+﻿namespace Fabric.Databus.Http
 {
+    using System.IO;
+    using System.IO.Compression;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Runtime.CompilerServices;
+    using System.Text;
+    using System.Threading.Tasks;
+
     public static class HttpClientExtensions
     {
         private static string _contentTypeHeader = "application/json";

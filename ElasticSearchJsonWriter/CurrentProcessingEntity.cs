@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchJsonWriter
+namespace Fabric.Databus.Json
 {
     /// <summary>
     /// The current processing entity lock type.

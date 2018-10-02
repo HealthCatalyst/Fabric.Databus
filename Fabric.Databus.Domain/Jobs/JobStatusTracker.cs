@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Concurrent;
-using ElasticSearchSqlFeeder.Shared;
 
 namespace Fabric.Databus.Domain.Jobs
 {
+    using Fabric.Databus.Shared;
+
     public class JobStatusTracker : IJobStatusTracker
     {
         private readonly ConcurrentDictionary<Guid, int> _jobDictionary = new ConcurrentDictionary<Guid, int>();

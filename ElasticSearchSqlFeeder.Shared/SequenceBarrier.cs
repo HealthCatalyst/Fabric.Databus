@@ -1,11 +1,16 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SequenceBarrier.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SequenceBarrier type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
+    using System.Collections.Concurrent;
+    using System.Linq;
 
     public class SequenceBarrier
     {
@@ -16,24 +21,24 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public string UpdateMinimumEntityIdProcessed(string queryId, string id)
         {
-            if (LastProcessedEntityIdForEachQuery.ContainsKey(queryId) == false)
+            if (this.LastProcessedEntityIdForEachQuery.ContainsKey(queryId) == false)
             {
-                LastProcessedEntityIdForEachQuery.GetOrAdd(queryId, (string)null);
+                this.LastProcessedEntityIdForEachQuery.GetOrAdd(queryId, (string)null);
             }
-            if (LastCompletedEntityIdForEachQuery.ContainsKey(queryId) == false)
+            if (this.LastCompletedEntityIdForEachQuery.ContainsKey(queryId) == false)
             {
-                LastCompletedEntityIdForEachQuery.GetOrAdd(queryId, (string)null);
-            }
-
-            if (id != LastProcessedEntityIdForEachQuery[queryId])
-            {
-                LastCompletedEntityIdForEachQuery.AddOrUpdate(queryId, LastProcessedEntityIdForEachQuery[queryId],
-                    (a, b) => LastProcessedEntityIdForEachQuery[queryId]);
+                this.LastCompletedEntityIdForEachQuery.GetOrAdd(queryId, (string)null);
             }
 
-            LastProcessedEntityIdForEachQuery.AddOrUpdate(queryId, id, (a, b) => id);
+            if (id != this.LastProcessedEntityIdForEachQuery[queryId])
+            {
+                this.LastCompletedEntityIdForEachQuery.AddOrUpdate(queryId, this.LastProcessedEntityIdForEachQuery[queryId],
+                    (a, b) => this.LastProcessedEntityIdForEachQuery[queryId]);
+            }
 
-            var min = LastCompletedEntityIdForEachQuery.Min(q => q.Value);
+            this.LastProcessedEntityIdForEachQuery.AddOrUpdate(queryId, id, (a, b) => id);
+
+            var min = this.LastCompletedEntityIdForEachQuery.Min(q => q.Value);
 
             //Logger.Verbose($"Minimum Key in Dictionary: {min}, {JsonConvert.SerializeObject(LastCompletedEntityIdForEachQuery)}");
 
@@ -47,7 +52,7 @@ namespace ElasticSearchSqlFeeder.Shared
             {
                 string temp;
 
-                LastCompletedEntityIdForEachQuery.TryRemove(queryId, out temp);
+                this.LastCompletedEntityIdForEachQuery.TryRemove(queryId, out temp);
             }
             //Logger.Verbose($"Completed {queryId}: queue: {_inQueue.Count}");
         }

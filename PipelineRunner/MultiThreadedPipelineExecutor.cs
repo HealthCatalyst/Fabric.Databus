@@ -16,7 +16,7 @@ namespace PipelineRunner
     using System.Threading;
     using System.Threading.Tasks;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     using FileSavePipelineStep;
 
@@ -94,20 +94,20 @@ namespace PipelineRunner
 
             for (var i = 0; i < count; i++)
             {
-                var PipelineStep = functionPipelineStep();
+                var pipelineStep = functionPipelineStep();
 
                 if (isFirst)
                 {
-                    PipelineStep.CreateOutQueue(thisStepNumber);
+                    pipelineStep.CreateOutQueue(thisStepNumber);
                     isFirst = false;
                 }
 
-                PipelineStep.InitializeWithStepNumber(thisStepNumber);
+                pipelineStep.InitializeWithStepNumber(thisStepNumber);
 
                 var task = Task.Factory.StartNew(
                     (o) =>
                     {
-                        PipelineStep.MonitorWorkQueue();
+                        pipelineStep.MonitorWorkQueue();
                         return 1;
                     },
                     thisStepNumber,

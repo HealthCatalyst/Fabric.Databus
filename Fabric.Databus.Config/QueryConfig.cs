@@ -12,7 +12,7 @@ namespace Fabric.Databus.Config
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     /// <summary>
     /// The query config.

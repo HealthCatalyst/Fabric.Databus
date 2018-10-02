@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Interfaces
+namespace Fabric.Databus.Interfaces
 {
     /// <summary>
     /// The elastic search types.

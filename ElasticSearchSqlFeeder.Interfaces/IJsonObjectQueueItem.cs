@@ -1,7 +1,5 @@
-﻿namespace QueueItems
+﻿namespace Fabric.Databus.Interfaces
 {
-    using ElasticSearchSqlFeeder.Interfaces;
-
     using Newtonsoft.Json.Linq;
 
     public interface IJsonObjectQueueItem : IQueueItem

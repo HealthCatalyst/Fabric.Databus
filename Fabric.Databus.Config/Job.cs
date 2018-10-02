@@ -11,7 +11,7 @@ namespace Fabric.Databus.Config
 {
     using System.Runtime.Serialization;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     /// <inheritdoc />
     /// <summary>

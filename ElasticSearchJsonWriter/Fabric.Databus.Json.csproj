@@ -9,9 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElasticSearchApiCaller\ElasticSearchApiCaller.csproj" />
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\ElasticSearchSqlFeeder.Interfaces.csproj" />
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj" />
+    <ProjectReference Include="..\ElasticSearchApiCaller\Fabric.Databus.ElasticSearch.csproj" />
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\Fabric.Databus.Interfaces.csproj" />
+    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\Fabric.Databus.Shared.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
   </ItemGroup>
 

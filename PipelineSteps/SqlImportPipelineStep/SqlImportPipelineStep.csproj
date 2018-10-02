@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ElasticSearchSqlFeeder.Shared\ElasticSearchSqlFeeder.Shared.csproj" />
+    <ProjectReference Include="..\..\ElasticSearchSqlFeeder.Shared\Fabric.Databus.Shared.csproj" />
     <ProjectReference Include="..\..\QueueItems\QueueItems.csproj" />
     <ProjectReference Include="..\BasePipelineStep\BasePipelineStep.csproj" />
   </ItemGroup>

@@ -17,9 +17,8 @@ namespace SaveBatchPipelineStep
 
     using BasePipelineStep;
 
-    using ElasticSearchJsonWriter;
-
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Json;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;

@@ -9,7 +9,7 @@
 
 namespace QueueItems
 {
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     using Newtonsoft.Json.Linq;
 

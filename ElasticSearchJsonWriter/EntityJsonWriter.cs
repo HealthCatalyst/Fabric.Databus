@@ -1,13 +1,12 @@
-﻿namespace ElasticSearchJsonWriter
+﻿namespace Fabric.Databus.Json
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
     using Fabric.Shared;
 
     using Newtonsoft.Json;
@@ -424,7 +423,7 @@
             //var count = jEnumerable.Count();
             //var firstOrDefault = jEnumerable.FirstOrDefault();
 
-            CopyAllProperties(originalJObject, newJObject);
+            this.CopyAllProperties(originalJObject, newJObject);
 
             foreach (KeyValuePair<string, JToken> property in newJObject)
             {
@@ -439,7 +438,7 @@
                         selectProperty = new JArray { };
                         originalJObject.Add(property.Key, selectProperty);
                     }
-                    MergeArrayFast(selectProperty, array, level);
+                    this.MergeArrayFast(selectProperty, array, level);
                 }
 
             }
@@ -467,14 +466,14 @@
                         {
                             found = true;
                             // found a match on key so try to merge
-                            MergeWithDocumentFast(originalJObject, newJObject, level);
+                            this.MergeWithDocumentFast(originalJObject, newJObject, level);
                             break;
                         }
                     }
 
                     if (!found)
                     {
-                        AddObjectAtEndOfArray(originalArray, newJObject);
+                        this.AddObjectAtEndOfArray(originalArray, newJObject);
                     }
                 }
             }
@@ -508,7 +507,7 @@
             // if propertyName is not set then copy all the properties into this new object
             if (propertyName == null)
             {
-                CopyAllProperties(document, newJObject);
+                this.CopyAllProperties(document, newJObject);
             }
             else
             {

@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
-using ElasticSearchSqlFeeder.Shared;
 
 namespace Fabric.Databus.Domain.ConfigValidators
 {
+    using Fabric.Databus.Shared;
+
     public interface IConfigValidator
     {
         Task<ConfigValidationResult> ValidateFromText(string fileContents);

@@ -9,7 +9,7 @@
 
 namespace Fabric.Databus.Config
 {
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     /// <summary>
     /// The Job interface.

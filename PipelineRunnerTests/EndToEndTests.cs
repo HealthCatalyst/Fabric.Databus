@@ -12,16 +12,13 @@ namespace PipelineRunnerTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
-    using ElasticSearchApiCaller;
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 

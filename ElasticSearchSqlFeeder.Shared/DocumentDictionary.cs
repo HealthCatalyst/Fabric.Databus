@@ -7,14 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
     using System;
     using System.Collections.Generic;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-
-    using QueueItems;
+    using Fabric.Databus.Interfaces;
 
     /// <inheritdoc />
     /// <summary>

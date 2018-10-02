@@ -13,7 +13,7 @@ namespace Fabric.Databus.Config
     using System.Runtime.Serialization;
     using System.Xml.Serialization;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     /// <summary>
     /// The data source.

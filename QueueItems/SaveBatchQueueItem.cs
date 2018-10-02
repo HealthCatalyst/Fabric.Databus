@@ -11,7 +11,7 @@ namespace QueueItems
 {
     using System.Collections.Generic;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     public class SaveBatchQueueItem : IQueueItem
     {

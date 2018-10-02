@@ -1,14 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="MessageQueue.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the MessageQueue type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ElasticSearchSqlFeeder.Queues
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using RabbitMQ.Client;
+    using RabbitMQ.Client.Events;
+
+    /// <summary>
+    /// The message queue.
+    /// </summary>
     public class MessageQueue
     {
         public void Send()

@@ -7,22 +7,20 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
-    using System;
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
     using Serilog;
-    using Serilog.Core;
 
     /// <summary>
     /// The metered blocking collection.
     /// </summary>
-    /// <typeparam name="T">
+    /// <typeparam name="T">item type
     /// </typeparam>
     public class MeteredBlockingCollection<T> : IMeteredBlockingCollection<T>
     {
@@ -40,35 +38,35 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public MeteredBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name)
         {
-            _blockingCollection = new BlockingCollection<T>(concurrentQueue);
-            _name = name;
+            this._blockingCollection = new BlockingCollection<T>(concurrentQueue);
+            this._name = name;
         }
 
         public MeteredBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name, int maxItems)
             : this(concurrentQueue, name)
         {
-            _maxItems = maxItems;
+            this._maxItems = maxItems;
         }
 
         public T Take()
         {
-            var item = _blockingCollection.Take();
-            ReleaseLockIfNeeded();
+            var item = this._blockingCollection.Take();
+            this.ReleaseLockIfNeeded();
 
             return item;
         }
 
         private void ReleaseLockIfNeeded()
         {
-            if (_maxItems > 0)
+            if (this._maxItems > 0)
             {
-                lock (_locker) // Let's now wake up the thread by
+                lock (this._locker) // Let's now wake up the thread by
                 {
-                    if (Count <= _maxItems)
+                    if (this.Count <= this._maxItems)
                     {
-                        Logger.Verbose($"MeteredQueue.ReleaseAll {_name}");
+                        Logger.Verbose($"MeteredQueue.ReleaseAll {this._name}");
 
-                        Monitor.PulseAll(_locker);
+                        Monitor.PulseAll(this._locker);
                     }
                 }
             }
@@ -76,29 +74,29 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public void Add(T item)
         {
-            BlockIfNeeded();
+            this.BlockIfNeeded();
 
-            _blockingCollection.Add(item);
+            this._blockingCollection.Add(item);
         }
 
         private void BlockIfNeeded()
         {
-            if (_maxItems > 0)
+            if (this._maxItems > 0)
             {
                 // if we have enough items in the queue then block
                 // http://www.albahari.com/threading/part4.aspx#_Signaling_with_Wait_and_Pulse
-                lock (_locker)
+                lock (this._locker)
                 {
                     bool didLock = false;
-                    while (Count > _maxItems)
+                    while (this.Count > this._maxItems)
                     {
                         didLock = true;
-                        Logger.Verbose($"MeteredQueue.Block {_name}, Count={Count:N0}");
-                        Monitor.Wait(_locker); // Lock is released while we’re waiting
+                        Logger.Verbose($"MeteredQueue.Block {this._name}, Count={this.Count:N0}");
+                        Monitor.Wait(this._locker); // Lock is released while we’re waiting
                     }
                     if (didLock)
                     {
-                        Logger.Verbose($"MeteredQueue.Released {_name}, Count={Count:N0}");
+                        Logger.Verbose($"MeteredQueue.Released {this._name}, Count={this.Count:N0}");
                     }
                 }
             }
@@ -106,26 +104,26 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public bool Any()
         {
-            return _blockingCollection.Any();
+            return this._blockingCollection.Any();
         }
 
         public bool TryTake(out T cacheItem)
         {
-            var result = _blockingCollection.TryTake(out cacheItem);
-            ReleaseLockIfNeeded();
+            var result = this._blockingCollection.TryTake(out cacheItem);
+            this.ReleaseLockIfNeeded();
 
             return result;
         }
 
-        public int Count => _blockingCollection.Count;
-        public bool IsCompleted => _blockingCollection.IsCompleted;
+        public int Count => this._blockingCollection.Count;
+        public bool IsCompleted => this._blockingCollection.IsCompleted;
 
         public void CompleteAdding()
         {
-            _blockingCollection.CompleteAdding();
+            this._blockingCollection.CompleteAdding();
         }
 
         // ReSharper disable once ConvertToAutoProperty
-        public string Name => _name;
+        public string Name => this._name;
     }
 }

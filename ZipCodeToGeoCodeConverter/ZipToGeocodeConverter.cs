@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using static System.String;
-
-namespace ZipCodeToGeoCodeConverter
+﻿namespace Fabric.Databus.ZipCodeToGeoCode
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
     public class ZipToGeocodeConverter
     {
         private static readonly Dictionary<string, GeoCode> ZipToGeocodeLookup = new Dictionary<string, GeoCode>();
@@ -19,7 +18,7 @@ namespace ZipCodeToGeoCodeConverter
         {
             if (!ZipToGeocodeLookup.Any())
             {
-                ReadEmbeddedFile();
+                this.ReadEmbeddedFile();
             }
 
             var containsKey = ZipToGeocodeLookup.ContainsKey(zipCode);
@@ -33,10 +32,10 @@ namespace ZipCodeToGeoCodeConverter
         {
             if (!ZipToGeocodeLookup.Any())
             {
-                ReadEmbeddedFile();
+                this.ReadEmbeddedFile();
             }
 
-            if (IsNullOrWhiteSpace(zipCodePrefix)
+            if (String.IsNullOrWhiteSpace(zipCodePrefix)
                 || zipCodePrefix.Any(c => !char.IsDigit(c))
                 || zipCodePrefix == "000")
                 return null;
@@ -80,7 +79,7 @@ namespace ZipCodeToGeoCodeConverter
                         var latitudeAsText = strings[latitudeColumnIndex];
                         var longitudeAsText = strings[longitudeColumnIndex];
 
-                        if (!IsNullOrWhiteSpace(latitudeAsText) && !IsNullOrWhiteSpace(longitudeAsText))
+                        if (!String.IsNullOrWhiteSpace(latitudeAsText) && !String.IsNullOrWhiteSpace(longitudeAsText))
                         {
                             ZipToGeocodeLookup.Add(strings[zipCodeColumnIndex], new GeoCode
                             {

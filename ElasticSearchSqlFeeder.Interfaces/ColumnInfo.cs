@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace ElasticSearchSqlFeeder.Interfaces
+﻿namespace Fabric.Databus.Interfaces
 {
     public class ColumnInfo
     {

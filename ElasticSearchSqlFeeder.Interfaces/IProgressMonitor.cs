@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using ElasticSearchSqlFeeder.ProgressMonitor;
-
-namespace ElasticSearchSqlFeeder.Interfaces
+﻿namespace Fabric.Databus.Interfaces
 {
+    using System;
+    using System.Collections.Generic;
+
     public interface IProgressMonitor
     {
         Action JobHistoryUpdateAction { get; set; }

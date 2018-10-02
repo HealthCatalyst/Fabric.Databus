@@ -1,6 +1,4 @@
-using ElasticSearchSqlFeeder.ProgressMonitor;
-
-namespace ElasticSearchSqlFeeder.Interfaces
+namespace Fabric.Databus.Interfaces
 {
     public interface IProgressLogger
     {

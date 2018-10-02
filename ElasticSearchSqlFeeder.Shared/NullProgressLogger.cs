@@ -1,11 +1,21 @@
-using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using ElasticSearchSqlFeeder.Interfaces;
-using ElasticSearchSqlFeeder.ProgressMonitor;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="NullProgressLogger.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The null progress logger.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
+    using System;
+
+    using Fabric.Databus.Interfaces;
+
+    /// <summary>
+    /// The null progress logger.
+    /// </summary>
     public class NullProgressLogger : IProgressLogger
     {
 

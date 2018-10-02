@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using ElasticSearchSqlFeeder.Shared;
 
 namespace Fabric.Databus.Domain.Jobs
 {
+    using Fabric.Databus.Shared;
+
     public interface IJobHistoryStore
     {
         IList<JobHistoryItem> GetJobHistory(string jobName);

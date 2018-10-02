@@ -11,9 +11,8 @@ namespace QueueItems
 {
     using System.Collections.Generic;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-
     using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces;
 
     /// <summary>
     /// The save schema queue item.

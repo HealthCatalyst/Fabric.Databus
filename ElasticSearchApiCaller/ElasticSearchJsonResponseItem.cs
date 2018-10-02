@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchApiCaller
+namespace Fabric.Databus.ElasticSearch
 {
     /// <summary>
     /// The elastic search json response item.

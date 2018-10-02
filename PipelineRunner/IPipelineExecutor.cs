@@ -1,10 +1,22 @@
-﻿namespace PipelineRunner
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IPipelineExecutor.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The PipelineExecutor interface.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace PipelineRunner
 {
     using System;
     using System.Collections.Generic;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
 
+    /// <summary>
+    /// The PipelineExecutor interface.
+    /// </summary>
     public interface IPipelineExecutor
     {
         /// <summary>

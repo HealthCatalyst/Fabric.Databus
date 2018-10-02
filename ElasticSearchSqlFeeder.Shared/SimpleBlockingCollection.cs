@@ -1,14 +1,27 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
-using ElasticSearchSqlFeeder.Interfaces;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SimpleBlockingCollection.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the SimpleBlockingCollection type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
+    using System.Collections.Concurrent;
+    using System.Linq;
+
+    using Fabric.Databus.Interfaces;
+
     using Serilog;
     using Serilog.Core;
 
+    /// <summary>
+    /// The simple blocking collection.
+    /// </summary>
+    /// <typeparam name="T">
+    /// </typeparam>
     public class SimpleBlockingCollection<T> : IMeteredBlockingCollection<T>
     {
         // ReSharper disable once StaticMemberInGenericType
@@ -20,8 +33,8 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public SimpleBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name)
         {
-            _blockingCollection = new BlockingCollection<T>(concurrentQueue);
-            _name = name;
+            this._blockingCollection = new BlockingCollection<T>(concurrentQueue);
+            this._name = name;
         }
 
         public SimpleBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name, int maxItems)
@@ -31,38 +44,38 @@ namespace ElasticSearchSqlFeeder.Shared
 
         public T Take()
         {
-            var item = _blockingCollection.Take();
+            var item = this._blockingCollection.Take();
 
             return item;
         }
 
         public void Add(T item)
         {
-            _blockingCollection.Add(item);
+            this._blockingCollection.Add(item);
         }
 
 
         public bool Any()
         {
-            return _blockingCollection.Any();
+            return this._blockingCollection.Any();
         }
 
         public bool TryTake(out T cacheItem)
         {
-            var result = _blockingCollection.TryTake(out cacheItem);
+            var result = this._blockingCollection.TryTake(out cacheItem);
 
             return result;
         }
 
-        public int Count => _blockingCollection.Count;
-        public bool IsCompleted => _blockingCollection.IsCompleted;
+        public int Count => this._blockingCollection.Count;
+        public bool IsCompleted => this._blockingCollection.IsCompleted;
 
         public void CompleteAdding()
         {
-            _blockingCollection.CompleteAdding();
+            this._blockingCollection.CompleteAdding();
         }
 
         // ReSharper disable once ConvertToAutoProperty
-        public string Name => _name;
+        public string Name => this._name;
     }
 }

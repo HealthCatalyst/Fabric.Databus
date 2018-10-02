@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeeder.Shared
+namespace Fabric.Databus.Shared
 {
     using System;
     using System.Collections.Generic;
@@ -16,11 +16,10 @@ namespace ElasticSearchSqlFeeder.Shared
     using System.Diagnostics;
     using System.Linq;
 
-    using ElasticSearchSqlFeeder.Interfaces;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.ZipCodeToGeoCode;
 
     using Serilog;
-
-    using ZipCodeToGeoCodeConverter;
 
     /// <summary>
     /// The databus sql reader.

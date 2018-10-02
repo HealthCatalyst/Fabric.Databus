@@ -2,9 +2,8 @@ namespace QueueItems
 {
     using System.IO;
 
-    using ElasticSearchSqlFeeder.Interfaces;
-
     using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces;
 
     public class MappingUploadQueueItem : IQueueItem
     {

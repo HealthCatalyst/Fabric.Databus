@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ConfigValidator.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The config validator.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace PipelineRunner
 {
     using System;
@@ -7,14 +16,14 @@ namespace PipelineRunner
     using System.Linq;
     using System.Threading.Tasks;
 
-    using ElasticSearchApiCaller;
-
-    using ElasticSearchSqlFeeder.Interfaces;
-    using ElasticSearchSqlFeeder.Shared;
-
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ConfigValidators;
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Shared;
 
+    /// <summary>
+    /// The config validator.
+    /// </summary>
     public class ConfigValidator : IConfigValidator
     {
         public async Task<ConfigValidationResult> ValidateFromText(string fileContents)

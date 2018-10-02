@@ -14,11 +14,10 @@ namespace Fabric.Databus.Shared
 
     using Fabric.Databus.Interfaces;
 
-    /// <inheritdoc />
     /// <summary>
     /// The file writer.
     /// </summary>
-    public class FileWriter : IFileWriter
+    public class FileWriter : IDetailedTemporaryFileWriter, ITemporaryFileWriter, IFileWriter
     {
         /// <inheritdoc />
         public void CreateDirectory(string path)
@@ -59,13 +58,14 @@ namespace Fabric.Databus.Shared
         }
 
 
+        /// <inheritdoc />
         /// <summary>
         /// The delete directory.
         /// </summary>
         /// <param name="folder">
         /// The folder.
         /// </param>
-        /// <exception cref="Exception">exception thrown
+        /// <exception cref="T:System.Exception">exception thrown
         /// </exception>
         public void DeleteDirectory(string folder)
         {
@@ -74,19 +74,9 @@ namespace Fabric.Databus.Shared
                 throw new Exception($"Folder {folder} does not exist");
             }
 
-            string[] files = Directory.GetFiles(folder);
-            string[] dirs = Directory.GetDirectories(folder);
+            Directory.Delete(folder, true);
 
-            foreach (var file in files)
-            {
-                File.SetAttributes(file, FileAttributes.Normal);
-                File.Delete(file);
-            }
-
-            foreach (string dir in dirs)
-            {
-                this.DeleteDirectory(dir);
-            }
+            Directory.CreateDirectory(folder);
         }
     }
 }

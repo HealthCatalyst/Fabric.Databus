@@ -32,7 +32,7 @@ namespace FileSavePipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IFileWriter fileWriter;
+        private readonly ITemporaryFileWriter fileWriter;
 
         /// <summary>
         /// The _locks.
@@ -62,7 +62,7 @@ namespace FileSavePipelineStep
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
-            IFileWriter fileWriter,
+            ITemporaryFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {

@@ -54,7 +54,7 @@ namespace JsonDocumentMergerPipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IFileWriter fileWriter;
+        private readonly IDetailedTemporaryFileWriter fileWriter;
 
         /// <summary>
         /// The _locks.
@@ -79,7 +79,7 @@ namespace JsonDocumentMergerPipelineStep
             IProgressMonitor progressMonitor,
             IDocumentDictionary documentDictionary,
             IEntityJsonWriter entityJsonWriter,
-            IFileWriter fileWriter,
+            IDetailedTemporaryFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
@@ -259,10 +259,8 @@ namespace JsonDocumentMergerPipelineStep
         private void SendToOutputQueue(IList<Tuple<string, IJsonObjectQueueItem>> list)
         {
             var path = this.folder;
-            if (this.Config.WriteDetailedTemporaryFilesToDisk)
-            {
-                Directory.CreateDirectory(path);
-            }
+
+            this.fileWriter.CreateDirectory(path);
 
             foreach (var tuple in list)
             {
@@ -274,10 +272,7 @@ namespace JsonDocumentMergerPipelineStep
 
                 this.AddToOutputQueue(tuple.Item2);
 
-                if (this.Config.WriteDetailedTemporaryFilesToDisk)
-                {
-                    this.fileWriter.WriteToFile(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
-                }
+                this.fileWriter.WriteToFile(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
             }
         }
     }

@@ -30,7 +30,7 @@ namespace SqlBatchPipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IFileWriter fileWriter;
+        private readonly IDetailedTemporaryFileWriter fileWriter;
 
         /// <summary>
         /// The folder.
@@ -56,7 +56,7 @@ namespace SqlBatchPipelineStep
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
-            IFileWriter fileWriter,
+            IDetailedTemporaryFileWriter fileWriter,
             CancellationToken cancellationToken) 
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
@@ -91,21 +91,18 @@ namespace SqlBatchPipelineStep
                         });
             }
 
-            if (this.Config.WriteDetailedTemporaryFilesToDisk)
+            foreach (var workItemLoad in workItem.Loads)
             {
-                foreach (var workItemLoad in workItem.Loads)
-                {
-                    var queryName = workItemLoad.Path ?? "Main";
-                    var queryId = queryName;
+                var queryName = workItemLoad.Path ?? "Main";
+                var queryId = queryName;
 
-                    var path = Path.Combine(this.folder, queryId);
+                var path = Path.Combine(this.folder, queryId);
 
-                    this.fileWriter.CreateDirectory(path);
+                this.fileWriter.CreateDirectory(path);
 
-                    var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
+                var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
 
-                    this.fileWriter.WriteToFile(filepath, $"start: {workItem.Start}, end: {workItem.End}");
-                }
+                this.fileWriter.WriteToFile(filepath, $"start: {workItem.Start}, end: {workItem.End}");
             }
 
             // wait until the other queues are cleared up

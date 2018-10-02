@@ -33,7 +33,7 @@ namespace SaveSchemaPipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IFileWriter fileWriter;
+        private readonly ITemporaryFileWriter fileWriter;
 
         /// <summary>
         /// The entity json writer.
@@ -62,7 +62,7 @@ namespace SaveSchemaPipelineStep
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
-            IFileWriter fileWriter,
+            ITemporaryFileWriter fileWriter,
             IEntityJsonWriter entityJsonWriter,
             CancellationToken cancellationToken) 
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
@@ -116,23 +116,28 @@ namespace SaveSchemaPipelineStep
 
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             {
-                this.entityJsonWriter.WriteMappingToStream(mapping.Columns, propertyPath, textWriter, mapping.PropertyType, this.Config.EntityType);
+                this.entityJsonWriter.WriteMappingToStream(
+                    mapping.Columns,
+                    propertyPath,
+                    textWriter,
+                    mapping.PropertyType,
+                    this.Config.EntityType);
             }
 
-            this.AddToOutputQueue(new MappingUploadQueueItem
-                                      {
-                                          PropertyName = mapping.PropertyPath,
-                                          SequenceNumber = mapping.SequenceNumber,
-                                          Stream = stream,
-                                          Job = workItemJob
-                                      });
+            this.AddToOutputQueue(
+                new MappingUploadQueueItem
+                    {
+                        PropertyName = mapping.PropertyPath,
+                        SequenceNumber = mapping.SequenceNumber,
+                        Stream = stream,
+                        Job = workItemJob
+                    });
 
-            if (this.Config.WriteTemporaryFilesToDisk)
-            {
-                string path = Path.Combine(this.Config.LocalSaveFolder, propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
+            string path = Path.Combine(
+                this.Config.LocalSaveFolder,
+                propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
 
-                this.fileWriter.WriteStream(path, stream);
-            }
+            this.fileWriter.WriteStream(path, stream);
         }
     }
 }

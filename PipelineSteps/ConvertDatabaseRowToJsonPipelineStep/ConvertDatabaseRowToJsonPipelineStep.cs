@@ -39,7 +39,10 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
 
-        private readonly IFileWriter fileWriter;
+        /// <summary>
+        /// The file writer.
+        /// </summary>
+        private readonly IDetailedTemporaryFileWriter fileWriter;
 
         /// <summary>
         /// The folder.
@@ -67,7 +70,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             IEntityJsonWriter entityJsonWriter,
-            IFileWriter fileWriter,
+            IDetailedTemporaryFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
@@ -112,33 +115,35 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         {
             var id = this.GetId(wt);
 
-            var jsonForRows = this.entityJsonWriter.GetJsonForRowForMerge(wt.Columns, wt.Rows, wt.PropertyName, wt.PropertyTypes);
+            var jsonForRows = this.entityJsonWriter.GetJsonForRowForMerge(
+                wt.Columns,
+                wt.Rows,
+                wt.PropertyName,
+                wt.PropertyTypes);
 
-            if (this.Config.WriteDetailedTemporaryFilesToDisk)
+            var path = Path.Combine(this.folder, wt.PropertyName ?? "main");
+
+            this.fileWriter.CreateDirectory(path);
+
+            var sb = new StringBuilder();
+
+            foreach (var jsonForRow in jsonForRows)
             {
-                var path = Path.Combine(this.folder, wt.PropertyName ?? "main");
-
-                this.fileWriter.CreateDirectory(path);
-
-                var sb = new StringBuilder();
-
-                foreach (var jsonForRow in jsonForRows)
-                {
-                    sb.AppendLine(jsonForRow.ToString());
-                }
-
-                this.fileWriter.WriteToFile(Path.Combine(path, $"{id}.json"), sb.ToString());
+                sb.AppendLine(jsonForRow.ToString());
             }
 
-            this.AddToOutputQueue(new JsonDocumentMergerQueueItem
-            {
-                BatchNumber = wt.BatchNumber,
-                QueryId = wt.QueryId,
-                Id = id,
-                PropertyName = wt.PropertyName,
-                //JoinColumnValue = workItem.JoinColumnValue,
-                NewJObjects = jsonForRows
-            });
+            this.fileWriter.WriteToFile(Path.Combine(path, $"{id}.json"), sb.ToString());
+
+            this.AddToOutputQueue(
+                new JsonDocumentMergerQueueItem
+                    {
+                        BatchNumber = wt.BatchNumber,
+                        QueryId = wt.QueryId,
+                        Id = id,
+                        PropertyName = wt.PropertyName,
+                        //JoinColumnValue = workItem.JoinColumnValue,
+                        NewJObjects = jsonForRows
+                    });
 
             var minimumEntityIdProcessed = SequenceBarrier.UpdateMinimumEntityIdProcessed(wt.QueryId, id);
 

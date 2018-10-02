@@ -42,7 +42,7 @@ namespace SqlGetSchemaPipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IFileWriter fileWriter;
+        private readonly IDetailedTemporaryFileWriter fileWriter;
 
         /// <summary>
         /// The folder.
@@ -57,7 +57,7 @@ namespace SqlGetSchemaPipelineStep
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             ISchemaLoader schemaLoader,
-            IFileWriter fileWriter,
+            IDetailedTemporaryFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
@@ -85,21 +85,14 @@ namespace SqlGetSchemaPipelineStep
 
             var mappingItems = dictionary.ToList();
 
-            if (this.Config.WriteDetailedTemporaryFilesToDisk)
+            foreach (var mappingItem in mappingItems)
             {
-                foreach (var mappingItem in mappingItems)
-                {
-                    var filePath = Path.Combine(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
+                var filePath = Path.Combine(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
 
-                    this.fileWriter.WriteToFile(filePath, mappingItem.ToJsonPretty());
-                }
+                this.fileWriter.WriteToFile(filePath, mappingItem.ToJsonPretty());
             }
 
-            this.AddToOutputQueue(new SaveSchemaQueueItem
-            {
-                Mappings = mappingItems,
-                Job = workItem.Job
-            });
+            this.AddToOutputQueue(new SaveSchemaQueueItem { Mappings = mappingItems, Job = workItem.Job });
         }
 
         /// <inheritdoc />

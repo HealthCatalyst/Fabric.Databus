@@ -73,8 +73,9 @@ namespace Fabric.Databus.Shared
             var @out = "Out";
             var processed = "Processed";
 
+            var complete = "Complete";
             var text =
-                $"{key,4} {loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {inQueueCount,7} {processed,10} {@out,7} {time, 15} {dictionary, 7} C";
+                $"{key,4} {loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {inQueueCount,7} {processed,10} {@out,7} {time,15} {dictionary,7} {complete}";
 
             this.AppendLine(text);
         }

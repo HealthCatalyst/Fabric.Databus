@@ -43,7 +43,7 @@ namespace SqlImportPipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IFileWriter fileWriter;
+        private readonly IDetailedTemporaryFileWriter fileWriter;
 
         /// <inheritdoc />
         /// <summary>
@@ -76,7 +76,7 @@ namespace SqlImportPipelineStep
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
-            IFileWriter fileWriter,
+            IDetailedTemporaryFileWriter fileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
@@ -154,15 +154,12 @@ namespace SqlImportPipelineStep
             }
             catch (Exception e)
             {
-                if (this.Config.WriteDetailedTemporaryFilesToDisk)
-                {
-                    var path = Path.Combine(this.folder, queryId);
-                    this.fileWriter.CreateDirectory(path);
+                var path = Path.Combine(this.folder, queryId);
+                this.fileWriter.CreateDirectory(path);
 
-                    var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
+                var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
 
-                    this.fileWriter.WriteToFile(filepath, e.ToString());
-                }
+                this.fileWriter.WriteToFile(filepath, e.ToString());
 
                 throw;
             }
@@ -199,34 +196,36 @@ namespace SqlImportPipelineStep
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
-            var result = this.databusSqlReader.ReadDataFromQuery(load, start, end, this.MyLogger, this.Config.TopLevelKeyColumn);
+            var result = this.databusSqlReader.ReadDataFromQuery(
+                load,
+                start,
+                end,
+                this.MyLogger,
+                this.Config.TopLevelKeyColumn);
 
-            if (this.Config.WriteDetailedTemporaryFilesToDisk)
+            var path = Path.Combine(Path.Combine(this.folder, queryId), Convert.ToString(batchNumber));
+
+            this.fileWriter.CreateDirectory(path);
+
+            foreach (var frame in result.Data)
             {
-                var path = Path.Combine(Path.Combine(this.folder, queryId), Convert.ToString(batchNumber));
+                var key = frame.Key;
 
-                Directory.CreateDirectory(path);
+                var filepath = Path.Combine(path, Convert.ToString(key) + ".csv");
 
-                foreach (var frame in result.Data)
+                using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
                 {
-                    var key = frame.Key;
-
-                    var filepath = Path.Combine(path, Convert.ToString(key) + ".csv");
-
-                    using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
+                    using (var streamWriter = new StreamWriter(stream))
                     {
-                        using (var streamWriter = new StreamWriter(stream))
+                        var columns = result.ColumnList.Select(c => c.Name).ToList();
+                        var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
+
+                        streamWriter.WriteLine(text);
+
+                        var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
+                        foreach (var item in list)
                         {
-                            var columns = result.ColumnList.Select(c => c.Name).ToList();
-                            var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
-
-                            streamWriter.WriteLine(text);
-
-                            var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
-                            foreach (var item in list)
-                            {
-                                streamWriter.WriteLine($@"""{key}""," + item);
-                            }
+                            streamWriter.WriteLine($@"""{key}""," + item);
                         }
                     }
                 }
@@ -234,25 +233,25 @@ namespace SqlImportPipelineStep
 
             foreach (var frame in result.Data)
             {
-                this.AddToOutputQueue(new ConvertDatabaseToJsonQueueItem
-                {
-                    BatchNumber = batchNumber,
-                    QueryId = queryId,
-                    JoinColumnValue = frame.Key,
-                    Rows = frame.Value,
-                    Columns = result.ColumnList,
-                    PropertyName = load.Path,
-                    PropertyType = load.PropertyType,
-                    JsonValueWriter = sqlJsonValueWriter,
-                    PropertyTypes = propertyTypes
-                });
+                this.AddToOutputQueue(
+                    new ConvertDatabaseToJsonQueueItem
+                        {
+                            BatchNumber = batchNumber,
+                            QueryId = queryId,
+                            JoinColumnValue = frame.Key,
+                            Rows = frame.Value,
+                            Columns = result.ColumnList,
+                            PropertyName = load.Path,
+                            PropertyType = load.PropertyType,
+                            JsonValueWriter = sqlJsonValueWriter,
+                            PropertyTypes = propertyTypes
+                        });
             }
 
             // now all the source data has been loaded
 
             // handle fields without any transform
-            var untransformedFields = load.Fields.Where(f => f.Transform == QueryFieldTransform.None)
-                .ToList();
+            var untransformedFields = load.Fields.Where(f => f.Transform == QueryFieldTransform.None).ToList();
 
             untransformedFields.ForEach(f => { });
 

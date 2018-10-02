@@ -170,9 +170,9 @@ namespace PipelineRunner
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
 
             sqlJobQueue.Add(new SqlJobQueueItem
-                                {
-                                    Job = job
-                                });
+            {
+                Job = job
+            });
 
             sqlJobQueue.CompleteAdding();
 
@@ -219,10 +219,10 @@ namespace PipelineRunner
             if (config.UploadToElasticSearch)
             {
                 processors.Add(new PipelineStepInfo
-                                   {
-                                       Type = typeof(FileUploadPipelineStep),
-                                       Count = 1
-                                   });
+                {
+                    Type = typeof(FileUploadPipelineStep),
+                    Count = 1
+                });
             }
 
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
@@ -252,9 +252,9 @@ namespace PipelineRunner
             var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
 
             var queueContext = new QueueContext
-                                   {
-                                       Config = config
-                                   };
+            {
+                Config = config
+            };
 
             var queueManager = new QueueManager();
             this.container.RegisterInstance<IQueueManager>(queueManager);
@@ -279,6 +279,24 @@ namespace PipelineRunner
             this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
 
             this.container.RegisterType<IEntityJsonWriter, EntityJsonWriter>();
+
+            if (config.WriteDetailedTemporaryFilesToDisk)
+            {
+                this.container.RegisterType<IDetailedTemporaryFileWriter, FileWriter>();
+            }
+            else
+            {
+                this.container.RegisterType<IDetailedTemporaryFileWriter, NullFileWriter>();
+            }
+
+            if (config.WriteTemporaryFilesToDisk)
+            {
+                this.container.RegisterType<ITemporaryFileWriter, FileWriter>();
+            }
+            else
+            {
+                this.container.RegisterType<ITemporaryFileWriter, NullFileWriter>();
+            }
 
             this.container.RegisterType<IFileWriter, FileWriter>();
         }

@@ -86,8 +86,14 @@ namespace ElasticSearchSqlFeederConsole
                     container.RegisterType<IHttpClientFactory, HttpClientFactory>();
                     container.RegisterInstance(logger);
 
-                    container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
-                    // container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
+                    if (config.Config.UseMultipleThreads)
+                    {
+                        container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
+                    }
+                    else
+                    {
+                        container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
+                    }
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 
@@ -96,6 +102,9 @@ namespace ElasticSearchSqlFeederConsole
             }
 
             stopwatch.Stop();
+            var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+            var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
+            Console.WriteLine($"Finished in {timeElapsed} using {threadText}");
 
 #if TRUE
             logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);
@@ -111,6 +120,6 @@ namespace ElasticSearchSqlFeederConsole
             Console.WriteLine("(Type any key to exit)");
             Console.ReadKey();
         }
-        
+
     }
 }

@@ -125,9 +125,7 @@ namespace Fabric.Databus.Shared
             return result;
         }
 
-        /// <summary>
-        /// The complete adding.
-        /// </summary>
+        /// <inheritdoc />
         public void CompleteAdding()
         {
             this.blockingCollection.CompleteAdding();

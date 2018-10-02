@@ -107,5 +107,8 @@ namespace Fabric.Databus.Config
         /// <inheritdoc />
         [DataMember]
         public bool KeepIndexOnline { get; set; }
+
+        [DataMember]
+        public bool UseMultipleThreads { get; set; }
     }
 }

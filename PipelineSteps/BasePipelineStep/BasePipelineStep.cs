@@ -211,7 +211,8 @@ namespace BasePipelineStep
 
                     stopWatch.Restart();
 
-                    await this.InternalHandleAsync(wt);
+                    // if we use await here then we go through all the items and nothing gets processed
+                    this.InternalHandleAsync(wt).Wait(this.cancellationToken);
 
                     processingTime = processingTime.Add(stopWatch.Elapsed);
                     stopWatch.Stop();

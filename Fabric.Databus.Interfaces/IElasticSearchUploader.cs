@@ -42,7 +42,7 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task StartUpload();
+        Task StartUploadAsync();
 
         /// <summary>
         /// The finish upload.
@@ -50,7 +50,7 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task FinishUpload();
+        Task FinishUploadAsync();
 
         /// <summary>
         /// The setup alias.
@@ -58,7 +58,7 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task SetupAlias();
+        Task SetupAliasAsync();
 
         /// <summary>
         /// The upload all files in folder.
@@ -128,7 +128,7 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task SendDataToHosts(
+        Task SendDataToHostsAsync(
             int batch,
             Stream stream,
             bool doLogContent,
@@ -152,7 +152,7 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task SendMainMappingFileToHosts(
+        Task SendMainMappingFileToHostsAsync(
             int batch,
             Stream stream,
             bool doLogContent,
@@ -176,7 +176,7 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task SendNestedMappingFileToHosts(
+        Task SendNestedMappingFileToHostsAsync(
             int batch,
             Stream stream,
             bool doLogContent,

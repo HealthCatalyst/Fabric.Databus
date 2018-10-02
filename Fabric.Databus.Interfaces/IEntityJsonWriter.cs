@@ -12,6 +12,7 @@ namespace Fabric.Databus.Interfaces
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Threading.Tasks;
 
     using Newtonsoft.Json.Linq;
 
@@ -40,7 +41,7 @@ namespace Fabric.Databus.Interfaces
         /// </returns>
         /// <exception cref="ArgumentNullException">exception thrown
         /// </exception>
-        JObject[] GetJsonForRowForMerge(
+        Task<JObject[]> GetJsonForRowForMergeAsync(
             List<ColumnInfo> columns,
             List<object[]> rows,
             string propertyName,
@@ -58,18 +59,24 @@ namespace Fabric.Databus.Interfaces
         /// <param name="document">
         /// The document.
         /// </param>
-        void SetPropertiesByMerge(string propertyName, JObject[] newJObjects, JObject document);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task SetPropertiesByMergeAsync(string propertyName, JObject[] newJObjects, JObject document);
 
         /// <summary>
         /// The remove temporary columns.
         /// </summary>
         /// <param name="node">
-        ///     The node.
+        /// The node.
         /// </param>
         /// <param name="topLevelKeyColumn">
         /// The top level key column
         /// </param>
-        void RemoveTemporaryColumns(JObject node, string topLevelKeyColumn);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task RemoveTemporaryColumns(JObject node, string topLevelKeyColumn);
 
         /// <summary>
         /// The write mapping to stream.
@@ -89,6 +96,9 @@ namespace Fabric.Databus.Interfaces
         /// <param name="entity">
         /// The entity.
         /// </param>
-        void WriteMappingToStream(List<ColumnInfo> columnList, string propertyPath, StreamWriter textWriter, string propertyType, string entity);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task WriteMappingToStreamAsync(List<ColumnInfo> columnList, string propertyPath, StreamWriter textWriter, string propertyType, string entity);
     }
 }

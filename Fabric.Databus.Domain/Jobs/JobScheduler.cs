@@ -73,7 +73,7 @@ namespace Fabric.Databus.Domain.Jobs
 
         public async Task<ConfigValidationResult> ValidateJob(string queryConfig, string jobName)
         {
-            var result = await _configValidator.ValidateFromText(queryConfig);
+            var result = await _configValidator.ValidateFromTextAsync(queryConfig);
 
             return result;
         }

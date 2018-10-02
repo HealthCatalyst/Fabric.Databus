@@ -13,6 +13,7 @@ namespace SqlJobPipelineStep
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -76,27 +77,27 @@ namespace SqlJobPipelineStep
         /// </param>
         /// <exception cref="T:System.NotImplementedException">exception thrown
         /// </exception>
-        protected override void Handle(SqlJobQueueItem workItem)
+        protected override async Task HandleAsync(SqlJobQueueItem workItem)
         {
             if (this.Config.EntitiesPerBatch <= 0)
             {
-                this.AddToOutputQueue(new SqlBatchQueueItem
-                                      {
-                                          BatchNumber = 1,
-                                          Start = null,
-                                          End = null,
-                                          Loads = workItem.Job.Data.DataSources,
-                                      });
+                await this.AddToOutputQueueAsync(new SqlBatchQueueItem
+                                          {
+                                              BatchNumber = 1,
+                                              Start = null,
+                                              End = null,
+                                              Loads = workItem.Job.Data.DataSources,
+                                          });
             }
             else
             {
-                var ranges = this.CalculateRanges(workItem.Job);
+                var ranges = await this.CalculateRangesAsync(workItem.Job);
 
                 int currentBatchNumber = 1;
 
                 foreach (var range in ranges)
                 {
-                    this.AddToOutputQueue(
+                    await this.AddToOutputQueueAsync(
                         new SqlBatchQueueItem
                             {
                                 BatchNumber = currentBatchNumber++,
@@ -108,33 +109,6 @@ namespace SqlJobPipelineStep
                             });
                 }
             }
-        }
-
-        /// <summary>
-        /// The begin.
-        /// </summary>
-        /// <param name="isFirstThreadForThisTask">
-        /// The is first thread for this task.
-        /// </param>
-        /// <exception cref="NotImplementedException">exception thrown
-        /// </exception>
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <summary>
-        /// The complete.
-        /// </summary>
-        /// <param name="queryId">
-        /// The query id.
-        /// </param>
-        /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
-        /// </param>
-        /// <exception cref="NotImplementedException">exception thrown
-        /// </exception>
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
         }
 
         /// <summary>
@@ -162,9 +136,9 @@ namespace SqlJobPipelineStep
         /// <returns>
         /// The <see cref="IEnumerable"/>.
         /// </returns>
-        private IEnumerable<Tuple<string, string>> CalculateRanges(IJob job)
+        private async Task<IEnumerable<Tuple<string, string>>> CalculateRangesAsync(IJob job)
         {
-            var list = this.databusSqlReader.GetListOfEntityKeys(
+            var list = await this.databusSqlReader.GetListOfEntityKeysAsync(
                 this.Config.TopLevelKeyColumn,
                 this.Config.MaximumEntitiesToLoad,
                 job.Data.DataSources.First(d => d.Path == null));
@@ -185,6 +159,5 @@ namespace SqlJobPipelineStep
 
             return ranges;
         }
-
     }
 }

@@ -13,6 +13,7 @@ namespace CreateBatchItemsPipelineStep
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -54,30 +55,28 @@ namespace CreateBatchItemsPipelineStep
         /// <summary>
         /// The flush all documents.
         /// </summary>
-        public void FlushAllDocuments()
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task FlushAllDocuments()
         {
             while (this.temporaryCache.Any())
             {
-                this.FlushDocumentsToLimit(this.temporaryCache.Count);
+                await this.FlushDocumentsToLimit(this.temporaryCache.Count);
             }
         }
 
         /// <inheritdoc />
-        protected override void Handle(IJsonObjectQueueItem workItem)
+        protected override async Task HandleAsync(IJsonObjectQueueItem workItem)
         {
             this.temporaryCache.Enqueue(workItem);
-            this.FlushDocumentsIfBatchSizeReached();
+            await this.FlushDocumentsIfBatchSizeReachedAsync();
         }
 
         /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
+        protected override async Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
         {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
-            this.FlushAllDocuments();
+            await this.FlushAllDocuments();
         }
 
         /// <inheritdoc />
@@ -89,31 +88,40 @@ namespace CreateBatchItemsPipelineStep
         /// <summary>
         /// The flush documents if batch size reached.
         /// </summary>
-        private void FlushDocumentsIfBatchSizeReached()
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task FlushDocumentsIfBatchSizeReachedAsync()
         {
             // see if there are enough to create a batch
             if (this.temporaryCache.Count > this.Config.EntitiesPerUploadFile)
             {
-                this.FlushDocuments();
+                await this.FlushDocumentsAsync();
             }
         }
 
         /// <summary>
         /// The flush documents.
         /// </summary>
-        private void FlushDocuments()
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task FlushDocumentsAsync()
         {
-            this.FlushDocumentsWithoutLock();
+            await this.FlushDocumentsWithoutLockAsync();
         }
 
         /// <summary>
         /// The flush documents without lock.
         /// </summary>
-        private void FlushDocumentsWithoutLock()
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task FlushDocumentsWithoutLockAsync()
         {
             while (this.temporaryCache.Count > this.Config.EntitiesPerUploadFile)
             {
-                this.FlushDocumentsToLimit(this.Config.EntitiesPerUploadFile);
+                await this.FlushDocumentsToLimit(this.Config.EntitiesPerUploadFile);
             }
         }
 
@@ -123,7 +131,10 @@ namespace CreateBatchItemsPipelineStep
         /// <param name="limit">
         /// The limit.
         /// </param>
-        private void FlushDocumentsToLimit(int limit)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task FlushDocumentsToLimit(int limit)
         {
             var docsToSave = new List<IJsonObjectQueueItem>();
             for (int i = 0; i < limit; i++)
@@ -135,7 +146,7 @@ namespace CreateBatchItemsPipelineStep
             if (docsToSave.Any())
             {
                 this.MyLogger.Verbose($"Saved Batch: count:{docsToSave.Count} from {docsToSave.First().Id} to {docsToSave.Last().Id}, inQueue:{this.InQueue.Count} ");
-                this.AddToOutputQueue(new SaveBatchQueueItem { ItemsToSave = docsToSave });
+                await this.AddToOutputQueueAsync(new SaveBatchQueueItem { ItemsToSave = docsToSave });
             }
         }
     }

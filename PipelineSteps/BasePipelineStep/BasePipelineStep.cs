@@ -12,6 +12,7 @@ namespace BasePipelineStep
     using System;
     using System.Diagnostics;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
 
@@ -161,7 +162,7 @@ namespace BasePipelineStep
         /// <summary>
         /// Gets or sets the config.
         /// </summary>
-        public IJobConfig Config { get; set; }
+        protected IJobConfig Config { get; set; }
 
         /// <summary>
         /// Gets the logger name.
@@ -173,16 +174,14 @@ namespace BasePipelineStep
         /// </summary>
         protected int UniqueId => this.id;
 
-        /// <summary>
-        /// The monitor work queue.
-        /// </summary>
-        public void MonitorWorkQueue()
+        /// <inheritdoc />
+        public async Task MonitorWorkQueueAsync()
         {
             var currentProcessorCount = Interlocked.Increment(ref processorCount);
             Interlocked.Increment(ref maxProcessorCount);
 
             var isFirstThreadForThisTask = currentProcessorCount < 2;
-            this.Begin(isFirstThreadForThisTask);
+            await this.BeginAsync(isFirstThreadForThisTask);
 
             this.LogToConsole(null);
 
@@ -197,7 +196,7 @@ namespace BasePipelineStep
                 {
                     stopWatch.Restart();
 
-                    var wt = this.InQueue.Take();
+                    var wt = this.InQueue.Take(this.cancellationToken);
 
                     if (wt == null)
                     {
@@ -212,7 +211,7 @@ namespace BasePipelineStep
 
                     stopWatch.Restart();
 
-                    this.InternalHandle(wt);
+                    await this.InternalHandleAsync(wt);
 
                     processingTime = processingTime.Add(stopWatch.Elapsed);
                     stopWatch.Stop();
@@ -236,7 +235,7 @@ namespace BasePipelineStep
 
             currentProcessorCount = Interlocked.Decrement(ref processorCount);
             var isLastThreadForThisTask = currentProcessorCount < 1;
-            this.Complete(queryId, isLastThreadForThisTask);
+            await this.CompleteAsync(queryId, isLastThreadForThisTask);
 
             this.MyLogger.Verbose($"Completed {queryId}: queue: {this.InQueue.Count}");
 
@@ -289,7 +288,7 @@ namespace BasePipelineStep
         /// </param>
         public void TestComplete(string queryId, bool isLastThreadForThisTask)
         {
-            this.Complete(queryId, isLastThreadForThisTask);
+            this.CompleteAsync(queryId, isLastThreadForThisTask);
         }
 
         /// <summary>
@@ -298,9 +297,12 @@ namespace BasePipelineStep
         /// <param name="wt">
         /// The wt.
         /// </param>
-        public void InternalHandle(TQueueInItem wt)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task InternalHandleAsync(TQueueInItem wt)
         {
-            this.Handle(wt);
+            await this.HandleAsync(wt);
         }
 
         /// <summary>
@@ -322,11 +324,15 @@ namespace BasePipelineStep
         /// <param name="item">
         /// The item.
         /// </param>
-        protected void AddToOutputQueue(TQueueOutItem item)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        protected Task AddToOutputQueueAsync(TQueueOutItem item)
         {
-            // Logger.Verbose($"AddToOutputQueue {item.ToJson()}");
+            // Logger.Verbose($"AddToOutputQueueAsync {item.ToJson()}");
             this.outQueue.Add(item);
             Interlocked.Increment(ref totalItemsAddedToOutputQueue);
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -335,7 +341,10 @@ namespace BasePipelineStep
         /// <param name="workItem">
         /// The workItem.
         /// </param>
-        protected abstract void Handle(TQueueInItem workItem);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        protected abstract Task HandleAsync(TQueueInItem workItem);
 
         /// <summary>
         /// The begin.
@@ -343,18 +352,30 @@ namespace BasePipelineStep
         /// <param name="isFirstThreadForThisTask">
         /// The is first thread for this task.
         /// </param>
-        protected abstract void Begin(bool isFirstThreadForThisTask);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        protected virtual Task BeginAsync(bool isFirstThreadForThisTask)
+        {
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// The complete.
         /// </summary>
         /// <param name="queryId">
-        /// The query id.
+        ///     The query id.
         /// </param>
         /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
+        ///     The is last thread for this task.
         /// </param>
-        protected abstract void Complete(string queryId, bool isLastThreadForThisTask);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        protected virtual Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
+        {
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// The get id.

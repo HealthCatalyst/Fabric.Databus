@@ -10,6 +10,7 @@
 namespace DummyMappingUploadPipelineStep
 {
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -54,38 +55,11 @@ namespace DummyMappingUploadPipelineStep
         /// </summary>
         protected override string LoggerName => "NullMappingUpload";
 
-        /// <summary>
-        /// The handle.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
-        protected override void Handle(MappingUploadQueueItem workItem)
+        /// <inheritdoc />
+        protected override Task HandleAsync(MappingUploadQueueItem workItem)
         {
             // do nothing
-        }
-
-        /// <summary>
-        /// The begin.
-        /// </summary>
-        /// <param name="isFirstThreadForThisTask">
-        /// The is first thread for this task.
-        /// </param>
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <summary>
-        /// The complete.
-        /// </summary>
-        /// <param name="queryId">
-        /// The query id.
-        /// </param>
-        /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
-        /// </param>
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
+            return Task.CompletedTask;
         }
 
         /// <summary>

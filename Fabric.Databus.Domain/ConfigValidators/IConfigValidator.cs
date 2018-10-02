@@ -6,6 +6,6 @@ namespace Fabric.Databus.Domain.ConfigValidators
 
     public interface IConfigValidator
     {
-        Task<ConfigValidationResult> ValidateFromText(string fileContents);
+        Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents);
     }
 }

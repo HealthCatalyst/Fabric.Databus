@@ -12,6 +12,7 @@ namespace SqlBatchPipelineStep
     using System;
     using System.IO;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -68,7 +69,7 @@ namespace SqlBatchPipelineStep
         protected override string LoggerName => "SqlBatch";
 
         /// <inheritdoc />
-        protected override void Handle(SqlBatchQueueItem workItem)
+        protected override async Task HandleAsync(SqlBatchQueueItem workItem)
         {
             int seed = 0;
 
@@ -77,7 +78,7 @@ namespace SqlBatchPipelineStep
                 var queryName = dataSource.Path ?? "Main";
                 var queryId = queryName;
 
-                this.AddToOutputQueue(
+                await this.AddToOutputQueueAsync(
                     new SqlImportQueueItem
                         {
                             BatchNumber = workItem.BatchNumber,
@@ -102,22 +103,12 @@ namespace SqlBatchPipelineStep
 
                 var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
 
-                this.fileWriter.WriteToFile(filepath, $"start: {workItem.Start}, end: {workItem.End}");
+                await this.fileWriter.WriteToFileAsync(filepath, $"start: {workItem.Start}, end: {workItem.End}");
             }
 
             // wait until the other queues are cleared up
 
             // QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
-        }
-
-        /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
         }
 
         /// <inheritdoc />

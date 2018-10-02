@@ -15,12 +15,14 @@ namespace Fabric.Databus.Shared
     using System.Data.SqlClient;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.ZipCodeToGeoCode;
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The databus sql reader.
     /// </summary>
@@ -59,31 +61,8 @@ namespace Fabric.Databus.Shared
             this.sqlCommandTimeoutInSeconds = sqlCommandTimeoutInSeconds;
         }
 
-        /// <summary>
-        /// The read data from query.
-        /// </summary>
-        /// <param name="load">
-        /// The load.
-        /// </param>
-        /// <param name="start">
-        /// The start.
-        /// </param>
-        /// <param name="end">
-        /// The end.
-        /// </param>
-        /// <param name="logger">
-        /// The logger.
-        /// </param>
-        /// <param name="topLevelKeyColumn">
-        /// The top Level Key Column.
-        /// </param>
-        /// <returns>
-        /// The <see cref="ReadSqlDataResult"/>ReadSqlDataResult
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// exception thrown
-        /// </exception>
-        public ReadSqlDataResult ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn)
+        /// <inheritdoc />
+        public async Task<ReadSqlDataResult> ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn)
         {
             using (var conn = new SqlConnection(this.connectionString))
             {
@@ -107,7 +86,7 @@ namespace Fabric.Databus.Shared
                 }
 
                 logger.Verbose($"Start: {cmd.CommandText}");
-                var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
+                var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
                 //var schema = reader.GetSchemaTable();
 
@@ -185,14 +164,14 @@ namespace Fabric.Databus.Shared
                                 {
                                     var sourceValueText = sourceValue.ToString();
                                     values[calculatedField.index] =
-                                        zipToGeocodeConverter.Convert3DigitZipcodeToGeocode(sourceValueText);
+                                        await zipToGeocodeConverter.Convert3DigitZipcodeToGeocodeAsync(sourceValueText);
                                 }
 
                                 if (calculatedField.Transform == QueryFieldTransform.Zip5ToGeocode.ToString())
                                 {
                                     var sourceValueText = sourceValue.ToString();
                                     var convertZipcodeToGeocode =
-                                        zipToGeocodeConverter.ConvertZipcodeToGeocode(sourceValueText);
+                                        await zipToGeocodeConverter.ConvertZipcodeToGeocodeAsync(sourceValueText);
                                     values[calculatedField.index] = convertZipcodeToGeocode;
                                 }
                             }
@@ -208,22 +187,8 @@ namespace Fabric.Databus.Shared
             }
         }
 
-        /// <summary>
-        /// The get list of entity keys.
-        /// </summary>
-        /// <param name="topLevelKeyColumn">
-        /// The top level key column.
-        /// </param>
-        /// <param name="maximumEntitiesToLoad">
-        /// The maximum entities to load.
-        /// </param>
-        /// <param name="dataSource">
-        /// The data source.
-        /// </param>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
-        public IList<string> GetListOfEntityKeys(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource)
+        /// <inheritdoc />
+        public async Task<IList<string>> GetListOfEntityKeysAsync(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource)
         {
             var load = dataSource;
 
@@ -242,7 +207,7 @@ namespace Fabric.Databus.Shared
                                       : $";WITH CTE AS ( {load.Sql} )  SELECT {topLevelKeyColumn} from CTE ORDER BY {topLevelKeyColumn} ASC;";
 
                 // Logger.Verbose($"Start: {cmd.CommandText}");
-                var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
+                var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
                 var list = new List<string>();
 

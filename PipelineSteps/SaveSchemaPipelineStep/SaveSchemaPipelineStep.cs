@@ -14,6 +14,7 @@ namespace SaveSchemaPipelineStep
     using System.Linq;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -75,22 +76,12 @@ namespace SaveSchemaPipelineStep
         protected override string LoggerName => "SaveSchema";
 
         /// <inheritdoc />
-        protected override void Handle(SaveSchemaQueueItem workItem)
+        protected override async System.Threading.Tasks.Task HandleAsync(SaveSchemaQueueItem workItem)
         {
             foreach (var mapping in workItem.Mappings.OrderBy(m => m.SequenceNumber).ToList())
             {
-                this.SendMapping(mapping, workItem.Job);
+                await this.SendMapping(mapping, workItem.Job);
             }
-        }
-
-        /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
         }
 
         /// <inheritdoc />
@@ -108,7 +99,10 @@ namespace SaveSchemaPipelineStep
         /// <param name="workItemJob">
         /// The work item job.
         /// </param>
-        private void SendMapping(MappingItem mapping, IJob workItemJob)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task SendMapping(MappingItem mapping, IJob workItemJob)
         {
             var stream = new MemoryStream(); // do not use using since we'll pass it to next queue
 
@@ -116,7 +110,7 @@ namespace SaveSchemaPipelineStep
 
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             {
-                this.entityJsonWriter.WriteMappingToStream(
+                await this.entityJsonWriter.WriteMappingToStreamAsync(
                     mapping.Columns,
                     propertyPath,
                     textWriter,
@@ -124,7 +118,7 @@ namespace SaveSchemaPipelineStep
                     this.Config.EntityType);
             }
 
-            this.AddToOutputQueue(
+            await this.AddToOutputQueueAsync(
                 new MappingUploadQueueItem
                     {
                         PropertyName = mapping.PropertyPath,
@@ -137,7 +131,7 @@ namespace SaveSchemaPipelineStep
                 this.Config.LocalSaveFolder,
                 propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
 
-            this.fileWriter.WriteStream(path, stream);
+            await this.fileWriter.WriteStreamAsync(path, stream);
         }
     }
 }

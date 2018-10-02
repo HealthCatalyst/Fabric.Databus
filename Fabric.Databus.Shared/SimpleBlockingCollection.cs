@@ -12,12 +12,11 @@ namespace Fabric.Databus.Shared
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Threading;
 
     using Fabric.Databus.Interfaces;
 
-    using Serilog;
-    using Serilog.Core;
-
+    /// <inheritdoc />
     /// <summary>
     /// The simple blocking collection.
     /// </summary>
@@ -25,9 +24,6 @@ namespace Fabric.Databus.Shared
     /// </typeparam>
     public class SimpleBlockingCollection<T> : IMeteredBlockingCollection<T>
     {
-        // ReSharper disable once StaticMemberInGenericType
-        private static readonly Logger Logger = new LoggerConfiguration().CreateLogger();
-
         /// <summary>
         /// The blocking collection.
         /// </summary>
@@ -53,8 +49,9 @@ namespace Fabric.Databus.Shared
             this.name = name;
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleBlockingCollection{T}"/> class.
+        /// Initializes a new instance of the <see cref="T:Fabric.Databus.Shared.SimpleBlockingCollection`1" /> class.
         /// </summary>
         /// <param name="concurrentQueue">
         /// The concurrent queue.
@@ -71,68 +68,6 @@ namespace Fabric.Databus.Shared
         }
 
         /// <summary>
-        /// The take.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="T"/>.
-        /// </returns>
-        [System.Diagnostics.DebuggerNonUserCode]
-        [System.Diagnostics.DebuggerHidden]
-        public T Take()
-        {
-            try
-            {
-                var item = this.blockingCollection.Take();
-
-                return item;
-            }
-            catch (InvalidOperationException)
-            {
-                // this is thrown when the collection is marked as completed
-            }
-
-            return default(T);
-        }
-
-        /// <summary>
-        /// The add.
-        /// </summary>
-        /// <param name="item">
-        /// The item.
-        /// </param>
-        public void Add(T item)
-        {
-            this.blockingCollection.Add(item);
-        }
-
-        /// <summary>
-        /// The any.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        public bool Any()
-        {
-            return this.blockingCollection.Any();
-        }
-
-        /// <summary>
-        /// The try take.
-        /// </summary>
-        /// <param name="cacheItem">
-        /// The cache item.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        public bool TryTake(out T cacheItem)
-        {
-            var result = this.blockingCollection.TryTake(out cacheItem);
-
-            return result;
-        }
-
-        /// <summary>
         /// The count.
         /// </summary>
         public int Count => this.blockingCollection.Count;
@@ -143,16 +78,59 @@ namespace Fabric.Databus.Shared
         public bool IsCompleted => this.blockingCollection.IsCompleted;
 
         /// <summary>
+        /// The name.
+        /// </summary>
+        public string Name => this.name;
+
+        /// <inheritdoc />
+        /// <summary>
+        /// The take.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>
+        /// The <see cref="!:T" />.
+        /// </returns>
+        [System.Diagnostics.DebuggerNonUserCode]
+        [System.Diagnostics.DebuggerHidden]
+        public T Take(CancellationToken cancellationToken)
+        {
+            try
+            {
+                return this.blockingCollection.Take(cancellationToken);
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            return default(T);
+        }
+
+        /// <inheritdoc />
+        public void Add(T item)
+        {
+            this.blockingCollection.Add(item);
+        }
+
+        /// <inheritdoc />
+        public bool Any()
+        {
+            return this.blockingCollection.Any();
+        }
+
+        /// <inheritdoc />
+        public bool TryTake(out T cacheItem)
+        {
+            var result = this.blockingCollection.TryTake(out cacheItem);
+
+            return result;
+        }
+
+        /// <summary>
         /// The complete adding.
         /// </summary>
         public void CompleteAdding()
         {
             this.blockingCollection.CompleteAdding();
         }
-
-        /// <summary>
-        /// The name.
-        /// </summary>
-        public string Name => this.name;
     }
 }

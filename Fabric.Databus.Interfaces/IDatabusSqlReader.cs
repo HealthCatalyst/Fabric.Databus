@@ -11,6 +11,7 @@ namespace Fabric.Databus.Interfaces
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using Serilog;
 
@@ -43,7 +44,7 @@ namespace Fabric.Databus.Interfaces
         /// <exception cref="ArgumentNullException">
         /// exception thrown
         /// </exception>
-        ReadSqlDataResult ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn);
+        Task<ReadSqlDataResult> ReadDataFromQuery(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn);
 
         /// <summary>
         /// The get list of entity keys.
@@ -60,6 +61,6 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="IList"/>.
         /// </returns>
-        IList<string> GetListOfEntityKeys(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource);
+        Task<IList<string>> GetListOfEntityKeysAsync(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource);
     }
 }

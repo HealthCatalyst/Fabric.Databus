@@ -14,6 +14,7 @@ namespace SqlImportPipelineStep
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -90,20 +91,9 @@ namespace SqlImportPipelineStep
         protected override string LoggerName => "SqlImport";
 
         /// <inheritdoc />
-        protected override void Handle(SqlImportQueueItem workItem)
+        protected override async System.Threading.Tasks.Task HandleAsync(SqlImportQueueItem workItem)
         {
-            this.ReadOneQueryFromDatabase(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber, workItem.PropertyTypes);
-        }
-
-        /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
-            //MarkOutputQueueAsCompleted();
+            await this.ReadOneQueryFromDatabaseAsync(workItem.QueryId, workItem.DataSource, workItem.Seed, workItem.Start, workItem.End, workItem.BatchNumber, workItem.PropertyTypes);
         }
 
         /// <inheritdoc />
@@ -139,7 +129,7 @@ namespace SqlImportPipelineStep
         /// <exception cref="Exception">
         /// exception thrown
         /// </exception>
-        private void ReadOneQueryFromDatabase(
+        private async System.Threading.Tasks.Task ReadOneQueryFromDatabaseAsync(
             string queryId,
             IDataSource load,
             int seed,
@@ -150,7 +140,7 @@ namespace SqlImportPipelineStep
         {
             try
             {
-                this.InternalReadOneQueryFromDatabase(queryId, load, start, end, workItemBatchNumber, propertyTypes);
+                await this.InternalReadOneQueryFromDatabase(queryId, load, start, end, workItemBatchNumber, propertyTypes);
             }
             catch (Exception e)
             {
@@ -159,7 +149,7 @@ namespace SqlImportPipelineStep
 
                 var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
 
-                this.fileWriter.WriteToFile(filepath, e.ToString());
+                await this.fileWriter.WriteToFileAsync(filepath, e.ToString());
 
                 throw;
             }
@@ -186,7 +176,7 @@ namespace SqlImportPipelineStep
         /// <param name="propertyTypes">
         /// The property Types.
         /// </param>
-        private void InternalReadOneQueryFromDatabase(
+        private async Task InternalReadOneQueryFromDatabase(
             string queryId,
             IDataSource load,
             string start,
@@ -196,7 +186,7 @@ namespace SqlImportPipelineStep
         {
             var sqlJsonValueWriter = new SqlJsonValueWriter();
 
-            var result = this.databusSqlReader.ReadDataFromQuery(
+            var result = await this.databusSqlReader.ReadDataFromQuery(
                 load,
                 start,
                 end,
@@ -220,12 +210,12 @@ namespace SqlImportPipelineStep
                         var columns = result.ColumnList.Select(c => c.Name).ToList();
                         var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
 
-                        streamWriter.WriteLine(text);
+                        await streamWriter.WriteLineAsync(text);
 
                         var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
                         foreach (var item in list)
                         {
-                            streamWriter.WriteLine($@"""{key}""," + item);
+                            await streamWriter.WriteLineAsync($@"""{key}""," + item);
                         }
                     }
                 }
@@ -233,7 +223,7 @@ namespace SqlImportPipelineStep
 
             foreach (var frame in result.Data)
             {
-                this.AddToOutputQueue(
+                await this.AddToOutputQueueAsync(
                     new ConvertDatabaseToJsonQueueItem
                         {
                             BatchNumber = batchNumber,

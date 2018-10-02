@@ -12,6 +12,7 @@ namespace Fabric.Databus.Shared
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
 
@@ -36,19 +37,31 @@ namespace Fabric.Databus.Shared
         private readonly object _locker = new object();
         private readonly string _name;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MeteredBlockingCollection{T}"/> class.
+        /// </summary>
+        /// <param name="concurrentQueue">
+        /// The concurrent queue.
+        /// </param>
+        /// <param name="name">
+        /// The name.
+        /// </param>
         public MeteredBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name)
         {
             this._blockingCollection = new BlockingCollection<T>(concurrentQueue);
             this._name = name;
         }
 
+        /// <inheritdoc />
         public MeteredBlockingCollection(IProducerConsumerCollection<T> concurrentQueue, string name, int maxItems)
             : this(concurrentQueue, name)
         {
             this._maxItems = maxItems;
         }
 
-        public T Take()
+        /// <param name="cancellationToken"></param>
+        /// <inheritdoc />
+        public T Take(CancellationToken cancellationToken)
         {
             var item = this._blockingCollection.Take();
             this.ReleaseLockIfNeeded();
@@ -56,6 +69,9 @@ namespace Fabric.Databus.Shared
             return item;
         }
 
+        /// <summary>
+        /// The release lock if needed.
+        /// </summary>
         private void ReleaseLockIfNeeded()
         {
             if (this._maxItems > 0)
@@ -72,6 +88,7 @@ namespace Fabric.Databus.Shared
             }
         }
 
+        /// <inheritdoc />
         public void Add(T item)
         {
             this.BlockIfNeeded();
@@ -79,6 +96,9 @@ namespace Fabric.Databus.Shared
             this._blockingCollection.Add(item);
         }
 
+        /// <summary>
+        /// The block if needed.
+        /// </summary>
         private void BlockIfNeeded()
         {
             if (this._maxItems > 0)
@@ -102,11 +122,13 @@ namespace Fabric.Databus.Shared
             }
         }
 
+        /// <inheritdoc />
         public bool Any()
         {
             return this._blockingCollection.Any();
         }
 
+        /// <inheritdoc />
         public bool TryTake(out T cacheItem)
         {
             var result = this._blockingCollection.TryTake(out cacheItem);
@@ -118,6 +140,7 @@ namespace Fabric.Databus.Shared
         public int Count => this._blockingCollection.Count;
         public bool IsCompleted => this._blockingCollection.IsCompleted;
 
+        /// <inheritdoc />
         public void CompleteAdding()
         {
             this._blockingCollection.CompleteAdding();

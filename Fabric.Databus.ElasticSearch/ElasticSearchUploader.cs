@@ -255,7 +255,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task StartUpload()
+        public async Task StartUploadAsync()
         {
             if (!this.keepIndexOnline)
             {
@@ -283,7 +283,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task FinishUpload()
+        public async Task FinishUploadAsync()
         {
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
 
@@ -323,7 +323,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task SetupAlias()
+        public async Task SetupAliasAsync()
         {
             var host = this.hosts.First();
             this.AddAuthorizationToken(this.httpClient);
@@ -350,7 +350,7 @@ namespace Fabric.Databus.ElasticSearch
             await this.InternalUploadAllFilesInFolder(this.index + "-*", $"/{this.index}/{this.entityType}/_bulk?pretty", folder);
 
             // await InternalUploadAllFilesInFolder(hosts, "patients2-Diagnoses*", @"/patients/_bulk?pretty");
-            await this.FinishUpload();
+            await this.FinishUploadAsync();
         }
 
         /// <inheritdoc />
@@ -372,7 +372,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        public async Task SendDataToHosts(
+        public async Task SendDataToHostsAsync(
             int batch,
             Stream stream,
             bool doLogContent,
@@ -401,7 +401,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        public async Task SendMainMappingFileToHosts(
+        public async Task SendMainMappingFileToHostsAsync(
             int batch,
             Stream stream,
             bool doLogContent,
@@ -430,7 +430,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        public async Task SendNestedMappingFileToHosts(
+        public async Task SendNestedMappingFileToHostsAsync(
             int batch,
             Stream stream,
             bool doLogContent,

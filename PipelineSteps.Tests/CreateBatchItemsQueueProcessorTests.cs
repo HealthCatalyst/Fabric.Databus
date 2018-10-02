@@ -12,6 +12,7 @@ namespace PipelineStep.Tests
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using CreateBatchItemsPipelineStep;
 
@@ -37,7 +38,7 @@ namespace PipelineStep.Tests
         /// The test success.
         /// </summary>
         [TestMethod]
-        public void TestSuccess()
+        public async Task TestSuccess()
         {
             // Arrange
             var job = new Job
@@ -80,7 +81,7 @@ namespace PipelineStep.Tests
                     QueryId = queryId
                 };
 
-                createBatchItemsQueueProcessor.InternalHandle(jsonObjectQueueItem1);
+                await createBatchItemsQueueProcessor.InternalHandleAsync(jsonObjectQueueItem1);
 
                 var jsonObjectQueueItem2 = new JsonObjectQueueItem
                 {
@@ -90,7 +91,7 @@ namespace PipelineStep.Tests
                 };
 
                 // Act
-                createBatchItemsQueueProcessor.InternalHandle(jsonObjectQueueItem2);
+                await createBatchItemsQueueProcessor.InternalHandleAsync(jsonObjectQueueItem2);
 
                 // Assert
                 var queues = queueManager.Queues;
@@ -104,7 +105,7 @@ namespace PipelineStep.Tests
 
                 Assert.AreEqual(1, outputQueue.Count);
 
-                var saveBatchQueueItem = outputQueue.Take();
+                var saveBatchQueueItem = outputQueue.Take(cancellationTokenSource.Token);
 
                 Assert.AreEqual(0, outputQueue.Count);
 
@@ -123,7 +124,7 @@ namespace PipelineStep.Tests
                 // Assert
                 Assert.AreEqual(1, outputQueue.Count);
 
-                saveBatchQueueItem = outputQueue.Take();
+                saveBatchQueueItem = outputQueue.Take(cancellationTokenSource.Token);
 
                 Assert.AreEqual(0, outputQueue.Count);
 

@@ -14,6 +14,7 @@ namespace SaveBatchPipelineStep
     using System.Linq;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -30,7 +31,10 @@ namespace SaveBatchPipelineStep
     /// <inheritdoc />
     public class SaveBatchPipelineStep : BasePipelineStep<SaveBatchQueueItem, FileUploadQueueItem>
     {
-        private static int _currentBatchFileNumber = 0;
+        /// <summary>
+        /// The current batch file number.
+        /// </summary>
+        private static int currentBatchFileNumber = 0;
 
         /// <inheritdoc />
         public SaveBatchPipelineStep(
@@ -43,26 +47,31 @@ namespace SaveBatchPipelineStep
         {
         }
 
+        /// <inheritdoc />
+        protected override string LoggerName => "SaveBatch";
 
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
-        }
-
+        /// <inheritdoc />
         protected override string GetId(SaveBatchQueueItem workItem)
         {
             return workItem.QueryId;
         }
 
-        protected override void Handle(SaveBatchQueueItem workItem)
+        /// <inheritdoc />
+        protected override async System.Threading.Tasks.Task HandleAsync(SaveBatchQueueItem workItem)
         {
-            this.FlushDocumentsToBatchFile(workItem.ItemsToSave);
+            await this.FlushDocumentsToBatchFile(workItem.ItemsToSave);
         }
 
-        private void FlushDocumentsToBatchFile(List<IJsonObjectQueueItem> documentCacheItems)
+        /// <summary>
+        /// The flush documents to batch file.
+        /// </summary>
+        /// <param name="documentCacheItems">
+        /// The document cache items.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task FlushDocumentsToBatchFile(List<IJsonObjectQueueItem> documentCacheItems)
         {
             var docs = documentCacheItems.Select(c => c.Document).ToList();
 
@@ -75,47 +84,42 @@ namespace SaveBatchPipelineStep
                 {
                     var entityId = doc[this.Config.TopLevelKeyColumn].Value<string>();
 
-                    writer.WriteStartObject();
+                    await writer.WriteStartObjectAsync();
                     using (new JsonPropertyWrapper(writer, "update"))
                     {
-                        writer.WritePropertyName("_id");
-                        writer.WriteValue(entityId);
+                        await writer.WritePropertyNameAsync("_id");
+                        await writer.WriteValueAsync(entityId);
                     }
-                    writer.WriteEndObject();
-                    writer.WriteRaw("\n");
+                    await writer.WriteEndObjectAsync();
+                    await writer.WriteRawAsync("\n");
 
-                    writer.WriteStartObject(); // <update>
+                    await writer.WriteStartObjectAsync(); // <update>
 
                     //-- start writing doc
-                    writer.WritePropertyName("doc");
+                    await writer.WritePropertyNameAsync("doc");
 
-                    doc.WriteTo(writer);
+                    await doc.WriteToAsync(writer);
                     //writer.WriteRaw(doc.ToString());
 
                     // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html
-                    writer.WritePropertyName("doc_as_upsert");
-                    writer.WriteValue(true);
+                    await writer.WritePropertyNameAsync("doc_as_upsert");
+                    await writer.WriteValueAsync(true);
 
-                    writer.WriteEndObject(); // </update>
+                    await writer.WriteEndObjectAsync(); // </update>
 
-                    writer.WriteRaw("\n");
+                    await writer.WriteRawAsync("\n");
                 }
-
             }
 
-            var batchNumber = Interlocked.Increment(ref _currentBatchFileNumber);
+            var batchNumber = Interlocked.Increment(ref currentBatchFileNumber);
 
-            this.AddToOutputQueue(new FileUploadQueueItem
-            {
-                BatchNumber = batchNumber,
-                Stream = stream
-            });
+            await this.AddToOutputQueueAsync(new FileUploadQueueItem
+                                                 {
+                                                     BatchNumber = batchNumber,
+                                                     Stream = stream
+                                                 });
 
             this.MyLogger.Verbose($"Wrote batch: {batchNumber}");
         }
-
-        protected override string LoggerName => "SaveBatch";
-
-
     }
 }

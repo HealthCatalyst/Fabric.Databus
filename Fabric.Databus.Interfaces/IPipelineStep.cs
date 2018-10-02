@@ -9,6 +9,8 @@
 
 namespace Fabric.Databus.Interfaces
 {
+    using System.Threading.Tasks;
+
     /// <summary>
     /// The PipelineStep interface.
     /// </summary>
@@ -17,7 +19,10 @@ namespace Fabric.Databus.Interfaces
         /// <summary>
         /// The monitor work queue.
         /// </summary>
-        void MonitorWorkQueue();
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task MonitorWorkQueueAsync();
 
         /// <summary>
         /// The mark output queue as completed.

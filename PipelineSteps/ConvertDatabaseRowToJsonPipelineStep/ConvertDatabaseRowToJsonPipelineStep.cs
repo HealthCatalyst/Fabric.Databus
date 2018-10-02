@@ -13,6 +13,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
     using System.IO;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -83,20 +84,15 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         protected override string LoggerName => "ConvertDatabaseRow";
 
         /// <inheritdoc />
-        protected override void Handle(ConvertDatabaseToJsonQueueItem workItem)
+        protected override async Task HandleAsync(ConvertDatabaseToJsonQueueItem workItem)
         {
-            this.WriteObjectToJson(workItem);
+            await this.WriteObjectToJsonAsync(workItem);
         }
 
         /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
+        protected override async Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
         {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
-            SequenceBarrier.CompleteQuery(queryId);
+            await SequenceBarrier.CompleteQuery(queryId);
         }
 
         /// <inheritdoc />
@@ -111,11 +107,14 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         /// <param name="wt">
         /// The wt.
         /// </param>
-        private void WriteObjectToJson(ConvertDatabaseToJsonQueueItem wt)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteObjectToJsonAsync(ConvertDatabaseToJsonQueueItem wt)
         {
             var id = this.GetId(wt);
 
-            var jsonForRows = this.entityJsonWriter.GetJsonForRowForMerge(
+            var jsonForRows = await this.entityJsonWriter.GetJsonForRowForMergeAsync(
                 wt.Columns,
                 wt.Rows,
                 wt.PropertyName,
@@ -132,9 +131,9 @@ namespace ConvertDatabaseRowToJsonPipelineStep
                 sb.AppendLine(jsonForRow.ToString());
             }
 
-            this.fileWriter.WriteToFile(Path.Combine(path, $"{id}.json"), sb.ToString());
+            await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{id}.json"), sb.ToString());
 
-            this.AddToOutputQueue(
+            await this.AddToOutputQueueAsync(
                 new JsonDocumentMergerQueueItem
                     {
                         BatchNumber = wt.BatchNumber,

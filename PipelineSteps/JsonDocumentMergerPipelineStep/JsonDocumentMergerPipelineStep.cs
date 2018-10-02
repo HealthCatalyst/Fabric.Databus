@@ -14,6 +14,7 @@ namespace JsonDocumentMergerPipelineStep
     using System.Collections.Generic;
     using System.IO;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -26,6 +27,7 @@ namespace JsonDocumentMergerPipelineStep
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The json document merger queue processor.
     /// </summary>
@@ -59,7 +61,7 @@ namespace JsonDocumentMergerPipelineStep
         /// <summary>
         /// The _locks.
         /// </summary>
-        private readonly ConcurrentDictionary<string, object> locks = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, SemaphoreSlim> locks = new ConcurrentDictionary<string, SemaphoreSlim>();
 
         /// <summary>
         /// The folder.
@@ -99,33 +101,28 @@ namespace JsonDocumentMergerPipelineStep
         protected override string LoggerName => "JsonDocumentMerger";
 
         /// <inheritdoc />
-        protected override void Handle(JsonDocumentMergerQueueItem workItem)
+        protected override async System.Threading.Tasks.Task HandleAsync(JsonDocumentMergerQueueItem workItem)
         {
             // if work item batch number is newer than the last one we saw that we can flush anything related to the old batch
             if (currentBatchNumber != workItem.BatchNumber)
             {
                 // find all items with old batch numbers and put them in the out queue
                 var list = this.documentDictionary.RemoveAllItemsExceptFromBatchNumber(workItem.BatchNumber);
-                this.SendToOutputQueue(list);
+                await this.SendToOutputQueue(list);
 
                 currentBatchNumber = workItem.BatchNumber;
             }
 
-            this.AddToJsonObject(workItem.QueryId, workItem.Id, workItem.PropertyName, workItem.NewJObjects, workItem.BatchNumber);
+            await this.AddToJsonObjectAsync(workItem.QueryId, workItem.Id, workItem.PropertyName, workItem.NewJObjects, workItem.BatchNumber);
         }
 
         /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
+        protected override async Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
         {
             var list = this.documentDictionary.RemoveAll();
-            this.SendToOutputQueue(list);
+            await this.SendToOutputQueue(list);
 
-            SequenceBarrier.CompleteQuery(queryId);
+            await SequenceBarrier.CompleteQuery(queryId);
 
             this.MyLogger.Verbose("Finished");
         }
@@ -159,23 +156,30 @@ namespace JsonDocumentMergerPipelineStep
         /// <param name="batchNumber">
         /// The batch number.
         /// </param>
-        private void AddToJsonObject(string queryId, string id, string propertyName, JObject[] newJObjects, int batchNumber)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task AddToJsonObjectAsync(string queryId, string id, string propertyName, JObject[] newJObjects, int batchNumber)
         {
             // BlockIfMaxSizeReached(id);
 
             // lock on id so multiple threads cannot update the same document at the same time
-            lock (this.locks.GetOrAdd(id, s => new object()))
+            var semaphoreSlim = this.locks.GetOrAdd(id, s => new SemaphoreSlim(1, 1));
+
+            // Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
+            await semaphoreSlim.WaitAsync();
+            try
             {
                 JObject document;
                 if (!this.documentDictionary.ContainsKey(id))
                 {
                     document = new JObject { { this.Config.TopLevelKeyColumn, id } };
                     var jsonObjectCacheItem = new JsonObjectQueueItem
-                    {
-                        BatchNumber = batchNumber,
-                        Id = id,
-                        Document = document
-                    };
+                                                  {
+                                                      BatchNumber = batchNumber,
+                                                      Id = id,
+                                                      Document = document
+                                                  };
 
 
                     this.documentDictionary.Add(id, jsonObjectCacheItem);
@@ -183,16 +187,21 @@ namespace JsonDocumentMergerPipelineStep
                     Interlocked.Increment(ref this.numDocumentsModified);
 
                     this.MyLogger.Verbose($"AddToJsonObject: id:{id} _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.documentDictionary.Count:N0}");
-                    this.entityJsonWriter.SetPropertiesByMerge(propertyName, newJObjects, document);
+                    await this.entityJsonWriter.SetPropertiesByMergeAsync(propertyName, newJObjects, document);
                 }
                 else
                 {
                     document = this.documentDictionary.GetById(id).Document;
 
                     this.MyLogger.Verbose($"UpdatedJsonObject: id:{id}  _numDocumentsModified={this.numDocumentsModified:N0} _documentDictionary.Count={this.documentDictionary.Count:N0}");
-                    this.entityJsonWriter.SetPropertiesByMerge(propertyName, newJObjects, document);
+                    await this.entityJsonWriter.SetPropertiesByMergeAsync(propertyName, newJObjects, document);
                 }
-
+            }
+            finally
+            {
+                //When the task is ready, release the semaphore. It is vital to ALWAYS release the semaphore when we are ready, or else we will end up with a Semaphore that is forever locked.
+                //This is why it is important to do the Release within a try...finally clause; program execution may crash or take a different path, this way you are guaranteed execution
+                semaphoreSlim.Release();
             }
 
             var minimum = SequenceBarrier.UpdateMinimumEntityIdProcessed(queryId, id);
@@ -211,11 +220,14 @@ namespace JsonDocumentMergerPipelineStep
         /// <param name="min">
         /// The min.
         /// </param>
-        private void AddDocumentsToOutQueue(string min)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task AddDocumentsToOutQueue(string min)
         {
             var keys = this.documentDictionary.GetKeysLessThan(min);
 
-            this.AddDocumentsToOutQueueByKeys(keys);
+            await this.AddDocumentsToOutQueueByKeys(keys);
         }
 
         /// <summary>
@@ -224,11 +236,14 @@ namespace JsonDocumentMergerPipelineStep
         /// <param name="keys">
         /// The keys.
         /// </param>
-        private void AddDocumentsToOutQueueByKeys(IList<string> keys)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task AddDocumentsToOutQueueByKeys(IList<string> keys)
         {
             foreach (var key in keys)
             {
-                this.AddDocumentToOutputQueueByKey(key);
+                await this.AddDocumentToOutputQueueByKey(key);
             }
         }
 
@@ -238,7 +253,10 @@ namespace JsonDocumentMergerPipelineStep
         /// <param name="key">
         /// The key.
         /// </param>
-        private void AddDocumentToOutputQueueByKey(string key)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task AddDocumentToOutputQueueByKey(string key)
         {
             IJsonObjectQueueItem item;
             if (this.documentDictionary.TryRemove(key, out item))
@@ -246,7 +264,7 @@ namespace JsonDocumentMergerPipelineStep
                 this.MyLogger.Verbose(
                     $"Remove from Dictionary: _documentDictionary.Count={this.documentDictionary.Count:N0}");
 
-                this.AddToOutputQueue(item);
+                await this.AddToOutputQueueAsync(item);
             }
         }
 
@@ -256,7 +274,10 @@ namespace JsonDocumentMergerPipelineStep
         /// <param name="list">
         /// The list.
         /// </param>
-        private void SendToOutputQueue(IList<Tuple<string, IJsonObjectQueueItem>> list)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task SendToOutputQueue(IList<Tuple<string, IJsonObjectQueueItem>> list)
         {
             var path = this.folder;
 
@@ -267,12 +288,12 @@ namespace JsonDocumentMergerPipelineStep
                 if (!this.Config.KeepTemporaryLookupColumnsInOutput)
                 {
                     // remove temporary columns
-                    this.entityJsonWriter.RemoveTemporaryColumns(tuple.Item2.Document, this.Config.TopLevelKeyColumn);
+                    await this.entityJsonWriter.RemoveTemporaryColumns(tuple.Item2.Document, this.Config.TopLevelKeyColumn);
                 }
 
-                this.AddToOutputQueue(tuple.Item2);
+                await this.AddToOutputQueueAsync(tuple.Item2);
 
-                this.fileWriter.WriteToFile(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
+                await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
             }
         }
     }

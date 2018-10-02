@@ -19,6 +19,7 @@ namespace FileUploadPipelineStep
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// The file upload queue processor.
     /// </summary>
@@ -65,34 +66,26 @@ namespace FileUploadPipelineStep
         protected override string LoggerName => "FileUpload";
 
         /// <inheritdoc />
-        protected override void Handle(FileUploadQueueItem workItem)
+        protected override async System.Threading.Tasks.Task HandleAsync(FileUploadQueueItem workItem)
         {
-            this.UploadFile(workItem);
+            await this.UploadFileAsync(workItem);
         }
 
         /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
+        protected override async System.Threading.Tasks.Task BeginAsync(bool isFirstThreadForThisTask)
         {
             if (isFirstThreadForThisTask)
             {
-                this.elasticSearchUploader.StartUpload().Wait();
+                await this.elasticSearchUploader.StartUploadAsync();
             }
         }
 
-        /// <summary>
-        /// The complete.
-        /// </summary>
-        /// <param name="queryId">
-        /// The query id.
-        /// </param>
-        /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
-        /// </param>
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
+        /// <inheritdoc />
+        protected override async System.Threading.Tasks.Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
         {
             if (isLastThreadForThisTask)
             {
-                this.elasticSearchUploader.FinishUpload().Wait();
+                await this.elasticSearchUploader.FinishUploadAsync();
             }
         }
 
@@ -116,14 +109,16 @@ namespace FileUploadPipelineStep
         /// <param name="wt">
         /// The wt.
         /// </param>
-        private void UploadFile(FileUploadQueueItem wt)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async System.Threading.Tasks.Task UploadFileAsync(FileUploadQueueItem wt)
         {
-            this.elasticSearchUploader.SendDataToHosts(
+            await this.elasticSearchUploader.SendDataToHostsAsync(
                     wt.BatchNumber,
                     wt.Stream,
                     doLogContent: false,
-                    doCompress: this.Config.CompressFiles)
-                .Wait();
+                    doCompress: this.Config.CompressFiles);
 
             this.MyLogger.Verbose($"Uploaded batch: {wt.BatchNumber} ");
 

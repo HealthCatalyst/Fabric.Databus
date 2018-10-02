@@ -1,9 +1,19 @@
-﻿namespace Fabric.Databus.Json
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="EntityJsonWriter.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the EntityJsonWriter type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace Fabric.Databus.Json
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Shared;
@@ -15,27 +25,8 @@
     /// <inheritdoc />
     public class EntityJsonWriter : IEntityJsonWriter
     {
-        /// <summary>
-        /// The get json for row for merge.
-        /// </summary>
-        /// <param name="columns">
-        ///     The columns.
-        /// </param>
-        /// <param name="rows">
-        ///     The rows.
-        /// </param>
-        /// <param name="propertyName">
-        ///     The property name.
-        /// </param>
-        /// <param name="propertyTypes">
-        /// The property types
-        /// </param>
-        /// <returns>
-        /// The <see cref="JObject"/>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">exception thrown
-        /// </exception>
-        public JObject[] GetJsonForRowForMerge(
+        /// <inheritdoc />
+        public Task<JObject[]> GetJsonForRowForMergeAsync(
             List<ColumnInfo> columns,
             List<object[]> rows,
             string propertyName,
@@ -136,27 +127,16 @@
                 jObjects.Add(jObjectOuter);
             }
 
-            return jObjects.ToArray();
+            return Task.FromResult(jObjects.ToArray());
         }
 
-        /// <summary>
-        /// The set properties by merge.
-        /// </summary>
-        /// <param name="propertyName">
-        /// The property name.
-        /// </param>
-        /// <param name="newJObjects">
-        /// The new j objects.
-        /// </param>
-        /// <param name="document">
-        /// The document.
-        /// </param>
-        public void SetPropertiesByMerge(string propertyName, JObject[] newJObjects, JObject document)
+        /// <inheritdoc />
+        public async Task SetPropertiesByMergeAsync(string propertyName, JObject[] newJObjects, JObject document)
         {
             // TODO: optimize this to avoid a loop
             foreach (var newJObject in newJObjects)
             {
-                this.MergeWithDocumentFast(document, newJObject, 0);
+                await this.MergeWithDocumentFastAsync(document, newJObject, 0);
             }
         }
 
@@ -170,7 +150,7 @@
         /// <param name="topLevelKeyColumn">
         /// The top level key column
         /// </param>
-        public void RemoveTemporaryColumns(JObject node, string topLevelKeyColumn)
+        public Task RemoveTemporaryColumns(JObject node, string topLevelKeyColumn)
         {
             this.WalkNode(
                 node,
@@ -196,14 +176,16 @@
                             }
                         }
                     });
+
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public void WriteMappingToStream(List<ColumnInfo> columnList, string propertyPath, StreamWriter textWriter, string propertyType, string entity)
+        public async Task WriteMappingToStreamAsync(List<ColumnInfo> columnList, string propertyPath, StreamWriter textWriter, string propertyType, string entity)
         {
             using (var writer = new JsonTextWriter(textWriter))
             {
-                writer.WriteStartObject(); // begin
+                await writer.WriteStartObjectAsync(); // begin
 
                 using (new JsonPropertyWrapper(writer, "mappings", propertyPath != null))
                 {
@@ -220,17 +202,17 @@
                                     queue.Enqueue(property);
                                 }
 
-                                this.WriteNestedProperty(columnList, queue, writer, propertyType);
+                                await this.WriteNestedPropertyAsync(columnList, queue, writer, propertyType);
                             }
                             else
                             {
-                                this.InternalWriteColumnsToJson(columnList, writer);
+                                await this.InternalWriteColumnsToJson(columnList, writer);
                             }
                         }
                     }
                 }
 
-                writer.WriteEndObject(); // end
+                await writer.WriteEndObjectAsync(); // end
             }
         }
 
@@ -249,7 +231,10 @@
         /// <param name="propertyType">
         /// The property type.
         /// </param>
-        private void WriteNestedProperty(List<ColumnInfo> columnList, Queue<string> properties, JsonTextWriter writer, string propertyType)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteNestedPropertyAsync(List<ColumnInfo> columnList, Queue<string> properties, JsonTextWriter writer, string propertyType)
         {
             if (properties.Any())
             {
@@ -257,21 +242,21 @@
 
                 using (new JsonPropertyWrapper(writer, propertyName))
                 {
-                    writer.WritePropertyName("type");
+                    await writer.WritePropertyNameAsync("type");
                     var type = propertyType != null && propertyType.Equals("object", StringComparison.OrdinalIgnoreCase)
                         ? "object"
                         : "nested";
 
-                    writer.WriteValue(type);
+                    await writer.WriteValueAsync(type);
                     using (new JsonPropertyWrapper(writer, "properties"))
                     {
-                        this.WriteNestedProperty(columnList, properties, writer, propertyType);
+                        await this.WriteNestedPropertyAsync(columnList, properties, writer, propertyType);
                     }
                 }
             }
             else
             {
-                this.InternalWriteColumnsToJson(columnList, writer);
+                await this.InternalWriteColumnsToJson(columnList, writer);
             }
         }
 
@@ -284,14 +269,17 @@
         /// <param name="writer">
         /// The writer.
         /// </param>
-        private void InternalWriteColumnsToJson(List<ColumnInfo> columnList, JsonTextWriter writer)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task InternalWriteColumnsToJson(List<ColumnInfo> columnList, JsonTextWriter writer)
         {
             foreach (var column in columnList)
             {
                 using (new JsonPropertyWrapper(writer, column.Name))
                 {
-                    writer.WritePropertyName("type");
-                    writer.WriteValue(column.ElasticSearchType);
+                    await writer.WritePropertyNameAsync("type");
+                    await writer.WriteValueAsync(column.ElasticSearchType);
                 }
             }
         }
@@ -411,7 +399,10 @@
         /// <param name="level">
         /// The level.
         /// </param>
-        private void MergeWithDocumentFast(JObject originalJObject, JObject newJObject, int level)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task MergeWithDocumentFastAsync(JObject originalJObject, JObject newJObject, int level)
         {
             level++;
 
@@ -423,7 +414,7 @@
             //var count = jEnumerable.Count();
             //var firstOrDefault = jEnumerable.FirstOrDefault();
 
-            this.CopyAllProperties(originalJObject, newJObject);
+            await this.CopyAllProperties(originalJObject, newJObject);
 
             foreach (KeyValuePair<string, JToken> property in newJObject)
             {
@@ -438,14 +429,30 @@
                         selectProperty = new JArray { };
                         originalJObject.Add(property.Key, selectProperty);
                     }
-                    this.MergeArrayFast(selectProperty, array, level);
+                    await this.MergeArrayFast(selectProperty, array, level);
                 }
 
             }
         }
 
-        private void MergeArrayFast(JArray originalArray, JArray newArray, int level)
+        /// <summary>
+        /// The merge array fast.
+        /// </summary>
+        /// <param name="originalArray">
+        /// The original array.
+        /// </param>
+        /// <param name="newArray">
+        /// The new array.
+        /// </param>
+        /// <param name="level">
+        /// The level.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task MergeArrayFast(JArray originalArray, JArray newArray, int level)
         {
+            // ReSharper disable once StyleCop.SA1305
             var jEnumerable = newArray.Children();
             foreach (var child in jEnumerable)
             {
@@ -454,32 +461,48 @@
                     var key = "KeyLevel" + level;
 
                     // try to match on key to see if originalArray also has this item
-                    var newJObject = (child as JObject);
-                    var newKeyValue = newJObject.Property(key).Value;
-
-                    bool found = false;
-                    foreach (var originalChild in originalArray.Children())
+                    if (child is JObject newJObject)
                     {
-                        var originalJObject = (originalChild as JObject);
-                        var originalKeyValue = originalJObject.Property(key).Value;
-                        if (originalKeyValue.Value<string>() == newKeyValue.Value<string>())
+                        var newKeyValue = newJObject.Property(key).Value;
+
+                        bool found = false;
+                        foreach (var originalChild in originalArray.Children())
                         {
-                            found = true;
-                            // found a match on key so try to merge
-                            this.MergeWithDocumentFast(originalJObject, newJObject, level);
-                            break;
+                            if (originalChild is JObject originalJObject)
+                            {
+                                var originalKeyValue = originalJObject.Property(key).Value;
+                                if (originalKeyValue.Value<string>() == newKeyValue.Value<string>())
+                                {
+                                    found = true;
+                                    // found a match on key so try to merge
+                                    await this.MergeWithDocumentFastAsync(originalJObject, newJObject, level);
+                                    break;
+                                }
+                            }
                         }
-                    }
 
-                    if (!found)
-                    {
-                        this.AddObjectAtEndOfArray(originalArray, newJObject);
+                        if (!found)
+                        {
+                            await this.AddObjectAtEndOfArray(originalArray, newJObject);
+                        }
                     }
                 }
             }
         }
 
-        private void AddObjectAtEndOfArray(JArray originalArray, JObject newJObject)
+        /// <summary>
+        /// The add object at end of array.
+        /// </summary>
+        /// <param name="originalArray">
+        /// The original array.
+        /// </param>
+        /// <param name="newJObject">
+        /// The new j object.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private Task AddObjectAtEndOfArray(JArray originalArray, JObject newJObject)
         {
             originalArray.Add(newJObject);
             //            // not found so add at the end
@@ -500,14 +523,31 @@
             //                // if property exists then add to the current array
             //                originalArray.Last.AddAfterSelf(newJObject);
             //            }
+
+            return Task.CompletedTask;
         }
 
-        private void SetProperties(string propertyName, JObject newJObject, JObject document)
+        /// <summary>
+        /// The set properties.
+        /// </summary>
+        /// <param name="propertyName">
+        /// The property name.
+        /// </param>
+        /// <param name="newJObject">
+        /// The new j object.
+        /// </param>
+        /// <param name="document">
+        /// The document.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task SetProperties(string propertyName, JObject newJObject, JObject document)
         {
             // if propertyName is not set then copy all the properties into this new object
             if (propertyName == null)
             {
-                this.CopyAllProperties(document, newJObject);
+                await this.CopyAllProperties(document, newJObject);
             }
             else
             {
@@ -530,13 +570,26 @@
                 else
                 {
                     // else create a new array
+                    // ReSharper disable once StyleCop.SA1305
                     var jArray = new JArray { newJObject };
                     document[propertyName] = jArray;
                 }
             }
         }
 
-        private void CopyAllProperties(JObject originalJObject, JObject newJObject)
+        /// <summary>
+        /// The copy all properties.
+        /// </summary>
+        /// <param name="originalJObject">
+        /// The original j object.
+        /// </param>
+        /// <param name="newJObject">
+        /// The new j object.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private Task CopyAllProperties(JObject originalJObject, JObject newJObject)
         {
             foreach (var property in newJObject.Properties())
             {
@@ -547,6 +600,8 @@
                     originalJObject[property.Name] = property.Value;
                 }
             }
+
+            return Task.CompletedTask;
         }
     }
 }

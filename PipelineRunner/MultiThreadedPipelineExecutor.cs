@@ -110,9 +110,9 @@ namespace PipelineRunner
                 pipelineStep.InitializeWithStepNumber(thisStepNumber);
 
                 var task = Task.Factory.StartNew(
-                    (o) =>
+                    async (o) =>
                     {
-                        pipelineStep.MonitorWorkQueue();
+                        await pipelineStep.MonitorWorkQueueAsync();
                         return 1;
                     },
                     thisStepNumber,

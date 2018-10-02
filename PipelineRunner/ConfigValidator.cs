@@ -26,10 +26,23 @@ namespace PipelineRunner
     /// </summary>
     public class ConfigValidator : IConfigValidator
     {
-        public async Task<ConfigValidationResult> ValidateFromText(string fileContents)
+        /// <summary>
+        /// The validate from text.
+        /// </summary>
+        /// <param name="fileContents">
+        /// The file contents.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">exception thrown
+        /// </exception>
+        public async Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents)
         {
-            if (String.IsNullOrWhiteSpace(fileContents))
+            if (string.IsNullOrWhiteSpace(fileContents))
+            {
                 throw new ArgumentNullException(nameof(fileContents));
+            }
 
             var configValidationResult = new ConfigValidationResult
             {
@@ -52,17 +65,17 @@ namespace PipelineRunner
 
                 configValidationResult.Results.Add($"Sql Connection String: {job.Config.ConnectionString}");
 
-                this.CheckDatabaseConnectionStringIsValid(job);
+                await this.CheckDatabaseConnectionStringIsValid(job);
 
                 configValidationResult.Results.Add($"Sql Connection String: OK");
 
-                var firstQueryIsValid = this.CheckFirstQueryIsValid(job) ? "OK" : "No Rows";
+                var firstQueryIsValid = await this.CheckFirstQueryIsValid(job) ? "OK" : "No Rows";
 
                 configValidationResult.Results.Add($"First Query: {firstQueryIsValid}");
 
                 foreach (var load in job.Data.DataSources)
                 {
-                    var queryIsValid = this.CheckQueryIsValid(job, load) ? "OK" : "No Rows";
+                    var queryIsValid = await this.CheckQueryIsValid(job, load) ? "OK" : "No Rows";
 
                     configValidationResult.Results.Add($"Query [{load.Path}]: {queryIsValid}");
                 }
@@ -85,7 +98,16 @@ namespace PipelineRunner
             return configValidationResult;
         }
 
-        public bool CheckDatabaseConnectionStringIsValid(IJob job)
+        /// <summary>
+        /// The check database connection string is valid.
+        /// </summary>
+        /// <param name="job">
+        /// The job.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        public Task<bool> CheckDatabaseConnectionStringIsValid(IJob job)
         {
             using (var conn = new SqlConnection(job.Config.ConnectionString))
             {
@@ -93,17 +115,40 @@ namespace PipelineRunner
                 conn.Close();
             }
 
-            return true;
+            return Task.FromResult(true);
         }
 
-        public bool CheckFirstQueryIsValid(IJob job)
+        /// <summary>
+        /// The check first query is valid.
+        /// </summary>
+        /// <param name="job">
+        /// The job.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        public async Task<bool> CheckFirstQueryIsValid(IJob job)
         {
             var load = job.Data.DataSources.First(c => c.Path == null);
 
-            return this.CheckQueryIsValid(job, load);
+            return await this.CheckQueryIsValid(job, load);
         }
 
-        public bool CheckQueryIsValid(IJob job, IDataSource load)
+        /// <summary>
+        /// The check query is valid.
+        /// </summary>
+        /// <param name="job">
+        /// The job.
+        /// </param>
+        /// <param name="load">
+        /// The load.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        /// <exception cref="Exception">exception thrown
+        /// </exception>
+        public async Task<bool> CheckQueryIsValid(IJob job, IDataSource load)
         {
             var numberOfLevels =
                 (load.Path?.Count(a => a == '.') + 1) ?? 0;
@@ -114,12 +159,13 @@ namespace PipelineRunner
                 var cmd = conn.CreateCommand();
 
                 if (job.Config.SqlCommandTimeoutInSeconds != 0)
+                {
                     cmd.CommandTimeout = job.Config.SqlCommandTimeoutInSeconds;
+                }
 
                 cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT TOP 1 * from CTE;";
 
-                var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-
+                var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
                 var foundRow = false;
 
@@ -153,7 +199,6 @@ namespace PipelineRunner
                         throw new Exception($"{keyColumnName} column not found in {load.Path} query");
                     }
                 }
-
 
                 return foundRow;
             }

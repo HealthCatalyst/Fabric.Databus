@@ -14,6 +14,7 @@ namespace FileSavePipelineStep
     using System.IO;
     using System.IO.Compression;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -37,7 +38,7 @@ namespace FileSavePipelineStep
         /// <summary>
         /// The _locks.
         /// </summary>
-        private readonly ConcurrentDictionary<string, object> locks = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, SemaphoreSlim> locks = new ConcurrentDictionary<string, SemaphoreSlim>();
 
         /// <inheritdoc />
         /// <summary>
@@ -84,19 +85,9 @@ namespace FileSavePipelineStep
         }
 
         /// <inheritdoc />
-        protected override void Handle(FileUploadQueueItem workItem)
+        protected override async System.Threading.Tasks.Task HandleAsync(FileUploadQueueItem workItem)
         {
-            this.SaveFile(workItem);
-        }
-
-        /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
+            await this.SaveFile(workItem);
         }
 
         /// <inheritdoc />
@@ -111,7 +102,10 @@ namespace FileSavePipelineStep
         /// <param name="wt">
         /// The wt.
         /// </param>
-        private void SaveFile(FileUploadQueueItem wt)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task SaveFile(FileUploadQueueItem wt)
         {
             if (this.Config.WriteTemporaryFilesToDisk)
             {
@@ -119,7 +113,11 @@ namespace FileSavePipelineStep
 
                 var path = Path.Combine(this.Config.LocalSaveFolder, $@"data-{wt.BatchNumber}{fileExtension}");
 
-                lock (this.locks.GetOrAdd(path, s => new object()))
+                var semaphoreSlim = this.locks.GetOrAdd(path, s => new SemaphoreSlim(1, 1));
+
+                // Asynchronously wait to enter the Semaphore. If no-one has been granted access to the Semaphore, code execution will proceed, otherwise this thread waits here until the semaphore is released 
+                await semaphoreSlim.WaitAsync();
+                try
                 {
                     this.MyLogger.Verbose($"Saving file: {path} ");
 
@@ -130,7 +128,7 @@ namespace FileSavePipelineStep
                             using (var zipStream = new GZipStream(fileStream, CompressionMode.Compress, false))
                             {
                                 wt.Stream.Seek(0, SeekOrigin.Begin);
-                                wt.Stream.CopyTo(zipStream);
+                                await wt.Stream.CopyToAsync(zipStream);
 
                                 fileStream.Flush();
                             }
@@ -141,7 +139,7 @@ namespace FileSavePipelineStep
                         using (var fileStream = this.fileWriter.CreateFile(path))
                         {
                             wt.Stream.Seek(0, SeekOrigin.Begin);
-                            wt.Stream.CopyTo(fileStream);
+                            await wt.Stream.CopyToAsync(fileStream);
 
                             fileStream.Flush();
                         }
@@ -149,9 +147,15 @@ namespace FileSavePipelineStep
 
                     this.MyLogger.Verbose($"Saved file: {path} ");
                 }
+                finally
+                {
+                    // When the task is ready, release the semaphore. It is vital to ALWAYS release the semaphore when we are ready, or else we will end up with a Semaphore that is forever locked.
+                    // This is why it is important to do the Release within a try...finally clause; program execution may crash or take a different path, this way you are guaranteed execution
+                    semaphoreSlim.Release();
+                }
             }
 
-            this.AddToOutputQueue(wt);
+            await this.AddToOutputQueueAsync(wt);
         }
     }
 }

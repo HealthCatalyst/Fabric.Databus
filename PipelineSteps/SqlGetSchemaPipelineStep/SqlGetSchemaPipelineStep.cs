@@ -13,6 +13,7 @@ namespace SqlGetSchemaPipelineStep
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -77,7 +78,7 @@ namespace SqlGetSchemaPipelineStep
         protected override string LoggerName => "SqlGetSchema";
 
         /// <inheritdoc />
-        protected override void Handle(SqlJobQueueItem workItem)
+        protected override async Task HandleAsync(SqlJobQueueItem workItem)
         {
             var workItemLoads = workItem.Job.Data.DataSources;
 
@@ -89,24 +90,19 @@ namespace SqlGetSchemaPipelineStep
             {
                 var filePath = Path.Combine(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
 
-                this.fileWriter.WriteToFile(filePath, mappingItem.ToJsonPretty());
+                await this.fileWriter.WriteToFileAsync(filePath, mappingItem.ToJsonPretty());
             }
 
-            this.AddToOutputQueue(new SaveSchemaQueueItem { Mappings = mappingItems, Job = workItem.Job });
+            await this.AddToOutputQueueAsync(new SaveSchemaQueueItem { Mappings = mappingItems, Job = workItem.Job });
         }
 
         /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
+        protected override async Task BeginAsync(bool isFirstThreadForThisTask)
         {
             if (isFirstThreadForThisTask)
             {
-                this.elasticSearchUploader.DeleteIndex().Wait();
+                await this.elasticSearchUploader.DeleteIndex();
             }
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
-        {
         }
 
         /// <inheritdoc />

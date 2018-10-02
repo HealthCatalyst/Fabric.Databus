@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Shared
 {
     using System.IO;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
 
@@ -24,8 +25,9 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public void WriteToFile(string filepath, string text)
+        public Task WriteToFileAsync(string filepath, string text)
         {
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -41,8 +43,9 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public void WriteStream(string path, MemoryStream stream)
+        public Task WriteStreamAsync(string path, MemoryStream stream)
         {
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />

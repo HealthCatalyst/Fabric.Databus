@@ -11,6 +11,7 @@ namespace MappingUploadPipelineStep
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using BasePipelineStep;
 
@@ -70,25 +71,20 @@ namespace MappingUploadPipelineStep
         /// <param name="workItem">
         /// The work item.
         /// </param>
-        protected override void Handle(MappingUploadQueueItem workItem)
+        protected override async Task HandleAsync(MappingUploadQueueItem workItem)
         {
-            this.UploadFiles(workItem);
+            await this.UploadFilesAsync(workItem);
 
-            this.AddToOutputQueue(new SqlJobQueueItem { Job = workItem.Job });
+            await this.AddToOutputQueueAsync(new SqlJobQueueItem { Job = workItem.Job });
         }
 
         /// <inheritdoc />
-        protected override void Begin(bool isFirstThreadForThisTask)
-        {
-        }
-
-        /// <inheritdoc />
-        protected override void Complete(string queryId, bool isLastThreadForThisTask)
+        protected override async Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
         {
             if (isLastThreadForThisTask)
             {
                 // set up aliases
-                this.elasticSearchUploader.SetupAlias().Wait();
+                await this.elasticSearchUploader.SetupAliasAsync();
             }
         }
 
@@ -104,15 +100,18 @@ namespace MappingUploadPipelineStep
         /// <param name="wt">
         /// The wt.
         /// </param>
-        private void UploadFiles(MappingUploadQueueItem wt)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task UploadFilesAsync(MappingUploadQueueItem wt)
         {
             if (string.IsNullOrEmpty(wt.PropertyName))
             {
-                this.elasticSearchUploader.SendMainMappingFileToHosts(1, wt.Stream, doLogContent: true, doCompress: false).Wait();
+                await this.elasticSearchUploader.SendMainMappingFileToHostsAsync(1, wt.Stream, doLogContent: true, doCompress: false);
             }
             else
             {
-                this.elasticSearchUploader.SendNestedMappingFileToHosts(1, wt.Stream, doLogContent: true, doCompress: false).Wait();
+                await this.elasticSearchUploader.SendNestedMappingFileToHostsAsync(1, wt.Stream, doLogContent: true, doCompress: false);
             }
 
             this.MyLogger.Verbose($"Uploaded mapping file: {wt.PropertyName} ");

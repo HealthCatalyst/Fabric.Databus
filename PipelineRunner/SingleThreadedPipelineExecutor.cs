@@ -61,7 +61,7 @@ namespace PipelineRunner
 
             queueProcessor.InitializeWithStepNumber(thisStepNumber);
 
-            queueProcessor.MonitorWorkQueue();
+            queueProcessor.MonitorWorkQueueAsync().Wait();
 
             functionQueueProcessor().MarkOutputQueueAsCompleted(thisStepNumber);
         }

@@ -11,6 +11,7 @@ namespace Fabric.Databus.Interfaces
 {
     using System;
     using System.IO;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The FileWriter interface.
@@ -34,7 +35,10 @@ namespace Fabric.Databus.Interfaces
         /// <param name="text">
         /// The text.
         /// </param>
-        void WriteToFile(string filepath, string text);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task WriteToFileAsync(string filepath, string text);
 
         /// <summary>
         /// The open stream for writing.
@@ -67,7 +71,10 @@ namespace Fabric.Databus.Interfaces
         /// <param name="stream">
         /// The stream.
         /// </param>
-        void WriteStream(string path, MemoryStream stream);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task WriteStreamAsync(string path, MemoryStream stream);
 
         /// <summary>
         /// The delete directory.

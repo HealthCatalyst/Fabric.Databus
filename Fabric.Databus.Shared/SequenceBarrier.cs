@@ -11,6 +11,7 @@ namespace Fabric.Databus.Shared
 {
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class SequenceBarrier
     {
@@ -46,7 +47,16 @@ namespace Fabric.Databus.Shared
 
         }
 
-        public void CompleteQuery(string queryId)
+        /// <summary>
+        /// The complete query.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public Task CompleteQuery(string queryId)
         {
             if (queryId != null)
             {
@@ -54,7 +64,8 @@ namespace Fabric.Databus.Shared
 
                 this.LastCompletedEntityIdForEachQuery.TryRemove(queryId, out temp);
             }
-            //Logger.Verbose($"Completed {queryId}: queue: {_inQueue.Count}");
+            
+            return Task.CompletedTask;
         }
     }
 }

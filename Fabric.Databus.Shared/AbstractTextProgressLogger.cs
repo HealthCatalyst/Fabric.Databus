@@ -67,7 +67,6 @@ namespace Fabric.Databus.Shared
             var queueProcessorCount = "current";
             var maxQueueProcessorCount = "max";
             var inQueueCount = "In";
-            var minimum = "minimum";
             var time = "Time";
             var dictionary = "dictionary";
             var @out = "Out";

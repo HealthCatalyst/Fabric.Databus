@@ -82,7 +82,7 @@ namespace PipelineRunnerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<ILogger>(),
-                    It.IsAny<string>())).Returns(
+                    It.IsAny<string>())).ReturnsAsync(
                 new ReadSqlDataResult
                 {
                     ColumnList = new List<ColumnInfo>
@@ -119,7 +119,7 @@ namespace PipelineRunnerTests
                     It.IsAny<bool>())).Returns(Task.CompletedTask);
 
             mockFileUploader
-                .Setup(service => service.StartUpload())
+                .Setup(service => service.StartUploadAsync())
                 .Returns(Task.CompletedTask);
 
             ILogger logger = new LoggerConfiguration()
@@ -207,7 +207,7 @@ namespace PipelineRunnerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<ILogger>(),
-                    It.IsAny<string>())).Returns(
+                    It.IsAny<string>())).ReturnsAsync(
                 new ReadSqlDataResult
                 {
                     ColumnList = new List<ColumnInfo>
@@ -244,7 +244,7 @@ namespace PipelineRunnerTests
                     It.IsAny<bool>())).Returns(Task.CompletedTask);
 
             mockFileUploader
-                .Setup(service => service.StartUpload())
+                .Setup(service => service.StartUploadAsync())
                 .Returns(Task.CompletedTask);
 
             ILogger logger = new LoggerConfiguration()

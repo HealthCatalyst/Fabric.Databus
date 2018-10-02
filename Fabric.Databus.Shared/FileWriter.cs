@@ -9,11 +9,12 @@
 
 namespace Fabric.Databus.Shared
 {
-    using System;
     using System.IO;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
 
+    /// <inheritdoc />
     /// <summary>
     /// The file writer.
     /// </summary>
@@ -26,9 +27,15 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public void WriteToFile(string filepath, string text)
+        public async Task WriteToFileAsync(string filepath, string text)
         {
-            File.WriteAllText(filepath, text);
+            using (FileStream target = File.Create(filepath))
+            {
+                using (StreamWriter writer = new StreamWriter(target))
+                {
+                    await writer.WriteAsync(text);
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -52,12 +59,12 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public void WriteStream(string path, MemoryStream stream)
+        public async Task WriteStreamAsync(string path, MemoryStream stream)
         {
             using (var fileStream = File.Create(path))
             {
                 stream.Seek(0, SeekOrigin.Begin);
-                stream.CopyTo(fileStream);
+                await stream.CopyToAsync(fileStream);
 
                 fileStream.Flush();
             }

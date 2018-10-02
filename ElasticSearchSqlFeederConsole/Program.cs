@@ -83,6 +83,7 @@ namespace ElasticSearchSqlFeederConsole
                     container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
                     container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
                     container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
+                    container.RegisterType<IHttpClientFactory, HttpClientFactory>();
                     container.RegisterInstance(logger);
 
                     // container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();

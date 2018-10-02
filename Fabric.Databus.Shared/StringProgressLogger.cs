@@ -11,9 +11,9 @@ namespace Fabric.Databus.Shared
             this._logStringBuilder.Clear();
         }
 
-        public override void AppendLine(string formattableString)
+        public override void AppendLine(string text)
         {
-            this._logStringBuilder.AppendLine(formattableString);
+            this._logStringBuilder.AppendLine(text);
         }
 
         public override string GetLog()

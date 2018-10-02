@@ -84,7 +84,9 @@ namespace ElasticSearchSqlFeederConsole
                     container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
                     container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
                     container.RegisterInstance(logger);
-                    container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
+
+                    // container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
+                    container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 

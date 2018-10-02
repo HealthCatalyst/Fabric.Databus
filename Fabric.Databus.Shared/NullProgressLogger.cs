@@ -13,22 +13,30 @@ namespace Fabric.Databus.Shared
 
     using Fabric.Databus.Interfaces;
 
+    /// <inheritdoc />
     /// <summary>
     /// The null progress logger.
     /// </summary>
     public class NullProgressLogger : IProgressLogger
     {
-
+        /// <inheritdoc />
         public void Reset()
         {
         }
 
+        /// <inheritdoc />
         public string GetLog()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc />
         public void LogProgressMonitorItem(int key, ProgressMonitorItem progressMonitorItem)
+        {
+        }
+
+        /// <inheritdoc />
+        public void LogHeader()
         {
         }
     }

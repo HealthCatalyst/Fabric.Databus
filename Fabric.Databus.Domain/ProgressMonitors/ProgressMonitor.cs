@@ -69,7 +69,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
 
             if (this.progressLogger != null)
             {
-                this.backgroundTask = Task.Run(() => this.LogProgress(token), token);
+                this.backgroundTask = Task.Run(() => this.RunLogProgressTask(token), token);
             }
         }
 
@@ -84,7 +84,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
         /// <param name="token">
         /// The token.
         /// </param>
-        public void LogProgress(CancellationToken token)
+        public void RunLogProgressTask(CancellationToken token)
         {
             while (true)
             {
@@ -92,22 +92,8 @@ namespace Fabric.Databus.Domain.ProgressMonitors
                 {
                     return;
                 }
-                this.progressLogger.Reset();
 
-                //Process proc = Process.GetCurrentProcess();
-                //Console.WriteLine($"Memory: {(proc.WorkingSet64 / 1024):N0} kb");
-
-                var progressMonitorItems = this.progressMonitorItems.OrderBy(p => p.Key).Select(p => new
-                    {
-                        p.Key,
-                        p.Value
-                    })
-                    .ToList();
-
-                foreach (var progressMonitorItem in progressMonitorItems)
-                {
-                    this.progressLogger.LogProgressMonitorItem(progressMonitorItem.Key, progressMonitorItem.Value);
-                }
+                this.LogProgress();
 
                 Thread.Sleep(1000);
             }
@@ -138,6 +124,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
         public void Dispose()
         {
             this.cancellationTokenSource?.Cancel();
+            this.LogProgress();
         }
 
         /// <summary>
@@ -149,6 +136,27 @@ namespace Fabric.Databus.Domain.ProgressMonitors
         public IList<ProgressMonitorItem> GetSnapshotOfProgressItems()
         {
             return this.progressMonitorItems.ToArray().Select(a => a.Value).ToList();
+        }
+
+        /// <summary>
+        /// The log progress.
+        /// </summary>
+        private void LogProgress()
+        {
+            this.progressLogger.Reset();
+
+            //Process proc = Process.GetCurrentProcess();
+            //Console.WriteLine($"Memory: {(proc.WorkingSet64 / 1024):N0} kb");
+
+            var progressMonitorItems1 =
+                this.progressMonitorItems.OrderBy(p => p.Key).Select(p => new { p.Key, p.Value }).ToList();
+
+            this.progressLogger.LogHeader();
+
+            foreach (var progressMonitorItem in progressMonitorItems1)
+            {
+                this.progressLogger.LogProgressMonitorItem(progressMonitorItem.Key, progressMonitorItem.Value);
+            }
         }
     }
 }

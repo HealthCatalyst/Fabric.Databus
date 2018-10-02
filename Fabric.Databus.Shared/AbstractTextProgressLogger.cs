@@ -9,10 +9,9 @@
 
 namespace Fabric.Databus.Shared
 {
-    using System;
-
     using Fabric.Databus.Interfaces;
 
+    /// <inheritdoc />
     /// <summary>
     /// The abstract text progress logger.
     /// </summary>
@@ -22,42 +21,62 @@ namespace Fabric.Databus.Shared
         /// The reset.
         /// </summary>
         public abstract void Reset();
-        public abstract void AppendLine(string formattableString);
+
+        /// <summary>
+        /// The append line.
+        /// </summary>
+        /// <param name="text">
+        /// The text string.
+        /// </param>
+        public abstract void AppendLine(string text);
+
+        /// <summary>
+        /// The get log.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public abstract string GetLog();
 
+        /// <inheritdoc />
         public void LogProgressMonitorItem(int key, ProgressMonitorItem progressMonitorItem)
         {
-            var isQueueCompleted = progressMonitorItem.IsInQueueCompleted ? " [C]" : String.Empty;
+            var isQueueCompleted = progressMonitorItem.IsInQueueCompleted ? " [C]" : string.Empty;
 
-            var formattableString =
-                $"{key,4}-{progressMonitorItem.LoggerName,25}({progressMonitorItem.QueueProcessorCount,3}/{progressMonitorItem.MaxQueueProcessorCount,3}) InQueue:{progressMonitorItem.InQueueCount,10:N0} Minimum:{progressMonitorItem.Minimum,10}";
+            var loggerName = progressMonitorItem.LoggerName;
+            var queueProcessorCount = progressMonitorItem.QueueProcessorCount;
+            var maxQueueProcessorCount = progressMonitorItem.MaxQueueProcessorCount;
+            var inQueueCount = progressMonitorItem.InQueueCount;
+            var minimum = progressMonitorItem.Minimum;
+            var time = progressMonitorItem.TimeElapsedProcessing.ToString(@"hh\:mm\:ss");
+            var dictionary = progressMonitorItem.DocumentDictionaryCount;
+            var @out = progressMonitorItem.TotalItemsAddedToOutputQueue;
+            var processed = progressMonitorItem.TotalItemsProcessed;
 
-            //if (progressMonitorItem.Value.LastCompletedEntityIdForEachQuery != null)
-            //{
-            //    foreach (var keyValuePair in progressMonitorItem.Value.LastCompletedEntityIdForEachQuery.OrderBy(a => a.Key))
-            //    {
-            //        formattableString += $" {keyValuePair.Key}: {keyValuePair.Value}";
-            //    }
-            //}
+            var text =
+                $"{key,4}-{loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {string.Empty,4} {inQueueCount,7} {processed,10} {@out,7} {time,15} {dictionary,7} {isQueueCompleted,3}";
 
-            if (progressMonitorItem.TimeElapsedProcessing != TimeSpan.Zero)
-            {
-                // ReSharper disable once UseFormatSpecifierInInterpolation
-                formattableString +=
-                    $" Time:{progressMonitorItem.TimeElapsedProcessing.ToString(@"hh\:mm\:ss"),10}";
-            }
-
-            if (progressMonitorItem.DocumentDictionaryCount > 0)
-            {
-                formattableString += $" Dictionary:{progressMonitorItem.DocumentDictionaryCount,10}";
-            }
-
-            formattableString += $" Processed: {progressMonitorItem.TotalItemsProcessed,10:N0}";
-            formattableString += $" Out: {progressMonitorItem.TotalItemsAddedToOutputQueue,10:N0}";
-            formattableString += $"{isQueueCompleted,3}";
-
-            this.AppendLine(formattableString);
+            this.AppendLine(text);
         }
 
+        /// <inheritdoc />
+        public void LogHeader()
+        {
+            var key = "key";
+            var loggerName = "Step";
+            var queueProcessorCount = "current";
+            var maxQueueProcessorCount = "max";
+            var inQueueCount = "In";
+            var minimum = "minimum";
+            var time = "Time";
+            var dictionary = "dictionary";
+            var @out = "Out";
+            var processed = "Processed";
+
+            var text =
+                $"{key,4} {loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {inQueueCount,7} {processed,10} {@out,7} {time, 15} {dictionary, 7} C";
+
+            this.AppendLine(text);
+        }
     }
 }

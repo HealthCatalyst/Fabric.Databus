@@ -20,9 +20,9 @@ namespace Fabric.Databus.Shared
         {
         }
 
-        public override void AppendLine(string formattableString)
+        public override void AppendLine(string text)
         {
-            Console.WriteLine(formattableString);
+            Console.WriteLine(text);
         }
 
         public override string GetLog()

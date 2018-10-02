@@ -24,9 +24,9 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public override void AppendLine(string formattableString)
+        public override void AppendLine(string text)
         {
-            Console.WriteLine(formattableString);
+            Console.WriteLine(text);
         }
 
         /// <inheritdoc />

@@ -27,6 +27,7 @@ namespace PipelineRunner
     using SqlBatchPipelineStep;
 
     using Unity;
+    using Unity.Resolution;
 
     /// <summary>
     /// The multi threader pipeline executor.
@@ -55,8 +56,12 @@ namespace PipelineRunner
             int timeoutInMilliseconds)
         {
             var tasks = processors
-                .Select(processor => this.RunAsync(() => (IPipelineStep)this.container.Resolve(processor.Type), processor.Count))
-                .SelectMany(task => task)
+                .Select(
+                    processor => this.RunAsync(
+                        () => (IPipelineStep)this.container.Resolve(
+                            processor.Type,
+                            new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token)),
+                        processor.Count)).SelectMany(task => task)
                 .ToList();
 
             try

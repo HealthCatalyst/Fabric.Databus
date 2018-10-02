@@ -9,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ElasticSearchApiCaller\Fabric.Databus.ElasticSearch.csproj" />
-    <ProjectReference Include="..\..\ElasticSearchSqlFeeder.Shared\Fabric.Databus.Shared.csproj" />
+    <ProjectReference Include="..\..\Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj" />
+    <ProjectReference Include="..\..\Fabric.Databus.Shared\Fabric.Databus.Shared.csproj" />
     <ProjectReference Include="..\..\QueueItems\QueueItems.csproj" />
     <ProjectReference Include="..\BasePipelineStep\BasePipelineStep.csproj" />
   </ItemGroup>

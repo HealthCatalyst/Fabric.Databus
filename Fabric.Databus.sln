@@ -3,23 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Json", "ElasticSearchJsonWriter\Fabric.Databus.Json.csproj", "{FC8CF81F-9790-4A46-9FD8-AFB220C4EF81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Json", "Fabric.Databus.Json\Fabric.Databus.Json.csproj", "{FC8CF81F-9790-4A46-9FD8-AFB220C4EF81}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ZipCodeToGeoCode", "ZipCodeToGeoCodeConverter\Fabric.Databus.ZipCodeToGeoCode.csproj", "{5BA49A86-B7FA-4504-92D1-DB7AC5695B09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ZipCodeToGeoCode", "Fabric.Databus.ZipCodeToGeoCode\Fabric.Databus.ZipCodeToGeoCode.csproj", "{5BA49A86-B7FA-4504-92D1-DB7AC5695B09}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.JsonSchema", "JsonSchemaValidator\Fabric.Databus.JsonSchema.csproj", "{DF401A17-F37B-4DB4-85F3-113DA9906305}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.JsonSchema", "Fabric.Databus.JsonSchema\Fabric.Databus.JsonSchema.csproj", "{DF401A17-F37B-4DB4-85F3-113DA9906305}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ElasticSearch", "ElasticSearchApiCaller\Fabric.Databus.ElasticSearch.csproj", "{3BBF6CF0-197F-4980-BDAF-1418E473C014}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ElasticSearch", "Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj", "{3BBF6CF0-197F-4980-BDAF-1418E473C014}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticSearchSqlFeederConsole", "ElasticSearchSqlFeederConsole\ElasticSearchSqlFeederConsole.csproj", "{148CF889-C721-4AD9-83BF-BDF7629A8C55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Interfaces", "ElasticSearchSqlFeeder.Interfaces\Fabric.Databus.Interfaces.csproj", "{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Interfaces", "Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj", "{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Shared", "ElasticSearchSqlFeeder.Shared\Fabric.Databus.Shared.csproj", "{ADE06C2E-4DD9-4C82-ACE2-BFEB881F74EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Shared", "Fabric.Databus.Shared\Fabric.Databus.Shared.csproj", "{ADE06C2E-4DD9-4C82-ACE2-BFEB881F74EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Queues", "ElasticSearchSqlFeeder.Queues\Fabric.Databus.Queues.csproj", "{623DECA8-87EE-4C04-B245-3F2DAA152289}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Queues", "Fabric.Databus.Queues\Fabric.Databus.Queues.csproj", "{623DECA8-87EE-4C04-B245-3F2DAA152289}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ProgressMonitors", "ElasticSearchSqlFeeder.ProgressMonitor\Fabric.Databus.ProgressMonitors.csproj", "{6B54F568-E193-4B5E-B3A6-827B1D2ACD2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ProgressMonitors", "Fabric.Databus.ProgressMonitors\Fabric.Databus.ProgressMonitors.csproj", "{6B54F568-E193-4B5E-B3A6-827B1D2ACD2E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Console", "Console", "{E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}"
 EndProject

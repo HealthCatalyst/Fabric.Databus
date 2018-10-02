@@ -173,27 +173,27 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ElasticSearchApiCaller\Fabric.Databus.ElasticSearch.csproj">
+    <ProjectReference Include="..\Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj">
       <Project>{3bbf6cf0-197f-4980-bdaf-1418e473c014}</Project>
       <Name>Fabric.Databus.ElasticSearch</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchJsonWriter\Fabric.Databus.Json.csproj">
+    <ProjectReference Include="..\Fabric.Databus.Json\Fabric.Databus.Json.csproj">
       <Project>{fc8cf81f-9790-4a46-9fd8-afb220c4ef81}</Project>
       <Name>Fabric.Databus.Json</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\Fabric.Databus.Interfaces.csproj">
+    <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj">
       <Project>{a6c96bfb-24c4-482a-a3da-54c2bb5a2b4f}</Project>
       <Name>Fabric.Databus.Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.ProgressMonitor\Fabric.Databus.ProgressMonitors.csproj">
+    <ProjectReference Include="..\Fabric.Databus.ProgressMonitors\Fabric.Databus.ProgressMonitors.csproj">
       <Project>{6b54f568-e193-4b5e-b3a6-827b1d2acd2e}</Project>
       <Name>Fabric.Databus.ProgressMonitors</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Queues\Fabric.Databus.Queues.csproj">
+    <ProjectReference Include="..\Fabric.Databus.Queues\Fabric.Databus.Queues.csproj">
       <Project>{623deca8-87ee-4c04-b245-3f2daa152289}</Project>
       <Name>Fabric.Databus.Queues</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Shared\Fabric.Databus.Shared.csproj">
+    <ProjectReference Include="..\Fabric.Databus.Shared\Fabric.Databus.Shared.csproj">
       <Project>{ade06c2e-4dd9-4c82-ace2-bfeb881f74ef}</Project>
       <Name>Fabric.Databus.Shared</Name>
     </ProjectReference>
@@ -205,7 +205,7 @@
       <Project>{dc1c2dff-2458-4396-a872-e44fef249de1}</Project>
       <Name>Fabric.Databus.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\JsonSchemaValidator\Fabric.Databus.JsonSchema.csproj">
+    <ProjectReference Include="..\Fabric.Databus.JsonSchema\Fabric.Databus.JsonSchema.csproj">
       <Project>{df401a17-f37b-4db4-85f3-113da9906305}</Project>
       <Name>Fabric.Databus.JsonSchema</Name>
     </ProjectReference>
@@ -213,7 +213,7 @@
       <Project>{AF1ADF05-EC10-43EA-877E-AD504A113B58}</Project>
       <Name>PipelineRunner</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ZipCodeToGeoCodeConverter\Fabric.Databus.ZipCodeToGeoCode.csproj">
+    <ProjectReference Include="..\Fabric.Databus.ZipCodeToGeoCode\Fabric.Databus.ZipCodeToGeoCode.csproj">
       <Project>{5ba49a86-b7fa-4504-92d1-db7ac5695b09}</Project>
       <Name>Fabric.Databus.ZipCodeToGeoCode</Name>
     </ProjectReference>

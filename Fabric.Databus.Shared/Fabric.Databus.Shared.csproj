@@ -11,10 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.ProgressMonitor\Fabric.Databus.ProgressMonitors.csproj" />
     <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.ProgressMonitors\Fabric.Databus.ProgressMonitors.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.ZipCodeToGeoCode\Fabric.Databus.ZipCodeToGeoCode.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
-    <ProjectReference Include="..\ZipCodeToGeoCodeConverter\Fabric.Databus.ZipCodeToGeoCode.csproj" />
   </ItemGroup>
 
 </Project>

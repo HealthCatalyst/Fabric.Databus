@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElasticSearchSqlFeeder.Interfaces\Fabric.Databus.Interfaces.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
   </ItemGroup>
 

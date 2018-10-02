@@ -73,15 +73,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Json\Fabric.Databus.Json.csproj">
       <Project>{FC8CF81F-9790-4A46-9FD8-AFB220C4EF81}</Project>
-      <Name>ElasticSearchJsonWriter</Name>
+      <Name>Fabric.Databus.Json</Name>
     </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj">
       <Project>{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}</Project>
-      <Name>ElasticSearchSqlFeeder.Interfaces</Name>
+      <Name>Fabric.Databus.Interfaces</Name>
     </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Shared\Fabric.Databus.Shared.csproj">
       <Project>{ADE06C2E-4DD9-4C82-ACE2-BFEB881F74EF}</Project>
-      <Name>ElasticSearchSqlFeeder.Shared</Name>
+      <Name>Fabric.Databus.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj">
       <Project>{C0ED4050-E7FB-4C68-ADF1-6C8E290A2950}</Project>

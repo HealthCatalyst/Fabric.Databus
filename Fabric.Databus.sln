@@ -69,7 +69,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared", "Fabric.Sha
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AA32DFFD-FEB5-4676-995E-A41DAE5752E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineSteps.Tests", "PipelineSteps.Tests\QueueProcessor.Tests.csproj", "{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineSteps.Tests", "PipelineSteps.Tests\PipelineSteps.Tests.csproj", "{7D79D811-9527-44FA-B9AA-1B339A9C5B3A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.Tests", "Fabric.Shared.Tests\Fabric.Shared.Tests.csproj", "{95CD492E-6D4A-4D9F-A307-1CCADD7BB0ED}"
 EndProject

@@ -82,7 +82,10 @@ namespace Fabric.Databus.Shared
                 else
                 {
                     cmd.CommandText =
-                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {topLevelKeyColumn} BETWEEN '{start}' AND '{end}' ORDER BY {topLevelKeyColumn} ASC;";
+                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {topLevelKeyColumn} BETWEEN @start AND @end ORDER BY {topLevelKeyColumn} ASC;";
+
+                    cmd.Parameters.AddWithValue("@start", $"'{start}'");
+                    cmd.Parameters.AddWithValue("@end", $"'{end}'");
                 }
 
                 logger.Verbose($"Start: {cmd.CommandText}");

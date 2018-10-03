@@ -1,4 +1,33 @@
-# Fabric.Databus
+# Architecture
+Databus is based on pipelines and queues.
+
+Each component of the pipeline is called a PipelineStep.  It receives an input QueueItem and writes to an output QueueItem.  The output QueueItem of one PipelineStep is the input QueueItem of the next PipelineStep.
+
+The underlying queue can either be an in-memory queue or a distributed queue like rabbitmq.
+
+One example of a queue would:
+SqlGetSchemaPipelineStep (reads the schema from a set of sql queries)
+SaveSchemaPipelineStep (saves the schema to files)
+MappingUploadPipelineStep (uploads schema to elasticsearch)
+SqlJobPipelineStep (processes a sqljob)
+SqlBatchPipelineStep (creates batches of data)
+SqlImportPipelineStep (reads data from sql queries)
+ConvertDatabaseRowToJsonPipelineStep (converts data to json)
+JsonDocumentMergerPipelineStep (merges json from multiple queries into one)
+CreateBatchItemsPipelineStep (creates batch files to send to REST API)
+SaveBatchPipelineStep (saves batch files)
+FileUploadPipelineStep (uploads json to REST API)
+
+Benefits:
+The queues can be monitored independently of the PipelineStep.
+Each PipelineStep has a defined queue item coming and going out so the QPipelineSteps are very pluggable
+You can specify the number of instances of each PipelineStep to use multiple threads
+The queues allow work to flow without each PipelineStep completing
+The queue manager controls how much data is loaded into memory
+Batching allows handling of large amounts of data by only loading small subsets in memory
+We use Unity so various modules can be replaced and unit testing is easy
+
+# Running Fabric.Databus via REST API and Docker
 
 Run the project (or get it from docker: curl -sSL https://healthcatalyst.github.io/InstallScripts/installfabricdatabus.txt | sh)
 
@@ -18,32 +47,3 @@ To post a new job (make sure to include the bearer token in an authorization hea
 curl -XPOST http://localhost:5000/job --data-binary @cjob.xml
 
 There is a sample config file in the configs/localhost folder.
-
-# Architecture
-Databus is based on pipelines and queues.
-
-Each component of the pipeline is called a QueueProcessor.  It receives an input QueueItem and writes to an outpunt QueueItem.  The output QueueItem of one QueueProcessor is the input QueueItem of the next QueueProcessor.
-
-The underlying queue can either be an in-memory queue or a distributed queue like rabbitmq.
-
-One example of a queue would:
-SqlGetSchemaQueueProcessor (reads the schema from a set of sql queries)
-SaveSchemaQueueProcessor (saves the schema to files)
-MappingUploadQueueProcessor (uploads schema to elasticsearch)
-SqlJobQueueProcessor (processes a sqljob)
-SqlBatchQueueProcessor (creates batches of data)
-SqlImportQueueProcessor (reads data from sql queries)
-ConvertDatabaseRowToJsonQueueProcessor (converts data to json)
-JsonDocumentMergerQueueProcessor (merges json from multiple queries into one)
-CreateBatchItemsQueueProcessor (creates batch files to send to REST API)
-SaveBatchQueueProcessor (saves batch files)
-FileUploadQueueProcessor (uploads json to REST API)
-
-Benefits:
-The queues can be monitored independently of the QueueProcessors.
-Each QueueProcessor has a defined queue item coming and going out so the QueueProcessors are very pluggable
-You can specify the number of instances of each QueueProcessor to use multiple threads
-The queues allow work to flow without each QueueProcessor completing
-The queue manager controls how much data is loaded into memory
-Batching allows handling of large amounts of data by only loading small subsets in memory
-We use Unity so various modules can be replaced and unit testing is easy

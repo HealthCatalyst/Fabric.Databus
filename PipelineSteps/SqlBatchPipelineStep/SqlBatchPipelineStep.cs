@@ -28,7 +28,7 @@ namespace SqlBatchPipelineStep
 
     /// <inheritdoc />
     /// <summary>
-    /// The sql batch queue processor.
+    /// Reads a SqlBatchQueueItem with a number of queries and splits it into one SqlImportQueueItem for each query
     /// </summary>
     public class SqlBatchPipelineStep : BasePipelineStep<SqlBatchQueueItem, SqlImportQueueItem>
     {

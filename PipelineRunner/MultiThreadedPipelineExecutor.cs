@@ -122,13 +122,12 @@ namespace PipelineRunner
                     .ContinueWith(
                 t =>
                 {
-                    if (t.IsFaulted)
                     {
                         this.cancellationTokenSource.Cancel();
                     }
                 },
-                this.cancellationTokenSource.Token,
-                TaskContinuationOptions.ExecuteSynchronously,
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted,
                 TaskScheduler.Current)
                 .ContinueWith(
                 t =>
@@ -141,10 +140,6 @@ namespace PipelineRunner
 
                 tasks.Add(task);
             }
-
-            var taskArray = tasks.ToArray();
-
-            Task.WhenAll(taskArray);
 
             return tasks;
         }

@@ -300,9 +300,13 @@ namespace PipelineRunner
                         new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SaveJsonToFilePipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SendToRestApiPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SaveJsonToFilePipelineStep), Count = 1 }
                     });
+
+            if (config.UploadToElasticSearch)
+            {
+                processors.Add(new PipelineStepInfo { Type = typeof(SendToRestApiPipelineStep), Count = 1 });
+            }
 
             var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
             var fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, config.Urls);

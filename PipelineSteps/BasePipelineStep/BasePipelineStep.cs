@@ -13,8 +13,6 @@ namespace BasePipelineStep
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
-
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;

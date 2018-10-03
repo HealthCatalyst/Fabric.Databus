@@ -32,7 +32,7 @@ namespace SqlImportPipelineStep
 
     /// <inheritdoc />
     /// <summary>
-    /// The sql import queue processor.
+    /// Reads a SqlImportQueueItem and calls SqlServer to load the data for that query and put it in a ConvertDatabaseToJsonQueueItem
     /// </summary>
     public class SqlImportPipelineStep : BasePipelineStep<SqlImportQueueItem, ConvertDatabaseToJsonQueueItem>
     {
@@ -96,7 +96,7 @@ namespace SqlImportPipelineStep
         protected override string LoggerName => "SqlImport";
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task HandleAsync(SqlImportQueueItem workItem)
+        protected override async Task HandleAsync(SqlImportQueueItem workItem)
         {
             await this.ReadOneQueryFromDatabaseAsync(
                 workItem.QueryId,

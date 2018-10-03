@@ -11,6 +11,9 @@ using Serilog;
 
 namespace SaveJsonToFilePipelineStep
 {
+    /// <summary>
+    /// Reads a IJsonObjectQueueItem, saves it to file using the {id}.json and then passes the IJsonObjectQueueItem to the next step
+    /// </summary>
     public class SaveJsonToFilePipelineStep : BasePipelineStep<IJsonObjectQueueItem, IJsonObjectQueueItem>
     {
         private readonly ITemporaryFileWriter fileWriter;

@@ -33,7 +33,7 @@ namespace JsonDocumentMergerPipelineStep
 
     /// <inheritdoc />
     /// <summary>
-    /// The json document merger queue processor.
+    /// Reads a JsonDocumentMergerQueueItem with a list of json objects and merges them into one json object based on property name.  Then stores these in a IJsonObjectQueueItem.
     /// </summary>
     public class JsonDocumentMergerPipelineStep : BasePipelineStep<JsonDocumentMergerQueueItem, IJsonObjectQueueItem>
     {

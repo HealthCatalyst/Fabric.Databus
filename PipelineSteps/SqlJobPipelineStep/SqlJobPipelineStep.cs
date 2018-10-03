@@ -30,7 +30,7 @@ namespace SqlJobPipelineStep
 
     /// <inheritdoc />
     /// <summary>
-    /// The sql job queue processor.
+    /// Reads a SqlJobQueueItem and creates a set of SqlBatchQueueItems based on EntitiesPerBatch config
     /// </summary>
     public class SqlJobPipelineStep : BasePipelineStep<SqlJobQueueItem, SqlBatchQueueItem>
     {

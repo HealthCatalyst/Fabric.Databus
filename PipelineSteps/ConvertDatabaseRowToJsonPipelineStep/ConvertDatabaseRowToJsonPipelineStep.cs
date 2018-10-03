@@ -30,7 +30,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
 
     /// <inheritdoc />
     /// <summary>
-    /// The convert database row to json queue processor.
+    /// Reads a ConvertDatabaseToJsonQueueItem and converts the data from rows into a json structure and stores it in JsonDocumentMergerQueueItem
     /// </summary>
     public class ConvertDatabaseRowToJsonPipelineStep : BasePipelineStep<ConvertDatabaseToJsonQueueItem, JsonDocumentMergerQueueItem>
     {

@@ -27,7 +27,6 @@ namespace PipelineRunner
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.FileWriters;
-    using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Json;
@@ -49,6 +48,8 @@ namespace PipelineRunner
     using SaveBatchPipelineStep;
 
     using SaveSchemaPipelineStep;
+
+    using SendToRestApiPipelineStep;
 
     using SqlBatchPipelineStep;
 
@@ -106,12 +107,12 @@ namespace PipelineRunner
         }
 
         /// <inheritdoc />
-        public void RunPipeline(IJob config, IProgressMonitor progressMonitor, IJobStatusTracker jobStatusTracker)
+        public void RunElasticSearchPipeline(IJob config, IJobStatusTracker jobStatusTracker)
         {
             jobStatusTracker.TrackStart();
             try
             {
-                this.RunPipeline(config);
+                this.RunElasticSearchPipeline(config);
             }
             catch (Exception e)
             {
@@ -128,7 +129,7 @@ namespace PipelineRunner
         /// <param name="job">
         /// The job.
         /// </param>
-        public void RunPipeline(IJob job)
+        public void RunElasticSearchPipeline(IJob job)
         {
             if (job == null)
             {
@@ -197,6 +198,96 @@ namespace PipelineRunner
                         new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 5 },
                         new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(CreateBatchItemsPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }
+                    });
+
+            if (config.WriteTemporaryFilesToDisk)
+            {
+                processors.Add(new PipelineStepInfo
+                {
+                    Type = typeof(FileSavePipelineStep),
+                    Count = 1
+                });
+            }
+
+            if (config.UploadToElasticSearch)
+            {
+                processors.Add(new PipelineStepInfo
+                {
+                    Type = typeof(FileUploadPipelineStep),
+                    Count = 1
+                });
+            }
+
+            var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
+
+            var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
+
+            pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
+
+            var stopwatchElapsed = stopwatch.Elapsed;
+            stopwatch.Stop();
+            Console.WriteLine(stopwatchElapsed);
+        }
+
+        /// <summary>
+        /// The run pipeline.
+        /// </summary>
+        /// <param name="job">
+        /// The job.
+        /// </param>
+        public void RunRestApiPipeline(IJob job)
+        {
+            if (job == null)
+            {
+                throw new ArgumentNullException(nameof(job));
+            }
+            if (job.Config == null)
+            {
+                throw new ArgumentNullException(nameof(job.Config));
+            }
+
+            var config = job.Config;
+            this.InitContainer(config);
+
+            if (config.WriteTemporaryFilesToDisk)
+            {
+                this.container.Resolve<IFileWriter>().DeleteDirectory(config.LocalSaveFolder);
+            }
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            int loadNumber = 0;
+
+            // add sequence number to every load
+            foreach (var load in job.Data.DataSources)
+            {
+                load.SequenceNumber = ++loadNumber;
+            }
+
+            // add job to the first queue
+            var sqlJobQueue = this.container.Resolve<IQueueManager>()
+                .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
+
+            sqlJobQueue.Add(new SqlJobQueueItem
+            {
+                Job = job
+            });
+
+            sqlJobQueue.CompleteAdding();
+
+            var processors = new List<PipelineStepInfo>();
+
+            processors.AddRange(
+                new List<PipelineStepInfo>
+                    {
+                        new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 15 },
+                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 5 },
+                        new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SendToRestApiPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }
                     });
 

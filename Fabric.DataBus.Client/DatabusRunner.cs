@@ -98,7 +98,7 @@ namespace Fabric.Databus.Client
 
             var pipelineRunner = new PipelineRunner(container, cancellationToken);
 
-            pipelineRunner.RunPipeline(config);
+            pipelineRunner.RunElasticSearchPipeline(config);
 
             stopwatch.Stop();
 

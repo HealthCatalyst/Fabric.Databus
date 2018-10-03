@@ -146,7 +146,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunPipeline(job);
+                        pipelineRunner.RunElasticSearchPipeline(job);
                     }
                     catch (OperationCanceledException e)
                     {
@@ -272,7 +272,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunPipeline(job);
+                        pipelineRunner.RunElasticSearchPipeline(job);
                     }
                     catch (OperationCanceledException e)
                     {

@@ -12,10 +12,12 @@ namespace Fabric.Databus.Interfaces.ElasticSearch
     using System.IO;
     using System.Threading.Tasks;
 
+    using Fabric.Databus.Interfaces.Http;
+
     /// <summary>
     /// The FileUploader interface.
     /// </summary>
-    public interface IElasticSearchUploader
+    public interface IElasticSearchUploader : IFileUploader
     {
         /// <summary>
         /// The create index and mappings.
@@ -70,29 +72,6 @@ namespace Fabric.Databus.Interfaces.ElasticSearch
         /// The <see cref="Task"/>.
         /// </returns>
         Task UploadAllFilesInFolder(string folder);
-
-        /// <summary>
-        /// The send stream to hosts.
-        /// </summary>
-        /// <param name="relativeUrl">
-        /// The relative url.
-        /// </param>
-        /// <param name="batch">
-        /// The batch.
-        /// </param>
-        /// <param name="stream">
-        /// The stream.
-        /// </param>
-        /// <param name="doLogContent">
-        /// The do log content.
-        /// </param>
-        /// <param name="doCompress">
-        /// The do compress.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        Task SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress);
 
         /// <summary>
         /// The test elastic search connection.

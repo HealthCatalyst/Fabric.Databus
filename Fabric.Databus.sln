@@ -130,6 +130,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QueueItems", "QueueItems", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Client", "Fabric.Databus.Client\Fabric.Databus.Client.csproj", "{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendToRestApiPipelineStep", "PipelineSteps\SendToRestApiPipelineStep\SendToRestApiPipelineStep.csproj", "{8F068CF4-B01F-4C0B-87E6-F39361C6CB3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -276,6 +278,10 @@ Global
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F068CF4-B01F-4C0B-87E6-F39361C6CB3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F068CF4-B01F-4C0B-87E6-F39361C6CB3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F068CF4-B01F-4C0B-87E6-F39361C6CB3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F068CF4-B01F-4C0B-87E6-F39361C6CB3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -322,6 +328,7 @@ Global
 		{653263D1-A870-4A19-919D-0F56BA7870B9} = {8E854DC5-EBE7-4581-81F6-EAA4AA10A871}
 		{BCCDABF8-94F7-4D4E-812A-908E8A436B14} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4} = {653263D1-A870-4A19-919D-0F56BA7870B9}
+		{8F068CF4-B01F-4C0B-87E6-F39361C6CB3F} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

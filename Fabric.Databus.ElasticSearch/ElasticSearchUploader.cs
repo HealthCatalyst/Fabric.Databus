@@ -29,26 +29,15 @@ namespace Fabric.Databus.ElasticSearch
 
     using Serilog;
 
-    /// <inheritdoc />
     /// <summary>
     /// The file uploader.
     /// </summary>
-    public class ElasticSearchUploader : IElasticSearchUploader
+    public class ElasticSearchUploader : FileUploader, IElasticSearchUploader
     {
         /// <summary>
         /// The number of parallel uploads.
         /// </summary>
         private const int NumberOfParallelUploads = 50;
-
-        /// <summary>
-        /// The logger.
-        /// </summary>
-        private readonly ILogger logger;
-
-        /// <summary>
-        /// The hosts.
-        /// </summary>
-        private readonly List<string> hosts;
 
         /// <summary>
         /// The index.
@@ -66,54 +55,14 @@ namespace Fabric.Databus.ElasticSearch
         private readonly string entityType;
 
         /// <summary>
-        /// The stopwatch.
-        /// </summary>
-        private readonly Stopwatch stopwatch = new Stopwatch();
-
-        /// <summary>
         /// The max thread.
         /// </summary>
         private readonly SemaphoreSlim maxThread = new SemaphoreSlim(NumberOfParallelUploads);
 
         /// <summary>
-        /// The queued files.
-        /// </summary>
-        private readonly ConcurrentQueue<string> queuedFiles = new ConcurrentQueue<string>();
-
-        /// <summary>
-        /// The username.
-        /// </summary>
-        private readonly string username;
-
-        /// <summary>
-        /// The password.
-        /// </summary>
-        private readonly string password;
-
-        /// <summary>
         /// The keep index online.
         /// </summary>
         private readonly bool keepIndexOnline;
-
-        /// <summary>
-        /// The http client.
-        /// </summary>
-        private readonly HttpClient httpClient;
-
-        /// <summary>
-        /// The total files.
-        /// </summary>
-        private int totalFiles;
-
-        /// <summary>
-        /// The request failures.
-        /// </summary>
-        private int requestFailures;
-
-        /// <summary>
-        /// The current requests.
-        /// </summary>
-        private int currentRequests = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticSearchUploader"/> class.
@@ -155,14 +104,13 @@ namespace Fabric.Databus.ElasticSearch
             string alias,
             string entityType,
             IHttpClientFactory httpClientFactory)
+        : base(logger, hosts, httpClientFactory, username, password)
         {
             if (httpClientFactory == null)
             {
                 throw new ArgumentNullException(nameof(httpClientFactory));
             }
 
-            this.username = username;
-            this.password = password;
             this.keepIndexOnline = keepIndexOnline;
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.hosts = hosts ?? throw new ArgumentNullException(nameof(hosts));
@@ -170,7 +118,6 @@ namespace Fabric.Databus.ElasticSearch
             this.alias = alias ?? throw new ArgumentNullException(nameof(alias));
             this.entityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
 
-            this.httpClient = httpClientFactory.Create();
         }
 
         /// <summary>
@@ -443,16 +390,6 @@ namespace Fabric.Databus.ElasticSearch
         }
 
         /// <inheritdoc />
-        public async Task SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
-        {
-            var hostNumber = batch % this.hosts.Count;
-
-            var url = this.hosts[hostNumber] + relativeUrl;
-
-            await this.SendStreamToUrl(url, batch, stream, doLogContent, doCompress);
-        }
-
-        /// <inheritdoc />
         public async Task<string> TestElasticSearchConnection()
         {
             var host = this.hosts.First();
@@ -479,113 +416,6 @@ namespace Fabric.Databus.ElasticSearch
             if (!this.keepIndexOnline)
             {
                 await this.httpClient.PostAsyncString(host + "/" + this.index + "/_refresh", null);
-            }
-        }
-
-        /// <summary>
-        /// The send stream to url.
-        /// </summary>
-        /// <param name="url">
-        /// The url.
-        /// </param>
-        /// <param name="batch">
-        /// The batch.
-        /// </param>
-        /// <param name="stream">
-        /// The stream.
-        /// </param>
-        /// <param name="doLogContent">
-        /// The do log content.
-        /// </param>
-        /// <param name="doCompress">
-        /// The do compress.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        internal async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
-        {
-            try
-            {
-                this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
-
-                // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
-
-                var baseUri = url;
-                this.httpClient.BaseAddress = new Uri(baseUri);
-                this.httpClient.DefaultRequestHeaders.Accept.Clear();
-
-                this.AddAuthorizationToken(this.httpClient);
-
-                string requestContent;
-
-                using (var newMemoryStream = new MemoryStream())
-                {
-                    stream.Position = 0;
-                    stream.CopyTo(newMemoryStream);
-                    newMemoryStream.Position = 0;
-                    using (var reader = new StreamReader(newMemoryStream, Encoding.UTF8))
-                    {
-                        requestContent = reader.ReadToEnd();
-
-                        // TODO: Do something with the value
-                        this.logger.Verbose($"{requestContent}");
-                    }
-                }
-
-                Interlocked.Increment(ref this.currentRequests);
-                var requestStartTimeMillisecs = this.stopwatch.ElapsedMilliseconds;
-
-                var response = doCompress
-                                   ? await this.httpClient.PutAsyncStreamCompressed(url, stream)
-                                   : await this.httpClient.PutAsyncStream(url, stream);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    Interlocked.Decrement(ref this.currentRequests);
-
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<ElasticSearchJsonResponse>(responseContent);
-
-                    var stopwatchElapsed = this.stopwatch.ElapsedMilliseconds;
-                    var millisecsPerFile = 0; // Convert.ToInt32(stopwatchElapsed / (_totalFiles - _queuedFiles.Count));
-
-                    var millisecsForThisFile = stopwatchElapsed - requestStartTimeMillisecs;
-
-                    if (result.errors)
-                    {
-                        if (result.items.Any(i => i.update.status == 429))
-                        {
-                            // add back to queue for sending
-
-                            // _queuedFiles.Enqueue(filepath);
-                            this.requestFailures++;
-                            this.logger.Error(
-                                $"Failed: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
-                        }
-                    }
-                    else
-                    {
-                        this.logger.Verbose(
-                            $"Finished: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
-                    }
-                }
-                else
-                {
-                    // logger.Verbose("========= Error =================");
-                    this.logger.Error(requestContent);
-
-                    var responseJson = await response.Content.ReadAsStringAsync();
-
-                    this.logger.Error(responseJson);
-
-                    // logger.Verbose("========= Error =================");
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.Error(ex, url);
-                throw;
             }
         }
 
@@ -664,22 +494,6 @@ namespace Fabric.Databus.ElasticSearch
             {
                 this.logger.Verbose("{Exception}", ex);
                 throw;
-            }
-        }
-
-        /// <summary>
-        /// The add authorization token.
-        /// </summary>
-        /// <param name="client">
-        /// The client.
-        /// </param>
-        private void AddAuthorizationToken(HttpClient client)
-        {
-            if (!string.IsNullOrEmpty(this.username) && !string.IsNullOrEmpty(this.password))
-            {
-                var byteArray = Encoding.ASCII.GetBytes($"{this.username}:{this.password}");
-                client.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             }
         }
 

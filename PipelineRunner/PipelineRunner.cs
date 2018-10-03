@@ -297,9 +297,9 @@ namespace PipelineRunner
                     {
                         new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 5 },
+                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 3 },
+                        new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 4 },
                         new PipelineStepInfo { Type = typeof(SaveJsonToFilePipelineStep), Count = 1 }
                     });
 

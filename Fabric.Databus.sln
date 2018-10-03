@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.JsonSchema",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ElasticSearch", "Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj", "{3BBF6CF0-197F-4980-BDAF-1418E473C014}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElasticSearchSqlFeederConsole", "ElasticSearchSqlFeederConsole\ElasticSearchSqlFeederConsole.csproj", "{148CF889-C721-4AD9-83BF-BDF7629A8C55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Console", "ElasticSearchSqlFeederConsole\Fabric.Databus.Console.csproj", "{148CF889-C721-4AD9-83BF-BDF7629A8C55}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Interfaces", "Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj", "{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}"
 EndProject
@@ -133,7 +133,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Client", "Fa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SendToRestApiPipelineStep", "PipelineSteps\SendToRestApiPipelineStep\SendToRestApiPipelineStep.csproj", "{8F068CF4-B01F-4C0B-87E6-F39361C6CB3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SaveJsonToFilePipelineStep", "PipelineSteps\SaveJsonToFilePipelineStep\SaveJsonToFilePipelineStep.csproj", "{85054188-DDEB-4833-B4E5-2F5B41E5FDBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveJsonToFilePipelineStep", "PipelineSteps\SaveJsonToFilePipelineStep\SaveJsonToFilePipelineStep.csproj", "{85054188-DDEB-4833-B4E5-2F5B41E5FDBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

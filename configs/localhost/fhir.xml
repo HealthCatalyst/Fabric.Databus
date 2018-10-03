@@ -16,7 +16,7 @@
     <Alias>patients</Alias>
     <EntityType>patient</EntityType>
     <TopLevelKeyColumn>EDWPatientID</TopLevelKeyColumn>
-    <UseMultipleThreads>true</UseMultipleThreads>
+    <UseMultipleThreads>false</UseMultipleThreads>
   </Config>
 
   <Data>

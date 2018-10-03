@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ElasticSearchSqlFeederConsole
+namespace Fabric.Databus.Console
 {
     using System;
     using System.Diagnostics;
@@ -20,7 +20,6 @@ namespace ElasticSearchSqlFeederConsole
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.ElasticSearch;
     using Fabric.Databus.Http;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;

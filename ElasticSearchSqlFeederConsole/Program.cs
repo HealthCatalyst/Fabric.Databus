@@ -20,8 +20,13 @@ namespace ElasticSearchSqlFeederConsole
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.ElasticSearch;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.ElasticSearch;
+    using Fabric.Databus.Interfaces.Http;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.JsonSchema;
     using Fabric.Databus.Shared;
+    using Fabric.Databus.Shared.Loggers;
 
     using PipelineRunner;
     using Serilog;

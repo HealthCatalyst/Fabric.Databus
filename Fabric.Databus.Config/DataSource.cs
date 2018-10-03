@@ -14,6 +14,8 @@ namespace Fabric.Databus.Config
     using System.Xml.Serialization;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.ElasticSearch;
 
     /// <summary>
     /// The data source.

@@ -12,6 +12,7 @@ namespace QueueItems
     using System.Collections.Generic;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
 
     public class SaveBatchQueueItem : IQueueItem
     {

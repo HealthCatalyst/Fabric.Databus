@@ -20,6 +20,11 @@ namespace SaveSchemaPipelineStep
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Databus.Interfaces.Sql;
 
     using QueueItems;
 

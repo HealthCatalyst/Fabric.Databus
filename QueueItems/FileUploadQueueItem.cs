@@ -12,6 +12,7 @@ namespace QueueItems
     using System.IO;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
 
     using Newtonsoft.Json;
 

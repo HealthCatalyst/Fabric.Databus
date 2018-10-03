@@ -13,6 +13,7 @@ namespace Fabric.Databus.Shared
     using System.Collections.Generic;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
 
     /// <inheritdoc />
     /// <summary>

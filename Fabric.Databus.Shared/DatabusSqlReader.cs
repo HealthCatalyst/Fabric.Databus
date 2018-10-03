@@ -18,6 +18,8 @@ namespace Fabric.Databus.Shared
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.ZipCodeToGeoCode;
 
     using Serilog;

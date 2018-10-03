@@ -11,6 +11,7 @@ namespace QueueItems
 {
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
 
     /// <summary>
     /// The sql job queue item.

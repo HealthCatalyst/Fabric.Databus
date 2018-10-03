@@ -12,6 +12,7 @@ namespace Fabric.Databus.Domain.Importers
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Jobs;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Loggers;
 
     /// <summary>
     /// The ImportRunner interface.

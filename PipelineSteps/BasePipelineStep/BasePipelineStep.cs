@@ -15,6 +15,9 @@ namespace BasePipelineStep
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
 
     using Serilog;
 
@@ -102,7 +105,7 @@ namespace BasePipelineStep
         /// <summary>
         /// The _out queue.
         /// </summary>
-        private IMeteredBlockingCollection<TQueueOutItem> outQueue;
+        private IQueue<TQueueOutItem> outQueue;
 
         /// <summary>
         /// The _total items processed by this processor.
@@ -157,7 +160,7 @@ namespace BasePipelineStep
         /// <summary>
         /// Gets or sets the in queue.
         /// </summary>
-        protected IMeteredBlockingCollection<TQueueInItem> InQueue { get; set; }
+        protected IQueue<TQueueInItem> InQueue { get; set; }
 
         /// <summary>
         /// Gets or sets the config.

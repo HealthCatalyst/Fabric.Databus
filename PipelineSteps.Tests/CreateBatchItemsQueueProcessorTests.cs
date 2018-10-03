@@ -18,7 +18,9 @@ namespace PipelineStep.Tests
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Shared;
+    using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -99,7 +101,7 @@ namespace PipelineStep.Tests
                 Assert.AreEqual(2, queues.Count);
 
                 var meteredBlockingCollection = queues.First(queue => queue.Key == "SaveBatchQueueItem2").Value;
-                var outputQueue = meteredBlockingCollection as IMeteredBlockingCollection<SaveBatchQueueItem>;
+                var outputQueue = meteredBlockingCollection as IQueue<SaveBatchQueueItem>;
 
                 Assert.IsNotNull(outputQueue);
 

@@ -13,6 +13,7 @@ namespace PipelineStep.Tests
     using System.Collections.Generic;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Loggers;
 
     /// <summary>
     /// The mock progress monitor.

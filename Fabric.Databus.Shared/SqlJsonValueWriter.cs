@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Shared
 {
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.ZipCodeToGeoCode;
 
     using Newtonsoft.Json;

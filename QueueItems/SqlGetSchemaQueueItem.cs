@@ -13,6 +13,7 @@ namespace QueueItems
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
 
     public class SqlGetSchemaQueueItem : IQueueItem
     {

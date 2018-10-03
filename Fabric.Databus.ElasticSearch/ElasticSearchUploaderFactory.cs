@@ -13,6 +13,8 @@ namespace Fabric.Databus.ElasticSearch
     using System.Collections.Generic;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.ElasticSearch;
+    using Fabric.Databus.Interfaces.Http;
 
     using Serilog;
 

@@ -18,7 +18,12 @@ namespace PipelineRunnerTests
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.ElasticSearch;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
+    using Fabric.Databus.Shared.Loggers;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -127,11 +132,12 @@ namespace PipelineRunnerTests
                 .WriteTo.Debug()
                 .CreateLogger();
 
-            using (ProgressMonitor progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
+            using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
             {
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
                     var container = new UnityContainer();
+                    container.RegisterInstance<IProgressMonitor>(progressMonitor);
                     container.RegisterInstance(mockDatabusSqlReader.Object);
                     container.RegisterInstance(mockFileUploaderFactory.Object);
                     container.RegisterInstance(logger);
@@ -257,6 +263,7 @@ namespace PipelineRunnerTests
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
                     var container = new UnityContainer();
+                    container.RegisterInstance<IProgressMonitor>(progressMonitor);
                     container.RegisterInstance(mockDatabusSqlReader.Object);
                     container.RegisterInstance(mockFileUploaderFactory.Object);
                     container.RegisterInstance(logger);

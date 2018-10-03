@@ -13,6 +13,7 @@ namespace Fabric.Databus.Config
     using System.Xml.Serialization;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
 
     /// <inheritdoc />
     /// <summary>

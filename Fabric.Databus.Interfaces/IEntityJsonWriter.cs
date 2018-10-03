@@ -14,6 +14,8 @@ namespace Fabric.Databus.Interfaces
     using System.IO;
     using System.Threading.Tasks;
 
+    using Fabric.Databus.Interfaces.Sql;
+
     using Newtonsoft.Json.Linq;
 
     /// <summary>

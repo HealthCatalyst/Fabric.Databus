@@ -17,6 +17,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Loggers;
 
     /// <summary>
     /// The progress monitor.

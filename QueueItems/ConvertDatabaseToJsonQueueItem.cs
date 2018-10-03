@@ -12,6 +12,8 @@ namespace QueueItems
     using System.Collections.Generic;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
 
     /// <summary>

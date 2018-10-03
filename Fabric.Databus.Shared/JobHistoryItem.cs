@@ -14,6 +14,7 @@ namespace Fabric.Databus.Shared
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Loggers;
 
     using Newtonsoft.Json;
 

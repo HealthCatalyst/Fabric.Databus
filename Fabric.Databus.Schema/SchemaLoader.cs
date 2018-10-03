@@ -17,6 +17,8 @@ namespace Fabric.Databus.Schema
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
 
     /// <inheritdoc />

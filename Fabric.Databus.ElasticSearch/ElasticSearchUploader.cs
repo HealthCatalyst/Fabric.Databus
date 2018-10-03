@@ -22,6 +22,8 @@ namespace Fabric.Databus.ElasticSearch
 
     using Fabric.Databus.Http;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.ElasticSearch;
+    using Fabric.Databus.Interfaces.Http;
 
     using Newtonsoft.Json;
 

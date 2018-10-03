@@ -13,6 +13,7 @@ namespace PipelineRunner
     using System.Threading;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
 
     using Unity;
 

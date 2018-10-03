@@ -16,6 +16,7 @@ namespace Fabric.Databus.Json
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
     using Fabric.Shared;
 

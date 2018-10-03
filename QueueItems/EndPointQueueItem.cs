@@ -10,6 +10,7 @@
 namespace QueueItems
 {
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Queues;
 
     public class EndPointQueueItem : IQueueItem
     {

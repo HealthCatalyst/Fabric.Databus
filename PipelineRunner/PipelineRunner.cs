@@ -24,9 +24,17 @@ namespace PipelineRunner
     using Fabric.Databus.Domain.Importers;
     using Fabric.Databus.Domain.Jobs;
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.ElasticSearch;
+    using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Json;
     using Fabric.Databus.Schema;
     using Fabric.Databus.Shared;
+    using Fabric.Databus.Shared.FileWriters;
+    using Fabric.Databus.Shared.Queues;
 
     using FileSavePipelineStep;
 
@@ -231,14 +239,8 @@ namespace PipelineRunner
         {
             var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
 
-            var queueContext = new QueueContext
-            {
-                Config = config
-            };
-
             var queueManager = new QueueManager();
             this.container.RegisterInstance<IQueueManager>(queueManager);
-            this.container.RegisterInstance<IQueueContext>(queueContext);
             this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
             this.container.RegisterInstance<IJobConfig>(config);
 

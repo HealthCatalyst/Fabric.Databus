@@ -12,6 +12,8 @@ namespace Fabric.Databus.Interfaces
     using System;
     using System.Collections.Generic;
 
+    using Fabric.Databus.Interfaces.Queues;
+
     /// <summary>
     /// The DocumentDictionary interface.
     /// </summary>

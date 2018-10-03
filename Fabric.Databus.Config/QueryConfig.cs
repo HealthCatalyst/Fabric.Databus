@@ -13,6 +13,7 @@ namespace Fabric.Databus.Config
     using System.Runtime.Serialization;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
 
     /// <summary>
     /// The query config.

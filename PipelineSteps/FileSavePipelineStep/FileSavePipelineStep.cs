@@ -19,6 +19,10 @@ namespace FileSavePipelineStep
     using BasePipelineStep;
 
     using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
 
     using QueueItems;
 

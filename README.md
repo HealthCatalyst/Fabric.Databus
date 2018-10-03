@@ -6,17 +6,29 @@ Each component of the pipeline is called a PipelineStep.  It receives an input Q
 The underlying queue can either be an in-memory queue or a distributed queue like rabbitmq.
 
 One example of a queue would:
-SqlGetSchemaPipelineStep (reads the schema from a set of sql queries)
+
+SqlGetSchemaPipelineStep (reads the schema from a set of sql queries) 
+
 SaveSchemaPipelineStep (saves the schema to files)
+
 MappingUploadPipelineStep (uploads schema to elasticsearch)
+
 SqlJobPipelineStep (processes a sqljob)
+
 SqlBatchPipelineStep (creates batches of data)
+
 SqlImportPipelineStep (reads data from sql queries)
+
 ConvertDatabaseRowToJsonPipelineStep (converts data to json)
+
 JsonDocumentMergerPipelineStep (merges json from multiple queries into one)
+
 CreateBatchItemsPipelineStep (creates batch files to send to REST API)
+
 SaveBatchPipelineStep (saves batch files)
+
 FileUploadPipelineStep (uploads json to REST API)
+
 
 Benefits:
 The queues can be monitored independently of the PipelineStep.
@@ -47,3 +59,11 @@ To post a new job (make sure to include the bearer token in an authorization hea
 curl -XPOST http://localhost:5000/job --data-binary @cjob.xml
 
 There is a sample config file in the configs/localhost folder.
+
+
+| Step  |      Description      |  Input | Output |
+|----------|:-------------:|------:|
+| col 1 is |  left-aligned | $1600 |
+| col 2 is |    centered   |   $12 |
+| col 3 is | right-aligned |    $1 |
+

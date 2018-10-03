@@ -222,13 +222,13 @@ namespace PipelineRunner
 
             var elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
             IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(
-    config.ElasticSearchUserName,
-    config.ElasticSearchPassword,
-    false,
-    config.Urls,
-    config.Index,
-    config.Alias,
-    config.EntityType);
+                                                            config.ElasticSearchUserName,
+                                                            config.ElasticSearchPassword,
+                                                            false,
+                                                            config.Urls,
+                                                            config.Index,
+                                                            config.Alias,
+                                                            config.EntityType);
 
             this.container.RegisterInstance(elasticSearchUploader);
 

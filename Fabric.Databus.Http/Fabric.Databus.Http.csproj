@@ -8,4 +8,8 @@
     <PackageReference Include="Serilog" Version="2.7.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj" />
+  </ItemGroup>
+
 </Project>

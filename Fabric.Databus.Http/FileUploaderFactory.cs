@@ -7,20 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.ElasticSearch
+namespace Fabric.Databus.Http
 {
     using System;
     using System.Collections.Generic;
-    using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
-
     using Serilog;
 
-    /// <inheritdoc />
-    /// <summary>
-    /// The file uploader factory.
-    /// </summary>
-    public class ElasticSearchUploaderFactory : IElasticSearchUploaderFactory
+    public class FileUploaderFactory : IFileUploaderFactory
     {
         /// <summary>
         /// The logger.
@@ -41,16 +35,16 @@ namespace Fabric.Databus.ElasticSearch
         /// <param name="httpClientFactory">
         /// The http Client Factory.
         /// </param>
-        public ElasticSearchUploaderFactory(ILogger logger, IHttpClientFactory httpClientFactory)
+        public FileUploaderFactory(ILogger logger, IHttpClientFactory httpClientFactory)
         {
             this.logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
         /// <inheritdoc />
-        public IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline, List<string> urls, string index, string alias, string entityType)
+        public IFileUploader Create(string userName, string password, List<string> urls)
         {
-            return new ElasticSearchUploader(userName, password, keepIndexOnline, this.logger, urls, index, alias, entityType, this.httpClientFactory);
+            return new FileUploader(this.logger, urls, this.httpClientFactory, userName, password);
         }
     }
 }

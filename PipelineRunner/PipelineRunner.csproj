@@ -19,6 +19,7 @@
     <ProjectReference Include="..\PipelineSteps\JsonDocumentMergerPipelineStep\JsonDocumentMergerPipelineStep.csproj" />
     <ProjectReference Include="..\PipelineSteps\MappingUploadPipelineStep\MappingUploadPipelineStep.csproj" />
     <ProjectReference Include="..\PipelineSteps\SaveBatchPipelineStep\SaveBatchPipelineStep.csproj" />
+    <ProjectReference Include="..\PipelineSteps\SaveJsonToFilePipelineStep\SaveJsonToFilePipelineStep.csproj" />
     <ProjectReference Include="..\PipelineSteps\SaveSchemaPipelineStep\SaveSchemaPipelineStep.csproj" />
     <ProjectReference Include="..\PipelineSteps\SendToRestApiPipelineStep\SendToRestApiPipelineStep.csproj" />
     <ProjectReference Include="..\PipelineSteps\SqlBatchPipelineStep\SqlBatchPipelineStep.csproj" />

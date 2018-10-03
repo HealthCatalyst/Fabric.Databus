@@ -13,6 +13,7 @@ namespace Fabric.Databus.Json
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
@@ -214,6 +215,15 @@ namespace Fabric.Databus.Json
                 }
 
                 await writer.WriteEndObjectAsync(); // end
+            }
+        }
+
+        public async Task WriteToStreamAsync(JObject document, Stream stream)
+        {
+            using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
+            using (var writer = new JsonTextWriter(textWriter))
+            {
+                await document.WriteToAsync(writer);
             }
         }
 

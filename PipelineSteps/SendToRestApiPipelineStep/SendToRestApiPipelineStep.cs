@@ -15,8 +15,9 @@ namespace SendToRestApiPipelineStep
     using System.Threading.Tasks;
 
     using BasePipelineStep;
-
+    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
 
@@ -32,15 +33,22 @@ namespace SendToRestApiPipelineStep
     /// </summary>
     public class SendToRestApiPipelineStep : BasePipelineStep<IJsonObjectQueueItem, EndPointQueueItem>
     {
+        private readonly IFileUploader fileUploader;
+        private readonly IEntityJsonWriter entityJsonWriter;
+
         /// <inheritdoc />
         public SendToRestApiPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
+            IFileUploader fileUploader,
+            IEntityJsonWriter entityJsonWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
+            this.fileUploader = fileUploader ?? throw new System.ArgumentNullException(nameof(fileUploader));
+            this.entityJsonWriter = entityJsonWriter ?? throw new System.ArgumentNullException(nameof(entityJsonWriter));
         }
 
         /// <inheritdoc />
@@ -51,13 +59,10 @@ namespace SendToRestApiPipelineStep
         {
             var stream = new MemoryStream();
 
-            using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
-            using (var writer = new JsonTextWriter(textWriter))
-            {
-                await workItem.Document.WriteToAsync(writer);
-            }
+            await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
             // now send to Rest Api
+            await fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
         }
 
         /// <inheritdoc />

@@ -81,7 +81,7 @@ namespace SaveSchemaPipelineStep
         protected override string LoggerName => "SaveSchema";
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task HandleAsync(SaveSchemaQueueItem workItem)
+        protected override async Task HandleAsync(SaveSchemaQueueItem workItem)
         {
             foreach (var mapping in workItem.Mappings.OrderBy(m => m.SequenceNumber).ToList())
             {

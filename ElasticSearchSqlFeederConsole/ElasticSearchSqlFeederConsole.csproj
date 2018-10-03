@@ -181,6 +181,10 @@
       <Project>{3bbf6cf0-197f-4980-bdaf-1418e473c014}</Project>
       <Name>Fabric.Databus.ElasticSearch</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.Http\Fabric.Databus.Http.csproj">
+      <Project>{bccdabf8-94f7-4d4e-812a-908e8a436b14}</Project>
+      <Name>Fabric.Databus.Http</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Json\Fabric.Databus.Json.csproj">
       <Project>{fc8cf81f-9790-4a46-9fd8-afb220c4ef81}</Project>
       <Name>Fabric.Databus.Json</Name>

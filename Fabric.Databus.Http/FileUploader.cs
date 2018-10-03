@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.ElasticSearch
+namespace Fabric.Databus.Http
 {
     using System;
     using System.Collections.Concurrent;
@@ -19,10 +19,7 @@ namespace Fabric.Databus.ElasticSearch
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
-    using Fabric.Databus.Http;
     using Fabric.Databus.Interfaces.Http;
-
     using Newtonsoft.Json;
 
     using Serilog;
@@ -136,7 +133,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        internal async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        virtual protected async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             try
             {
@@ -155,7 +152,7 @@ namespace Fabric.Databus.ElasticSearch
                 using (var newMemoryStream = new MemoryStream())
                 {
                     stream.Position = 0;
-                    stream.CopyTo(newMemoryStream);
+                    await stream.CopyToAsync(newMemoryStream);
                     newMemoryStream.Position = 0;
                     using (var reader = new StreamReader(newMemoryStream, Encoding.UTF8))
                     {
@@ -178,30 +175,11 @@ namespace Fabric.Databus.ElasticSearch
                     Interlocked.Decrement(ref this.currentRequests);
 
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<ElasticSearchJsonResponse>(responseContent);
 
                     var stopwatchElapsed = this.stopwatch.ElapsedMilliseconds;
                     var millisecsPerFile = 0; // Convert.ToInt32(stopwatchElapsed / (_totalFiles - _queuedFiles.Count));
 
                     var millisecsForThisFile = stopwatchElapsed - requestStartTimeMillisecs;
-
-                    if (result.errors)
-                    {
-                        if (result.items.Any(i => i.update.status == 429))
-                        {
-                            // add back to queue for sending
-
-                            // _queuedFiles.Enqueue(filepath);
-                            this.requestFailures++;
-                            this.logger.Error(
-                                $"Failed: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
-                        }
-                    }
-                    else
-                    {
-                        this.logger.Verbose(
-                            $"Finished: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
-                    }
                 }
                 else
                 {

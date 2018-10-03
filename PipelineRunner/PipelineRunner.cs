@@ -27,6 +27,7 @@ namespace PipelineRunner
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Json;
@@ -46,7 +47,7 @@ namespace PipelineRunner
     using QueueItems;
 
     using SaveBatchPipelineStep;
-
+    using SaveJsonToFilePipelineStep;
     using SaveSchemaPipelineStep;
 
     using SendToRestApiPipelineStep;
@@ -219,6 +220,18 @@ namespace PipelineRunner
                 });
             }
 
+            var elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
+            IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(
+    config.ElasticSearchUserName,
+    config.ElasticSearchPassword,
+    false,
+    config.Urls,
+    config.Index,
+    config.Alias,
+    config.EntityType);
+
+            this.container.RegisterInstance(elasticSearchUploader);
+
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
 
             var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
@@ -284,30 +297,16 @@ namespace PipelineRunner
                     {
                         new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 15 },
-                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 5 },
+                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SaveJsonToFilePipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SendToRestApiPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }
                     });
 
-            if (config.WriteTemporaryFilesToDisk)
-            {
-                processors.Add(new PipelineStepInfo
-                {
-                    Type = typeof(FileSavePipelineStep),
-                    Count = 1
-                });
-            }
-
-            if (config.UploadToElasticSearch)
-            {
-                processors.Add(new PipelineStepInfo
-                {
-                    Type = typeof(FileUploadPipelineStep),
-                    Count = 1
-                });
-            }
+            var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
+            var fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, config.Urls);
+            this.container.RegisterInstance(fileUploader);
 
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
 
@@ -337,15 +336,6 @@ namespace PipelineRunner
 
             IElasticSearchUploaderFactory elasticSearchUploaderFactory =
                 this.container.Resolve<IElasticSearchUploaderFactory>();
-            IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(
-                config.ElasticSearchUserName,
-                config.ElasticSearchPassword,
-                false,
-                config.Urls,
-                config.Index,
-                config.Alias,
-                config.EntityType);
-            this.container.RegisterInstance(elasticSearchUploader);
 
             var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn);
             this.container.RegisterInstance<ISchemaLoader>(schemaLoader);

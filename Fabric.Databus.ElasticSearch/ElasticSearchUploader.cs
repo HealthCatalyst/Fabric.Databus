@@ -420,6 +420,113 @@ namespace Fabric.Databus.ElasticSearch
         }
 
         /// <summary>
+        /// The send stream to url.
+        /// </summary>
+        /// <param name="url">
+        /// The url.
+        /// </param>
+        /// <param name="batch">
+        /// The batch.
+        /// </param>
+        /// <param name="stream">
+        /// The stream.
+        /// </param>
+        /// <param name="doLogContent">
+        /// The do log content.
+        /// </param>
+        /// <param name="doCompress">
+        /// The do compress.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        override protected async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        {
+            try
+            {
+                this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
+
+                // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
+
+                var baseUri = url;
+                this.httpClient.BaseAddress = new Uri(baseUri);
+                this.httpClient.DefaultRequestHeaders.Accept.Clear();
+
+                this.AddAuthorizationToken(this.httpClient);
+
+                string requestContent;
+
+                using (var newMemoryStream = new MemoryStream())
+                {
+                    stream.Position = 0;
+                    stream.CopyTo(newMemoryStream);
+                    newMemoryStream.Position = 0;
+                    using (var reader = new StreamReader(newMemoryStream, Encoding.UTF8))
+                    {
+                        requestContent = reader.ReadToEnd();
+
+                        // TODO: Do something with the value
+                        this.logger.Verbose($"{requestContent}");
+                    }
+                }
+
+                Interlocked.Increment(ref this.currentRequests);
+                var requestStartTimeMillisecs = this.stopwatch.ElapsedMilliseconds;
+
+                var response = doCompress
+                                   ? await this.httpClient.PutAsyncStreamCompressed(url, stream)
+                                   : await this.httpClient.PutAsyncStream(url, stream);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Interlocked.Decrement(ref this.currentRequests);
+
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var result = JsonConvert.DeserializeObject<ElasticSearchJsonResponse>(responseContent);
+
+                    var stopwatchElapsed = this.stopwatch.ElapsedMilliseconds;
+                    var millisecsPerFile = 0; // Convert.ToInt32(stopwatchElapsed / (_totalFiles - _queuedFiles.Count));
+
+                    var millisecsForThisFile = stopwatchElapsed - requestStartTimeMillisecs;
+
+                    if (result.errors)
+                    {
+                        if (result.items.Any(i => i.update.status == 429))
+                        {
+                            // add back to queue for sending
+
+                            // _queuedFiles.Enqueue(filepath);
+                            this.requestFailures++;
+                            this.logger.Error(
+                                $"Failed: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+                        }
+                    }
+                    else
+                    {
+                        this.logger.Verbose(
+                            $"Finished: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.queuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+                    }
+                }
+                else
+                {
+                    // logger.Verbose("========= Error =================");
+                    this.logger.Error(requestContent);
+
+                    var responseJson = await response.Content.ReadAsStringAsync();
+
+                    this.logger.Error(responseJson);
+
+                    // logger.Verbose("========= Error =================");
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, url);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// The send file to url.
         /// </summary>
         /// <param name="url">

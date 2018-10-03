@@ -19,6 +19,7 @@ namespace ElasticSearchSqlFeederConsole
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.ElasticSearch;
+    using Fabric.Databus.Http;
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
@@ -90,7 +91,10 @@ namespace ElasticSearchSqlFeederConsole
                     var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
                     container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
                     container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
+                    container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
                     container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
+                    container.RegisterType<IFileUploader, FileUploader>();
+
                     container.RegisterType<IHttpClientFactory, HttpClientFactory>();
                     container.RegisterInstance(logger);
 
@@ -105,7 +109,8 @@ namespace ElasticSearchSqlFeederConsole
 
                     var pipelineRunner = new DatabusRunner();
 
-                    pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
+                    // pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
+                    pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
                 }
             }
 

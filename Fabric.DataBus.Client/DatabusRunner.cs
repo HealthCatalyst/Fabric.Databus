@@ -106,5 +106,37 @@ namespace Fabric.Databus.Client
             var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
             container.Resolve<ILogger>().Verbose($"Finished in {timeElapsed} using {threadText}");
         }
+
+        /// <summary>
+        /// The run elastic search pipeline.
+        /// </summary>
+        /// <param name="container">
+        ///     The container.
+        /// </param>
+        /// <param name="config">
+        ///     The config.
+        /// </param>
+        /// <param name="cancellationToken">
+        ///     The cancellation token
+        /// </param>
+        public void RunRestApiPipeline(
+            IUnityContainer container,
+            IJob config,
+            CancellationToken cancellationToken)
+        {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var pipelineRunner = new PipelineRunner(container, cancellationToken);
+
+            pipelineRunner.RunRestApiPipeline(config);
+
+            stopwatch.Stop();
+
+            var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+            var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
+            container.Resolve<ILogger>().Verbose($"Finished in {timeElapsed} using {threadText}");
+        }
+
     }
 }

@@ -118,14 +118,8 @@ namespace PipelineRunner
                         return 1;
                     },
                     thisStepNumber,
-                    this.cancellationTokenSource.Token);
-
-                tasks.Add(task);
-            }
-
-            var taskArray = tasks.ToArray();
-
-            Task.WhenAll(taskArray).ContinueWith(
+                    this.cancellationTokenSource.Token)
+                    .ContinueWith(
                 t =>
                 {
                     if (t.IsFaulted)
@@ -135,14 +129,22 @@ namespace PipelineRunner
                 },
                 this.cancellationTokenSource.Token,
                 TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Current).ContinueWith(
-                task =>
+                TaskScheduler.Current)
+                .ContinueWith(
+                t =>
                 {
-                    if (!task.IsFaulted)
+                    if (!t.IsFaulted)
                     {
                         functionPipelineStep().MarkOutputQueueAsCompleted(thisStepNumber);
                     }
                 });
+
+                tasks.Add(task);
+            }
+
+            var taskArray = tasks.ToArray();
+
+            Task.WhenAll(taskArray);
 
             return tasks;
         }

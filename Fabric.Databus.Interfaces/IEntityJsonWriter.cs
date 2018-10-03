@@ -49,6 +49,8 @@ namespace Fabric.Databus.Interfaces
             string propertyName,
             IDictionary<string, string> propertyTypes);
 
+        Task WriteToStreamAsync(JObject document, Stream stream);
+
         /// <summary>
         /// The set properties by merge.
         /// </summary>

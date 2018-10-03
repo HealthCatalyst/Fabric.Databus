@@ -15,6 +15,7 @@ namespace ElasticSearchSqlFeederConsole
     using System.Linq;
     using System.Threading;
 
+    using Fabric.Databus.Client;
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.ElasticSearch;
@@ -79,6 +80,8 @@ namespace ElasticSearchSqlFeederConsole
                 using (var cancellationTokenSource = new CancellationTokenSource())
                 {
                     var container = new UnityContainer();
+                    container.RegisterInstance<IProgressMonitor>(progressMonitor);
+
                     var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
                     container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
                     container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
@@ -95,9 +98,9 @@ namespace ElasticSearchSqlFeederConsole
                         container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
                     }
 
-                    var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+                    var pipelineRunner = new DatabusRunner();
 
-                    pipelineRunner.RunPipeline(config, progressMonitor);
+                    pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
                 }
             }
 

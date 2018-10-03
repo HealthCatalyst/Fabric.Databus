@@ -173,6 +173,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Fabric.Databus.Client\Fabric.Databus.Client.csproj">
+      <Project>{0b223ee6-7d5e-4d45-aa4d-3417f691bba4}</Project>
+      <Name>Fabric.Databus.Client</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj">
       <Project>{3bbf6cf0-197f-4980-bdaf-1418e473c014}</Project>
       <Name>Fabric.Databus.ElasticSearch</Name>

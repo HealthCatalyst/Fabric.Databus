@@ -140,7 +140,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunPipeline(job, progressMonitor);
+                        pipelineRunner.RunPipeline(job);
                     }
                     catch (OperationCanceledException e)
                     {
@@ -265,7 +265,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunPipeline(job, progressMonitor);
+                        pipelineRunner.RunPipeline(job);
                     }
                     catch (OperationCanceledException e)
                     {

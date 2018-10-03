@@ -42,30 +42,33 @@ namespace Fabric.Databus.Client
         /// </param>
         public void RunElasticSearchPipeline(IJob config, CancellationToken cancellationToken)
         {
-            var container = new UnityContainer();
-
-            ILogger logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.File(Path.Combine(Path.GetTempPath(), "Databus.out.txt"))
-                .CreateLogger();
-
-            var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
-            container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
-            container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
-            container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
-            container.RegisterType<IHttpClientFactory, HttpClientFactory>();
-            container.RegisterInstance(logger);
-
-            if (config.Config.UseMultipleThreads)
+            using (var progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
             {
-                container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
-            }
-            else
-            {
-                container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
-            }
+                var container = new UnityContainer();
 
-            this.RunElasticSearchPipeline(container, config, logger);
+                ILogger logger = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo
+                    .File(Path.Combine(Path.GetTempPath(), "Databus.out.txt")).CreateLogger();
+
+                container.RegisterInstance<IProgressMonitor>(progressMonitor);
+
+                var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
+                container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
+                container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
+                container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
+                container.RegisterType<IHttpClientFactory, HttpClientFactory>();
+                container.RegisterInstance(logger);
+
+                if (config.Config.UseMultipleThreads)
+                {
+                    container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
+                }
+                else
+                {
+                    container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
+                }
+
+                this.RunElasticSearchPipeline(container, config, cancellationToken);
+            }
         }
 
         /// <summary>
@@ -77,29 +80,26 @@ namespace Fabric.Databus.Client
         /// <param name="config">
         ///     The config.
         /// </param>
-        /// <param name="logger">
-        ///     The logger.
+        /// <param name="cancellationToken">
+        ///     The cancellation token
         /// </param>
-        public void RunElasticSearchPipeline(IUnityContainer container, IJob config, ILogger logger)
+        public void RunElasticSearchPipeline(
+            IUnityContainer container,
+            IJob config,
+            CancellationToken cancellationToken)
         {
-            using (var progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
-            {
-                using (var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource())
-                {
-                    var stopwatch = new Stopwatch();
-                    stopwatch.Start();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-                    var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+            var pipelineRunner = new PipelineRunner(container, cancellationToken);
 
-                    pipelineRunner.RunPipeline(config, progressMonitor);
+            pipelineRunner.RunPipeline(config);
 
-                    stopwatch.Stop();
+            stopwatch.Stop();
 
-                    var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
-                    var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
-                    logger.Verbose($"Finished in {timeElapsed} using {threadText}");
-                }
-            }
+            var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+            var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
+            container.Resolve<ILogger>().Verbose($"Finished in {timeElapsed} using {threadText}");
         }
     }
 }

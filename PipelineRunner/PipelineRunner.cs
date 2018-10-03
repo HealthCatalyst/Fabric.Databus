@@ -103,7 +103,7 @@ namespace PipelineRunner
             jobStatusTracker.TrackStart();
             try
             {
-                this.RunPipeline(config, progressMonitor);
+                this.RunPipeline(config);
             }
             catch (Exception e)
             {
@@ -120,10 +120,7 @@ namespace PipelineRunner
         /// <param name="job">
         /// The job.
         /// </param>
-        /// <param name="progressMonitor">
-        /// The progress monitor.
-        /// </param>
-        public void RunPipeline(IJob job, IProgressMonitor progressMonitor)
+        public void RunPipeline(IJob job)
         {
             if (job == null)
             {
@@ -135,7 +132,7 @@ namespace PipelineRunner
             }
 
             var config = job.Config;
-            this.InitContainer(progressMonitor, config);
+            this.InitContainer(config);
 
             if (config.WriteTemporaryFilesToDisk)
             {
@@ -227,15 +224,10 @@ namespace PipelineRunner
         /// <summary>
         /// The init container.
         /// </summary>
-        /// <param name="progressMonitor">
-        /// The progress monitor.
-        /// </param>
         /// <param name="config">
         /// The config.
         /// </param>
-        private void InitContainer(
-            IProgressMonitor progressMonitor,
-            IQueryConfig config)
+        private void InitContainer(IQueryConfig config)
         {
             var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
 
@@ -246,7 +238,6 @@ namespace PipelineRunner
 
             var queueManager = new QueueManager();
             this.container.RegisterInstance<IQueueManager>(queueManager);
-            this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
             this.container.RegisterInstance<IQueueContext>(queueContext);
             this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
             this.container.RegisterInstance<IJobConfig>(config);

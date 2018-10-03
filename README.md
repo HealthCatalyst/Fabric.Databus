@@ -31,13 +31,23 @@ FileUploadPipelineStep (uploads json to REST API)
 
 
 Benefits:
+
 The queues can be monitored independently of the PipelineStep.
+
 Each PipelineStep has a defined queue item coming and going out so the QPipelineSteps are very pluggable
+
 You can specify the number of instances of each PipelineStep to use multiple threads
+
 The queues allow work to flow without each PipelineStep completing
+
 The queue manager controls how much data is loaded into memory
+
 Batching allows handling of large amounts of data by only loading small subsets in memory
+
 We use Unity so various modules can be replaced and unit testing is easy
+
+# Running via console
+You can run ElasticSearchSqlFeederConsole and pass it a xml file.  There is a sample fhir.xml.
 
 # Running Fabric.Databus via REST API and Docker
 

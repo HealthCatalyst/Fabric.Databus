@@ -3,13 +3,13 @@
   <Config>
     <ConnectionString>server=(local);initial catalog=SharedDeId;Trusted_Connection=True;</ConnectionString>
     <Url>http://localhost:9200</Url>
-    <MaximumEntitiesToLoad>5000</MaximumEntitiesToLoad>
+    <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
     <EntitiesPerBatch>100</EntitiesPerBatch>
     <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
     <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
     <DropAndReloadIndex>false</DropAndReloadIndex>
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
-    <WriteDetailedTemporaryFilesToDisk>false</WriteDetailedTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
     <UploadToElasticSearch>false</UploadToElasticSearch>
     <Index>patients2</Index>
@@ -17,6 +17,7 @@
     <EntityType>patient</EntityType>
     <TopLevelKeyColumn>EDWPatientID</TopLevelKeyColumn>
     <UseMultipleThreads>true</UseMultipleThreads>
+    <KeepTemporaryLookupColumnsInOutput>true</KeepTemporaryLookupColumnsInOutput>
   </Config>
 
   <Data>

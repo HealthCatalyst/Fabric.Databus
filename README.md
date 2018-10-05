@@ -70,10 +70,23 @@ curl -XPOST http://localhost:5000/job --data-binary @cjob.xml
 
 There is a sample config file in the configs/localhost folder.
 
+# Creating nested json
 
-| Step  |      Description      |  Input | Output |
-|----------|:-------------:|------:|
-| col 1 is |  left-aligned | $1600 |
-| col 2 is |    centered   |   $12 |
-| col 3 is | right-aligned |    $1 |
+Patients table
+
+| PatientID  | PatientLastNM |
+| ------------- | ------------- |
+| 1  | Jones  |
+| 2  | McConnell  |
+
+
+PatientDiagnosis table
+
+| DiagnosisID  | PatientID |  DiagnosisCD |
+| ------------- | ------------- | ---------- |
+| 1  | 1  |  E11.3 |
+| 2  | 1  | E 13.4 !
+
+
+
 

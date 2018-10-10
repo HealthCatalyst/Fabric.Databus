@@ -10,6 +10,7 @@
 namespace MappingUploadPipelineStep
 {
     using System;
+    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -36,6 +37,11 @@ namespace MappingUploadPipelineStep
         /// </summary>
         private readonly IElasticSearchUploader elasticSearchUploader;
 
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:MappingUploadPipelineStep.MappingUploadPipelineStep" /> class.
@@ -60,6 +66,12 @@ namespace MappingUploadPipelineStep
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
+            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-{LoggerName}");
+            if (this.Config.WriteDetailedTemporaryFilesToDisk)
+            {
+                Directory.CreateDirectory(this.folder);
+            }
+
         }
 
         /// <inheritdoc />s

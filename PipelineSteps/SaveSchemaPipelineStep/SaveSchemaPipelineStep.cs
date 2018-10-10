@@ -46,6 +46,11 @@ namespace SaveSchemaPipelineStep
         /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
 
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:SaveSchemaPipelineStep.SaveSchemaPipelineStep" /> class.
@@ -75,6 +80,8 @@ namespace SaveSchemaPipelineStep
         {
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
             this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
+            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-{LoggerName}");
+            this.fileWriter.CreateDirectory(this.folder);
         }
 
         /// <inheritdoc />
@@ -133,7 +140,7 @@ namespace SaveSchemaPipelineStep
                     });
 
             string path = Path.Combine(
-                this.Config.LocalSaveFolder,
+                this.folder,
                 propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
 
             await this.fileWriter.WriteStreamAsync(path, stream);

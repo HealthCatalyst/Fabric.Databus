@@ -10,18 +10,14 @@
 namespace Fabric.Databus.ElasticSearch
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Net.Http;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Fabric.Databus.Http;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
 
@@ -133,8 +129,6 @@ namespace Fabric.Databus.ElasticSearch
         {
             var host = this.hosts.First();
 
-            this.AddAuthorizationToken(this.httpClient);
-
             // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
             await this.httpClient.PostAsyncString(
                 host + "/_aliases?pretty",
@@ -180,8 +174,6 @@ namespace Fabric.Databus.ElasticSearch
             var relativeUrl = $"/{this.index}";
             var host = this.hosts.First();
 
-            this.AddAuthorizationToken(this.httpClient);
-
             // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
             await this.httpClient.PostAsyncString(
                 host + "/_aliases?pretty",
@@ -210,8 +202,6 @@ namespace Fabric.Databus.ElasticSearch
             {
                 var host = this.hosts.First() ?? throw new ArgumentNullException("hosts.First()");
 
-                this.AddAuthorizationToken(this.httpClient);
-
                 // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
                 await this.httpClient.PostAsync(host + "/_forcemerge?only_expunge_deletes=true", null);
 
@@ -237,8 +227,6 @@ namespace Fabric.Databus.ElasticSearch
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
 
             var host = this.hosts.First();
-
-            this.AddAuthorizationToken(this.httpClient);
 
             if (!this.keepIndexOnline)
             {
@@ -275,7 +263,6 @@ namespace Fabric.Databus.ElasticSearch
         public async Task SetupAliasAsync()
         {
             var host = this.hosts.First();
-            this.AddAuthorizationToken(this.httpClient);
             await this.httpClient.PostAsyncString(
                 host + "/_aliases?pretty",
                 "{\"actions\" : [{ \"add\" : { \"index\" : \"" + this.index + "\", \"alias\" : \"" + this.alias
@@ -394,8 +381,6 @@ namespace Fabric.Databus.ElasticSearch
         {
             var host = this.hosts.First();
 
-            this.AddAuthorizationToken(this.httpClient);
-
             return await this.httpClient.GetStringAsync(host);
         }
 
@@ -410,8 +395,6 @@ namespace Fabric.Databus.ElasticSearch
             // curl -XPUT %ESURL%/patients2/_settings --data "{ \"index\" : {\"refresh_interval\" : \"1s\" } }"
 
             var host = this.hosts.First();
-
-            this.AddAuthorizationToken(this.httpClient);
 
             if (!this.keepIndexOnline)
             {
@@ -449,11 +432,6 @@ namespace Fabric.Databus.ElasticSearch
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
 
                 var baseUri = url;
-                this.httpClient.BaseAddress = new Uri(baseUri);
-                this.httpClient.DefaultRequestHeaders.Accept.Clear();
-
-                this.AddAuthorizationToken(this.httpClient);
-
                 string requestContent;
 
                 using (var newMemoryStream = new MemoryStream())
@@ -474,8 +452,8 @@ namespace Fabric.Databus.ElasticSearch
                 var requestStartTimeMillisecs = this.stopwatch.ElapsedMilliseconds;
 
                 var response = doCompress
-                                   ? await this.httpClient.PutAsyncStreamCompressed(url, stream)
-                                   : await this.httpClient.PutAsyncStream(url, stream);
+                                   ? await this.httpClient.PutAsyncStreamCompressed(baseUri, url, stream)
+                                   : await this.httpClient.PutAsyncStream(baseUri, url, stream);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -545,10 +523,6 @@ namespace Fabric.Databus.ElasticSearch
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
 
                 var baseUri = url;
-                this.httpClient.BaseAddress = new Uri(baseUri);
-                this.httpClient.DefaultRequestHeaders.Accept.Clear();
-
-                this.AddAuthorizationToken(this.httpClient);
 
                 // var fileContent = new FileContent(filepath);
 
@@ -556,7 +530,7 @@ namespace Fabric.Databus.ElasticSearch
                 Interlocked.Increment(ref this.currentRequests);
                 var requestStartTimeMillisecs = this.stopwatch.ElapsedMilliseconds;
 
-                var response = await this.httpClient.PutAsyncFileCompressed(url, filepath);
+                var response = await this.httpClient.PutAsyncFileCompressed(baseUri, url, filepath);
 
                 if (response.IsSuccessStatusCode)
                 {

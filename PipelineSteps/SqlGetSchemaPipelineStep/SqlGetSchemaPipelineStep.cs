@@ -71,11 +71,8 @@ namespace SqlGetSchemaPipelineStep
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.schemaLoader = schemaLoader ?? throw new ArgumentNullException(nameof(schemaLoader));
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
-            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlGetSchema");
-            if (this.Config.WriteDetailedTemporaryFilesToDisk)
-            {
-                Directory.CreateDirectory(this.folder);
-            }
+            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-{LoggerName}");
+            this.fileWriter.CreateDirectory(this.folder);
         }
 
         /// <summary>

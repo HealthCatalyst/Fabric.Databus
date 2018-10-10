@@ -1,0 +1,47 @@
+<?xml version="1.0"?> 
+<Job>
+  <Config>
+    <ConnectionString>server=imranedw2;initial catalog=EdwAdmin;Trusted_Connection=True;</ConnectionString>
+    <Url>http://localhost:9200</Url>
+    <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
+    <EntitiesPerBatch>100</EntitiesPerBatch>
+    <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
+    <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
+    <DropAndReloadIndex>true</DropAndReloadIndex>
+    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
+    <CompressFiles>false</CompressFiles>
+    <UploadToElasticSearch>true</UploadToElasticSearch>
+    <Index>metadata1</Index>
+    <Alias>metadata</Alias>
+    <EntityType>datamart</EntityType>
+    <TopLevelKeyColumn>DataMartID</TopLevelKeyColumn>
+    <UseMultipleThreads>false</UseMultipleThreads>
+  </Config>
+
+  <Data>
+    <DataSource>
+      <Sql>
+        SELECT
+        DataMartID,
+        DataMartNM,
+        ContentID
+        from CatalystAdmin.DataMartBASE
+      </Sql>
+    </DataSource>
+    <DataSource Path="entities">
+      <Sql>
+        /****** Script for SelectTopNRows command from SSMS  ******/
+        SELECT [EntityID] As KeyLevel1
+        ,[DataMartID]
+        ,[ConnectionID]
+        ,[ContentID]
+        ,[EntityNM]
+        ,[LastModifiedDTS]
+        ,[LastDeployedDTS]
+        ,[LastSuccessfulLoadDTS]
+        FROM [CatalystAdmin].[EntityBASE]
+      </Sql>
+    </DataSource>
+  </Data>
+</Job>

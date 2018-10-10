@@ -100,6 +100,11 @@ namespace Fabric.Databus.Http
             this.password = password;
 
             this.httpClient = httpClientFactory.Create();
+            this.httpClient.DefaultRequestHeaders.Accept.Clear();
+
+            this.AddAuthorizationToken(this.httpClient);
+
+
         }
 
         /// <inheritdoc />
@@ -142,11 +147,6 @@ namespace Fabric.Databus.Http
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
 
                 var baseUri = url;
-                this.httpClient.BaseAddress = new Uri(baseUri);
-                this.httpClient.DefaultRequestHeaders.Accept.Clear();
-
-                this.AddAuthorizationToken(this.httpClient);
-
                 string requestContent;
 
                 using (var newMemoryStream = new MemoryStream())
@@ -167,8 +167,8 @@ namespace Fabric.Databus.Http
                 var requestStartTimeMillisecs = this.stopwatch.ElapsedMilliseconds;
 
                 var response = doCompress
-                                   ? await this.httpClient.PutAsyncStreamCompressed(url, stream)
-                                   : await this.httpClient.PutAsyncStream(url, stream);
+                                   ? await this.httpClient.PutAsyncStreamCompressed(baseUri, url, stream)
+                                   : await this.httpClient.PutAsyncStream(baseUri, url, stream);
 
                 if (response.IsSuccessStatusCode)
                 {

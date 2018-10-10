@@ -108,8 +108,14 @@ namespace Fabric.Databus.Console
 
                     var pipelineRunner = new DatabusRunner();
 
-                    // pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
-                    pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
+                    if (config.Config.UploadToElasticSearch)
+                    {
+                        pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
+                    }
+                    else
+                    {
+                        pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
+                    }
                 }
             }
 

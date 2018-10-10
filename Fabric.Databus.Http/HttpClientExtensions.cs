@@ -1,5 +1,6 @@
 ﻿namespace Fabric.Databus.Http
 {
+    using System;
     using System.IO;
     using System.IO.Compression;
     using System.Net.Http;
@@ -22,7 +23,7 @@
             return client.PutAsync(url, stringcontent);
         }
 
-        public static ConfiguredTaskAwaitable<HttpResponseMessage> PutAsyncFileCompressed(this HttpClient client, string url,
+        public static ConfiguredTaskAwaitable<HttpResponseMessage> PutAsyncFileCompressed(this HttpClient client, string baseUri, string relativeUrl,
                                                                         string filename)
         {
             var allText = File.ReadAllText(filename);
@@ -37,10 +38,10 @@
             content.Headers.ContentType = new MediaTypeHeaderValue(_contentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-
+            var url = new Uri(new Uri(baseUri), relativeUrl);
             return client.PutAsync(url, content).ConfigureAwait(false); ;
         }
-        public static ConfiguredTaskAwaitable<HttpResponseMessage> PutAsyncStreamCompressed(this HttpClient client, string url,
+        public static ConfiguredTaskAwaitable<HttpResponseMessage> PutAsyncStreamCompressed(this HttpClient client, string baseUri, string relativeUrl,
                                                                         Stream stream)
         {
             stream.Position = 0;
@@ -57,10 +58,11 @@
             content.Headers.ContentType = new MediaTypeHeaderValue(_contentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
+            var url = new Uri(new Uri(baseUri), relativeUrl);
             return client.PutAsync(url, content).ConfigureAwait(false);
         }
 
-        public static ConfiguredTaskAwaitable<HttpResponseMessage> PutAsyncStream(this HttpClient client, string url,
+        public static ConfiguredTaskAwaitable<HttpResponseMessage> PutAsyncStream(this HttpClient client, string baseUri, string relativeUrl,
             Stream stream)
         {
             stream.Position = 0;
@@ -73,6 +75,7 @@
             StreamContent content = new StreamContent(ms);
             content.Headers.ContentType = new MediaTypeHeaderValue(_contentTypeHeader);
 
+            var url = new Uri(new Uri(baseUri), relativeUrl);
             return client.PutAsync(url, content).ConfigureAwait(false);
         }
 

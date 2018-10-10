@@ -108,8 +108,8 @@ namespace Fabric.Databus.Json
                     {
                         if (value == null
                             || value == DBNull.Value
-                            || string.IsNullOrEmpty((string)value)
-                            || ((string)value).Equals("NULL", StringComparison.OrdinalIgnoreCase))
+                            || (value is string && string.IsNullOrEmpty((string)value))
+                            || (value is string && ((string)value).Equals("NULL", StringComparison.OrdinalIgnoreCase)))
                         {
                             shouldWriteColumn = false;
                         }

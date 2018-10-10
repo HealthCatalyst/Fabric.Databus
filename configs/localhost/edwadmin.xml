@@ -29,10 +29,11 @@
         from CatalystAdmin.DataMartBASE
       </Sql>
     </DataSource>
-    <DataSource Path="entities">
+    <DataSource Path="Entities">
       <Sql>
         /****** Script for SelectTopNRows command from SSMS  ******/
-        SELECT [EntityID] As KeyLevel1
+        SELECT [EntityID]
+        ,[EntityID] As KeyLevel1
         ,[DataMartID]
         ,[ConnectionID]
         ,[ContentID]

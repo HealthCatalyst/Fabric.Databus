@@ -27,6 +27,7 @@
         DataMartNM,
         ContentID
         from CatalystAdmin.DataMartBASE
+        WHERE LastModifiedDate > '1/1/2018'
       </Sql>
     </DataSource>
     <DataSource Path="Entities">
@@ -42,6 +43,18 @@
         ,[LastDeployedDTS]
         ,[LastSuccessfulLoadDTS]
         FROM [CatalystAdmin].[EntityBASE]
+      </Sql>
+    </DataSource>
+    <DataSource Path="Entities.Fields">
+      <Sql>
+        SELECT [FieldID]
+        ,[DataMartID]
+        ,fb.[EntityID]
+        ,fb.[ContentID]
+        ,[FieldNM]
+        FROM [CatalystAdmin].[FieldBASE] fb
+        inner join [CatalystAdmin].EntityBASE
+        on [CatalystAdmin].EntityBASE.EntityID = fb.EntityID
       </Sql>
     </DataSource>
   </Data>

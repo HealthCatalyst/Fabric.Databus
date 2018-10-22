@@ -9,4 +9,6 @@ RUN /usr/sbin/update-ca-certificates
 
 RUN mkdir -p /home/hcadmin/json
 
+RUN touch v1.52.txt
+
 ENTRYPOINT ["dotnet", "Fabric.Databus.API.dll"]

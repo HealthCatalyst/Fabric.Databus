@@ -13,7 +13,7 @@ namespace Fabric.Databus.API.Modules
 		{
 				public ValidateJobModule(ILogger logger, IJobScheduler jobScheduler) : base("/validate")
 				{
-						this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.validate", StringComparison.OrdinalIgnoreCase));
+						// this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.validate", StringComparison.OrdinalIgnoreCase));
 
 						Post("/", async parameters =>
 						{

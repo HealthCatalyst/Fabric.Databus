@@ -14,7 +14,7 @@ namespace Fabric.Databus.API.Modules
 		{
 				public JobModule(ILogger logger, IJobScheduler jobScheduler) : base("/jobs")
 				{
-						this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
+						// this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
 
 						Post("/", parameters =>
 						{

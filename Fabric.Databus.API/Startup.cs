@@ -46,13 +46,13 @@ namespace Fabric.Databus.API
 						var log = ConfigureLogger(levelSwitch, appConfig);
 
 						app.UseCors("default");
-						app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
-						{
-								Authority = appConfig.Authority,
-								RequireHttpsMetadata = false,
+						//app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
+						//{
+						//		Authority = appConfig.Authority,
+						//		RequireHttpsMetadata = false,
 
-								ApiName = appConfig.ClientId,
-						});
+						//		ApiName = appConfig.ClientId,
+						//});
 
 						app.UseOwin(buildFunc =>
 						{

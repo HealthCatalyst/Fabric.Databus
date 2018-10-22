@@ -11,7 +11,7 @@ namespace Fabric.Databus.API.Modules
 		{
 				public JobStatusModule(ILogger logger, IJobScheduler jobScheduler) : base("/jobstatus")
 				{
-						this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
+						// this.RequiresClaims(claim => claim.Value.Equals("fabric/databus.queuejob", StringComparison.OrdinalIgnoreCase));
 
 						Get("/", parameters => jobScheduler.GetMostRecentJobs(10));
 

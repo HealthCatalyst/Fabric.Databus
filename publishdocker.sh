@@ -1,11 +1,11 @@
 echo off
 
-version=1.2
+version=1.54
 
 read -n 1 -p 'Are you sure you want to publish to dockerhub?'
 echo "(ok)"
 
-echo Logging in to dockerhub as healthcatalyst  
+echo Logging in to dockerhub as healthcatalyst
 docker login --username healthcatalyst
 
 docker stop fabric.databus

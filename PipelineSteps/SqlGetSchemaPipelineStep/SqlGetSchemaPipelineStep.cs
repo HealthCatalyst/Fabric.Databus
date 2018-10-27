@@ -93,7 +93,10 @@ namespace SqlGetSchemaPipelineStep
             {
                 var filePath = Path.Combine(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
 
-                await this.fileWriter.WriteToFileAsync(filePath, mappingItem.ToJsonPretty());
+                if (this.fileWriter.IsWritingEnabled)
+                {
+                    await this.fileWriter.WriteToFileAsync(filePath, mappingItem.ToJsonPretty());
+                }
             }
 
             await this.AddToOutputQueueAsync(new SaveSchemaQueueItem { Mappings = mappingItems, Job = workItem.Job });

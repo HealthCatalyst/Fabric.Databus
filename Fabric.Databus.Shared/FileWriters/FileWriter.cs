@@ -15,12 +15,14 @@ namespace Fabric.Databus.Shared.FileWriters
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.FileWriters;
 
-    /// <inheritdoc />
     /// <summary>
     /// The file writer.
     /// </summary>
     public class FileWriter : IDetailedTemporaryFileWriter, ITemporaryFileWriter, IFileWriter
     {
+        /// <inheritdoc />
+        public bool IsWritingEnabled => true;
+
         /// <inheritdoc />
         public void CreateDirectory(string path)
         {

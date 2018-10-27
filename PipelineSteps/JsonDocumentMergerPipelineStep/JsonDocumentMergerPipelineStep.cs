@@ -297,7 +297,10 @@ namespace JsonDocumentMergerPipelineStep
 
                 await this.AddToOutputQueueAsync(tuple.Item2);
 
-                await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
+                if (this.fileWriter.IsWritingEnabled)
+                {
+                    await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
+                }
             }
         }
     }

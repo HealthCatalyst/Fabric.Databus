@@ -19,6 +19,11 @@ namespace Fabric.Databus.Interfaces.FileWriters
     public interface IFileWriter
     {
         /// <summary>
+        /// Gets a value indicating whether is writing enable.
+        /// </summary>
+        bool IsWritingEnabled { get; }
+
+        /// <summary>
         /// The create directory.
         /// </summary>
         /// <param name="path">

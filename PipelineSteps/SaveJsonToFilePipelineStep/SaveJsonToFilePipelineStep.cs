@@ -50,7 +50,10 @@ namespace SaveJsonToFilePipelineStep
 
             string path = Path.Combine(this.Config.LocalSaveFolder, $"{workItem.Id}.json");
 
-            await fileWriter.WriteStreamAsync(path, stream);
+            if (this.fileWriter.IsWritingEnabled)
+            {
+                await fileWriter.WriteStreamAsync(path, stream);
+            }
 
             await this.AddToOutputQueueAsync(workItem);
         }

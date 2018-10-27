@@ -213,27 +213,30 @@ namespace SqlImportPipelineStep
 
             var path = Path.Combine(Path.Combine(this.folder, queryId), Convert.ToString(batchNumber));
 
-            this.fileWriter.CreateDirectory(path);
-
-            foreach (var frame in result.Data)
+            if (this.fileWriter.IsWritingEnabled)
             {
-                var key = frame.Key;
+                this.fileWriter.CreateDirectory(path);
 
-                var filepath = Path.Combine(path, Convert.ToString(key) + ".csv");
-
-                using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
+                foreach (var frame in result.Data)
                 {
-                    using (var streamWriter = new StreamWriter(stream))
+                    var key = frame.Key;
+
+                    var filepath = Path.Combine(path, Convert.ToString(key) + ".csv");
+
+                    using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
                     {
-                        var columns = result.ColumnList.Select(c => c.Name).ToList();
-                        var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
-
-                        await streamWriter.WriteLineAsync(text);
-
-                        var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
-                        foreach (var item in list)
+                        using (var streamWriter = new StreamWriter(stream))
                         {
-                            await streamWriter.WriteLineAsync($@"""{key}""," + item);
+                            var columns = result.ColumnList.Select(c => c.Name).ToList();
+                            var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
+
+                            await streamWriter.WriteLineAsync(text);
+
+                            var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
+                            foreach (var item in list)
+                            {
+                                await streamWriter.WriteLineAsync($@"""{key}""," + item);
+                            }
                         }
                     }
                 }

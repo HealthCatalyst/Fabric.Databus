@@ -143,7 +143,10 @@ namespace SaveSchemaPipelineStep
                 this.folder,
                 propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
 
-            await this.fileWriter.WriteStreamAsync(path, stream);
+            if (this.fileWriter.IsWritingEnabled)
+            {
+                await this.fileWriter.WriteStreamAsync(path, stream);
+            }
         }
     }
 }

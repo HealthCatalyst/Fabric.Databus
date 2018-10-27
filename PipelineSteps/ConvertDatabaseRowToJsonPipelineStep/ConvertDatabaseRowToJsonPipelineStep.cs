@@ -135,7 +135,10 @@ namespace ConvertDatabaseRowToJsonPipelineStep
                 sb.AppendLine(jsonForRow.ToString());
             }
 
-            await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{id}.json"), sb.ToString());
+            if (this.fileWriter.IsWritingEnabled)
+            {
+                await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{id}.json"), sb.ToString());
+            }
 
             await this.AddToOutputQueueAsync(
                 new JsonDocumentMergerQueueItem

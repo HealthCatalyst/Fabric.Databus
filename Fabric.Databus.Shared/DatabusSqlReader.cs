@@ -122,15 +122,15 @@ namespace Fabric.Databus.Shared
                 // add any calculated fields
                 var calculatedFields = load.Fields.Where(f => f.Destination != null)
                     .Select(f => new ColumnInfo
-                                     {
-                                         sourceIndex =
+                    {
+                        sourceIndex =
                                              columnList.FirstOrDefault(c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
-                                         index = numberOfColumns++,
-                                         Name = f.Destination,
-                                         ElasticSearchType = f.DestinationType.ToString(),
-                                         IsCalculated = true,
-                                         Transform = f.Transform.ToString()
-                                     })
+                        index = numberOfColumns++,
+                        Name = f.Destination,
+                        ElasticSearchType = f.DestinationType.ToString(),
+                        IsCalculated = true,
+                        Transform = f.Transform.ToString()
+                    })
                     .ToList();
 
                 calculatedFields.ForEach(c => columnList.Add(c));
@@ -150,11 +150,12 @@ namespace Fabric.Databus.Shared
                     var key = Convert.ToString(values[joinColumnIndex]);
                     if (!data.ContainsKey(key))
                     {
-                        data.Add(key, new List<object[]>());
+                        data.Add(key, new List<object[]> { values });
                     }
-
-
-                    data[key].Add(values);
+                    else
+                    {
+                        data[key].Add(values);
+                    }
                 }
 
                 logger.Verbose($"Finish: {cmd.CommandText} rows={rows}");

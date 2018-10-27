@@ -21,6 +21,10 @@ namespace Fabric.Databus.Shared.FileWriters
     public class NullFileWriter : IDetailedTemporaryFileWriter, ITemporaryFileWriter, IFileWriter
     {
         /// <inheritdoc />
+        public bool IsWritingEnabled => true;
+
+
+        /// <inheritdoc />
         public void CreateDirectory(string path)
         {
         }

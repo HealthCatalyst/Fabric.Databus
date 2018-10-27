@@ -122,25 +122,21 @@ namespace Fabric.Databus.Shared
                 // add any calculated fields
                 var calculatedFields = load.Fields.Where(f => f.Destination != null)
                     .Select(f => new ColumnInfo
-                    {
-                        sourceIndex =
-                            columnList.FirstOrDefault(c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
-                        index = numberOfColumns++,
-                        Name = f.Destination,
-                        ElasticSearchType = f.DestinationType.ToString(),
-                        IsCalculated = true,
-                        Transform = f.Transform.ToString()
-                    })
+                                     {
+                                         sourceIndex =
+                                             columnList.FirstOrDefault(c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
+                                         index = numberOfColumns++,
+                                         Name = f.Destination,
+                                         ElasticSearchType = f.DestinationType.ToString(),
+                                         IsCalculated = true,
+                                         Transform = f.Transform.ToString()
+                                     })
                     .ToList();
 
                 calculatedFields.ForEach(c => columnList.Add(c));
 
-                //EsJsonWriter.WriteMappingToJson(columnList, load.PropertyPath);
-
                 // now write the data
                 var data = new Dictionary<string, List<object[]>>();
-
-                var zipToGeocodeConverter = new ZipToGeocodeConverter();
 
                 int rows = 0;
 
@@ -158,31 +154,6 @@ namespace Fabric.Databus.Shared
                     }
 
 
-                    foreach (var calculatedField in calculatedFields)
-                    {
-                        if (calculatedField.Transform != null && calculatedField.sourceIndex != null)
-                        {
-                            var sourceValue = values[calculatedField.sourceIndex.Value];
-                            if (sourceValue != null)
-                            {
-                                if (calculatedField.Transform == QueryFieldTransform.Zip3ToGeocode.ToString())
-                                {
-                                    var sourceValueText = sourceValue.ToString();
-                                    values[calculatedField.index] =
-                                        await zipToGeocodeConverter.Convert3DigitZipcodeToGeocodeAsync(sourceValueText);
-                                }
-
-                                if (calculatedField.Transform == QueryFieldTransform.Zip5ToGeocode.ToString())
-                                {
-                                    var sourceValueText = sourceValue.ToString();
-                                    var convertZipcodeToGeocode =
-                                        await zipToGeocodeConverter.ConvertZipcodeToGeocodeAsync(sourceValueText);
-                                    values[calculatedField.index] = convertZipcodeToGeocode;
-                                }
-                            }
-                        }
-                    }
-
                     data[key].Add(values);
                 }
 
@@ -190,6 +161,62 @@ namespace Fabric.Databus.Shared
 
                 return new ReadSqlDataResult { Data = data, ColumnList = columnList };
             }
+        }
+
+        /// <summary>
+        /// The calculate fields.
+        /// </summary>
+        /// <param name="load">
+        ///     The load.
+        /// </param>
+        /// <param name="columnList">
+        ///     The column list.
+        /// </param>
+        /// <param name="rows">
+        ///     The rows.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task<List<object[]>> CalculateFields(
+            IDataSource load,
+            List<ColumnInfo> columnList,
+            List<object[]> rows)
+        {
+            var zipToGeocodeConverter = new ZipToGeocodeConverter();
+
+            var calculatedFields = columnList.Where(c => c.IsCalculated).ToList();
+
+            foreach (var row in rows)
+            {
+                var values = row;
+                foreach (var calculatedField in calculatedFields)
+                {
+                    if (calculatedField.Transform != null && calculatedField.sourceIndex != null)
+                    {
+                        var sourceValue = values[calculatedField.sourceIndex.Value];
+                        if (sourceValue != null)
+                        {
+                            if (calculatedField.Transform == QueryFieldTransform.Zip3ToGeocode.ToString())
+                            {
+                                var sourceValueText = sourceValue.ToString();
+                                values[calculatedField.index] =
+                                    await zipToGeocodeConverter.Convert3DigitZipcodeToGeocodeAsync(sourceValueText);
+                            }
+
+                            if (calculatedField.Transform == QueryFieldTransform.Zip5ToGeocode.ToString())
+                            {
+                                var sourceValueText = sourceValue.ToString();
+                                var convertZipcodeToGeocode =
+                                    await zipToGeocodeConverter.ConvertZipcodeToGeocodeAsync(sourceValueText);
+                                values[calculatedField.index] = convertZipcodeToGeocode;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return rows;
         }
 
         /// <inheritdoc />

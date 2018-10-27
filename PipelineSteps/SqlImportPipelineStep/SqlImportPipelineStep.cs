@@ -263,12 +263,6 @@ namespace SqlImportPipelineStep
 
             untransformedFields.ForEach(f => { });
 
-            // EsJsonWriter.WriteRawDataToJson(data, columnList, seed, load.PropertyPath, 
-            //    new SqlJsonValueWriter(), load.Index, load.EntityType);
-
-            // esJsonWriter.WriteRawObjectsToJson(data, columnList, seed, load.PropertyPath, 
-            //    new SqlJsonValueWriter(), load.Index, load.EntityType);
-
             this.MyLogger.Verbose($"Finished reading rows for {queryId}");
         }
     }

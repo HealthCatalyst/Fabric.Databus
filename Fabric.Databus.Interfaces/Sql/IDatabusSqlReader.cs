@@ -64,5 +64,22 @@ namespace Fabric.Databus.Interfaces.Sql
         /// The <see cref="IList"/>.
         /// </returns>
         Task<IList<string>> GetListOfEntityKeysAsync(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource);
+
+        /// <summary>
+        /// The calculate fields.
+        /// </summary>
+        /// <param name="load">
+        ///     The load.
+        /// </param>
+        /// <param name="columnList">
+        ///     The column list.
+        /// </param>
+        /// <param name="rows">
+        ///     The rows.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task<List<object[]>> CalculateFields(IDataSource load, List<ColumnInfo> columnList, List<object[]> rows);
     }
 }

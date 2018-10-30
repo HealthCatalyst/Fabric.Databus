@@ -177,8 +177,8 @@ namespace Fabric.Databus.Http
                     var responseContent = await response.Content.ReadAsStringAsync();
 
                     var stopwatchElapsed = this.stopwatch.ElapsedMilliseconds;
-                    var millisecsPerFile = 0; // Convert.ToInt32(stopwatchElapsed / (_totalFiles - _queuedFiles.Count));
 
+                    // var millisecsPerFile = 0; // Convert.ToInt32(stopwatchElapsed / (_totalFiles - _queuedFiles.Count));
                     var millisecsForThisFile = stopwatchElapsed - requestStartTimeMillisecs;
                 }
                 else

@@ -13,10 +13,4 @@
     <ProjectReference Include="..\..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="NLog">
-      <HintPath>..\..\..\..\..\Users\imran.qureshi\.nuget\packages\nlog\5.0.0-beta06\lib\netstandard1.5\NLog.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

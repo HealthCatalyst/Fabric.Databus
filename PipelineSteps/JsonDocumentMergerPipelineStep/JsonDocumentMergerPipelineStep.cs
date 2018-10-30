@@ -262,7 +262,10 @@ namespace JsonDocumentMergerPipelineStep
         /// </returns>
         private async Task AddDocumentToOutputQueueByKey(string key)
         {
+#pragma warning disable IDE0018 // Inline variable declaration
+            // ReSharper disable once InlineOutVariableDeclaration
             IJsonObjectQueueItem item;
+#pragma warning restore IDE0018 // Inline variable declaration
             if (this.documentDictionary.TryRemove(key, out item))
             {
                 this.MyLogger.Verbose(

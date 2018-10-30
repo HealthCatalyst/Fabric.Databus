@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Fabric.Databus.Client</id>
+    <version>1.0.4</version>
+    <authors>Fabric.Databus.Client</authors>
+    <owners>Fabric.Databus.Client</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Serilog" version="2.7.1" exclude="Build,Analyzers" />
+        <dependency id="Serilog.Sinks.File" version="4.0.0" exclude="Build,Analyzers" />
+        <dependency id="Unity" version="5.8.11" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src=".\bin\Debug\netstandard2.0\*.dll" target="lib\netstandard2.0" />
+  </files>
+</package>

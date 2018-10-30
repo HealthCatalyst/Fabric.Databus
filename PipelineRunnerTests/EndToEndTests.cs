@@ -22,14 +22,13 @@ namespace PipelineRunnerTests
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Sql;
+    using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.Loggers;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using PipelineRunner;
 
     using Serilog;
 

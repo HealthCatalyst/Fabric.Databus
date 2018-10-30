@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PipelineRunner
+namespace Fabric.Databus.PipelineRunner
 {
     using System.Threading;
 

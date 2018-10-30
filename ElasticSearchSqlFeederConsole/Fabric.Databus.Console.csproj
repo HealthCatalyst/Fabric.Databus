@@ -217,9 +217,9 @@
       <Project>{df401a17-f37b-4db4-85f3-113da9906305}</Project>
       <Name>Fabric.Databus.JsonSchema</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PipelineRunner\PipelineRunner.csproj">
+    <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
       <Project>{AF1ADF05-EC10-43EA-877E-AD504A113B58}</Project>
-      <Name>PipelineRunner</Name>
+      <Name>Fabric.Databus.PipelineRunner</Name>
     </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.ZipCodeToGeoCode\Fabric.Databus.ZipCodeToGeoCode.csproj">
       <Project>{5ba49a86-b7fa-4504-92d1-db7ac5695b09}</Project>

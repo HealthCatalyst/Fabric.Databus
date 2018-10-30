@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PipelineRunner
+namespace Fabric.Databus.PipelineRunner
 {
     using System;
     using System.Collections.Generic;
@@ -18,7 +18,6 @@ namespace PipelineRunner
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ConfigValidators;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Shared;
 

@@ -7,26 +7,16 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PipelineRunner
+namespace Fabric.Databus.PipelineRunner
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Queues;
-
-    using FileSavePipelineStep;
-
-    using FileUploadPipelineStep;
-
-    using SaveBatchPipelineStep;
-
-    using SqlBatchPipelineStep;
 
     using Unity;
     using Unity.Resolution;
@@ -38,7 +28,7 @@ namespace PipelineRunner
     {
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:PipelineRunner.MultiThreadedPipelineExecutor" /> class.
+        /// Initializes a new instance of the <see cref="T:Fabric.Databus.PipelineRunner.MultiThreadedPipelineExecutor" /> class.
         /// </summary>
         /// <param name="container">
         /// The container.

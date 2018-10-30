@@ -155,9 +155,9 @@
       <Project>{DC1C2DFF-2458-4396-A872-E44FEF249DE1}</Project>
       <Name>Fabric.Databus.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PipelineRunner\PipelineRunner.csproj">
-      <Project>{AF1ADF05-EC10-43EA-877E-AD504A113B58}</Project>
-      <Name>PipelineRunner</Name>
+    <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
+      <Project>{af1adf05-ec10-43ea-877e-ad504a113b58}</Project>
+      <Name>Fabric.Databus.PipelineRunner</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

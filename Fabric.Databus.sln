@@ -105,7 +105,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlGetSchemaPipelineStep", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BasePipelineStep", "PipelineSteps\BasePipelineStep\BasePipelineStep.csproj", "{CFD6967D-8547-42ED-8EED-CBAA607CDDED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PipelineRunner", "PipelineRunner\PipelineRunner.csproj", "{AF1ADF05-EC10-43EA-877E-AD504A113B58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.PipelineRunner", "PipelineRunner\Fabric.Databus.PipelineRunner.csproj", "{AF1ADF05-EC10-43EA-877E-AD504A113B58}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineRunnerTests", "PipelineRunnerTests\PipelineRunnerTests.csproj", "{F03C5E9C-2DDA-4709-8F98-4690944CFB0D}"
 EndProject
@@ -138,7 +138,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaveJsonToFilePipelineStep"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ElasticSearchConsole", "Fabric.Databus.ElasticSearchConsole\Fabric.Databus.ElasticSearchConsole.csproj", "{DBA64266-AF85-4627-81F6-6183D62858FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCalculateFieldsPipelineStep", "PipelineSteps\SqlCalculateFieldsPipelineStep\SqlCalculateFieldsPipelineStep.csproj", "{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlCalculateFieldsPipelineStep", "PipelineSteps\SqlCalculateFieldsPipelineStep\SqlCalculateFieldsPipelineStep.csproj", "{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

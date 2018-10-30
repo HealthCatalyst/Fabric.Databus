@@ -18,7 +18,7 @@
     <ProjectReference Include="..\Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj" />
     <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj" />
     <ProjectReference Include="..\Fabric.Databus.Shared\Fabric.Databus.Shared.csproj" />
-    <ProjectReference Include="..\PipelineRunner\PipelineRunner.csproj" />
+    <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj" />
   </ItemGroup>
 
 </Project>

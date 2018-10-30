@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PipelineRunner
+namespace Fabric.Databus.PipelineRunner
 {
     using System;
     using System.Collections.Generic;
@@ -47,7 +47,9 @@ namespace PipelineRunner
     using QueueItems;
 
     using SaveBatchPipelineStep;
+
     using SaveJsonToFilePipelineStep;
+
     using SaveSchemaPipelineStep;
 
     using SendToRestApiPipelineStep;

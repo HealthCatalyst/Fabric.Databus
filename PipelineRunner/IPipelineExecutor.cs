@@ -7,12 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PipelineRunner
+namespace Fabric.Databus.PipelineRunner
 {
     using System;
     using System.Collections.Generic;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
 
     /// <summary>

@@ -21,10 +21,9 @@ namespace Fabric.Databus.Client
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Sql;
+    using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.Loggers;
-
-    using PipelineRunner;
 
     using Serilog;
 

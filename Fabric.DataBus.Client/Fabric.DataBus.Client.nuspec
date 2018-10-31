@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>Catalyst.Fabric.Databus.Client</id>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
     <authors>Health Catalyst</authors>
     <owners>Health Catalyst</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -13,6 +13,7 @@
         <dependency id="Serilog" version="2.7.1" exclude="Build,Analyzers" />
         <dependency id="Serilog.Sinks.File" version="4.0.0" exclude="Build,Analyzers" />
         <dependency id="Unity" version="5.8.11" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.5.1" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>

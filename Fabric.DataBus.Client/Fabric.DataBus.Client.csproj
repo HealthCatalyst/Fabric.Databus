@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="Catalyst.Fabric.Databus.Client.1.0.6.nupkg" />
+    <None Remove="Catalyst.Fabric.Databus.Client.1.0.8.nupkg" />
     <None Remove="Fabric.Databus.Client.1.0.3.nupkg" />
     <None Remove="Fabric.Databus.Client.1.0.4.nupkg" />
   </ItemGroup>

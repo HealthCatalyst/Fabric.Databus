@@ -25,7 +25,7 @@ namespace Fabric.Databus.PipelineRunner
         /// <param name="config">
         /// The config.
         /// </param>
-        /// <param name="processors">processors to run</param>
+        /// <param name="pipelineSteps">pipelineSteps to run</param>
         /// <param name="timeoutInMilliseconds">
         /// The timeout in milliseconds.
         /// </param>
@@ -33,7 +33,7 @@ namespace Fabric.Databus.PipelineRunner
         /// </exception>
         void RunPipelineTasks(
             IQueryConfig config,
-            IList<PipelineStepInfo> processors,
+            IList<PipelineStepInfo> pipelineSteps,
             int timeoutInMilliseconds);
     }
 }

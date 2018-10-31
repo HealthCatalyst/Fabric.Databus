@@ -31,9 +31,9 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public override void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> processors, int timeoutInMilliseconds)
+        public override void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> pipelineSteps, int timeoutInMilliseconds)
         {
-            foreach (var processor in processors)
+            foreach (var processor in pipelineSteps)
             {
                 this.RunSync(
                     () => (IPipelineStep)this.container.Resolve(

@@ -8,8 +8,8 @@
     <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
     <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
     <DropAndReloadIndex>false</DropAndReloadIndex>
-    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
-    <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
+    <WriteTemporaryFilesToDisk>false</WriteTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>false</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
     <UploadToElasticSearch>false</UploadToElasticSearch>
     <Index>patients2</Index>

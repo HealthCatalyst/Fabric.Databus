@@ -68,76 +68,83 @@ namespace Fabric.Databus.Console
                 return;
             }
 
-            string inputFile = args[0];
-
-            var config = new ConfigReader().ReadXml(inputFile);
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            ILogger logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.File(Path.Combine(Path.GetTempPath(), "Databus.out.txt"))
-                .CreateLogger();
-
-            using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
+            try
             {
-                using (var cancellationTokenSource = new CancellationTokenSource())
+                string inputFile = args[0];
+
+                var config = new ConfigReader().ReadXml(inputFile);
+
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                ILogger logger = new LoggerConfiguration()
+                    .MinimumLevel.Verbose()
+                    .WriteTo.File(Path.Combine(Path.GetTempPath(), "Databus.out.txt"))
+                    .CreateLogger();
+
+                using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
                 {
-                    var container = new UnityContainer();
-                    container.RegisterInstance<IProgressMonitor>(progressMonitor);
-
-                    var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
-                    container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
-                    container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
-                    container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
-                    container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
-                    container.RegisterType<IFileUploader, FileUploader>();
-
-                    container.RegisterType<IHttpClientFactory, HttpClientFactory>();
-                    container.RegisterInstance(logger);
-
-                    if (config.Config.UseMultipleThreads)
+                    using (var cancellationTokenSource = new CancellationTokenSource())
                     {
-                        container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
-                    }
-                    else
-                    {
-                        container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
-                    }
+                        var container = new UnityContainer();
+                        container.RegisterInstance<IProgressMonitor>(progressMonitor);
 
-                    var pipelineRunner = new DatabusRunner();
+                        var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
+                        container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
+                        container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
+                        container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
+                        container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
+                        container.RegisterType<IFileUploader, FileUploader>();
 
-                    if (config.Config.UploadToElasticSearch)
-                    {
-                        pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
-                    }
-                    else
-                    {
-                        pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
+                        container.RegisterType<IHttpClientFactory, HttpClientFactory>();
+                        container.RegisterInstance(logger);
+
+                        if (config.Config.UseMultipleThreads)
+                        {
+                            container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
+                        }
+                        else
+                        {
+                            container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
+                        }
+
+                        var pipelineRunner = new DatabusRunner();
+
+                        if (config.Config.UploadToElasticSearch)
+                        {
+                            pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
+                        }
+                        else
+                        {
+                            pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
+                        }
                     }
                 }
-            }
 
-            stopwatch.Stop();
-            var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
-            var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
-            Console.WriteLine($"Finished in {timeElapsed} using {threadText}");
+                stopwatch.Stop();
+                var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+                var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
+                Console.WriteLine($"Finished in {timeElapsed} using {threadText}");
 
 #if TRUE
-            logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);
-            //logger.Error(new Exception("test"), "An error has occurred.");
+                logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);
+                //logger.Error(new Exception("test"), "An error has occurred.");
 
-            Log.CloseAndFlush();
+                Log.CloseAndFlush();
 
-            //file.Flush();
-            //file.Close();
-            //file.Dispose();
-            //file = null;
+                //file.Flush();
+                //file.Close();
+                //file.Dispose();
+                //file = null;
 #endif
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
             Console.WriteLine("(Type any key to exit)");
             Console.ReadKey();
         }
-
     }
 }

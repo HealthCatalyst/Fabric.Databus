@@ -56,6 +56,8 @@ namespace Fabric.Databus.Nuget.Console
                 throw new Exception("Please pass the job.xml file as a parameter");
             }
 
+            try
+            {
             string inputFile = args[0];
 
             var config = new ConfigReader().ReadXml(inputFile);
@@ -118,11 +120,17 @@ namespace Fabric.Databus.Nuget.Console
 
             Log.CloseAndFlush();
 
-            //file.Flush();
-            //file.Close();
-            //file.Dispose();
-            //file = null;
+                //file.Flush();
+                //file.Close();
+                //file.Dispose();
+                //file = null;
 #endif
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
             Console.WriteLine("(Type any key to exit)");
             Console.ReadKey();
 

@@ -11,6 +11,7 @@ namespace Fabric.Databus.PipelineRunner
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -44,26 +45,60 @@ namespace Fabric.Databus.PipelineRunner
         /// <inheritdoc />
         public override void RunPipelineTasks(
             IQueryConfig config,
-            IList<PipelineStepInfo> processors,
+            IList<PipelineStepInfo> pipelineSteps,
             int timeoutInMilliseconds)
         {
-            var tasks = processors
-                .Select(
-                    processor => this.RunAsync(
-                        () => (IPipelineStep)this.container.Resolve(
-                            processor.Type,
-                            new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token)),
-                        processor.Count)).SelectMany(task => task)
-                .ToList();
+            List<Task> tasks = new List<Task>();
+
+            foreach (var pipelineStep in pipelineSteps)
+            {
+                // ReSharper disable once ConvertToLocalFunction
+                Func<IPipelineStep> functionPipelineStep =
+                    () => (IPipelineStep)this.container.Resolve(
+                    pipelineStep.Type,
+                    new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token));
+
+                var tasksForPipelineStep = this.CreateTasks(functionPipelineStep, pipelineStep.Count);
+
+                tasks.AddRange(tasksForPipelineStep);
+
+                // create a local variable so it can captured in the closure
+                var thisStepNumber = this.stepNumber;
+
+                // mark a queue as done when all the tasks for that queue are done
+                Task.WhenAll(tasksForPipelineStep).ContinueWith(
+                    t =>
+                        {
+                            functionPipelineStep().MarkOutputQueueAsCompleted(thisStepNumber);
+                        });
+            }
 
             try
             {
-                Task.WaitAll(tasks.ToArray(), timeoutInMilliseconds, this.cancellationTokenSource.Token);
+                foreach (var task in tasks)
+                {
+                    // do it here so we don't have the original tasks in the list not the continuation ones
+                    task.ContinueWith(
+                        t =>
+                            {
+                                if (!this.cancellationTokenSource.IsCancellationRequested)
+                                {
+                                    // set the cancellationToken so other tasks are canceled
+                                    this.cancellationTokenSource.Cancel();
+                                }
+                            },
+                        this.cancellationTokenSource.Token,
+                        TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted,
+                        TaskScheduler.Current);
+                }
+
+                tasks.ForEach(t => t.Start());
+                Task.WaitAll(tasks.ToArray());
             }
-            catch (Exception)
+            catch (AggregateException ex)
             {
-                var exceptions = tasks.Where(task => task.Exception != null).Select(task => task.Exception.Flatten()).ToList();
-                throw new AggregateException(exceptions);
+                var realExceptions = ex.Flatten().InnerExceptions.Where(e => !(e is TaskCanceledException)).ToList();
+                throw new AggregateException(realExceptions);
             }
         }
 
@@ -79,12 +114,14 @@ namespace Fabric.Databus.PipelineRunner
         /// <returns>
         /// The <see cref="IList"/>.
         /// </returns>
-        private IList<Task> RunAsync(Func<IPipelineStep> functionPipelineStep, int count)
+        [Pure]
+        private IList<Task> CreateTasks(Func<IPipelineStep> functionPipelineStep, int count)
         {
             IList<Task> tasks = new List<Task>();
 
             this.stepNumber++;
 
+            // create a local variable so it can captured in the closure
             var thisStepNumber = this.stepNumber;
 
             bool isFirst = true;
@@ -101,32 +138,14 @@ namespace Fabric.Databus.PipelineRunner
 
                 pipelineStep.InitializeWithStepNumber(thisStepNumber);
 
-                var task = Task.Factory.StartNew(
-                    async (o) =>
+                var task = new Task<int>(
+                    (o) =>
                     {
-                        await pipelineStep.MonitorWorkQueueAsync();
+                        pipelineStep.MonitorWorkQueueAsync().Wait();
                         return 1;
                     },
                     thisStepNumber,
-                    this.cancellationTokenSource.Token)
-                    .ContinueWith(
-                t =>
-                {
-                    {
-                        this.cancellationTokenSource.Cancel();
-                    }
-                },
-                CancellationToken.None,
-                TaskContinuationOptions.ExecuteSynchronously | TaskContinuationOptions.OnlyOnFaulted,
-                TaskScheduler.Current)
-                .ContinueWith(
-                t =>
-                {
-                    if (!t.IsFaulted)
-                    {
-                        functionPipelineStep().MarkOutputQueueAsCompleted(thisStepNumber);
-                    }
-                });
+                    this.cancellationTokenSource.Token);
 
                 tasks.Add(task);
             }

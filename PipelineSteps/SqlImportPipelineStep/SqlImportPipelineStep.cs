@@ -98,6 +98,7 @@ namespace SqlImportPipelineStep
         /// <inheritdoc />
         protected override async Task HandleAsync(SqlImportQueueItem workItem)
         {
+            // throw new ArgumentNullException(nameof(workItem));
             await this.ReadOneQueryFromDatabaseAsync(
                 workItem.QueryId,
                 workItem.DataSource,

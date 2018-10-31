@@ -52,6 +52,6 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public abstract void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> processors, int timeoutInMilliseconds);
+        public abstract void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> pipelineSteps, int timeoutInMilliseconds);
     }
 }

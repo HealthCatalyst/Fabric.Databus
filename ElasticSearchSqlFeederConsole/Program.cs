@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Console
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -29,6 +30,7 @@ namespace Fabric.Databus.Console
     using Fabric.Databus.Shared.Loggers;
 
     using PipelineRunner;
+
     using Serilog;
 
     using Unity;
@@ -48,6 +50,10 @@ namespace Fabric.Databus.Console
         /// </exception>
         public static void Main(string[] args)
         {
+            RunDatabus();
+
+            return;
+
             if (!args.Any())
             {
                 throw new Exception("Please pass the job.xml file as a parameter");
@@ -77,10 +83,8 @@ namespace Fabric.Databus.Console
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                ILogger logger = new LoggerConfiguration()
-                    .MinimumLevel.Verbose()
-                    .WriteTo.File(Path.Combine(Path.GetTempPath(), "Databus.out.txt"))
-                    .CreateLogger();
+                ILogger logger = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo
+                    .File(Path.Combine(Path.GetTempPath(), "Databus.out.txt")).CreateLogger();
 
                 using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
                 {
@@ -145,6 +149,45 @@ namespace Fabric.Databus.Console
 
             Console.WriteLine("(Type any key to exit)");
             Console.ReadKey();
+        }
+
+        public static void RunDatabus()
+        {
+            var config = new QueryConfig
+            {
+                ConnectionString = "server=(local);initial catalog=SharedDeId;Trusted_Connection=True;",
+                Url = "https://HC2260.hqcatalyst.local/DataProcessingService/v1/BatchExecutions",
+                MaximumEntitiesToLoad = 1000,
+                EntitiesPerBatch = 100,
+                EntitiesPerUploadFile = 100,
+                LocalSaveFolder = @"C:\Catalyst\databus",
+                DropAndReloadIndex = false,
+                WriteTemporaryFilesToDisk = true,
+                WriteDetailedTemporaryFilesToDisk = true,
+                CompressFiles = false,
+                UploadToElasticSearch = false,
+                Index = "Patients2",
+                Alias = "patients",
+                EntityType = "patient",
+                TopLevelKeyColumn = "EDWPatientID",
+                UseMultipleThreads = false,
+                KeepTemporaryLookupColumnsInOutput = true
+            };
+            var jobData = new JobData
+            {
+                DataModel = "{}",
+                MyDataSources = new List<DataSource>
+                                                      {
+                                                          new DataSource
+                                                              {
+                                                                  Sql =
+                                                                      "SELECT 3 [EDWPatientID], 2 [BatchDefinitionId], 'Queued' [Status], 'Batch' [PipelineType]"
+                                                              }
+                                                      }
+            };
+            var job = new Job { Config = config, Data = jobData };
+            var runner = new DatabusRunner();
+            runner.RunRestApiPipeline(new UnityContainer(), job, new CancellationToken());
         }
     }
 }

@@ -12,6 +12,7 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Threading;
 
     using ConvertDatabaseRowToJsonPipelineStep;
@@ -23,17 +24,22 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Importers;
     using Fabric.Databus.Domain.Jobs;
+    using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.ElasticSearch;
+    using Fabric.Databus.Http;
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Http;
+    using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Json;
     using Fabric.Databus.Schema;
     using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.FileWriters;
+    using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
 
     using FileSavePipelineStep;
@@ -53,6 +59,8 @@ namespace Fabric.Databus.PipelineRunner
     using SaveSchemaPipelineStep;
 
     using SendToRestApiPipelineStep;
+
+    using Serilog;
 
     using SqlBatchPipelineStep;
 
@@ -340,9 +348,6 @@ namespace Fabric.Databus.PipelineRunner
             this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
             this.container.RegisterInstance<IJobConfig>(config);
 
-            IElasticSearchUploaderFactory elasticSearchUploaderFactory =
-                this.container.Resolve<IElasticSearchUploaderFactory>();
-
             var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn);
             this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
 
@@ -367,6 +372,80 @@ namespace Fabric.Databus.PipelineRunner
             }
 
             this.container.RegisterType<IFileWriter, FileWriter>();
+
+            this.InitContainerWithDefaults(config);
+        }
+
+        /// <summary>
+        /// The init container with defaults.
+        /// </summary>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        private void InitContainerWithDefaults(IQueryConfig config)
+        {
+            if (!this.container.IsRegistered<IProgressMonitor>())
+            {
+                IProgressMonitor progressMonitor = new ProgressMonitor(new NullProgressLogger());
+                this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
+            }
+
+            if (!this.container.IsRegistered<IDatabusSqlReader>())
+            {
+                var databusSqlReader = new DatabusSqlReader(config.ConnectionString, 0);
+                this.container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
+            }
+            if (!this.container.IsRegistered<ILogger>())
+            {
+                ILogger logger = new LoggerConfiguration().MinimumLevel.Verbose().CreateLogger();
+
+                this.container.RegisterInstance(logger);
+            }
+
+            if (!this.container.IsRegistered<IElasticSearchUploaderFactory>())
+            {
+                this.container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
+            }
+
+            if (!this.container.IsRegistered<IElasticSearchUploaderFactory>())
+            {
+                this.container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
+            }
+
+            if (!this.container.IsRegistered<IFileUploaderFactory>())
+            {
+                this.container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
+            }
+
+            if (!this.container.IsRegistered<IElasticSearchUploader>())
+            {
+                this.container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
+            }
+
+            if (!this.container.IsRegistered<IFileUploader>())
+            {
+                this.container.RegisterType<IFileUploader, FileUploader>();
+            }
+
+            if (!this.container.IsRegistered<IHttpClientFactory>())
+            {
+                this.container.RegisterType<IHttpClientFactory, HttpClientFactory>();
+            }
+
+            if (config.UseMultipleThreads)
+            {
+                if (!this.container.IsRegistered<IPipelineExecutorFactory>())
+                {
+                    this.container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
+                }
+            }
+            else
+            {
+                if (!this.container.IsRegistered<IPipelineExecutorFactory>())
+                {
+                    this.container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
+                }
+            }
         }
     }
 }

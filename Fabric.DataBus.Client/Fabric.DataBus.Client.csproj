@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
+    <PackageId>Catalyst.Fabric.Databus.Client</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

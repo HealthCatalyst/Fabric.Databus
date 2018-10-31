@@ -53,7 +53,9 @@ namespace Fabric.Databus.PipelineRunner
             foreach (var pipelineStep in pipelineSteps)
             {
                 // ReSharper disable once ConvertToLocalFunction
+#pragma warning disable IDE0039 // Use local function
                 Func<IPipelineStep> functionPipelineStep =
+#pragma warning restore IDE0039 // Use local function
                     () => (IPipelineStep)this.container.Resolve(
                     pipelineStep.Type,
                     new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token));

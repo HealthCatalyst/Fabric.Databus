@@ -140,6 +140,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ElasticSearc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlCalculateFieldsPipelineStep", "PipelineSteps\SqlCalculateFieldsPipelineStep\SqlCalculateFieldsPipelineStep.csproj", "{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Nuget.Console", "Fabric.Databus.Nuget.Console\Fabric.Databus.Nuget.Console.csproj", "{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -302,6 +304,10 @@ Global
 		{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -352,6 +358,7 @@ Global
 		{85054188-DDEB-4833-B4E5-2F5B41E5FDBB} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 		{DBA64266-AF85-4627-81F6-6183D62858FF} = {E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}
 		{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
+		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB} = {E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

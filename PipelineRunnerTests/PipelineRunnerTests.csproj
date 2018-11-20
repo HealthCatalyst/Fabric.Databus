@@ -129,12 +129,17 @@
   <ItemGroup>
     <Compile Include="EndToEndTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SanityTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Fabric.Databus.Client\Fabric.Databus.Client.csproj">
+      <Project>{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}</Project>
+      <Name>Fabric.Databus.Client</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj">
       <Project>{3BBF6CF0-197F-4980-BDAF-1418E473C014}</Project>
       <Name>Fabric.Databus.ElasticSearch</Name>

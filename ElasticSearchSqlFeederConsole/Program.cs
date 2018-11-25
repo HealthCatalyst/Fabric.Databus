@@ -50,10 +50,6 @@ namespace Fabric.Databus.Console
         /// </exception>
         public static void Main(string[] args)
         {
-            RunDatabus();
-
-            return;
-
             if (!args.Any())
             {
                 throw new Exception("Please pass the job.xml file as a parameter");
@@ -151,6 +147,9 @@ namespace Fabric.Databus.Console
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// The run databus.
+        /// </summary>
         public static void RunDatabus()
         {
             var config = new QueryConfig

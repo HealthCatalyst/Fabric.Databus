@@ -1,0 +1,84 @@
+<?xml version="1.0"?> 
+<Job>
+  <Config>
+    <ConnectionString>server=HCS-DEV0002;initial catalog=Shared;Trusted_Connection=True;</ConnectionString>
+    <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
+    <EntitiesPerBatch>100</EntitiesPerBatch>
+    <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
+    <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
+    <DropAndReloadIndex>false</DropAndReloadIndex>
+    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
+    <CompressFiles>false</CompressFiles>
+    <Index>patients2</Index>
+    <Alias>patients</Alias>
+    <EntityType>documents</EntityType>
+    <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
+    <KeepTemporaryLookupColumnsInOutput>true</KeepTemporaryLookupColumnsInOutput>
+  </Config>
+
+  <Data>
+    <DataSource>
+      <Sql>
+        SELECT Text.TextID,
+        Text.TextID as [key],
+        Text.EDWPatientID as [EDWPatientId],
+        Text.TextTXT as [data],
+        Text.MimeTypeNM as [data_format],
+        Text.TextID as [root],
+        Text.TextSourceDSC as [extension],
+        Text.TextOriginTableNM as [extension_suffix]
+        from Text.Text
+      </Sql>
+    </DataSource>
+    <DataSource Path="Patient" PropertyType="object">
+      <Sql>
+        select Text.TextID as [TextID],
+        Patient.EDWPatientID as [KeyLevel1],
+        Patient.EDWPatientID as [key],
+        Patient.MRN as [MRN],
+        PatientFullNM as [last_name], /* last name is missing */
+        PatientFullNM as [first_name], /* first name is missing */
+        PatientFullNM as [middle_name], /* middle name is missing */
+        GenderNormDSC as [gender], /* gender is null */
+        BirthDTS as [date_of_birth]
+        from Text.Text
+        inner join Person.Patient
+        on Text.EDWPatientID = Patient.EDWPatientID
+      </Sql>
+    </DataSource>
+    <DataSource Path="Visit" PropertyType="object">
+      <Sql>
+        select distinct
+        Text.TextID as [TextID],
+        Encounter.EncounterID as [KeyLevel1],
+        FacilityAccount.FacilityAccountID as [key],
+        /* [root] */
+        FacilityAccount.FacilityAccountID as [extension],
+        AdmitDTS as [admitted_at],
+        DischargeDTS as [discharged_at]
+        from Text.Text
+        inner join Clinical.Encounter
+        on Text.EncounterID = Encounter.EncounterID
+        inner join Clinical.FacilityAccount
+        on Encounter.FacilityAccountID = FacilityAccount.FacilityAccountID
+      </Sql>
+    </DataSource>
+    <DataSource Path="Visit.Facility" PropertyType="object">
+      <Sql>
+        select distinct
+        Text.TextID as [TextID],
+        Encounter.EncounterID as [KeyLevel1],
+        FacilityAccount.FacilityAccountID as [KeyLevel2],
+        FacilityAccount.FacilityAccountID as [key],
+        DischargePhysicalLocationID as [root],
+        DischargePhysicalLocationNM as [extension] /* always null */
+        from Text.Text
+        inner join Clinical.Encounter
+        on Text.EncounterID = Encounter.EncounterID
+        inner join Clinical.FacilityAccount
+        on Encounter.FacilityAccountID = FacilityAccount.FacilityAccountID
+      </Sql>
+    </DataSource>
+  </Data>
+</Job>

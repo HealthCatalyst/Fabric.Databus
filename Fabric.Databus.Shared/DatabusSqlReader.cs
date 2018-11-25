@@ -66,6 +66,11 @@ namespace Fabric.Databus.Shared
         /// <inheritdoc />
         public async Task<ReadSqlDataResult> ReadDataFromQueryAsync(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn)
         {
+            if (string.IsNullOrWhiteSpace(load.Sql))
+            {
+                throw new ArgumentNullException($"Sql property is null for load with path: {load.Path}");
+            }
+
             using (var conn = new SqlConnection(this.connectionString))
             {
                 conn.Open();

@@ -227,6 +227,7 @@
     <Compile Include="InitializerExtensions.cs" />
     <Compile Include="MyContractResolver.cs" />
     <Compile Include="MyDynamicObject.cs" />
+    <Compile Include="MyJsonParser.cs" />
     <Compile Include="Sources\DateSource.cs" />
     <Compile Include="DynamicCompilationHelper.cs" />
     <Compile Include="Sources\EncounterSource.cs" />

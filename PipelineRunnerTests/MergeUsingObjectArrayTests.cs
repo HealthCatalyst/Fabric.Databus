@@ -17,6 +17,7 @@ namespace PipelineRunnerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// The merge using object array tests.
@@ -142,6 +143,50 @@ namespace PipelineRunnerTests
 
                 var result = textWriter.ToString();
             }
+        }
+
+        /// <summary>
+        /// The test parsing json.
+        /// </summary>
+        [TestMethod]
+        public void TestParsingJson()
+        {
+            string json = @"
+{
+	""root"": ""Text.TextID"",
+	""data"": ""Text.TextTXT"",
+	""data_format"": ""Text.MimeTypeNM"",
+	""extension"": ""Text.TextSourceDSC"",
+	""Patient"": {
+		""root"": ""Person.EDWPatientId"",
+		""MRN"": ""Person.MRN""
+	},
+	""Visit"": {
+		""root"": ""FacilityAccount.FacilityAccountID"",
+		""Facility"": {
+			""root"": ""FacilityAccount.FacilityAccountID"",
+			""extension"": ""FacilityAccount.FacilityAccountID""
+		},
+		""People"": [
+			{
+				""root"": ""FacilityAccount.AttendingProviderID"",
+				""last_name"": ""FacilityAccount.ProviderLastNM""
+			}
+		]
+	},
+	""Document"": {
+		""root"": ""Text.TextID"",
+		""source_created_at"": ""Date.DTS"",
+		""People"": [
+			{
+				""root"": ""Provider.EDWPersonID"",
+				""last_name"": ""Provider.ProviderLastNM""
+			}
+		]
+	}
+}";
+
+            JObject o = JObject.Parse(json);
         }
     }
 }

@@ -12,7 +12,6 @@ namespace Fabric.Databus.Config
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
 
     /// <summary>
@@ -95,7 +94,7 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public bool UploadToElasticSearch { get; set; } = true;
+        public bool UploadToElasticSearch { get; set; }
 
         /// <inheritdoc />
         [DataMember]
@@ -109,6 +108,9 @@ namespace Fabric.Databus.Config
         [DataMember]
         public bool KeepIndexOnline { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether use multiple threads.
+        /// </summary>
         [DataMember]
         public bool UseMultipleThreads { get; set; }
     }

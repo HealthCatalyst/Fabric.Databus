@@ -7,11 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PipelineRunnerTests
+namespace Fabric.Databus.Shared
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     using Fabric.Databus.Interfaces.Sql;
@@ -21,7 +20,6 @@ namespace PipelineRunnerTests
     /// <summary>
     /// The my dynamic object.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Reviewed. Suppression is OK here.")]
     public class SourceWrapper
     {
         /// <summary>

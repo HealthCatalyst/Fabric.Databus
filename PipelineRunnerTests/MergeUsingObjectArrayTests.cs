@@ -13,6 +13,7 @@ namespace PipelineRunnerTests
     using System.IO;
 
     using Fabric.Databus.Interfaces.Sql;
+    using Fabric.Databus.Shared;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -138,6 +139,105 @@ namespace PipelineRunnerTests
 
             sourceWrapperCollection.Add(peopleSourceWrapper);
 
+            string expectedJsonText = @"
+[{
+		""TextID"": ""1"",
+		""EDWPatientId"": ""100"",
+		""TextTXT"": ""This is my first test"",
+		""EncounterID"": ""301"",
+		""Patient"": {
+			""TextID"": ""1"",
+			""EDWPatientId"": ""100"",
+			""MRN"": ""Mrn100""
+		},
+		""Visit"": {
+			""TextID"": ""1"",
+			""EncounterID"": ""301"",
+			""FacilityAccountID"": ""401"",
+			""Facility"": {
+				""TextID"": ""1"",
+				""EncounterID"": ""301"",
+				""FacilityAccountID"": ""401"",
+				""EDWAttendingProviderID"": ""501"",
+				""People"": [{
+						""TextID"": ""1"",
+						""EncounterID"": ""301"",
+						""FacilityAccountID"": ""401"",
+						""EDWProviderID"": ""501"",
+						""last_name"": ""Jones""
+					}
+				]
+			}
+		}
+	}, {
+		""TextID"": ""2"",
+		""EDWPatientId"": ""100"",
+		""TextTXT"": ""This is my second test"",
+		""EncounterID"": ""302"",
+		""Patient"": {
+			""TextID"": ""2"",
+			""EDWPatientId"": ""100"",
+			""MRN"": ""Mrn100""
+		},
+		""Visit"": {
+			""TextID"": ""2"",
+			""EncounterID"": ""302"",
+			""FacilityAccountID"": ""402"",
+			""Facility"": {
+				""TextID"": ""2"",
+				""EncounterID"": ""302"",
+				""FacilityAccountID"": ""402"",
+				""EDWAttendingProviderID"": ""502"",
+				""People"": [{
+						""TextID"": ""2"",
+						""EncounterID"": ""302"",
+						""FacilityAccountID"": ""402"",
+						""EDWProviderID"": ""502"",
+						""last_name"": ""Smith""
+					}
+				]
+			}
+		}
+	}, {
+		""TextID"": ""3"",
+		""EDWPatientId"": ""101"",
+		""TextTXT"": ""This is my third test"",
+		""EncounterID"": ""303"",
+		""Patient"": {
+			""TextID"": ""3"",
+			""EDWPatientId"": ""101"",
+			""MRN"": ""Mrn101""
+		},
+		""Visit"": {
+			""TextID"": ""3"",
+			""EncounterID"": ""303"",
+			""FacilityAccountID"": ""403"",
+			""Facility"": {
+				""TextID"": ""3"",
+				""EncounterID"": ""303"",
+				""FacilityAccountID"": ""403"",
+				""EDWAttendingProviderID"": ""503"",
+				""People"": [{
+						""TextID"": ""3"",
+						""EncounterID"": ""303"",
+						""FacilityAccountID"": ""403"",
+						""EDWProviderID"": ""503"",
+						""last_name"": ""Smith""
+					}, {
+						""TextID"": ""3"",
+						""EncounterID"": ""303"",
+						""FacilityAccountID"": ""403"",
+						""EDWProviderID"": ""504"",
+						""last_name"": ""Bradford""
+					}
+				]
+			}
+		}
+	}
+]
+";
+            var expectedJson = JArray.Parse(expectedJsonText);
+
             using (var textWriter = new StringWriter())
             {
                 using (var writer = new JsonTextWriter(textWriter))
@@ -146,6 +246,8 @@ namespace PipelineRunnerTests
                 }
 
                 var result = textWriter.ToString();
+                var actualJson = JArray.Parse(result);
+                Assert.IsTrue(JToken.DeepEquals(expectedJson, actualJson));
             }
         }
 

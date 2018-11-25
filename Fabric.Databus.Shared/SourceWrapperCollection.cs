@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PipelineRunnerTests
+namespace Fabric.Databus.Shared
 {
     using System;
     using System.Collections.Generic;

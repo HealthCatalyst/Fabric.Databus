@@ -31,8 +31,10 @@ namespace PipelineRunnerTests
         [TestMethod]
         public void TestMergeUsingObjectArray()
         {
-            string propertyName = string.Empty;
-            var textSourceWrapper = new MyDynamicObject(
+            var sourceWrapperCollection = new SourceWrapperCollection();
+
+            string propertyName = "$";
+            var textSourceWrapper = new SourceWrapper(
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -50,8 +52,10 @@ namespace PipelineRunnerTests
                 new List<string> { "TextID" },
                 true);
 
-            propertyName = "Patient";
-            var patientSourcesWrapper = new MyDynamicObject(
+            sourceWrapperCollection.Add(textSourceWrapper);
+
+            propertyName = "$.Patient";
+            var patientSourcesWrapper = new SourceWrapper(
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -68,10 +72,10 @@ namespace PipelineRunnerTests
                 new List<string> { "TextID", "EDWPatientId" },
                 false);
 
-            textSourceWrapper.Merge(propertyName, patientSourcesWrapper);
+            sourceWrapperCollection.Add(patientSourcesWrapper);
 
-            propertyName = "Visit";
-            var encounterSourceWrapper = new MyDynamicObject(
+            propertyName = "$.Visit";
+            var encounterSourceWrapper = new SourceWrapper(
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -88,10 +92,10 @@ namespace PipelineRunnerTests
                 new List<string> { "TextID", "EncounterID" },
                 false);
 
-            textSourceWrapper.Merge(propertyName, encounterSourceWrapper);
+            sourceWrapperCollection.Add(encounterSourceWrapper);
 
-            propertyName = "Visit.Facility";
-            var facilitySourceWrapper = new MyDynamicObject(
+            propertyName = "$.Visit.Facility";
+            var facilitySourceWrapper = new SourceWrapper(
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -109,10 +113,10 @@ namespace PipelineRunnerTests
                 new List<string> { "TextID", "EncounterID", "FacilityAccountID" },
                 false);
 
-            encounterSourceWrapper.Merge(propertyName, facilitySourceWrapper);
+            sourceWrapperCollection.Add(facilitySourceWrapper);
 
-            propertyName = "Visit.Facility.People";
-            var peopleSourceWrapper = new MyDynamicObject(
+            propertyName = "$.Visit.Facility.People";
+            var peopleSourceWrapper = new SourceWrapper(
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -132,13 +136,13 @@ namespace PipelineRunnerTests
                 new List<string> { "TextID", "EncounterID", "FacilityAccountID", "EDWProviderID" },
                 true);
 
-            facilitySourceWrapper.Merge(propertyName, peopleSourceWrapper);
+            sourceWrapperCollection.Add(peopleSourceWrapper);
 
             using (var textWriter = new StringWriter())
             {
                 using (var writer = new JsonTextWriter(textWriter))
                 {
-                    textSourceWrapper.Write(writer, new List<KeyValuePair<string, object>>());
+                    sourceWrapperCollection.WriteToJson(writer);
                 }
 
                 var result = textWriter.ToString();

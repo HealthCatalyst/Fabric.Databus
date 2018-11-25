@@ -226,13 +226,14 @@
   <ItemGroup>
     <Compile Include="InitializerExtensions.cs" />
     <Compile Include="MyContractResolver.cs" />
-    <Compile Include="MyDynamicObject.cs" />
+    <Compile Include="SourceWrapper.cs" />
     <Compile Include="MyJsonParser.cs" />
     <Compile Include="Sources\DateSource.cs" />
     <Compile Include="DynamicCompilationHelper.cs" />
     <Compile Include="Sources\EncounterSource.cs" />
     <Compile Include="EndToEndTests.cs" />
     <Compile Include="Sources\FacilitySource.cs" />
+    <Compile Include="SourceWrapperCollection.cs" />
     <Compile Include="Types\Patient.cs" />
     <Compile Include="Sources\PatientSource.cs" />
     <Compile Include="Types\People.cs" />

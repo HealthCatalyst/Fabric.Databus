@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MyDynamicObject.cs" company="">
+// <copyright file="SourceWrapper.cs" company="">
 //   
 // </copyright>
 // <summary>
@@ -13,7 +13,6 @@ namespace PipelineRunnerTests
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Runtime.Serialization;
 
     using Fabric.Databus.Interfaces.Sql;
 
@@ -23,7 +22,7 @@ namespace PipelineRunnerTests
     /// The my dynamic object.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Reviewed. Suppression is OK here.")]
-    public class MyDynamicObject
+    public class SourceWrapper
     {
         /// <summary>
         /// The key columns.
@@ -36,7 +35,7 @@ namespace PipelineRunnerTests
         private readonly bool isArray;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MyDynamicObject"/> class.
+        /// Initializes a new instance of the <see cref="SourceWrapper"/> class.
         /// </summary>
         /// <param name="columns">
         /// The columns.
@@ -53,7 +52,7 @@ namespace PipelineRunnerTests
         /// <param name="isArray">
         /// The is Array.
         /// </param>
-        public MyDynamicObject(List<ColumnInfo> columns, string propertyName, List<object[]> rows, IList<string> keyColumns, bool isArray)
+        public SourceWrapper(List<ColumnInfo> columns, string propertyName, List<object[]> rows, IList<string> keyColumns, bool isArray)
         {
             this.keyColumns = keyColumns;
             this.isArray = isArray;
@@ -61,7 +60,7 @@ namespace PipelineRunnerTests
             this.PropertyName = propertyName;
             this.PropertyNameLastPart = GetLastPart(propertyName);
             this.Rows = rows;
-            this.Children = new List<MyDynamicObject>();
+            this.Children = new List<SourceWrapper>();
         }
 
         /// <summary>
@@ -73,6 +72,10 @@ namespace PipelineRunnerTests
         /// Gets or sets the property name.
         /// </summary>
         public string PropertyName { get; set; }
+
+        /// <summary>
+        /// Gets the property name last part.
+        /// </summary>
         public string PropertyNameLastPart { get; }
 
         /// <summary>
@@ -83,7 +86,7 @@ namespace PipelineRunnerTests
         /// <summary>
         /// Gets the children.
         /// </summary>
-        private List<MyDynamicObject> Children { get; }
+        private List<SourceWrapper> Children { get; }
 
         /// <summary>
         /// The merge.
@@ -94,7 +97,7 @@ namespace PipelineRunnerTests
         /// <param name="childSourcesWrapper">
         /// The patient sources wrapper.
         /// </param>
-        public void Merge(string propertyName, MyDynamicObject childSourcesWrapper)
+        public void Merge(string propertyName, SourceWrapper childSourcesWrapper)
         {
             this.Children.Add(childSourcesWrapper);
         }

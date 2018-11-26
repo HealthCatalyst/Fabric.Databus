@@ -23,14 +23,23 @@ namespace SaveJsonToFilePipelineStep
 
     using Serilog;
 
+    /// <inheritdoc />
     /// <summary>
     /// Reads a IJsonObjectQueueItem, saves it to file using the {id}.json and then passes the IJsonObjectQueueItem to the next step
     /// </summary>
     public class SaveJsonToFilePipelineStep : BasePipelineStep<IJsonObjectQueueItem, IJsonObjectQueueItem>
     {
+        /// <summary>
+        /// The file writer.
+        /// </summary>
         private readonly ITemporaryFileWriter fileWriter;
+
+        /// <summary>
+        /// The entity json writer.
+        /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
 
+        /// <inheritdoc />
         public SaveJsonToFilePipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
@@ -45,26 +54,29 @@ namespace SaveJsonToFilePipelineStep
             this.entityJsonWriter = entityJsonWriter ?? throw new System.ArgumentNullException(nameof(entityJsonWriter));
         }
 
+        /// <inheritdoc />
         protected override string LoggerName => "SaveJsonToFile";
 
+        /// <inheritdoc />
         protected override string GetId(IJsonObjectQueueItem workItem)
         {
             return workItem.Id;
         }
 
+        /// <inheritdoc />
         protected override async Task HandleAsync(IJsonObjectQueueItem workItem)
         {
             var stream = new MemoryStream();
 
             await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
-            fileWriter.CreateDirectory(this.Config.LocalSaveFolder);
+            this.fileWriter.CreateDirectory(this.Config.LocalSaveFolder);
 
             string path = Path.Combine(this.Config.LocalSaveFolder, $"{workItem.Id}.json");
 
             if (this.fileWriter.IsWritingEnabled)
             {
-                await fileWriter.WriteStreamAsync(path, stream);
+                await this.fileWriter.WriteStreamAsync(path, stream);
             }
 
             await this.AddToOutputQueueAsync(workItem);

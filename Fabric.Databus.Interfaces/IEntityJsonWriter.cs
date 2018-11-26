@@ -61,7 +61,7 @@ namespace Fabric.Databus.Interfaces
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task WriteToStreamAsync(JContainer document, Stream stream);
+        Task WriteToStreamAsync(JToken document, Stream stream);
 
         /// <summary>
         /// The set properties by merge.

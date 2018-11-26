@@ -218,7 +218,19 @@ namespace Fabric.Databus.Json
             }
         }
 
-        public async Task WriteToStreamAsync(JContainer document, Stream stream)
+        /// <summary>
+        /// The write to stream async.
+        /// </summary>
+        /// <param name="document">
+        /// The document.
+        /// </param>
+        /// <param name="stream">
+        /// The stream.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task WriteToStreamAsync(JToken document, Stream stream)
         {
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             using (var writer = new JsonTextWriter(textWriter))

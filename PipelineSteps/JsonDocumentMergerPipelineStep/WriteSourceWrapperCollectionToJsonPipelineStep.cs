@@ -9,7 +9,9 @@
 
 namespace JsonDocumentMergerPipelineStep
 {
+    using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -76,8 +78,17 @@ namespace JsonDocumentMergerPipelineStep
 
                 var result = textWriter.ToString();
                 var actualJson = JArray.Parse(result);
-                var container = new JObject { { "result", actualJson } };
-                this.AddToOutputQueueAsync(new JsonObjectQueueItem { Document = container });
+
+                foreach (var entity in actualJson)
+                {
+                    this.AddToOutputQueueAsync(
+                        new JsonObjectQueueItem
+                            {
+                                BatchNumber = workItem.BatchNumber,
+                                Id = entity[this.Config.TopLevelKeyColumn].ToString(),
+                                Document = (JObject)entity
+                            });
+                }
             }
 
             return Task.CompletedTask;

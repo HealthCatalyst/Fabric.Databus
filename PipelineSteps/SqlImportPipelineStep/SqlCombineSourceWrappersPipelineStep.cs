@@ -36,6 +36,11 @@ namespace SqlImportPipelineStep
         /// </summary>
         private readonly SourceWrapperCollection sourceWrapperCollection = new SourceWrapperCollection();
 
+        /// <summary>
+        /// Gets or sets the batch number.
+        /// </summary>
+        private int batchNumber;
+
         /// <inheritdoc />
         public SqlCombineSourceWrappersPipelineStep(
             IJobConfig jobConfig,
@@ -69,6 +74,7 @@ namespace SqlImportPipelineStep
                     keys,
                     workItem.PropertyType != "object"));
 
+            this.batchNumber = workItem.BatchNumber;
             return Task.CompletedTask;
         }
 
@@ -89,6 +95,7 @@ namespace SqlImportPipelineStep
         {
             this.AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
                                            {
+                                               BatchNumber = this.batchNumber,
                                                SourceWrapperCollection = this.sourceWrapperCollection
                                            });
 

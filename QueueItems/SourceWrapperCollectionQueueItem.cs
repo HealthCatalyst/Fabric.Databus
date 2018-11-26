@@ -28,5 +28,10 @@ namespace QueueItems
         /// Gets or sets the source wrapper collection.
         /// </summary>
         public SourceWrapperCollection SourceWrapperCollection { get; set; }
+
+        /// <summary>
+        /// Gets or sets the batch number.
+        /// </summary>
+        public int BatchNumber { get; set; }
     }
 }

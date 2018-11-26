@@ -255,6 +255,7 @@ namespace BasePipelineStep
             this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber1).CompleteAdding();
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// The initialize with step number.
         /// </summary>

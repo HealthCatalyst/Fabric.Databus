@@ -33,6 +33,7 @@ namespace PipelineRunnerTests
         /// The test simple run.
         /// </summary>
         [TestMethod]
+        [Ignore]
         public void TestSimpleRun()
         {
             var localSaveFolder = Path.Combine(Path.GetTempPath(), "databus");

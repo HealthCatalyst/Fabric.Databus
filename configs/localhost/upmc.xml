@@ -14,7 +14,7 @@
     <Alias>patients</Alias>
     <EntityType>documents</EntityType>
     <TopLevelKeyColumn>KeyLevel1</TopLevelKeyColumn>
-    <KeepTemporaryLookupColumnsInOutput>true</KeepTemporaryLookupColumnsInOutput>
+    <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
   </Config>
 
   <Data>
@@ -41,9 +41,9 @@
         FROM   Text.Date
       </Sql>
     </DataSource>
-    <DataSource Path="$.Patient" PropertyType="object">
+    <DataSource Path="$.patient" PropertyType="object">
       <Sql>
-        SELECT DISTINCT Text.TextID          AS [TextID],
+        SELECT DISTINCT
         Text.TextID          AS [KeyLevel1],
         Patient.EDWPatientID AS [KeyLevel2],
         Patient.EDWPatientID AS [key],
@@ -59,9 +59,9 @@
         ON Text.EDWPatientID = Patient.EDWPatientID
       </Sql>
     </DataSource>
-    <DataSource Path="$.Visit" PropertyType="object">
+    <DataSource Path="$.visit" PropertyType="object">
       <Sql>
-        SELECT DISTINCT Text.TextID                       AS [TextID],
+        SELECT DISTINCT 
         Text.TextID                       AS [KeyLevel1],
         Encounter.EncounterID             AS [KeyLevel2],
         FacilityAccount.FacilityAccountID AS [key],
@@ -77,9 +77,9 @@
         FacilityAccount.FacilityAccountID
       </Sql>
     </DataSource>
-    <DataSource Path="$.Visit.Facility" PropertyType="object">
+    <DataSource Path="$.visit.facility" PropertyType="object">
       <Sql>
-        SELECT DISTINCT Text.TextID                       AS [TextID],
+        SELECT DISTINCT 
         Text.TextID                       AS [KeyLevel1],
         Encounter.EncounterID             AS [KeyLevel2],
         FacilityAccount.FacilityAccountID AS [KeyLevel3],
@@ -95,9 +95,9 @@
         FacilityAccount.FacilityAccountID
       </Sql>
     </DataSource>
-    <DataSource Path="$.Visit.People">
+    <DataSource Path="$.visit.people">
       <Sql>
-        SELECT DISTINCT Text.TextID                       AS [KeyLevel1],
+        SELECT DISTINCT Text.TextID       AS [KeyLevel1],
         Encounter.EncounterID             AS [KeyLevel2],
         Provider.EDWProviderID            AS [KeyLevel3],
         FacilityAccount.FacilityAccountID AS [FacilityAccountID],
@@ -121,7 +121,7 @@
         FacilityAccount.EDWAttendingProviderID
       </Sql>
     </DataSource>
-    <DataSource Path="$.Document" PropertyType="object">
+    <DataSource Path="$.document" PropertyType="object">
       <Sql>
         SELECT DISTINCT Text.TextID        AS [KeyLevel1],
         Text.TextID        AS [KeyLevel2],
@@ -139,7 +139,7 @@
         FROM   Text.Text
       </Sql>
     </DataSource>
-    <DataSource Path="$.Document" PropertyType="object">
+    <DataSource Path="$.document" PropertyType="object">
       <Sql>
         SELECT DISTINCT Date.TextID  AS [KeyLevel1],
         Date.TextID  AS [KeyLevel2],
@@ -148,7 +148,7 @@
         FROM   Text.Date
       </Sql>
     </DataSource>
-    <DataSource Path="$.Document.People">
+    <DataSource Path="$.document.people">
       <Sql>
         SELECT DISTINCT Text.TextID               AS [KeyLevel1],
         Text.TextID               AS [KeyLevel2],

@@ -85,7 +85,7 @@ namespace JsonDocumentMergerPipelineStep
                         new JsonObjectQueueItem
                             {
                                 BatchNumber = workItem.BatchNumber,
-                                Id = entity[this.Config.TopLevelKeyColumn].ToString(),
+                                Id = entity.Children().First().First().ToString(),
                                 Document = (JObject)entity
                             });
                 }

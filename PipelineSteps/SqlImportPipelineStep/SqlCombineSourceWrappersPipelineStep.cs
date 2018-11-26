@@ -73,7 +73,8 @@ namespace SqlImportPipelineStep
                     workItem.PropertyName,
                     workItem.Rows,
                     keys,
-                    workItem.PropertyType != "object"));
+                    workItem.PropertyType != "object",
+                    this.Config.KeepTemporaryLookupColumnsInOutput));
 
             this.batchNumber = workItem.BatchNumber;
             return Task.CompletedTask;

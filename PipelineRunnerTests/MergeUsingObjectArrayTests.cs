@@ -53,6 +53,7 @@ namespace PipelineRunnerTests
                         new object[] { "3", "101", "This is my third test", "303" },
                     },
                 new List<string> { "TextID" },
+                true,
                 true);
 
             sourceWrapperCollection.Add(textSourceWrapper);
@@ -74,6 +75,7 @@ namespace PipelineRunnerTests
                         new object[] { "3", DateTime.Parse("3/1/2018"), DateTime.Parse("3/2/2018") },
                     },
                 new List<string> { "TextID" },
+                true,
                 true);
 
             sourceWrapperCollection.Add(textDateSourceWrapper);
@@ -95,7 +97,8 @@ namespace PipelineRunnerTests
                         new object[] { "3", "101", "Mrn101" },
                     },
                 new List<string> { "TextID", "EDWPatientId" },
-                false);
+                false,
+                true);
 
             sourceWrapperCollection.Add(patientSourcesWrapper);
 
@@ -116,7 +119,8 @@ namespace PipelineRunnerTests
                         new object[] { "3", "303", "403" },
                     },
                 new List<string> { "TextID", "EncounterID" },
-                false);
+                false,
+                true);
 
             sourceWrapperCollection.Add(encounterSourceWrapper);
 
@@ -138,7 +142,8 @@ namespace PipelineRunnerTests
                         new object[] { "3", "303", "403", "503" },
                     },
                 new List<string> { "TextID", "EncounterID", "FacilityAccountID" },
-                false);
+                false,
+                true);
 
             sourceWrapperCollection.Add(facilitySourceWrapper);
 
@@ -162,6 +167,7 @@ namespace PipelineRunnerTests
                         new object[] { "3", "303", "403", "504", "Bradford" },
                     },
                 new List<string> { "TextID", "EncounterID", "FacilityAccountID", "EDWProviderID" },
+                true,
                 true);
 
             sourceWrapperCollection.Add(peopleSourceWrapper);

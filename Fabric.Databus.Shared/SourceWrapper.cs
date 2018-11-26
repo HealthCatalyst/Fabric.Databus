@@ -33,10 +33,15 @@ namespace Fabric.Databus.Shared
         private readonly bool isArray;
 
         /// <summary>
+        /// The keep temporary lookup columns in output.
+        /// </summary>
+        private readonly bool keepTemporaryLookupColumnsInOutput;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SourceWrapper"/> class.
         /// </summary>
         /// <param name="id">
-        /// id of source wrapper
+        ///     id of source wrapper
         /// </param>
         /// <param name="columns">
         ///     The columns.
@@ -53,16 +58,20 @@ namespace Fabric.Databus.Shared
         /// <param name="isArray">
         ///     The is Array.
         /// </param>
+        /// <param name="keepTemporaryLookupColumnsInOutput">
+        /// keep temporary lookup columns in output</param>
         public SourceWrapper(
             string id,
             List<ColumnInfo> columns,
             string propertyName,
             List<object[]> rows,
             IList<string> keyColumns,
-            bool isArray)
+            bool isArray,
+            bool keepTemporaryLookupColumnsInOutput)
         {
             this.keyColumns = keyColumns;
             this.isArray = isArray;
+            this.keepTemporaryLookupColumnsInOutput = keepTemporaryLookupColumnsInOutput;
             this.Id = id;
             this.Columns = columns;
             this.PropertyName = propertyName;
@@ -189,6 +198,14 @@ namespace Fabric.Databus.Shared
                 writer.WriteStartObject();
                 foreach (var column in this.Columns)
                 {
+                    if (!this.keepTemporaryLookupColumnsInOutput)
+                    {
+                        if (column.Name.StartsWith("KeyLevel"))
+                        {
+                            continue;
+                        }
+                    }
+
                     writer.WritePropertyName(column.Name);
                     writer.WriteValue(row[column.index]);
                 }

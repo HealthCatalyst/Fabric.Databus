@@ -5,9 +5,26 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version Condition=" '$(BUILD_BUILDNUMBER)' == '' ">1.1.0.0-local</Version>
     <Version Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_BUILDNUMBER)</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageVersion>$(Version)</PackageVersion>
+    <Description>Client for Fabric.Databus</Description>
+    <Authors>Health Catalyst</Authors>
     <PackageId>Catalyst.Fabric.Databus.Client</PackageId>
     <NuspecFile>Fabric.DataBus.Client.nuspec</NuspecFile>
   </PropertyGroup>
+
+  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>$(NuspecProperties);id=$(AssemblyName)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);description=$(Description)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
+    </PropertyGroup>
+    <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
+  </Target>
 
   <ItemGroup>
     <None Remove="Catalyst.Fabric.Databus.Client.1.0.6.nupkg" />

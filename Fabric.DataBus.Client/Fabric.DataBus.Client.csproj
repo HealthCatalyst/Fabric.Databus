@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.10</Version>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' == '' ">1.1.0.0-local</Version>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_BUILDNUMBER)</Version>
     <PackageId>Catalyst.Fabric.Databus.Client</PackageId>
   </PropertyGroup>
 

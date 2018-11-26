@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,6 +6,7 @@
     <Version Condition=" '$(BUILD_BUILDNUMBER)' == '' ">1.1.0.0-local</Version>
     <Version Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_BUILDNUMBER)</Version>
     <PackageId>Catalyst.Fabric.Databus.Client</PackageId>
+    <NuspecFile>Fabric.DataBus.Client.nuspec</NuspecFile>
   </PropertyGroup>
 
   <ItemGroup>

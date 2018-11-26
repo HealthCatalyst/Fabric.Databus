@@ -168,9 +168,18 @@ namespace Fabric.Databus.PipelineRunner
             foreach (var load in job.Data.DataSources)
             {
                 load.SequenceNumber = ++loadNumber;
-            }
 
-            // add job to the first queue
+                // support older syntax
+                if (load.Path == null)
+                {
+                    load.Path = "$";
+                }
+                else if (!load.Path.StartsWith("$"))
+                {
+                    load.Path = $"$.{load.Path}";
+                }
+            }
+           
             var sqlJobQueue = this.container.Resolve<IQueueManager>()
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
 
@@ -206,8 +215,8 @@ namespace Fabric.Databus.PipelineRunner
                         new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 15 },
-                        new PipelineStepInfo { Type = typeof(ConvertDatabaseRowToJsonPipelineStep), Count = 5 },
-                        new PipelineStepInfo { Type = typeof(JsonDocumentMergerPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlCombineSourceWrappersPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(WriteSourceWrapperCollectionToJsonPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(CreateBatchItemsPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }
                     });
@@ -287,6 +296,16 @@ namespace Fabric.Databus.PipelineRunner
             foreach (var load in job.Data.DataSources)
             {
                 load.SequenceNumber = ++loadNumber;
+
+                // support older syntax
+                if (load.Path == null)
+                {
+                    load.Path = "$";
+                }
+                else if (!load.Path.StartsWith("$"))
+                {
+                    load.Path = $"$.{load.Path}";
+                }
             }
 
             // add job to the first queue

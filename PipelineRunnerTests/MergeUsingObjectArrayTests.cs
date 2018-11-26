@@ -9,6 +9,7 @@
 
 namespace PipelineRunnerTests
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -27,7 +28,7 @@ namespace PipelineRunnerTests
     public class MergeUsingObjectArrayTests
     {
         /// <summary>
-        /// The test method 1.
+        /// The test merge using object array.
         /// </summary>
         [TestMethod]
         public void TestMergeUsingObjectArray()
@@ -36,6 +37,7 @@ namespace PipelineRunnerTests
 
             string propertyName = "$";
             var textSourceWrapper = new SourceWrapper(
+                "1",
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -55,8 +57,30 @@ namespace PipelineRunnerTests
 
             sourceWrapperCollection.Add(textSourceWrapper);
 
+            propertyName = "$";
+            var textDateSourceWrapper = new SourceWrapper(
+                "2",
+                new List<ColumnInfo>
+                    {
+                        new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
+                        new ColumnInfo { index = 1, Name = "source_last_modified_at", SqlColumnType = "datetime" },
+                        new ColumnInfo { index = 2, Name = "source_versioned_at", SqlColumnType = "datetime" },
+                    },
+                propertyName,
+                new List<object[]>
+                    {
+                        new object[] { "1", DateTime.Parse("1/1/2018"), DateTime.Parse("1/2/2018") },
+                        new object[] { "2", DateTime.Parse("2/1/2018"), DateTime.Parse("2/2/2018") },
+                        new object[] { "3", DateTime.Parse("3/1/2018"), DateTime.Parse("3/2/2018") },
+                    },
+                new List<string> { "TextID" },
+                true);
+
+            sourceWrapperCollection.Add(textDateSourceWrapper);
+
             propertyName = "$.Patient";
             var patientSourcesWrapper = new SourceWrapper(
+                "3",
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -77,6 +101,7 @@ namespace PipelineRunnerTests
 
             propertyName = "$.Visit";
             var encounterSourceWrapper = new SourceWrapper(
+                "4",
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -97,6 +122,7 @@ namespace PipelineRunnerTests
 
             propertyName = "$.Visit.Facility";
             var facilitySourceWrapper = new SourceWrapper(
+                "5",
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -118,6 +144,7 @@ namespace PipelineRunnerTests
 
             propertyName = "$.Visit.Facility.People";
             var peopleSourceWrapper = new SourceWrapper(
+                "6",
                 new List<ColumnInfo>
                     {
                         new ColumnInfo { index = 0, Name = "TextID", SqlColumnType = "varchar(256)" },
@@ -145,6 +172,9 @@ namespace PipelineRunnerTests
 		""EDWPatientId"": ""100"",
 		""TextTXT"": ""This is my first test"",
 		""EncounterID"": ""301"",
+		""TextID"": ""1"",
+		""source_last_modified_at"": ""2018-01-01T00:00:00"",
+		""source_versioned_at"": ""2018-01-02T00:00:00"",
 		""Patient"": {
 			""TextID"": ""1"",
 			""EDWPatientId"": ""100"",
@@ -174,6 +204,9 @@ namespace PipelineRunnerTests
 		""EDWPatientId"": ""100"",
 		""TextTXT"": ""This is my second test"",
 		""EncounterID"": ""302"",
+		""TextID"": ""2"",
+		""source_last_modified_at"": ""2018-02-01T00:00:00"",
+		""source_versioned_at"": ""2018-02-02T00:00:00"",
 		""Patient"": {
 			""TextID"": ""2"",
 			""EDWPatientId"": ""100"",
@@ -203,6 +236,9 @@ namespace PipelineRunnerTests
 		""EDWPatientId"": ""101"",
 		""TextTXT"": ""This is my third test"",
 		""EncounterID"": ""303"",
+		""TextID"": ""3"",
+		""source_last_modified_at"": ""2018-03-01T00:00:00"",
+		""source_versioned_at"": ""2018-03-02T00:00:00"",
 		""Patient"": {
 			""TextID"": ""3"",
 			""EDWPatientId"": ""101"",

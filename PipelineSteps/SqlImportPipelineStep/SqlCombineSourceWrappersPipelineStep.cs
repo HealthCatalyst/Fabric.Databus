@@ -68,6 +68,7 @@ namespace SqlImportPipelineStep
 
             this.sourceWrapperCollection.Add(
                 new SourceWrapper(
+                    workItem.QueryId,
                     workItem.Columns,
                     workItem.PropertyName,
                     workItem.Rows,

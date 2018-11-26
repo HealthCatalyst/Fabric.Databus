@@ -108,7 +108,10 @@ namespace SqlJobPipelineStep
                                 Start = range.Item1,
                                 End = range.Item2,
                                 Loads = workItem.Job.Data.DataSources,
-                                PropertyTypes = workItem.Job.Data.DataSources.Where(a => a.Path != null)
+                                PropertyTypes = workItem.Job.Data.DataSources
+                                    .Where(a => a.Path != null)
+                                    .GroupBy(a => a.Path)
+                                    .Select(g => g.First())
                                     .ToDictionary(a => a.Path, a => a.PropertyType)
                             });
                 }

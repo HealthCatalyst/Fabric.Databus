@@ -31,6 +31,17 @@
         from Text.Text
       </Sql>
     </DataSource>
+    <DataSource Path="$">
+      <Sql>
+        select DISTINCT
+        Date.TextID as [KeyLevel1],
+        Date.TextID as [key],
+        Date.TextID as [root],
+        Date.DateDTS as [source_last_modified_at],
+        Date.DateDTS as [source_versioned_at]
+        from Text.Date
+      </Sql>
+    </DataSource>
     <DataSource Path="$.Patient" PropertyType="object">
       <Sql>
         SELECT DISTINCT 

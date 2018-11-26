@@ -35,31 +35,47 @@ namespace Fabric.Databus.Shared
         /// <summary>
         /// Initializes a new instance of the <see cref="SourceWrapper"/> class.
         /// </summary>
+        /// <param name="id">
+        /// id of source wrapper
+        /// </param>
         /// <param name="columns">
-        /// The columns.
+        ///     The columns.
         /// </param>
         /// <param name="propertyName">
-        /// The property name.
+        ///     The property name.
         /// </param>
         /// <param name="rows">
-        /// The rows.
+        ///     The rows.
         /// </param>
         /// <param name="keyColumns">
-        /// The key Columns.
+        ///     The key Columns.
         /// </param>
         /// <param name="isArray">
-        /// The is Array.
+        ///     The is Array.
         /// </param>
-        public SourceWrapper(List<ColumnInfo> columns, string propertyName, List<object[]> rows, IList<string> keyColumns, bool isArray)
+        public SourceWrapper(
+            string id,
+            List<ColumnInfo> columns,
+            string propertyName,
+            List<object[]> rows,
+            IList<string> keyColumns,
+            bool isArray)
         {
             this.keyColumns = keyColumns;
             this.isArray = isArray;
+            this.Id = id;
             this.Columns = columns;
             this.PropertyName = propertyName;
             this.PropertyNameLastPart = GetLastPart(propertyName);
             this.Rows = rows;
             this.Children = new List<SourceWrapper>();
+            this.Siblings = new List<SourceWrapper>();
         }
+
+        /// <summary>
+        /// Gets the id.
+        /// </summary>
+        public string Id { get; }
 
         /// <summary>
         /// Gets or sets the columns.
@@ -87,18 +103,32 @@ namespace Fabric.Databus.Shared
         private List<SourceWrapper> Children { get; }
 
         /// <summary>
+        /// Gets the siblings.
+        /// </summary>
+        private List<SourceWrapper> Siblings { get; }
+
+        /// <summary>
         /// The merge.
         /// </summary>
-        /// <param name="propertyName">
-        /// The property name.
-        /// </param>
         /// <param name="childSourcesWrapper">
-        /// The patient sources wrapper.
+        ///     The patient sources wrapper.
         /// </param>
-        public void Merge(string propertyName, SourceWrapper childSourcesWrapper)
+        public void AddChild(SourceWrapper childSourcesWrapper)
         {
             this.Children.Add(childSourcesWrapper);
         }
+
+        /// <summary>
+        /// The add sibling.
+        /// </summary>
+        /// <param name="sourceWrapper">
+        /// The source wrapper.
+        /// </param>
+        public void AddSibling(SourceWrapper sourceWrapper)
+        {
+            this.Siblings.Add(sourceWrapper);
+        }
+
 
         /// <summary>
         /// The write.
@@ -163,6 +193,18 @@ namespace Fabric.Databus.Shared
                     writer.WriteValue(row[column.index]);
                 }
 
+                // write siblings
+                foreach (var sibling in this.Siblings)
+                {
+                    // find sibling rows matched by key
+                    var keyValuePairs = this.keyColumns.Select(
+                        keyColumnName => new KeyValuePair<string, object>(
+                            keyColumnName,
+                            row[this.GetIndexOfColumn(keyColumnName)])).ToList();
+
+                    sibling.WriteProperties(writer, keyValuePairs);
+                }
+
                 foreach (var child in this.Children)
                 {
                     var keyValuePairs = this.keyColumns.Select(
@@ -179,6 +221,60 @@ namespace Fabric.Databus.Shared
             if (this.isArray)
             {
                 writer.WriteEndArray();
+            }
+        }
+
+        /// <summary>
+        /// The write properties.
+        /// </summary>
+        /// <param name="writer">
+        /// The writer.
+        /// </param>
+        /// <param name="keys">
+        /// The keys.
+        /// </param>
+        public void WriteProperties(JsonWriter writer, IList<KeyValuePair<string, object>> keys)
+        {
+            var rows = this.Rows;
+
+            // filter the list by keys
+            if (keys.Any())
+            {
+                foreach (var keyValuePair in keys)
+                {
+                    var indexOfColumn = this.GetIndexOfColumn(keyValuePair.Key);
+
+                    rows = rows.Where(row => keyValuePair.Value.Equals(row[indexOfColumn])).ToList();
+                }
+            }
+
+            if (!rows.Any())
+            {
+                return;
+            }
+
+            if (rows.Count > 1)
+            {
+                rows = rows.Take(1).ToList();
+            }
+
+            foreach (var row in rows)
+            {
+                foreach (var column in this.Columns)
+                {
+                    writer.WritePropertyName(column.Name);
+                    writer.WriteValue(row[column.index]);
+                }
+
+                foreach (var child in this.Children)
+                {
+                    var keyValuePairs = this.keyColumns.Select(
+                        keyColumnName => new KeyValuePair<string, object>(
+                            keyColumnName,
+                            row[this.GetIndexOfColumn(keyColumnName)])).ToList();
+
+                    child.Write(child.PropertyNameLastPart, writer, keyValuePairs);
+                }
             }
         }
 
@@ -211,5 +307,6 @@ namespace Fabric.Databus.Shared
                 .Where(column => column.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
                 .Select(column => column.index).First();
         }
+
     }
 }

@@ -77,10 +77,12 @@ namespace SqlBatchPipelineStep
         {
             int seed = 0;
 
+            int i = 0;
             foreach (var dataSource in workItem.Loads)
             {
                 var queryName = dataSource.Path ?? "Main";
-                var queryId = queryName;
+                i++;
+                var queryId = $"{Convert.ToString(i)}-{queryName}";
 
                 await this.AddToOutputQueueAsync(
                     new SqlImportQueueItem

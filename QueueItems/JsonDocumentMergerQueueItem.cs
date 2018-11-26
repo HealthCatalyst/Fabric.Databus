@@ -9,7 +9,6 @@
 
 namespace QueueItems
 {
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
 
     using Newtonsoft.Json.Linq;

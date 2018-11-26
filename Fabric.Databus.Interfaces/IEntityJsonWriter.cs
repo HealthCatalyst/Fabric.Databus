@@ -49,7 +49,19 @@ namespace Fabric.Databus.Interfaces
             string propertyName,
             IDictionary<string, string> propertyTypes);
 
-        Task WriteToStreamAsync(JObject document, Stream stream);
+        /// <summary>
+        /// The write to stream async.
+        /// </summary>
+        /// <param name="document">
+        /// The document.
+        /// </param>
+        /// <param name="stream">
+        /// The stream.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task WriteToStreamAsync(JContainer document, Stream stream);
 
         /// <summary>
         /// The set properties by merge.

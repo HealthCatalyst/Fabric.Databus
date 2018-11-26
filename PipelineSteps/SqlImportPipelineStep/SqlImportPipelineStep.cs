@@ -32,9 +32,9 @@ namespace SqlImportPipelineStep
 
     /// <inheritdoc />
     /// <summary>
-    /// Reads a SqlImportQueueItem and calls SqlServer to load the data for that query and put it in a ConvertDatabaseToJsonQueueItem
+    /// Reads a SqlImportQueueItem and calls SqlServer to load the data for that query and put it in a SqlDataLoadedQueueItem
     /// </summary>
-    public class SqlImportPipelineStep : BasePipelineStep<SqlImportQueueItem, ConvertDatabaseToJsonQueueItem>
+    public class SqlImportPipelineStep : BasePipelineStep<SqlImportQueueItem, SqlDataLoadedQueueItem>
     {
         /// <summary>
         /// The folder.
@@ -246,7 +246,7 @@ namespace SqlImportPipelineStep
             foreach (var frame in result.Data)
             {
                 await this.AddToOutputQueueAsync(
-                    new ConvertDatabaseToJsonQueueItem
+                    new SqlDataLoadedQueueItem
                         {
                             BatchNumber = batchNumber,
                             QueryId = queryId,

@@ -27,7 +27,7 @@ namespace SqlCalculateFieldsPipelineStep
     /// <summary>
     /// The sql calculate fields pipeline step.
     /// </summary>
-    public class SqlCalculateFieldsPipelineStep : BasePipelineStep<ConvertDatabaseToJsonQueueItem, ConvertDatabaseToJsonQueueItem>
+    public class SqlCalculateFieldsPipelineStep : BasePipelineStep<SqlDataLoadedQueueItem, SqlDataLoadedQueueItem>
     {
         /// <summary>
         /// The databus sql reader.
@@ -51,7 +51,7 @@ namespace SqlCalculateFieldsPipelineStep
         protected override string LoggerName => "SqlCalculateFields";
 
         /// <inheritdoc />
-        protected override async Task HandleAsync(ConvertDatabaseToJsonQueueItem workItem)
+        protected override async Task HandleAsync(SqlDataLoadedQueueItem workItem)
         {
             var rows = await this.databusSqlReader.CalculateFields(null, workItem.Columns, workItem.Rows);
 
@@ -61,7 +61,7 @@ namespace SqlCalculateFieldsPipelineStep
         }
 
         /// <inheritdoc />
-        protected override string GetId(ConvertDatabaseToJsonQueueItem workItem)
+        protected override string GetId(SqlDataLoadedQueueItem workItem)
         {
             return workItem.QueryId;
         }

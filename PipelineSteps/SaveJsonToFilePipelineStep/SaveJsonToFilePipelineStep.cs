@@ -1,16 +1,28 @@
-﻿using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using BasePipelineStep;
-using Fabric.Databus.Interfaces;
-using Fabric.Databus.Interfaces.Config;
-using Fabric.Databus.Interfaces.FileWriters;
-using Fabric.Databus.Interfaces.Loggers;
-using Fabric.Databus.Interfaces.Queues;
-using Serilog;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SaveJsonToFilePipelineStep.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Reads a IJsonObjectQueueItem, saves it to file using the {id}.json and then passes the IJsonObjectQueueItem to the next step
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace SaveJsonToFilePipelineStep
 {
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using BasePipelineStep;
+
+    using Fabric.Databus.Interfaces;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
+
+    using Serilog;
+
     /// <summary>
     /// Reads a IJsonObjectQueueItem, saves it to file using the {id}.json and then passes the IJsonObjectQueueItem to the next step
     /// </summary>

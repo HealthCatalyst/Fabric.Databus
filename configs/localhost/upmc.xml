@@ -2,9 +2,9 @@
 <Job>
   <Config>
     <ConnectionString>server=HCS-DEV0002;initial catalog=Shared;Trusted_Connection=True;</ConnectionString>
-    <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
-    <EntitiesPerBatch>100</EntitiesPerBatch>
-    <EntitiesPerUploadFile>100</EntitiesPerUploadFile>
+    <MaximumEntitiesToLoad>100</MaximumEntitiesToLoad>
+    <EntitiesPerBatch>10</EntitiesPerBatch>
+    <EntitiesPerUploadFile>10</EntitiesPerUploadFile>
     <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
     <DropAndReloadIndex>false</DropAndReloadIndex>
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
@@ -13,15 +13,15 @@
     <Index>patients2</Index>
     <Alias>patients</Alias>
     <EntityType>documents</EntityType>
-    <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
+    <TopLevelKeyColumn>KeyLevel1</TopLevelKeyColumn>
     <KeepTemporaryLookupColumnsInOutput>true</KeepTemporaryLookupColumnsInOutput>
   </Config>
 
   <Data>
-    <DataSource>
+    <DataSource Path="$">
       <Sql>
         SELECT Text.TextID,
-        Text.TextID as [key],
+        Text.TextID as [KeyLevel1],
         Text.EDWPatientID as [EDWPatientId],
         Text.TextTXT as [data],
         Text.MimeTypeNM as [data_format],
@@ -31,10 +31,12 @@
         from Text.Text
       </Sql>
     </DataSource>
-    <DataSource Path="Patient" PropertyType="object">
+    <DataSource Path="$.Patient" PropertyType="object">
       <Sql>
-        select Text.TextID as [TextID],
-        Patient.EDWPatientID as [KeyLevel1],
+        SELECT DISTINCT 
+        Text.TextID as [TextID],
+        Text.TextID as [KeyLevel1],
+        Patient.EDWPatientID as [KeyLevel2],
         Patient.EDWPatientID as [key],
         Patient.MRN as [MRN],
         PatientFullNM as [last_name], /* last name is missing */
@@ -47,11 +49,12 @@
         on Text.EDWPatientID = Patient.EDWPatientID
       </Sql>
     </DataSource>
-    <DataSource Path="Visit" PropertyType="object">
+    <DataSource Path="$.Visit" PropertyType="object">
       <Sql>
         select distinct
         Text.TextID as [TextID],
-        Encounter.EncounterID as [KeyLevel1],
+        Text.TextID as [KeyLevel1],
+        Encounter.EncounterID as [KeyLevel2],
         FacilityAccount.FacilityAccountID as [key],
         /* [root] */
         FacilityAccount.FacilityAccountID as [extension],
@@ -64,12 +67,13 @@
         on Encounter.FacilityAccountID = FacilityAccount.FacilityAccountID
       </Sql>
     </DataSource>
-    <DataSource Path="Visit.Facility" PropertyType="object">
+    <DataSource Path="$.Visit.Facility" PropertyType="object">
       <Sql>
         select distinct
         Text.TextID as [TextID],
-        Encounter.EncounterID as [KeyLevel1],
-        FacilityAccount.FacilityAccountID as [KeyLevel2],
+        Text.TextID as [KeyLevel1],
+        Encounter.EncounterID as [KeyLevel2],
+        FacilityAccount.FacilityAccountID as [KeyLevel3],
         FacilityAccount.FacilityAccountID as [key],
         DischargePhysicalLocationID as [root],
         DischargePhysicalLocationNM as [extension] /* always null */
@@ -78,6 +82,26 @@
         on Text.EncounterID = Encounter.EncounterID
         inner join Clinical.FacilityAccount
         on Encounter.FacilityAccountID = FacilityAccount.FacilityAccountID
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.Visit.People">
+      <Sql>
+        SELECT DISTINCT
+        Text.TextID as [KeyLevel1],
+        Encounter.EncounterID as [KeyLevel2],
+        Provider.EDWProviderID as [KeyLevel3],
+        FacilityAccount.FacilityAccountID as [FacilityAccountID], /* not always null but null often */
+        Provider.EDWProviderID as [key],
+        Provider.ProviderLastNM as [last_name],
+        Provider.ProviderFirstNM as [first_name],
+        Provider.ProviderMiddleNM as [middle_name] /* mostly null */
+        from Text.Text
+        inner join Clinical.Encounter
+        on Text.EncounterID = Encounter.EncounterID
+        inner join Clinical.FacilityAccount
+        on Encounter.FacilityAccountID = FacilityAccount.FacilityAccountID
+        inner join Person.Provider
+        on Provider.EDWProviderID = FacilityAccount.EDWAttendingProviderID
       </Sql>
     </DataSource>
   </Data>

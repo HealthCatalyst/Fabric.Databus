@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConvertDatabaseToJsonQueueItem.cs" company="Health Catalyst">
+// <copyright file="SqlDataLoadedQueueItem.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the ConvertDatabaseToJsonQueueItem type.
+//   Defines the SqlDataLoadedQueueItem type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ namespace QueueItems
     /// <summary>
     /// The convert database to json queue item.
     /// </summary>
-    public class ConvertDatabaseToJsonQueueItem : IQueueItem
+    public class SqlDataLoadedQueueItem : IQueueItem
     {
         /// <inheritdoc />
         public string QueryId { get; set; }

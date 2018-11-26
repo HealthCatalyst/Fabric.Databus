@@ -1,23 +1,22 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="JsonObjectQueueItem.cs" company="">
+// <copyright file="SourceWrapperCollectionQueueItem.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the JsonObjectQueueItem type.
+//   Defines the SourceWrapperCollectionQueueItem type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace QueueItems
 {
     using Fabric.Databus.Interfaces.Queues;
-
-    using Newtonsoft.Json.Linq;
+    using Fabric.Databus.Shared;
 
     /// <inheritdoc />
     /// <summary>
-    /// The json object queue item.
+    /// The source wrapper collection queue item.
     /// </summary>
-    public class JsonObjectQueueItem : IQueueItem, IJsonObjectQueueItem
+    public class SourceWrapperCollectionQueueItem : IQueueItem
     {
         /// <inheritdoc />
         public string QueryId { get; set; }
@@ -25,13 +24,9 @@ namespace QueueItems
         /// <inheritdoc />
         public string PropertyName { get; set; }
 
-        /// <inheritdoc />
-        public string Id { get; set; }
-
-        /// <inheritdoc />
-        public JObject Document { get; set; }
-
-        /// <inheritdoc />
-        public int BatchNumber { get; set; }
+        /// <summary>
+        /// Gets or sets the source wrapper collection.
+        /// </summary>
+        public SourceWrapperCollection SourceWrapperCollection { get; set; }
     }
 }

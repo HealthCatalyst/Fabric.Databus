@@ -22,7 +22,7 @@ namespace Fabric.Databus.Shared
         /// <summary>
         /// The wrappers.
         /// </summary>
-        private IDictionary<string, SourceWrapper> wrappers = new Dictionary<string, SourceWrapper>();
+        private readonly IDictionary<string, SourceWrapper> wrappers = new Dictionary<string, SourceWrapper>();
 
         /// <summary>
         /// The add.
@@ -37,20 +37,39 @@ namespace Fabric.Databus.Shared
                 throw new ArgumentNullException(nameof(sourceWrapper.PropertyName));
             }
 
-            this.wrappers.Add(new KeyValuePair<string, SourceWrapper>(sourceWrapper.PropertyName, sourceWrapper));
-
-            if (sourceWrapper.PropertyName != "$")
+            if (this.wrappers.ContainsKey(sourceWrapper.PropertyName))
             {
-                var lastIndexOf = sourceWrapper.PropertyName.LastIndexOf('.');
-                var parentPropertyName = sourceWrapper.PropertyName.Substring(0, lastIndexOf);
-
-                if (!this.wrappers.ContainsKey(parentPropertyName))
-                {
-                    throw new Exception($"Parent entity of {sourceWrapper.PropertyName} was not found");
-                }
-
-                this.wrappers[parentPropertyName].Merge(sourceWrapper.PropertyName, sourceWrapper);
+                var previousWrapper = this.wrappers[sourceWrapper.PropertyName];
+                previousWrapper.Rows.AddRange(sourceWrapper.Rows);
             }
+            else
+            {
+                this.wrappers.Add(new KeyValuePair<string, SourceWrapper>(sourceWrapper.PropertyName, sourceWrapper));
+
+                if (sourceWrapper.PropertyName != "$")
+                {
+                    var lastIndexOf = sourceWrapper.PropertyName.LastIndexOf('.');
+                    var parentPropertyName = sourceWrapper.PropertyName.Substring(0, lastIndexOf);
+
+                    if (!this.wrappers.ContainsKey(parentPropertyName))
+                    {
+                        throw new Exception($"Parent entity of {sourceWrapper.PropertyName} was not found");
+                    }
+
+                    this.wrappers[parentPropertyName].Merge(sourceWrapper.PropertyName, sourceWrapper);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The add or merge.
+        /// </summary>
+        /// <param name="sourceWrapper">
+        /// The source wrapper.
+        /// </param>
+        public void AddOrMerge(SourceWrapper sourceWrapper)
+        {
+
         }
 
         /// <summary>
@@ -67,7 +86,7 @@ namespace Fabric.Databus.Shared
             }
 
             var sourceWrapper = this.wrappers["$"];
-            sourceWrapper.Write(writer, new List<KeyValuePair<string, object>>());
+            sourceWrapper.Write(null, writer, new List<KeyValuePair<string, object>>());
         }
     }
 }

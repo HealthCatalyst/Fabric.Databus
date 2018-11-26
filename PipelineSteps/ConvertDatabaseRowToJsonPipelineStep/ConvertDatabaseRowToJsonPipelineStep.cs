@@ -30,9 +30,9 @@ namespace ConvertDatabaseRowToJsonPipelineStep
 
     /// <inheritdoc />
     /// <summary>
-    /// Reads a ConvertDatabaseToJsonQueueItem and converts the data from rows into a json structure and stores it in JsonDocumentMergerQueueItem
+    /// Reads a SqlDataLoadedQueueItem and converts the data from rows into a json structure and stores it in JsonDocumentMergerQueueItem
     /// </summary>
-    public class ConvertDatabaseRowToJsonPipelineStep : BasePipelineStep<ConvertDatabaseToJsonQueueItem, JsonDocumentMergerQueueItem>
+    public class ConvertDatabaseRowToJsonPipelineStep : BasePipelineStep<SqlDataLoadedQueueItem, JsonDocumentMergerQueueItem>
     {
         /// <summary>
         /// The sequence barrier.
@@ -88,7 +88,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         protected override string LoggerName => "ConvertDatabaseRow";
 
         /// <inheritdoc />
-        protected override async Task HandleAsync(ConvertDatabaseToJsonQueueItem workItem)
+        protected override async Task HandleAsync(SqlDataLoadedQueueItem workItem)
         {
             await this.WriteObjectToJsonAsync(workItem);
         }
@@ -100,7 +100,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         }
 
         /// <inheritdoc />
-        protected override string GetId(ConvertDatabaseToJsonQueueItem workItem)
+        protected override string GetId(SqlDataLoadedQueueItem workItem)
         {
             return Convert.ToString(workItem.JoinColumnValue);
         }
@@ -114,7 +114,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task WriteObjectToJsonAsync(ConvertDatabaseToJsonQueueItem wt)
+        private async Task WriteObjectToJsonAsync(SqlDataLoadedQueueItem wt)
         {
             var id = this.GetId(wt);
 

@@ -145,7 +145,7 @@ namespace SqlJobPipelineStep
             var list = await this.databusSqlReader.GetListOfEntityKeysAsync(
                 this.Config.TopLevelKeyColumn,
                 this.Config.MaximumEntitiesToLoad,
-                job.Data.DataSources.First(d => d.Path == null));
+                job.Data.DataSources.First(d => (d.Path == null || d.Path == "$")));
 
             var itemsLeft = list.Count;
 

@@ -103,23 +103,17 @@ namespace Fabric.Databus.Shared
         /// <summary>
         /// The write.
         /// </summary>
+        /// <param name="propertyName">
+        /// property name
+        /// </param>
         /// <param name="writer">
-        /// The writer.
+        ///     The writer.
         /// </param>
         /// <param name="keys">
-        /// The keys.
+        ///     The keys.
         /// </param>
-        public void Write(JsonWriter writer, IList<KeyValuePair<string, object>> keys)
+        public void Write(string propertyName, JsonWriter writer, IList<KeyValuePair<string, object>> keys)
         {
-            if (this.isArray)
-            {
-                writer.WriteStartArray();
-            }
-            else
-            {
-                // writer.WriteStartObject();
-            }
-
             var rows = this.Rows;
 
             // filter the list by keys
@@ -129,15 +123,34 @@ namespace Fabric.Databus.Shared
                 {
                     var indexOfColumn = this.GetIndexOfColumn(keyValuePair.Key);
 
-                    rows = rows.Where(row => row[indexOfColumn] == keyValuePair.Value).ToList();
+                    rows = rows.Where(row => keyValuePair.Value.Equals(row[indexOfColumn])).ToList();
                 }
+            }
+
+            if (!rows.Any())
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(propertyName))
+            {
+                writer.WritePropertyName(propertyName);
+            }
+
+            if (this.isArray)
+            {
+                writer.WriteStartArray();
+            }
+            else
+            {
+                // writer.WriteStartObject();
             }
 
             if (!this.isArray)
             {
                 if (rows.Count > 1)
                 {
-                    throw new ArgumentOutOfRangeException("found more than 1 rows");
+                    rows = rows.Take(1).ToList();
                 }
             }
 
@@ -152,14 +165,12 @@ namespace Fabric.Databus.Shared
 
                 foreach (var child in this.Children)
                 {
-                    writer.WritePropertyName(child.PropertyNameLastPart);
-
                     var keyValuePairs = this.keyColumns.Select(
                         keyColumnName => new KeyValuePair<string, object>(
                             keyColumnName,
                             row[this.GetIndexOfColumn(keyColumnName)])).ToList();
 
-                    child.Write(writer, keyValuePairs);
+                    child.Write(child.PropertyNameLastPart, writer, keyValuePairs);
                 }
 
                 writer.WriteEndObject();

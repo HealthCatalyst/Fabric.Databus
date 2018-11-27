@@ -32,7 +32,7 @@ namespace Fabric.Databus.Shared.Loggers
         }
 
         /// <inheritdoc />
-        public void LogProgressMonitorItem(int key, ProgressMonitorItem progressMonitorItem)
+        public void LogProgressMonitorItem(string key, ProgressMonitorItem progressMonitorItem)
         {
         }
 

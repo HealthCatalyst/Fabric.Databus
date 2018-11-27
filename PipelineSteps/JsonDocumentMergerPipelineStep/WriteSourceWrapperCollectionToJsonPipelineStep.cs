@@ -64,7 +64,7 @@ namespace JsonDocumentMergerPipelineStep
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "WriteSourceWrapperCollectionToJson";
+        protected override string LoggerName => "WriteSourceWrapperToJson";
 
         /// <inheritdoc />
         protected override Task HandleAsync(SourceWrapperCollectionQueueItem workItem)

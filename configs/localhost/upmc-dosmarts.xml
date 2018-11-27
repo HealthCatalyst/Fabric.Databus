@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Job>
   <Config>
-    <ConnectionString>server=HCS-DEV0002;initial catalog=SAM;Trusted_Connection=True;</ConnectionString>
+    <ConnectionString>server=HCS-DEV0002;initial catalog=Shared;Trusted_Connection=True;</ConnectionString>
     <MaximumEntitiesToLoad>100</MaximumEntitiesToLoad>
     <EntitiesPerBatch>10</EntitiesPerBatch>
     <EntitiesPerUploadFile>10</EntitiesPerUploadFile>

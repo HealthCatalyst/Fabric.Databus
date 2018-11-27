@@ -31,12 +31,12 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// The log progress monitor item.
         /// </summary>
         /// <param name="key">
-        /// The key.
+        ///     The key.
         /// </param>
         /// <param name="progressMonitorItem">
-        /// The progress monitor item.
+        ///     The progress monitor item.
         /// </param>
-        void LogProgressMonitorItem(int key, ProgressMonitorItem progressMonitorItem);
+        void LogProgressMonitorItem(string key, ProgressMonitorItem progressMonitorItem);
 
         /// <summary>
         /// The log header.

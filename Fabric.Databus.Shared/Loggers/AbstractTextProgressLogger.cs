@@ -41,7 +41,7 @@ namespace Fabric.Databus.Shared.Loggers
         public abstract string GetLog();
 
         /// <inheritdoc />
-        public void LogProgressMonitorItem(int key, ProgressMonitorItem progressMonitorItem)
+        public void LogProgressMonitorItem(string key, ProgressMonitorItem progressMonitorItem)
         {
             var isQueueCompleted = progressMonitorItem.IsInQueueCompleted ? " [C]" : string.Empty;
 
@@ -56,7 +56,7 @@ namespace Fabric.Databus.Shared.Loggers
             var processed = progressMonitorItem.TotalItemsProcessed;
 
             var text =
-                $"{key,4}-{loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {string.Empty,4} {inQueueCount,7} {processed,10} {@out,7} {time,15} {dictionary,7} {isQueueCompleted,3}";
+                $"{key,25} {loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {string.Empty,4} {inQueueCount,7} {processed,10} {@out,7} {time,15} {dictionary,7} {isQueueCompleted,3}";
 
             this.AppendLine(text);
         }
@@ -77,7 +77,7 @@ namespace Fabric.Databus.Shared.Loggers
             const string Complete = "Complete";
 
             var text =
-                $"{Key,4} {LoggerName,25}({QueueProcessorCount,3}/{MaxQueueProcessorCount,3}) {InQueueCount,7} {Processed,10} {Out,7} {Time,15} {Dictionary,7} {Complete}";
+                $"{Key,25} {LoggerName,25}({QueueProcessorCount,3}/{MaxQueueProcessorCount,3}) {InQueueCount,7} {Processed,10} {Out,7} {Time,15} {Dictionary,7} {Complete}";
 
             this.AppendLine(text);
         }

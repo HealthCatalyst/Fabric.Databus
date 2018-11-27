@@ -36,8 +36,8 @@ namespace Fabric.Databus.Domain.ProgressMonitors
         /// <summary>
         /// The progress monitor items.
         /// </summary>
-        private readonly ConcurrentDictionary<int, ProgressMonitorItem> progressMonitorItems =
-            new ConcurrentDictionary<int, ProgressMonitorItem>();
+        private readonly ConcurrentDictionary<string, ProgressMonitorItem> progressMonitorItems =
+            new ConcurrentDictionary<string, ProgressMonitorItem>();
 
         /// <summary>
         /// The background task.
@@ -111,7 +111,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
             //lock (Lock)
             {
                 Interlocked.Increment(ref id);
-                var key = (progressMonitorItem.StepNumber * 100) + progressMonitorItem.UniqueStepId;
+                var key = $"{progressMonitorItem.StepNumber}-{progressMonitorItem.QueryId}";
                 this.progressMonitorItems.AddOrUpdate(key, progressMonitorItem, (a, b) => progressMonitorItem);
                 this.JobHistoryUpdateAction?.Invoke();
             }

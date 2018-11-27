@@ -10,6 +10,8 @@
 namespace BasePipelineStep
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
@@ -33,6 +35,12 @@ namespace BasePipelineStep
         where TQueueInItem : IQueueItem
         where TQueueOutItem : IQueueItem
     {
+        /// <summary>
+        /// The processing time by query id.
+        /// </summary>
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly ConcurrentDictionary<string, TimeSpan> ProcessingTimeByQueryId = new ConcurrentDictionary<string, TimeSpan>();
+
         /// <summary>
         /// The _total items processed.
         /// </summary>
@@ -93,7 +101,7 @@ namespace BasePipelineStep
         /// <summary>
         /// The id.
         /// </summary>
-        private readonly int id = 0;
+        private readonly int id;
 
         /// <summary>
         /// The _step number.
@@ -185,7 +193,7 @@ namespace BasePipelineStep
             var isFirstThreadForThisTask = currentProcessorCount < 2;
             await this.BeginAsync(isFirstThreadForThisTask);
 
-            this.LogToConsole(null);
+            this.LogToConsole(null, null);
 
             string queryId = null;
             var stopWatch = new Stopwatch();
@@ -217,6 +225,16 @@ namespace BasePipelineStep
                     this.InternalHandleAsync(wt).Wait(this.cancellationToken);
 
                     processingTime = processingTime.Add(stopWatch.Elapsed);
+
+                    var uniqueWorkItemId = this.GetId(wt);
+                    if (uniqueWorkItemId != null)
+                    {
+                        ProcessingTimeByQueryId.AddOrUpdate(
+                            uniqueWorkItemId,
+                            stopWatch.Elapsed,
+                            (myQueryId, previousElapsed) => previousElapsed.Add(stopWatch.Elapsed));
+                    }
+
                     stopWatch.Stop();
 
                     this.totalItemsProcessedByThisProcessor++;
@@ -242,7 +260,7 @@ namespace BasePipelineStep
 
             this.MyLogger.Verbose($"Completed {queryId}: queue: {this.InQueue.Count}");
 
-            this.LogToConsole(null);
+            this.LogToConsole(null, null);
         }
 
         /// <inheritdoc />
@@ -321,7 +339,7 @@ namespace BasePipelineStep
         {
             var myId = this.GetId(wt);
 
-            this.LogToConsole(myId);
+            this.LogToConsole(myId, wt.QueryId);
         }
 
         /// <summary>
@@ -400,18 +418,25 @@ namespace BasePipelineStep
         /// <param name="id1">
         /// The id.
         /// </param>
-        private void LogToConsole(string id1)
+        /// <param name="queryId">
+        /// The query Id.
+        /// </param>
+        private void LogToConsole(string id1, string queryId)
         {
+            var timeElapsedProcessing = queryId != null && ProcessingTimeByQueryId.ContainsKey(queryId)
+                                            ? ProcessingTimeByQueryId[queryId]
+                                            : processingTime;
+
             this.progressMonitor.SetProgressItem(new ProgressMonitorItem
             {
                 StepNumber = this.stepNumber,
-                UniqueStepId = this.UniqueId,
+                QueryId = queryId,
                 LoggerName = this.LoggerName,
                 Id = id1,
                 InQueueCount = this.InQueue.Count,
                 InQueueName = this.InQueue.Name,
                 IsInQueueCompleted = this.InQueue.IsCompleted,
-                TimeElapsedProcessing = processingTime,
+                TimeElapsedProcessing = timeElapsedProcessing,
                 TimeElapsedBlocked = blockedTime,
                 TotalItemsProcessed = totalItemsProcessed,
                 TotalItemsAddedToOutputQueue = totalItemsAddedToOutputQueue,

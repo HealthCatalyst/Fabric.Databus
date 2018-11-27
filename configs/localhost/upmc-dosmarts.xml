@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<Job>
+  <Config>
+    <ConnectionString>server=HCS-DEV0002;initial catalog=SAM;Trusted_Connection=True;</ConnectionString>
+    <MaximumEntitiesToLoad>100</MaximumEntitiesToLoad>
+    <EntitiesPerBatch>10</EntitiesPerBatch>
+    <EntitiesPerUploadFile>10</EntitiesPerUploadFile>
+    <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
+    <DropAndReloadIndex>false</DropAndReloadIndex>
+    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
+    <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
+    <CompressFiles>false</CompressFiles>
+    <TopLevelKeyColumn>KeyLevel1</TopLevelKeyColumn>
+    <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
+  </Config>
+
+  <Data>
+    <DataSource Path="$">
+      <Sql>
+        SELECT
+        Text.TextID            AS [KeyLevel1],
+        Text.TextID            AS [extension],
+        Text.TextSourceDSC     AS [root],
+        Text.TextOriginTableNM AS [extension_suffix], 
+        Text.TextTXT           AS [data],
+        Text.TextTXT           AS [base64_data],
+        Text.MimeTypeNM        AS [data_format]
+        FROM   Text.Text
+      </Sql>
+    </DataSource>
+    <DataSource Path="$">
+      <Sql>
+        SELECT DISTINCT
+        Date.TextID  AS [KeyLevel1],
+        Date.DateDTS AS [source_last_modified_at],
+        Date.DateDTS AS [source_versioned_at],
+        'Primary'    AS [data_precedence]
+        FROM   Text.Date
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.patient" PropertyType="object">
+      <Sql>
+        SELECT DISTINCT
+        Text.TextID							AS [KeyLevel1],
+        PatientCrossWalk.EDWPatientID		AS [KeyLevel2],
+        PatientCrossWalk.RowSourceDSC		AS [root],
+        PatientCrossWalk.PatientID          AS [extension],
+        PatientCrossWalk.PatientFullNM      AS [last_name],
+        PatientCrossWalk.PatientFullNM      AS [first_name],
+        PatientCrossWalk.PatientFullNM      AS [middle_name],
+        PatientCrossWalk.GenderCD			AS [gender],
+        PatientCrossWalk.BirthDTS           AS [date_of_birth]
+        FROM   Text.Text
+        INNER JOIN Person.PatientCrossWalk
+        ON Text.EDWPatientID = PatientCrossWalk.EDWPatientID
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.visit" PropertyType="object">
+      <Sql>
+        SELECT DISTINCT
+        Text.TextID                       AS [KeyLevel1],
+        Encounter.EncounterID             AS [KeyLevel2],
+        FacilityAccount.RowSourceDSC      AS [root],
+        FacilityAccount.FacilityAccountID AS [extension],
+        FacilityAccount.AdmitDTS          AS [admitted_at],
+        FacilityAccount.DischargeDTS      AS [discharged_at]
+        FROM   Text.Text
+        INNER JOIN Clinical.Encounter
+        ON Text.EncounterID = Encounter.EncounterID
+        INNER JOIN Clinical.FacilityAccount
+        ON Encounter.FacilityAccountID =
+        FacilityAccount.FacilityAccountID
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.visit.facility" PropertyType="object">
+      <Sql>
+        SELECT DISTINCT
+        Text.TextID                       AS [KeyLevel1],
+        Encounter.EncounterID             AS [KeyLevel2],
+        FacilityAccount.FacilityAccountID AS [KeyLevel3],
+        FacilityAccount.RowSourceDSC      AS [root],
+        DischargePhysicalLocationID       AS [extension] /* always null */
+        FROM   Text.Text
+        INNER JOIN Clinical.Encounter
+        ON Text.EncounterID = Encounter.EncounterID
+        INNER JOIN Clinical.FacilityAccount
+        ON Encounter.FacilityAccountID =
+        FacilityAccount.FacilityAccountID
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.visit.people">
+      <Sql>
+        SELECT DISTINCT
+        Text.TextID                       AS [KeyLevel1],
+        Encounter.EncounterID             AS [KeyLevel2],
+        Provider.EDWProviderID            AS [KeyLevel3],
+        FacilityAccount.RowSourceDSC      AS [root],
+        Provider.EDWProviderID            AS [extension],
+        'attending'                       AS [role],
+        Provider.ProviderLastNM           AS [last_name],
+        Provider.ProviderFirstNM          AS [first_name],
+        Provider.ProviderMiddleNM         AS [middle_name]
+        /* mostly null */
+        FROM   Text.Text
+        INNER JOIN Clinical.Encounter
+        ON Text.EncounterID = Encounter.EncounterID
+        INNER JOIN Clinical.FacilityAccount
+        ON Encounter.FacilityAccountID =
+        FacilityAccount.FacilityAccountID
+        INNER JOIN Person.Provider
+        ON Provider.EDWProviderID =
+        FacilityAccount.EDWAttendingProviderID
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.document" PropertyType="object">
+      <Sql>
+        SELECT DISTINCT 
+        Text.TextID        AS [KeyLevel1],
+        Text.TextID        AS [KeyLevel2],
+        Text.TextSourceDSC AS [root],
+        Text.TextID        AS [extension],
+        'unknown'          AS [confidentiality_code],
+        StatusDSC          AS [Status], /* needs to be mapped to unknown, preliminary, final, corrected, addendum, in_error, cancelled */
+        Text.TextSourceDSC AS [type_root],
+        Text.TextTypeCD    AS [type_extension],
+        Text.TextTypeDSC   AS [type_description]
+        FROM   Text.Text
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.document" PropertyType="object">
+      <Sql>
+        SELECT DISTINCT
+        Date.TextID  AS [KeyLevel1],
+        Date.TextID  AS [KeyLevel2],
+        Date.TextID  AS [key],
+        Date.DateDTS AS [date_of_service],
+        Date.DateDTS AS [source_created_at],
+        Date.EDWLastModifiedDTS AS [source_updated_at]
+        FROM   Text.Date
+      </Sql>
+    </DataSource>
+    <DataSource Path="$.document.people">
+      <Sql>
+        SELECT DISTINCT
+        Text.TextID                        AS [KeyLevel1],
+        Text.TextID                        AS [KeyLevel2],
+        ProviderCrossWalk.EDWProviderID    AS [KeyLevel3],
+        ProviderCrossWalk.RowSourceDSC     AS [root],
+        ProviderCrossWalk.ProviderID       AS [extension],
+        'attending'                        AS [role],
+        ProviderCrossWalk.ProviderLastNM   AS [last_name],
+        ProviderCrossWalk.ProviderFirstNM  AS [first_name],
+        ProviderCrossWalk.ProviderMiddleNM AS [middle_name] /* middle name is always null */
+        FROM   Text.Text
+        INNER JOIN Clinical.Encounter
+        ON Text.EncounterID = Encounter.EncounterID
+        INNER JOIN Clinical.FacilityAccount
+        ON Encounter.FacilityAccountID =
+        FacilityAccount.FacilityAccountID
+        INNER JOIN Person.ProviderCrossWalk
+        ON ProviderCrossWalk.EDWProviderID =
+        FacilityAccount.EDWAttendingProviderID
+      </Sql>
+    </DataSource>
+  </Data>
+</Job>

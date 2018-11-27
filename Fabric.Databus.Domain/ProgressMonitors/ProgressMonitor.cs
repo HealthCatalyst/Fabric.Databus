@@ -16,7 +16,6 @@ namespace Fabric.Databus.Domain.ProgressMonitors
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Loggers;
 
     /// <summary>
@@ -74,6 +73,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Gets or sets the job history update action.
         /// </summary>
@@ -108,17 +108,17 @@ namespace Fabric.Databus.Domain.ProgressMonitors
         /// </param>
         public void SetProgressItem(ProgressMonitorItem progressMonitorItem)
         {
-
             //lock (Lock)
             {
                 Interlocked.Increment(ref id);
-                var key = progressMonitorItem.StepNumber;
+                var key = (progressMonitorItem.StepNumber * 100) + progressMonitorItem.UniqueStepId;
                 this.progressMonitorItems.AddOrUpdate(key, progressMonitorItem, (a, b) => progressMonitorItem);
                 this.JobHistoryUpdateAction?.Invoke();
             }
 
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// The dispose.
         /// </summary>
@@ -128,11 +128,12 @@ namespace Fabric.Databus.Domain.ProgressMonitors
             this.LogProgress();
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// The get snapshot of progress items.
         /// </summary>
         /// <returns>
-        /// The <see cref="IList"/>.
+        /// The <see cref="T:System.Collections.Generic.IList`1" />.
         /// </returns>
         public IList<ProgressMonitorItem> GetSnapshotOfProgressItems()
         {

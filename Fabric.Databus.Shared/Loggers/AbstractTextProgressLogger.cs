@@ -9,7 +9,6 @@
 
 namespace Fabric.Databus.Shared.Loggers
 {
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Loggers;
 
     /// <inheritdoc />
@@ -18,6 +17,7 @@ namespace Fabric.Databus.Shared.Loggers
     /// </summary>
     public abstract class AbstractTextProgressLogger : IProgressLogger
     {
+        /// <inheritdoc />
         /// <summary>
         /// The reset.
         /// </summary>
@@ -31,11 +31,12 @@ namespace Fabric.Databus.Shared.Loggers
         /// </param>
         public abstract void AppendLine(string text);
 
+        /// <inheritdoc />
         /// <summary>
         /// The get log.
         /// </summary>
         /// <returns>
-        /// The <see cref="string"/>.
+        /// The <see cref="T:System.String" />.
         /// </returns>
         public abstract string GetLog();
 
@@ -63,19 +64,20 @@ namespace Fabric.Databus.Shared.Loggers
         /// <inheritdoc />
         public void LogHeader()
         {
-            var key = "key";
-            var loggerName = "Step";
-            var queueProcessorCount = "current";
-            var maxQueueProcessorCount = "max";
-            var inQueueCount = "In";
-            var time = "Time";
-            var dictionary = "dictionary";
-            var @out = "Out";
-            var processed = "Processed";
+            const string Key = "key";
+            const string LoggerName = "Step";
+            const string QueueProcessorCount = "current";
+            const string MaxQueueProcessorCount = "max";
+            const string InQueueCount = "In";
+            const string Time = "Time";
+            const string Dictionary = "dictionary";
+            const string Out = "Out";
+            const string Processed = "Processed";
 
-            var complete = "Complete";
+            const string Complete = "Complete";
+
             var text =
-                $"{key,4} {loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {inQueueCount,7} {processed,10} {@out,7} {time,15} {dictionary,7} {complete}";
+                $"{Key,4} {LoggerName,25}({QueueProcessorCount,3}/{MaxQueueProcessorCount,3}) {InQueueCount,7} {Processed,10} {Out,7} {Time,15} {Dictionary,7} {Complete}";
 
             this.AppendLine(text);
         }

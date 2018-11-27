@@ -173,6 +173,7 @@ namespace BasePipelineStep
         /// <summary>
         /// The unique id.
         /// </summary>
+        // ReSharper disable once ConvertToAutoProperty
         protected int UniqueId => this.id;
 
         /// <inheritdoc />
@@ -244,6 +245,7 @@ namespace BasePipelineStep
             this.LogToConsole(null);
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// The mark output queue as completed.
         /// </summary>
@@ -269,6 +271,7 @@ namespace BasePipelineStep
             this.outQueue = this.queueManager.GetOutputQueue<TQueueOutItem>(stepNumber1);
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// The create out queue.
         /// </summary>
@@ -316,9 +319,9 @@ namespace BasePipelineStep
         /// </param>
         protected virtual void LogItemToConsole(TQueueInItem wt)
         {
-            var id = this.GetId(wt);
+            var myId = this.GetId(wt);
 
-            this.LogToConsole(id);
+            this.LogToConsole(myId);
         }
 
         /// <summary>
@@ -402,6 +405,7 @@ namespace BasePipelineStep
             this.progressMonitor.SetProgressItem(new ProgressMonitorItem
             {
                 StepNumber = this.stepNumber,
+                UniqueStepId = this.UniqueId,
                 LoggerName = this.LoggerName,
                 Id = id1,
                 InQueueCount = this.InQueue.Count,

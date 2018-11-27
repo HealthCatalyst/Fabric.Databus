@@ -10,9 +10,6 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <Index>patients2</Index>
-    <Alias>patients</Alias>
-    <EntityType>documents</EntityType>
     <TopLevelKeyColumn>KeyLevel1</TopLevelKeyColumn>
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
   </Config>
@@ -24,7 +21,7 @@
         Text.TextID            AS [KeyLevel1],
         Text.TextID            AS [extension],
         Text.TextSourceDSC     AS [root],
-        Text.TextOriginTableNM AS [extension_suffix],
+        Text.TextOriginTableNM AS [extension_suffix], 
         Text.TextTXT           AS [data],
         Text.TextTXT           AS [base64_data],
         Text.MimeTypeNM        AS [data_format]

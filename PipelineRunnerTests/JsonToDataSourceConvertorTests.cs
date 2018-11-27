@@ -71,6 +71,36 @@ namespace PipelineRunnerTests
         /// The test parsing json mapping.
         /// </summary>
         [TestMethod]
+        public void TestParsingJsonMappingOneEntitySimplerSyntax()
+        {
+            string json = @"
+                        {
+	                        ""_metadata"": {
+			                    ""key"": ""TextID"",
+			                    ""entity"": ""Text""
+		                    },
+	                        ""root"": ""Text.TextID"",
+	                        ""data"": ""Text.TextTXT""
+                        }";
+
+            JObject myObject = JObject.Parse(json);
+
+            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(myObject);
+
+            Assert.AreEqual(1, dataSources.Count);
+            Assert.AreEqual("SELECT * FROM Text", dataSources[0].Sql);
+
+            Assert.AreEqual("$", dataSources[0].Path);
+            Assert.AreEqual("Array", dataSources[0].PropertyType);
+
+            Assert.AreEqual(1, dataSources[0].KeyLevels.Count);
+            Assert.AreEqual("TextID", dataSources[0].KeyLevels[0]);
+        }
+
+        /// <summary>
+        /// The test parsing json mapping.
+        /// </summary>
+        [TestMethod]
         public void TestParsingJsonMappingNestedEntity()
         {
             string json = @"

@@ -244,6 +244,7 @@
     <Compile Include="Types\Text.cs" />
     <Compile Include="Sources\TextSource.cs" />
     <Compile Include="Types\Visit.cs" />
+    <Compile Include="JsonToDataSourceConvertorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -1,24 +1,32 @@
-using System.IO;
-using System.Xml.Serialization;
-using Fabric.Shared;
-using Newtonsoft.Json;
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ConfigReader.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   The config reader.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.Config
 {
+    using System.IO;
+
+    using Fabric.Shared;
+
+    /// <summary>
+    /// The config reader.
+    /// </summary>
     public class ConfigReader
     {
-        //public QueryConfig Read(string inputFile)
-        //{
-        //    var fileContents = File.ReadAllText(inputFile);
-        //    return ReadFromText(fileContents);
-        //}
-
-        //public QueryConfig ReadFromText(string fileContents)
-        //{
-        //    var configs = JsonConvert.DeserializeObject<QueryConfig>(fileContents);
-        //    return configs;
-        //}
-
+        /// <summary>
+        /// The read xml.
+        /// </summary>
+        /// <param name="inputFile">
+        /// The input file.
+        /// </param>
+        /// <returns>
+        /// The <see cref="XmlJob"/>.
+        /// </returns>
         public XmlJob ReadXml(string inputFile)
         {
             var fileContents = File.ReadAllText(inputFile);
@@ -26,6 +34,15 @@ namespace Fabric.Databus.Config
             return this.ReadXmlFromText(fileContents);
         }
 
+        /// <summary>
+        /// The read xml from text.
+        /// </summary>
+        /// <param name="fileContents">
+        /// The file contents.
+        /// </param>
+        /// <returns>
+        /// The <see cref="XmlJob"/>.
+        /// </returns>
         public XmlJob ReadXmlFromText(string fileContents)
         {
             return fileContents.FromXml<XmlJob>();

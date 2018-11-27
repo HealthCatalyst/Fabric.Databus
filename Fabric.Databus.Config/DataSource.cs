@@ -13,20 +13,15 @@ namespace Fabric.Databus.Config
     using System.Runtime.Serialization;
     using System.Xml.Serialization;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
 
-    /// <summary>
-    /// The data source.
-    /// </summary>
+    /// <inheritdoc />
     [DataContract(Name = "DataSource", Namespace = "")]
     [XmlType("DataSource")]
     public class DataSource : IDataSource
     {
-        /// <summary>
-        /// Gets or sets the sql.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public string Sql
         {
@@ -34,29 +29,26 @@ namespace Fabric.Databus.Config
             set;
         }
 
-        /// <summary>
-        /// Gets or sets the path.
-        /// </summary>
+        /// <inheritdoc />
         [XmlAttribute("Path")]
         [DataMember]
         public string Path { get; set; }
 
-        /// <summary>
-        /// Gets or sets the property type.
-        /// </summary>
+        /// <inheritdoc />
         [XmlAttribute("PropertyType")]
         [DataMember]
         public string PropertyType { get; set; }
 
-        /// <summary>
-        /// Gets or sets the fields.
-        /// </summary>
+        /// <inheritdoc />
         [XmlIgnore]
         public List<IQueryField> Fields { get; set; } = new List<IQueryField>();
 
-        /// <summary>
-        /// Gets or sets the sequence number.
-        /// </summary>
+        /// <inheritdoc />
         public int SequenceNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the key levels.
+        /// </summary>
+        public IList<string> KeyLevels { get; set; }
     }
 }

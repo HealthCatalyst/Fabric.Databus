@@ -23,6 +23,11 @@ namespace Fabric.Databus.Shared
     public class SourceWrapper
     {
         /// <summary>
+        /// The key level name.
+        /// </summary>
+        private const string KeyLevelName = "KeyLevel";
+
+        /// <summary>
         /// The key columns.
         /// </summary>
         private readonly IList<string> keyColumns;
@@ -200,7 +205,7 @@ namespace Fabric.Databus.Shared
                 {
                     if (!this.keepTemporaryLookupColumnsInOutput)
                     {
-                        if (column.Name.StartsWith("KeyLevel"))
+                        if (column.Name.StartsWith(KeyLevelName))
                         {
                             continue;
                         }
@@ -279,6 +284,14 @@ namespace Fabric.Databus.Shared
             {
                 foreach (var column in this.Columns)
                 {
+                    if (!this.keepTemporaryLookupColumnsInOutput)
+                    {
+                        if (column.Name.StartsWith(KeyLevelName))
+                        {
+                            continue;
+                        }
+                    }
+
                     writer.WritePropertyName(column.Name);
                     writer.WriteValue(row[column.index]);
                 }
@@ -324,6 +337,5 @@ namespace Fabric.Databus.Shared
                 .Where(column => column.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
                 .Select(column => column.index).First();
         }
-
     }
 }

@@ -15,15 +15,22 @@ namespace Fabric.Databus.Config
     /// <summary>
     /// The json metadata.
     /// </summary>
+    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Reviewed. Suppression is OK here.")]
+#pragma warning disable IDE1006 // Naming Styles
+    // ReSharper disable InconsistentNaming
     public class JsonMetadata
     {
+
+        /// <summary>
+        /// Gets or sets the key levels.
+        /// </summary>
+        public IList<string> keyLevels { get; set; }
+
         /// <summary>
         /// Gets or sets the entities.
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Reviewed. Suppression is OK here.")]
-        // ReSharper disable once InconsistentNaming
-#pragma warning disable IDE1006 // Naming Styles
         public IList<JsonMetadataEntity> entities { get; set; }
-#pragma warning restore IDE1006 // Naming Styles
     }
+    // ReSharper restore InconsistentNaming
+#pragma warning restore IDE1006 // Naming Styles
 }

@@ -31,22 +31,32 @@ namespace Fabric.Databus.Config
         /// <param name="dataSources">
         /// The data Sources.
         /// </param>
-        public static void ParseJsonIntoDataSources(IList<string> propertyNames, JToken myObject, IList<DataSource> dataSources)
+        /// <param name="keyLevels">
+        /// The key Levels.
+        /// </param>
+        /// <param name="objectType">
+        /// The j Object Type.
+        /// </param>
+        private static void InternalParseJsonIntoDataSources(IList<string> propertyNames, JToken myObject, IList<DataSource> dataSources, IList<string> keyLevels, JsonMetadataEntityType objectType)
         {
-            JToken metadata = myObject["_metadata"];
+            JToken metadata = myObject is JObject ? myObject["_metadata"] : myObject.First["_metadata"];
 
             JsonMetadata jsonMetadata = metadata.ToObject<JsonMetadata>();
 
             var fullyQualifiedPropertyName = string.Join(".", propertyNames);
 
+            var newKeyLevels = new List<string>(keyLevels)
+                .Concat(jsonMetadata.keyLevels)
+                .ToList();
+
             var myDataSources = jsonMetadata.entities.Select(
                 entity => new DataSource
-                {
-                    Path = propertyNames.Any() ? $"$.{fullyQualifiedPropertyName}" : "$",
-                    PropertyType = "object",
-                    Sql = $"SELECT * FROM {entity.databaseEntity}",
-                    KeyLevels = entity.keyLevels
-                })
+                              {
+                                  Path = propertyNames.Any() ? $"$.{fullyQualifiedPropertyName}" : "$",
+                                  PropertyType = objectType.ToString(),
+                                  Sql = $"SELECT * FROM {entity.databaseEntity}",
+                                  KeyLevels = newKeyLevels
+                              })
                 .ToList();
 
             myDataSources.ForEach(dataSources.Add);
@@ -65,15 +75,34 @@ namespace Fabric.Databus.Config
                         switch (jProperty.Value)
                         {
                             case JObject obj:
-                                ParseJsonIntoDataSources(nestedPropertyNames, obj, dataSources);
+                                InternalParseJsonIntoDataSources(nestedPropertyNames, obj, dataSources, newKeyLevels, JsonMetadataEntityType.Object);
                                 break;
                             case JArray array:
-                                ParseJsonIntoDataSources(nestedPropertyNames, array, dataSources);
+                                InternalParseJsonIntoDataSources(nestedPropertyNames, array, dataSources, newKeyLevels, JsonMetadataEntityType.Array);
                                 break;
                         }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// The parse json into data sources.
+        /// </summary>
+        /// <param name="myObject">
+        /// The my object.
+        /// </param>
+        /// <returns>
+        /// The <see cref="List{T}"/>
+        /// data sources
+        /// </returns>
+        public static List<DataSource> ParseJsonIntoDataSources(JObject myObject)
+        {
+            var dataSources = new List<DataSource>();
+
+            InternalParseJsonIntoDataSources(new List<string>(), myObject, dataSources, new List<string>(), JsonMetadataEntityType.Array);
+
+            return dataSources;
         }
     }
 }

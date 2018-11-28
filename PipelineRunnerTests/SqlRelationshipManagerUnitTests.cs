@@ -24,6 +24,101 @@ namespace PipelineRunnerTests
     public class SqlRelationshipManagerUnitTests
     {
         /// <summary>
+        /// The test no relationships.
+        /// </summary>
+        [TestMethod]
+        public void TestNoRelationships()
+        {
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement("Text.Text", "TextID", new List<ISqlRelationship>(), new List<ISqlEntityColumnMapping>());
+
+            string expected = @"SELECT
+Text.Text.*,Text.Text.[TextID] AS [KeyLevel1]
+FROM Text.Text
+";
+            Assert.AreEqual(expected, sqlStatement);
+        }
+
+        /// <summary>
+        /// The test no relationships.
+        /// </summary>
+        [TestMethod]
+        public void TestNoRelationshipsWithSpecificColumnsWithoutEntity()
+        {
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+                "Text.Text",
+                "TextID",
+                new List<ISqlRelationship>(),
+                new List<ISqlEntityColumnMapping>
+                    {
+                        new SqlEntityColumnMapping
+                            {
+                                Name = "TextSourceDSC"
+                            }
+                    });
+
+
+            string expected = @"SELECT
+Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
+FROM Text.Text
+";
+            Assert.AreEqual(expected, sqlStatement);
+        }
+
+        /// <summary>
+        /// The test no relationships.
+        /// </summary>
+        [TestMethod]
+        public void TestNoRelationshipsWithSpecificColumns()
+        {
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+                "Text.Text",
+                "TextID",
+                new List<ISqlRelationship>(),
+                new List<ISqlEntityColumnMapping>
+                    {
+                        new SqlEntityColumnMapping
+                            {
+                                Entity = "Text.Text",
+                                Name = "TextSourceDSC"
+                            }
+                    });
+
+
+            string expected = @"SELECT
+Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
+FROM Text.Text
+";
+            Assert.AreEqual(expected, sqlStatement);
+        }
+
+        /// <summary>
+        /// The test no relationships.
+        /// </summary>
+        [TestMethod]
+        public void TestNoRelationshipsWithSpecificColumnsUsingAlias()
+        {
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+                "Text.Text",
+                "TextID",
+                new List<ISqlRelationship>(),
+                new List<ISqlEntityColumnMapping>
+                    {
+                        new SqlEntityColumnMapping
+                            {
+                                Name = "TextSourceDSC",
+                                Alias = "extension"
+                            }
+                    });
+
+
+            string expected = @"SELECT
+Text.Text.[TextSourceDSC] AS [extension],Text.Text.[TextID] AS [KeyLevel1]
+FROM Text.Text
+";
+            Assert.AreEqual(expected, sqlStatement);
+        }
+
+        /// <summary>
         /// The test simple relationship.
         /// </summary>
         [TestMethod]
@@ -37,7 +132,11 @@ namespace PipelineRunnerTests
                                           DestinationEntityKey = "EdwPatientID"
                                       };
 
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(new List<ISqlRelationship> { sqlRelationship }, "TextID");
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+                "Person.Patient",
+                "TextID",
+                new List<ISqlRelationship> { sqlRelationship },
+                new List<ISqlEntityColumnMapping>());
 
             string expected = @"SELECT
 Person.Patient.*,Person.Patient.[EdwPatientID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]
@@ -70,7 +169,11 @@ INNER JOIN Text.Text ON Text.Text.[EdwPatientID] = Person.Patient.[EdwPatientID]
                                           DestinationEntityKey = "FacilityAccountID"
             };
 
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2 }, "TextID");
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+                "Clinical.FacilityAccount",
+                "TextID",
+                new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2 },
+                new List<ISqlEntityColumnMapping>());
 
             string expected = @"SELECT
 Clinical.FacilityAccount.*,Clinical.FacilityAccount.[FacilityAccountID] AS [KeyLevel3],Clinical.Encounter.[EncounterID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]
@@ -112,7 +215,11 @@ INNER JOIN Text.Text ON Text.Text.[EncounterID] = Clinical.Encounter.[EncounterI
                                            DestinationEntityKey = "EDWProviderID"
                                        };
 
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2, sqlRelationship3 }, "TextID");
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+                "Person.Provider",
+                "TextID",
+                new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2, sqlRelationship3 },
+                new List<ISqlEntityColumnMapping>());
 
             string expected = @"SELECT
 Person.Provider.*,Person.Provider.[EDWProviderID] AS [KeyLevel4],Clinical.FacilityAccount.[FacilityAccountID] AS [KeyLevel3],Clinical.Encounter.[EncounterID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]

@@ -49,6 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "localhost", "localhost", "{
 		configs\localhost\fhir_elasticsearch.xml = configs\localhost\fhir_elasticsearch.xml
 		configs\localhost\job.xml = configs\localhost\job.xml
 		configs\localhost\test.xml = configs\localhost\test.xml
+		configs\localhost\upmc-dosmarts-tables.xml = configs\localhost\upmc-dosmarts-tables.xml
 		configs\localhost\upmc-dosmarts-withmodel.xml = configs\localhost\upmc-dosmarts-withmodel.xml
 		configs\localhost\upmc-dosmarts.xml = configs\localhost\upmc-dosmarts.xml
 		configs\localhost\upmc.xml = configs\localhost\upmc.xml

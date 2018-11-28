@@ -15,8 +15,6 @@ namespace Fabric.Databus.Schema
     using System.Data.SqlClient;
     using System.Linq;
 
-    using Fabric.Databus.Config;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
@@ -49,23 +47,13 @@ namespace Fabric.Databus.Schema
             this.topLevelKeyColumn = topLevelKeyColumn ?? throw new ArgumentNullException(nameof(topLevelKeyColumn));
         }
 
-        /// <summary>
-        /// The get schemas for loads.
-        /// </summary>
-        /// <param name="workitemLoads">
-        /// The workitem loads.
-        /// </param>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
-        /// <exception cref="ArgumentException">exception thrown
-        /// </exception>
+        /// <inheritdoc />
         public IList<MappingItem> GetSchemasForLoads(
-            IList<IDataSource> workitemLoads)
+            IList<IDataSource> workItemLoads)
         {
             var dictionary = new List<MappingItem>();
 
-            foreach (var load in workitemLoads)
+            foreach (var load in workItemLoads)
             {
                 using (var conn = new SqlConnection(this.connectionString))
                 {
@@ -78,8 +66,6 @@ namespace Fabric.Databus.Schema
                     try
                     {
                         var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-
-
 
                         var numberOfColumns = reader.FieldCount;
 

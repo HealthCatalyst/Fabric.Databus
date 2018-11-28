@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj" />
     <ProjectReference Include="..\PipelineSteps\ConvertDatabaseRowToJsonPipelineStep\ConvertDatabaseRowToJsonPipelineStep.csproj" />
     <ProjectReference Include="..\PipelineSteps\CreateBatchItemsPipelineStep\CreateBatchItemsPipelineStep.csproj" />
     <ProjectReference Include="..\PipelineSteps\DummyMappingUploadPipelineStep\DummyMappingUploadPipelineStep.csproj" />

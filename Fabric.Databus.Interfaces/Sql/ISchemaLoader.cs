@@ -21,13 +21,13 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <summary>
         /// The get schemas for loads.
         /// </summary>
-        /// <param name="workitemLoads">
+        /// <param name="workItemLoads">
         /// The workitem loads.
         /// </param>
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
         IList<MappingItem> GetSchemasForLoads(
-            IList<IDataSource> workitemLoads);
+            IList<IDataSource> workItemLoads);
     }
 }

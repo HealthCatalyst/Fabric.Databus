@@ -63,7 +63,7 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [XmlIgnore]
-        public IEnumerable<ISqlRelationship> Relationships => this.MyRelationships.Cast<ISqlRelationship>();
+        public IEnumerable<ISqlRelationship> Relationships => this.MyRelationships;
 
         /// <summary>
         /// Gets or sets the data sources.
@@ -71,5 +71,16 @@ namespace Fabric.Databus.Config
         [DataMember(Name = "Relationships")]
         [XmlElement("Relationship")]
         public List<SqlRelationship> MyRelationships { get; set; }
+
+        /// <inheritdoc />
+        [XmlIgnore]
+        public IEnumerable<ISqlEntityColumnMapping> SqlEntityColumnMappings => this.MySqlEntityColumnMappings;
+
+        /// <summary>
+        /// Gets or sets the data sources.
+        /// </summary>
+        [DataMember(Name = "Columns")]
+        [XmlElement("Column")]
+        public List<SqlEntityColumnMapping> MySqlEntityColumnMappings { get; set; }
     }
 }

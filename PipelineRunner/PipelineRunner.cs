@@ -12,10 +12,7 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Threading;
-
-    using ConvertDatabaseRowToJsonPipelineStep;
 
     using CreateBatchItemsPipelineStep;
 
@@ -41,6 +38,7 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Shared.FileWriters;
     using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
+    using Fabric.Databus.SqlGenerator;
 
     using FileSavePipelineStep;
 
@@ -72,6 +70,7 @@ namespace Fabric.Databus.PipelineRunner
 
     using Unity;
 
+    /// <inheritdoc />
     /// <summary>
     /// The sql import runner simple.
     /// </summary>
@@ -165,21 +164,26 @@ namespace Fabric.Databus.PipelineRunner
             int loadNumber = 0;
 
             // add sequence number to every load
-            foreach (var load in job.Data.DataSources)
+            foreach (var dataSource in job.Data.DataSources)
             {
-                load.SequenceNumber = ++loadNumber;
+                dataSource.SequenceNumber = ++loadNumber;
 
                 // support older syntax
-                if (load.Path == null)
+                if (dataSource.Path == null)
                 {
-                    load.Path = "$";
+                    dataSource.Path = "$";
                 }
-                else if (!load.Path.StartsWith("$"))
+                else if (!dataSource.Path.StartsWith("$"))
                 {
-                    load.Path = $"$.{load.Path}";
+                    dataSource.Path = $"$.{dataSource.Path}";
+                }
+
+                if (string.IsNullOrEmpty(dataSource.Sql))
+                {
+                    dataSource.Sql = GenerateSqlForDataSource(dataSource, config.TopLevelKeyColumn);
                 }
             }
-           
+
             var sqlJobQueue = this.container.Resolve<IQueueManager>()
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
 
@@ -293,18 +297,23 @@ namespace Fabric.Databus.PipelineRunner
             int loadNumber = 0;
 
             // add sequence number to every load
-            foreach (var load in job.Data.DataSources)
+            foreach (var dataSource in job.Data.DataSources)
             {
-                load.SequenceNumber = ++loadNumber;
+                dataSource.SequenceNumber = ++loadNumber;
 
                 // support older syntax
-                if (load.Path == null)
+                if (dataSource.Path == null)
                 {
-                    load.Path = "$";
+                    dataSource.Path = "$";
                 }
-                else if (!load.Path.StartsWith("$"))
+                else if (!dataSource.Path.StartsWith("$"))
                 {
-                    load.Path = $"$.{load.Path}";
+                    dataSource.Path = $"$.{dataSource.Path}";
+                }
+
+                if (string.IsNullOrEmpty(dataSource.Sql))
+                {
+                   dataSource.Sql = GenerateSqlForDataSource(dataSource,config.TopLevelKeyColumn);
                 }
             }
 
@@ -350,6 +359,23 @@ namespace Fabric.Databus.PipelineRunner
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
             Console.WriteLine(stopwatchElapsed);
+        }
+
+        /// <summary>
+        /// The generate sql for data source.
+        /// </summary>
+        /// <param name="dataSource">
+        /// The data source.
+        /// </param>
+        /// <param name="topLevelKeyColumn">
+        /// The top Level Key Column.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        private static string GenerateSqlForDataSource(IDataSource dataSource, string topLevelKeyColumn)
+        {
+            return SqlSelectStatementGenerator.GetSqlStatement(dataSource.TableOrView, topLevelKeyColumn, dataSource.Relationships, dataSource.SqlEntityColumnMappings);
         }
 
         /// <summary>

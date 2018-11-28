@@ -11,6 +11,7 @@ namespace Fabric.Databus.Interfaces.Config
 {
     using System.Collections.Generic;
 
+    using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
 
     /// <summary>
@@ -62,5 +63,8 @@ namespace Fabric.Databus.Interfaces.Config
         /// Gets the relationships.
         /// </summary>
         IEnumerable<ISqlRelationship> Relationships { get; }
+
+        /// <inheritdoc />
+        IEnumerable<ISqlEntityColumnMapping> SqlEntityColumnMappings { get; }
     }
 }

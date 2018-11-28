@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Shared.FileWriters
 {
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
@@ -87,9 +88,16 @@ namespace Fabric.Databus.Shared.FileWriters
         {
             if (Directory.Exists(folder))
             {
-                Directory.Delete(folder, true);
+                var files = Directory.GetFiles(folder)
+                    .ToList();
 
-                Directory.CreateDirectory(folder);
+                files.ForEach(File.Delete);
+
+                var directories = Directory.GetDirectories(folder);
+                foreach (var directory in directories)
+                {
+                    Directory.Delete(directory, true);
+                }
             }
         }
     }

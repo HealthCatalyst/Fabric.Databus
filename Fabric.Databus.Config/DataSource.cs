@@ -70,7 +70,7 @@ namespace Fabric.Databus.Config
         /// </summary>
         [DataMember(Name = "Relationships")]
         [XmlElement("Relationship")]
-        public List<SqlRelationship> MyRelationships { get; set; }
+        public List<SqlRelationship> MyRelationships { get; set; } = new List<SqlRelationship>();
 
         /// <inheritdoc />
         [XmlIgnore]
@@ -81,6 +81,6 @@ namespace Fabric.Databus.Config
         /// </summary>
         [DataMember(Name = "Columns")]
         [XmlElement("Column")]
-        public List<SqlEntityColumnMapping> MySqlEntityColumnMappings { get; set; }
+        public List<SqlEntityColumnMapping> MySqlEntityColumnMappings { get; set; } = new List<SqlEntityColumnMapping>();
     }
 }

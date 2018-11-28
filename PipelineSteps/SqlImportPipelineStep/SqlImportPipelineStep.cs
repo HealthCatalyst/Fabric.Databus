@@ -86,7 +86,10 @@ namespace SqlImportPipelineStep
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
-            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
+            if (this.fileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            {
+                this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
+            }
 
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
@@ -160,12 +163,15 @@ namespace SqlImportPipelineStep
             }
             catch (Exception e)
             {
-                var path = Path.Combine(this.folder, queryId);
-                this.fileWriter.CreateDirectory(path);
+                if (this.folder != null)
+                {
+                    var path = Path.Combine(this.folder, queryId);
+                    this.fileWriter.CreateDirectory(path);
 
-                var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
+                    var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
 
-                await this.fileWriter.WriteToFileAsync(filepath, e.ToString());
+                    await this.fileWriter.WriteToFileAsync(filepath, e.ToString());
+                }
 
                 throw;
             }
@@ -212,10 +218,10 @@ namespace SqlImportPipelineStep
                 this.MyLogger,
                 this.Config.TopLevelKeyColumn);
 
-            var path = Path.Combine(Path.Combine(this.folder, queryId), Convert.ToString(batchNumber));
-
-            if (this.fileWriter.IsWritingEnabled)
+            if (this.fileWriter?.IsWritingEnabled == true && this.folder != null)
             {
+                var path = Path.Combine(Path.Combine(this.folder, queryId), Convert.ToString(batchNumber));
+
                 this.fileWriter.CreateDirectory(path);
 
                 foreach (var frame in result.Data)

@@ -16,15 +16,18 @@ namespace Fabric.Databus.Shared.Loggers
     /// </summary>
     public class TestConsoleProgressLogger : AbstractTextProgressLogger
     {
+        /// <inheritdoc />
         public override void Reset()
         {
         }
 
+        /// <inheritdoc />
         public override void AppendLine(string text)
         {
             Console.WriteLine(text);
         }
 
+        /// <inheritdoc />
         public override string GetLog()
         {
             return string.Empty;

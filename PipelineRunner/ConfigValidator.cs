@@ -220,5 +220,65 @@ namespace Fabric.Databus.PipelineRunner
                 return foundRow;
             }
         }
+
+        /// <inheritdoc />
+        public void ValidateJob(IJob job)
+        {
+            if (job == null)
+            {
+                throw new Exception("job cannot be null");
+            }
+
+            if (job.Config == null)
+            {
+                throw new Exception("job.Config cannot be null");
+            }
+
+            if (string.IsNullOrWhiteSpace(job.Config.ConnectionString))
+            {
+                throw new Exception("No connection string was passed");
+            }
+
+            if (string.IsNullOrWhiteSpace(job.Config.TopLevelKeyColumn))
+            {
+                throw new Exception("No TopLevelKeyColumn was specified");
+            }
+
+            if (string.IsNullOrWhiteSpace(job.Config.LocalSaveFolder))
+            {
+
+            }
+
+            if (job.Data == null)
+            {
+                throw new Exception("job.Data cannot be null");
+            }
+
+            if (!job.Data.DataSources.Any())
+            {
+                throw new Exception("No data sources were specified");
+            }
+
+            int i = 0;
+            foreach (var dataSource in job.Data.DataSources)
+            {
+                i++;
+                if (string.IsNullOrWhiteSpace(dataSource.Sql) && string.IsNullOrWhiteSpace(dataSource.TableOrView))
+                {
+                    throw new Exception(
+                        $"Both Sql and TableOrView is empty for dataSource index {i} with name {dataSource.Name} and path {dataSource.Path}");
+                }
+
+                if (dataSource.Relationships == null)
+                {
+                    throw new Exception("dataSource.Relationships cannot be null");
+                }
+
+                if (dataSource.SqlEntityColumnMappings == null)
+                {
+                    throw new Exception("dataSource.SqlEntityColumnMappings cannot be null");
+                }
+            }
+        }
     }
 }

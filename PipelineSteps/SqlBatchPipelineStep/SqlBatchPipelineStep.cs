@@ -57,16 +57,20 @@ namespace SqlBatchPipelineStep
         /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
         public SqlBatchPipelineStep(
-            IJobConfig jobConfig, 
-            ILogger logger, 
-            IQueueManager queueManager, 
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IDetailedTemporaryFileWriter fileWriter,
-            CancellationToken cancellationToken) 
+            CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
-            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
+
+            if (this.fileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            {
+                this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
+            }
         }
 
         /// <inheritdoc />
@@ -86,30 +90,33 @@ namespace SqlBatchPipelineStep
 
                 await this.AddToOutputQueueAsync(
                     new SqlImportQueueItem
-                        {
-                            BatchNumber = workItem.BatchNumber,
-                            QueryId = queryId,
-                            PropertyName = dataSource.Path,
-                            Seed = seed,
-                            DataSource = dataSource,
-                            Start = workItem.Start,
-                            End = workItem.End,
-                            PropertyTypes = workItem.PropertyTypes
-                        });
+                    {
+                        BatchNumber = workItem.BatchNumber,
+                        QueryId = queryId,
+                        PropertyName = dataSource.Path,
+                        Seed = seed,
+                        DataSource = dataSource,
+                        Start = workItem.Start,
+                        End = workItem.End,
+                        PropertyTypes = workItem.PropertyTypes
+                    });
             }
 
-            foreach (var workItemLoad in workItem.Loads)
+            if (this.fileWriter?.IsWritingEnabled == true && this.folder != null)
             {
-                var queryName = workItemLoad.Path ?? "Main";
-                var queryId = queryName;
+                foreach (var workItemLoad in workItem.Loads)
+                {
+                    var queryName = workItemLoad.Path ?? "Main";
+                    var queryId = queryName;
 
-                var path = Path.Combine(this.folder, queryId);
+                    var path = Path.Combine(this.folder, queryId);
 
-                this.fileWriter.CreateDirectory(path);
+                    this.fileWriter.CreateDirectory(path);
 
-                var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
+                    var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
 
-                await this.fileWriter.WriteToFileAsync(filepath, $"start: {workItem.Start}, end: {workItem.End}");
+                    await this.fileWriter.WriteToFileAsync(filepath, $"start: {workItem.Start}, end: {workItem.End}");
+                }
             }
 
             // wait until the other queues are cleared up

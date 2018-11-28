@@ -83,6 +83,11 @@ namespace Fabric.Databus.Shared
         /// </param>
         public void WriteToJson(JsonTextWriter writer)
         {
+            if (!this.wrappers.Any())
+            {
+                throw new Exception("No source wrappers found");
+            }
+
             if (this.wrappers.All(wrapper => wrapper.PropertyName != "$"))
             {
                 throw new Exception($"No entity with property name $ was found");
@@ -90,6 +95,17 @@ namespace Fabric.Databus.Shared
 
             var sourceWrapper = this.wrappers.First();
             sourceWrapper.Write(null, writer, new List<KeyValuePair<string, object>>());
+        }
+
+        /// <summary>
+        /// The any.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        public bool Any()
+        {
+            return this.wrappers.Any();
         }
     }
 }

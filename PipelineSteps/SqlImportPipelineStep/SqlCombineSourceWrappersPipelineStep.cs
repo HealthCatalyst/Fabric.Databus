@@ -9,6 +9,7 @@
 
 namespace SqlImportPipelineStep
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -63,7 +64,7 @@ namespace SqlImportPipelineStep
             var keys = new List<string>();
             for (int i = 0; i < keyLevels + 1; i++)
             {
-                var keyLevelColumnName = $"KeyLevel{i+1}";
+                var keyLevelColumnName = $"KeyLevel{i + 1}";
                 if (workItem.Columns.Any(c => c.Name.Equals(keyLevelColumnName)))
                 {
                     keys.Add(keyLevelColumnName);
@@ -99,11 +100,15 @@ namespace SqlImportPipelineStep
         /// </returns>
         protected override Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
         {
-            this.AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
-                                           {
-                                               BatchNumber = this.batchNumber,
-                                               SourceWrapperCollection = this.sourceWrapperCollection
-                                           });
+            if (this.sourceWrapperCollection.Any())
+            {
+                this.AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
+                {
+                    BatchNumber = this.batchNumber,
+                    SourceWrapperCollection = this.sourceWrapperCollection
+                });
+
+            }
 
             return base.CompleteAsync(queryId, isLastThreadForThisTask);
         }

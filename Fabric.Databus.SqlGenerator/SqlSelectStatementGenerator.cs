@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.SqlGenerator
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
@@ -46,6 +47,16 @@ namespace Fabric.Databus.SqlGenerator
             IEnumerable<ISqlRelationship> sqlRelationships,
             IEnumerable<ISqlEntityColumnMapping> entityColumnMappings)
         {
+            if (sqlRelationships == null)
+            {
+                throw new ArgumentNullException(nameof(sqlRelationships));
+            }
+
+            if (entityColumnMappings == null)
+            {
+                throw new ArgumentNullException(nameof(entityColumnMappings));
+            }
+
             var sqlRelationships1 = sqlRelationships.Reverse().ToList();
 
             var sqlEntityColumnMappings = entityColumnMappings.ToList();

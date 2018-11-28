@@ -12,6 +12,7 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
 
     using CreateBatchItemsPipelineStep;
@@ -19,6 +20,7 @@ namespace Fabric.Databus.PipelineRunner
     using DummyMappingUploadPipelineStep;
 
     using Fabric.Databus.Config;
+    using Fabric.Databus.Domain.ConfigValidators;
     using Fabric.Databus.Domain.Importers;
     using Fabric.Databus.Domain.Jobs;
     using Fabric.Databus.Domain.ProgressMonitors;
@@ -47,6 +49,8 @@ namespace Fabric.Databus.PipelineRunner
     using JsonDocumentMergerPipelineStep;
 
     using MappingUploadPipelineStep;
+
+    using Nest;
 
     using QueueItems;
 
@@ -150,8 +154,11 @@ namespace Fabric.Databus.PipelineRunner
                 throw new ArgumentNullException(nameof(job.Config));
             }
 
+
             var config = job.Config;
             this.InitContainerWithDefaults(config);
+
+            this.container.Resolve<IConfigValidator>().ValidateJob(job);
 
             if (config.WriteTemporaryFilesToDisk)
             {
@@ -286,6 +293,8 @@ namespace Fabric.Databus.PipelineRunner
             var config = job.Config;
             this.InitContainerWithDefaults(config);
 
+            this.container.Resolve<IConfigValidator>().ValidateJob(job);
+
             if (config.WriteTemporaryFilesToDisk)
             {
                 this.container.Resolve<IFileWriter>().DeleteDirectory(config.LocalSaveFolder);
@@ -378,6 +387,7 @@ namespace Fabric.Databus.PipelineRunner
             return SqlSelectStatementGenerator.GetSqlStatement(dataSource.TableOrView, topLevelKeyColumn, dataSource.Relationships, dataSource.SqlEntityColumnMappings);
         }
 
+
         /// <summary>
         /// The init container with defaults.
         /// </summary>
@@ -401,6 +411,11 @@ namespace Fabric.Databus.PipelineRunner
             if (!this.container.IsRegistered<IJobConfig>())
             {
                 this.container.RegisterInstance<IJobConfig>(config);
+            }
+
+            if (!this.container.IsRegistered<IConfigValidator>())
+            {
+                this.container.RegisterType<IConfigValidator, ConfigValidator>();
             }
 
             if (!this.container.IsRegistered<IEntityJsonWriter>())

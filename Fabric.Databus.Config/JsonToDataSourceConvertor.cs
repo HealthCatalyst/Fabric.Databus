@@ -50,6 +50,16 @@ namespace Fabric.Databus.Config
                 .Concat(jsonMetadata.keyLevels)
                 .ToList();
 
+            // get column names
+            foreach (JToken property in myObject)
+            {
+                // ReSharper disable once InvertIf
+                if (property is JProperty jProperty)
+                {
+
+                }
+            }
+
             var myDataSources = jsonMetadata.entities.Select(
                 entity => new DataSource
                               {

@@ -49,6 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "localhost", "localhost", "{
 		configs\localhost\fhir_elasticsearch.xml = configs\localhost\fhir_elasticsearch.xml
 		configs\localhost\job.xml = configs\localhost\job.xml
 		configs\localhost\test.xml = configs\localhost\test.xml
+		configs\localhost\upmc-dosmarts-withmodel.xml = configs\localhost\upmc-dosmarts-withmodel.xml
 		configs\localhost\upmc-dosmarts.xml = configs\localhost\upmc-dosmarts.xml
 		configs\localhost\upmc.xml = configs\localhost\upmc.xml
 	EndProjectSection
@@ -143,6 +144,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlCalculateFieldsPipelineStep", "PipelineSteps\SqlCalculateFieldsPipelineStep\SqlCalculateFieldsPipelineStep.csproj", "{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Nuget.Console", "Fabric.Databus.Nuget.Console\Fabric.Databus.Nuget.Console.csproj", "{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.SqlGenerator", "Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj", "{104C7335-D0B6-4587-A1A9-843C69042AE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -310,6 +313,10 @@ Global
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{104C7335-D0B6-4587-A1A9-843C69042AE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{104C7335-D0B6-4587-A1A9-843C69042AE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{104C7335-D0B6-4587-A1A9-843C69042AE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{104C7335-D0B6-4587-A1A9-843C69042AE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -361,6 +368,7 @@ Global
 		{DBA64266-AF85-4627-81F6-6183D62858FF} = {E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}
 		{A94179A9-A0C4-43A7-BD59-7EE2FFDD9B82} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB} = {E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}
+		{104C7335-D0B6-4587-A1A9-843C69042AE2} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

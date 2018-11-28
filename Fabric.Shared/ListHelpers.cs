@@ -9,6 +9,7 @@
 
 namespace Fabric.Shared
 {
+    using System.Collections.Generic;
     using System.IO;
     using System.Xml.Serialization;
 
@@ -99,6 +100,20 @@ namespace Fabric.Shared
         public static bool DoesStringContainPeriods(this string txt)
         {
             return txt != null && txt.Contains(".");
+        }
+
+        /// <summary>
+        /// The to csv.
+        /// </summary>
+        /// <param name="list">
+        /// The list.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public static string ToCsv(this List<string> list)
+        {
+            return string.Join(",", list);
         }
     }
 }

@@ -247,9 +247,11 @@
     <Compile Include="Types\Visit.cs" />
     <Compile Include="JsonToDataSourceConvertorTests.cs" />
     <Compile Include="ConfigReaderTests.cs" />
+    <Compile Include="SqlRelationshipManagerUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <EmbeddedResource Include="Files\SimpleDataModel.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +279,14 @@
       <Project>{DC1C2DFF-2458-4396-A872-E44FEF249DE1}</Project>
       <Name>Fabric.Databus.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj">
+      <Project>{104c7335-d0b6-4587-a1a9-843c69042ae2}</Project>
+      <Name>Fabric.Databus.SqlGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj">
+      <Project>{bb878905-9592-4a9d-a811-46e73d9f7f6a}</Project>
+      <Name>Fabric.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
       <Project>{af1adf05-ec10-43ea-877e-ad504a113b58}</Project>
       <Name>Fabric.Databus.PipelineRunner</Name>
@@ -297,9 +307,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Files\SimpleConfigWithNoDataSources.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Files\SimpleDataModel.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

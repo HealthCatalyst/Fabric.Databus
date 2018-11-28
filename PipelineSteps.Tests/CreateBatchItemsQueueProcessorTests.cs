@@ -17,9 +17,7 @@ namespace PipelineStep.Tests
     using CreateBatchItemsPipelineStep;
 
     using Fabric.Databus.Config;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
-    using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;

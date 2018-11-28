@@ -89,8 +89,6 @@ namespace Fabric.Databus.Console
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
 
-                        var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
-                        container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
                         container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
                         container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
                         container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();

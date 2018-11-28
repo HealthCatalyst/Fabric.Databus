@@ -19,6 +19,7 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ConfigValidators;
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
 
     /// <summary>
@@ -26,6 +27,22 @@ namespace Fabric.Databus.PipelineRunner
     /// </summary>
     public class ConfigValidator : IConfigValidator
     {
+        /// <summary>
+        /// The sql connection factory.
+        /// </summary>
+        private readonly ISqlConnectionFactory sqlConnectionFactory;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigValidator"/> class.
+        /// </summary>
+        /// <param name="sqlConnectionFactory">
+        /// The sql connection factory.
+        /// </param>
+        public ConfigValidator(ISqlConnectionFactory sqlConnectionFactory)
+        {
+            this.sqlConnectionFactory = sqlConnectionFactory;
+        }
+
         /// <summary>
         /// The validate from text.
         /// </summary>
@@ -109,7 +126,7 @@ namespace Fabric.Databus.PipelineRunner
         /// </returns>
         public Task<bool> CheckDatabaseConnectionStringIsValid(IJob job)
         {
-            using (var conn = new SqlConnection(job.Config.ConnectionString))
+            using (var conn = this.sqlConnectionFactory.GetConnection(job.Config.ConnectionString))
             {
                 conn.Open();
                 conn.Close();
@@ -153,7 +170,7 @@ namespace Fabric.Databus.PipelineRunner
             var numberOfLevels =
                 (load.Path?.Count(a => a == '.') + 1) ?? 0;
 
-            using (var conn = new SqlConnection(job.Config.ConnectionString))
+            using (var conn = this.sqlConnectionFactory.GetConnection(job.Config.ConnectionString))
             {
                 conn.Open();
                 var cmd = conn.CreateCommand();

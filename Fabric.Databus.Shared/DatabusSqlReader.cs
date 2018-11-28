@@ -12,6 +12,7 @@ namespace Fabric.Databus.Shared
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Data.Common;
     using System.Data.SqlClient;
     using System.Linq;
     using System.Threading.Tasks;
@@ -40,6 +41,11 @@ namespace Fabric.Databus.Shared
         private readonly int sqlCommandTimeoutInSeconds;
 
         /// <summary>
+        /// The sql connection factory.
+        /// </summary>
+        private readonly ISqlConnectionFactory sqlConnectionFactory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DatabusSqlReader"/> class.
         /// </summary>
         /// <param name="connectionString">
@@ -48,10 +54,10 @@ namespace Fabric.Databus.Shared
         /// <param name="sqlCommandTimeoutInSeconds">
         /// The sql Command Timeout In Seconds.
         /// </param>
-        /// <exception cref="NotImplementedException">
-        /// exception thrown
-        /// </exception>
-        public DatabusSqlReader(string connectionString, int sqlCommandTimeoutInSeconds)
+        /// <param name="sqlConnectionFactory">
+        /// The sql Connection Factory.
+        /// </param>
+        public DatabusSqlReader(string connectionString, int sqlCommandTimeoutInSeconds, ISqlConnectionFactory sqlConnectionFactory)
         {
             if (sqlCommandTimeoutInSeconds < 0)
             {
@@ -60,6 +66,7 @@ namespace Fabric.Databus.Shared
 
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             this.sqlCommandTimeoutInSeconds = sqlCommandTimeoutInSeconds;
+            this.sqlConnectionFactory = sqlConnectionFactory;
         }
 
         /// <inheritdoc />
@@ -70,7 +77,7 @@ namespace Fabric.Databus.Shared
                 throw new ArgumentNullException($"Sql property is null for load with path: {load.Path}");
             }
 
-            using (var conn = new SqlConnection(this.connectionString))
+            using (var conn = this.sqlConnectionFactory.GetConnection(this.connectionString))
             {
                 conn.Open();
                 var cmd = conn.CreateCommand();
@@ -90,8 +97,8 @@ namespace Fabric.Databus.Shared
                     cmd.CommandText =
                         $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE KeyLevel1 BETWEEN @start AND @end ORDER BY KeyLevel1 ASC;";
 
-                    cmd.Parameters.AddWithValue("@start", start);
-                    cmd.Parameters.AddWithValue("@end", end);
+                    cmd.AddParameterWithValue("@start", start);
+                    cmd.AddParameterWithValue("@end", end);
                 }
 
                 logger.Verbose($"Start: {cmd.CommandText}");
@@ -226,7 +233,7 @@ namespace Fabric.Databus.Shared
         {
             var load = dataSource;
 
-            using (var conn = new SqlConnection(this.connectionString))
+            using (var conn = this.sqlConnectionFactory.GetConnection(this.connectionString))
             {
                 conn.Open();
                 var cmd = conn.CreateCommand();

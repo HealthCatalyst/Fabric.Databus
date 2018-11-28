@@ -32,6 +32,8 @@ namespace Fabric.Databus.Schema
         /// </summary>
         private readonly string topLevelKeyColumn;
 
+        private readonly ISqlConnectionFactory sqlConnectionFactory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SchemaLoader"/> class.
         /// </summary>
@@ -41,10 +43,14 @@ namespace Fabric.Databus.Schema
         /// <param name="topLevelKeyColumn">
         /// The top Level Key Column.
         /// </param>
-        public SchemaLoader(string connectionString, string topLevelKeyColumn)
+        /// <param name="sqlConnectionFactory">
+        /// The sql Connection Factory.
+        /// </param>
+        public SchemaLoader(string connectionString, string topLevelKeyColumn, ISqlConnectionFactory sqlConnectionFactory)
         {
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             this.topLevelKeyColumn = topLevelKeyColumn ?? throw new ArgumentNullException(nameof(topLevelKeyColumn));
+            this.sqlConnectionFactory = sqlConnectionFactory;
         }
 
         /// <inheritdoc />
@@ -55,7 +61,7 @@ namespace Fabric.Databus.Schema
 
             foreach (var load in workItemLoads)
             {
-                using (var conn = new SqlConnection(this.connectionString))
+                using (var conn = this.sqlConnectionFactory.GetConnection(this.connectionString))
                 {
                     conn.Open();
                     var cmd = conn.CreateCommand();

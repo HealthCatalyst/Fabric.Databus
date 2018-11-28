@@ -44,6 +44,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "localhost", "localhost", "{3EFB9E07-4AD4-4A75-9C40-E42877A607F5}"
 	ProjectSection(SolutionItems) = preProject
 		configs\localhost\config.json = configs\localhost\config.json
+		configs\localhost\edwadmin-to-elasticsearch.xml = configs\localhost\edwadmin-to-elasticsearch.xml
 		configs\localhost\edwadmin.xml = configs\localhost\edwadmin.xml
 		configs\localhost\fhir.xml = configs\localhost\fhir.xml
 		configs\localhost\fhir_elasticsearch.xml = configs\localhost\fhir_elasticsearch.xml

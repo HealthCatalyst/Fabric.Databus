@@ -2,11 +2,10 @@
 <Job>
   <Config>
     <ConnectionString>server=HCS-DEV0002;initial catalog=Shared;Trusted_Connection=True;</ConnectionString>
-    <MaximumEntitiesToLoad>100</MaximumEntitiesToLoad>
+    <MaximumEntitiesToLoad>20</MaximumEntitiesToLoad>
     <EntitiesPerBatch>10</EntitiesPerBatch>
     <EntitiesPerUploadFile>10</EntitiesPerUploadFile>
     <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
-    <DropAndReloadIndex>false</DropAndReloadIndex>
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>

@@ -151,7 +151,7 @@ namespace Fabric.Databus.PipelineRunner
             }
 
             var config = job.Config;
-            this.InitContainer(config);
+            this.InitContainerWithDefaults(config);
 
             if (config.WriteTemporaryFilesToDisk)
             {
@@ -284,7 +284,7 @@ namespace Fabric.Databus.PipelineRunner
             }
 
             var config = job.Config;
-            this.InitContainer(config);
+            this.InitContainerWithDefaults(config);
 
             if (config.WriteTemporaryFilesToDisk)
             {
@@ -379,24 +379,34 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <summary>
-        /// The init container.
+        /// The init container with defaults.
         /// </summary>
         /// <param name="config">
         /// The config.
         /// </param>
-        private void InitContainer(IQueryConfig config)
+        private void InitContainerWithDefaults(IQueryConfig config)
         {
-            var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
+            if (!this.container.IsRegistered<IQueueManager>())
+            {
+                var queueManager = new QueueManager();
+                this.container.RegisterInstance<IQueueManager>(queueManager);
+            }
 
-            var queueManager = new QueueManager();
-            this.container.RegisterInstance<IQueueManager>(queueManager);
-            this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
-            this.container.RegisterInstance<IJobConfig>(config);
+            if (!this.container.IsRegistered<IDocumentDictionary>())
+            {
+                var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
+                this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
+            }
 
-            var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn);
-            this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
+            if (!this.container.IsRegistered<IJobConfig>())
+            {
+                this.container.RegisterInstance<IJobConfig>(config);
+            }
 
-            this.container.RegisterType<IEntityJsonWriter, EntityJsonWriter>();
+            if (!this.container.IsRegistered<IEntityJsonWriter>())
+            {
+                this.container.RegisterType<IEntityJsonWriter, EntityJsonWriter>();
+            }
 
             if (config.WriteDetailedTemporaryFilesToDisk)
             {
@@ -416,30 +426,36 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterType<ITemporaryFileWriter, NullFileWriter>();
             }
 
-            this.container.RegisterType<IFileWriter, FileWriter>();
+            if (!this.container.IsRegistered<IFileWriter>())
+            {
+                this.container.RegisterType<IFileWriter, FileWriter>();
+            }
 
-            this.InitContainerWithDefaults(config);
-        }
-
-        /// <summary>
-        /// The init container with defaults.
-        /// </summary>
-        /// <param name="config">
-        /// The config.
-        /// </param>
-        private void InitContainerWithDefaults(IQueryConfig config)
-        {
             if (!this.container.IsRegistered<IProgressMonitor>())
             {
                 IProgressMonitor progressMonitor = new ProgressMonitor(new NullProgressLogger());
                 this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
             }
 
+            if (!this.container.IsRegistered<ISqlConnectionFactory>())
+            {
+                this.container.RegisterType<ISqlConnectionFactory, SqlConnectionFactory>();
+            }
+
             if (!this.container.IsRegistered<IDatabusSqlReader>())
             {
-                var databusSqlReader = new DatabusSqlReader(config.ConnectionString, 0);
+                var sqlConnectionFactory = this.container.Resolve<ISqlConnectionFactory>();
+                var databusSqlReader = new DatabusSqlReader(config.ConnectionString, 0, sqlConnectionFactory);
                 this.container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
             }
+
+            if (!this.container.IsRegistered<ISchemaLoader>())
+            {
+                var sqlConnectionFactory = this.container.Resolve<ISqlConnectionFactory>();
+                var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn, sqlConnectionFactory);
+                this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
+            }
+
             if (!this.container.IsRegistered<ILogger>())
             {
                 ILogger logger = new LoggerConfiguration().MinimumLevel.Verbose().CreateLogger();

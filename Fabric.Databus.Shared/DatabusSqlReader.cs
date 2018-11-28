@@ -13,7 +13,6 @@ namespace Fabric.Databus.Shared
     using System.Collections.Generic;
     using System.Data;
     using System.Data.SqlClient;
-    using System.Diagnostics;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -84,12 +83,12 @@ namespace Fabric.Databus.Shared
                 if (start == null)
                 {
                     cmd.CommandText =
-                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE ORDER BY {topLevelKeyColumn} ASC;";
+                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE ORDER BY KeyLevel1 ASC;";
                 }
                 else
                 {
                     cmd.CommandText =
-                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE {topLevelKeyColumn} BETWEEN @start AND @end ORDER BY {topLevelKeyColumn} ASC;";
+                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE KeyLevel1 BETWEEN @start AND @end ORDER BY KeyLevel1 ASC;";
 
                     cmd.Parameters.AddWithValue("@start", start);
                     cmd.Parameters.AddWithValue("@end", end);
@@ -98,7 +97,7 @@ namespace Fabric.Databus.Shared
                 logger.Verbose($"Start: {cmd.CommandText}");
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
-                //var schema = reader.GetSchemaTable();
+                /* var schema = reader.GetSchemaTable(); */
 
                 var numberOfColumns = reader.FieldCount;
 
@@ -119,10 +118,7 @@ namespace Fabric.Databus.Shared
                     });
                 }
 
-                var joinColumn = columnList.FirstOrDefault(c => c.IsJoinColumn);
-                Debug.Assert(joinColumn != null, nameof(joinColumn) + " != null");
-
-                var joinColumnIndex = joinColumn.index;
+                var joinColumnIndex = 0;
 
                 // add any calculated fields
                 var calculatedFields = load.Fields.Where(f => f.Destination != null)

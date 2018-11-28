@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Config
 {
     using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
     using System.Linq;
 
     using Newtonsoft.Json.Linq;
@@ -52,6 +53,7 @@ namespace Fabric.Databus.Config
             var myDataSources = jsonMetadata.entities.Select(
                 entity => new DataSource
                               {
+                                  Name = entity.databaseEntity,
                                   Path = propertyNames.Any() ? $"$.{fullyQualifiedPropertyName}" : "$",
                                   PropertyType = objectType.ToString(),
                                   Sql = $"SELECT * FROM {entity.databaseEntity}",
@@ -89,15 +91,17 @@ namespace Fabric.Databus.Config
         /// <summary>
         /// The parse json into data sources.
         /// </summary>
-        /// <param name="myObject">
-        /// The my object.
+        /// <param name="json">
+        /// The json.
         /// </param>
         /// <returns>
         /// The <see cref="List{T}"/>
         /// data sources
         /// </returns>
-        public static List<DataSource> ParseJsonIntoDataSources(JObject myObject)
+        [Pure]
+        public static List<DataSource> ParseJsonIntoDataSources(string json)
         {
+            JObject myObject = JObject.Parse(json);
             var dataSources = new List<DataSource>();
 
             InternalParseJsonIntoDataSources(new List<string>(), myObject, dataSources, new List<string>(), JsonMetadataEntityType.Array);

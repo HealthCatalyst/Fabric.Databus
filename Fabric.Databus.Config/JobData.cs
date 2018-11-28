@@ -36,13 +36,7 @@ namespace Fabric.Databus.Config
         /// Gets or sets the data sources.
         /// </summary>
         [XmlIgnore]
-        public IList<IDataSource> DataSources
-        {
-            get
-            {
-                return this.MyDataSources.Cast<IDataSource>().ToList();
-            }
-        }
+        public IList<IDataSource> DataSources => this.MyDataSources.Cast<IDataSource>().ToList();
 
         /// <summary>
         /// Gets or sets the data sources.

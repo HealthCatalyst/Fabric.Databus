@@ -19,6 +19,11 @@ namespace Fabric.Databus.Interfaces.Config
     public interface IDataSource
     {
         /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
         /// Gets or sets the sql.
         /// </summary>
         string Sql { get; set; }
@@ -42,5 +47,10 @@ namespace Fabric.Databus.Interfaces.Config
         /// Gets or sets the sequence number.
         /// </summary>
         int SequenceNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the key levels.
+        /// </summary>
+        IList<string> KeyLevels { get; set; }
     }
 }

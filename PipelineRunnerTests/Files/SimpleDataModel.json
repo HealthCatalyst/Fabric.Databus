@@ -1,0 +1,18 @@
+﻿{
+  "_metadata": {
+    "key": "TextID",
+    "entities": [
+      {
+        "databaseEntity": "Text"
+      },
+      {
+        "databaseEntity": "TextDate"
+      }
+    ]
+  },
+  "root": "Text.TextSourceDSC",
+  "extension_suffix": "Text.TextOriginTableNM",
+  "data": "Text.TextTXT",
+  "data_format": "Text.MimeTypeNM",
+  "extension": "Text.TextID"
+}

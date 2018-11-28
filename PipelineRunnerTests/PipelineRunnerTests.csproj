@@ -232,6 +232,7 @@
     <Compile Include="Sources\EncounterSource.cs" />
     <Compile Include="EndToEndTests.cs" />
     <Compile Include="Sources\FacilitySource.cs" />
+    <Compile Include="TestFileLoader.cs" />
     <Compile Include="Types\Patient.cs" />
     <Compile Include="Sources\PatientSource.cs" />
     <Compile Include="Types\People.cs" />
@@ -245,6 +246,7 @@
     <Compile Include="Sources\TextSource.cs" />
     <Compile Include="Types\Visit.cs" />
     <Compile Include="JsonToDataSourceConvertorTests.cs" />
+    <Compile Include="ConfigReaderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -283,6 +285,21 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.1\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.1\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\ConfigWithModel.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\SimpleConfigWithNewModel.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\SimpleConfigWithUpdatingModel.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\SimpleConfigWithNoDataSources.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\SimpleDataModel.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

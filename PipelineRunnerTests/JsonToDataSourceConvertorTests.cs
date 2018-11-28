@@ -46,9 +46,7 @@ namespace PipelineRunnerTests
 	                        ""data"": ""Text.TextTXT""
                         }";
 
-            JObject myObject = JObject.Parse(json);
-
-            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(myObject);
+            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(json);
 
             Assert.AreEqual(2, dataSources.Count);
             Assert.AreEqual("SELECT * FROM Text", dataSources[0].Sql);
@@ -83,9 +81,8 @@ namespace PipelineRunnerTests
 	                        ""data"": ""Text.TextTXT""
                         }";
 
-            JObject myObject = JObject.Parse(json);
 
-            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(myObject);
+            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(json);
 
             Assert.AreEqual(1, dataSources.Count);
             Assert.AreEqual("SELECT * FROM Text", dataSources[0].Sql);
@@ -137,9 +134,7 @@ namespace PipelineRunnerTests
 }
                         ";
 
-            JObject myObject = JObject.Parse(json);
-
-            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(myObject);
+            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(json);
 
             Assert.AreEqual(3, dataSources.Count);
             Assert.AreEqual("SELECT * FROM Text", dataSources[0].Sql);
@@ -278,9 +273,7 @@ namespace PipelineRunnerTests
 }
 ";
 
-            JObject myObject = JObject.Parse(json);
-
-            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(myObject);
+            var dataSources = JsonToDataSourceConvertor.ParseJsonIntoDataSources(json);
 
             Assert.AreEqual(8, dataSources.Count);
             var visitPeopleDataSource = dataSources[5];

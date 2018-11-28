@@ -22,6 +22,11 @@ namespace Fabric.Databus.Config
     public class DataSource : IDataSource
     {
         /// <inheritdoc />
+        [XmlAttribute("Name")]
+        [DataMember]
+        public string Name { get; set; }
+
+        /// <inheritdoc />
         [DataMember]
         public string Sql
         {
@@ -46,9 +51,8 @@ namespace Fabric.Databus.Config
         /// <inheritdoc />
         public int SequenceNumber { get; set; }
 
-        /// <summary>
-        /// Gets or sets the key levels.
-        /// </summary>
+        /// <inheritdoc />
+        [XmlIgnore]
         public IList<string> KeyLevels { get; set; }
     }
 }

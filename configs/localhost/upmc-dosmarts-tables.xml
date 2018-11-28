@@ -11,6 +11,7 @@
     <CompressFiles>false</CompressFiles>
     <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
+    <SqlCommandTimeoutInSeconds>60</SqlCommandTimeoutInSeconds>
   </Config>
 
   <Data>

@@ -445,7 +445,7 @@ namespace Fabric.Databus.PipelineRunner
             if (!this.container.IsRegistered<IDatabusSqlReader>())
             {
                 var sqlConnectionFactory = this.container.Resolve<ISqlConnectionFactory>();
-                var databusSqlReader = new DatabusSqlReader(config.ConnectionString, 0, sqlConnectionFactory);
+                var databusSqlReader = new DatabusSqlReader(config.ConnectionString, config.SqlCommandTimeoutInSeconds, sqlConnectionFactory);
                 this.container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
             }
 

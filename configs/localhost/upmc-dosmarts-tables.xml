@@ -16,30 +16,45 @@
 
   <Data>
     <DataSource Path="$" TableOrView="Text.Text">
-      <Column Name="TextID"></Column>
-      <Column Name="TextSourceDSC" Alias="root"></Column>
-      <Column Name="TextID" Alias="extension"></Column>
-      <Column Name="TextOriginTableNM" Alias="extension_suffix"></Column>
-      <Column Name="TextTXT" Alias="data"></Column>
+      <Column Name="TextID"/>
+      <Column Name="TextSourceDSC" Alias="root"/>
+      <Column Name="TextID" Alias="extension"/>
+      <Column Name="TextOriginTableNM" Alias="extension_suffix"/>
+      <Column Name="TextTXT" Alias="data"/>
+      <Column Name="TextTXT" Alias="base64_data"/>
+      <Column Name="MimeTypeNM" Alias="data_format"/>
     </DataSource>
-    <DataSource Path="$.patient" PropertyType="object" TableOrView="Person.Patient">
+    <DataSource Path="$" TableOrView="Text.Date">
+      <Column Name="TextID"/>
+      <Column Name="DateDTS" Alias="source_last_modified_at"/>
+      <Column Name="DateDTS" Alias="source_versioned_at"/>
+    </DataSource>
+    <DataSource Path="$.patient" PropertyType="object" TableOrView="Person.PatientCrossWalk">
       <Relationship>
-        <Source Entity="Text.Text" Key="EdwPatientID"></Source>
-        <Destination Entity="Person.Patient" Key="EdwPatientID"></Destination>
+        <Source Entity="Text.Text" Key="EdwPatientID"/>
+        <Destination Entity="Person.PatientCrossWalk" Key="EdwPatientID"/>
       </Relationship>
-      <Column Name="PatientFullNM"></Column>
+      <Column Name="RowSourceDSC" Alias="root"/>
+      <Column Name="PatientID" Alias="extension"/>
+      <Column Name="PatientFullNM" Alias="last_name"/>
+      <Column Name="PatientFullNM" Alias="first_name"/>
+      <Column Name="PatientFullNM" Alias="middle_name"/>
+      <Column Name="GenderCD" Alias="gender"/>
+      <Column Name="BirthDTS" Alias="date_of_birth"/>
     </DataSource>
     <DataSource Path="$.visit" PropertyType="object" TableOrView="Clinical.Encounter">
       <Relationship>
-        <Source Entity="Text.Text" Key="EncounterID"></Source>
-        <Destination Entity="Clinical.Encounter" Key="EncounterID"></Destination>
+        <Source Entity="Text.Text" Key="EncounterID"/>
+        <Destination Entity="Clinical.Encounter" Key="EncounterID"/>
       </Relationship>
       <Relationship>
-        <Source Entity="Clinical.Encounter" Key="FacilityAccountID"></Source>
-        <Destination Entity="Clinical.FacilityAccount" Key="FacilityAccountID"></Destination>
+        <Source Entity="Clinical.Encounter" Key="FacilityAccountID"/>
+        <Destination Entity="Clinical.FacilityAccount" Key="FacilityAccountID"/>
       </Relationship>
-      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"></Column>
-      <Column Name="EncounterID" Alias="extension"></Column>
+      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"/>
+      <Column Name="EncounterID" Alias="extension"/>
+      <Column Entity="Clinical.FacilityAccount" Name="AdmitDTS" Alias="admitted_at"/>
+      <Column Entity="Clinical.FacilityAccount" Name="DischargeDTS" Alias="discharged_at"/>
     </DataSource>
   </Data>
 </Job>

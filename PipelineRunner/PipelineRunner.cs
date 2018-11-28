@@ -313,7 +313,7 @@ namespace Fabric.Databus.PipelineRunner
 
                 if (string.IsNullOrEmpty(dataSource.Sql))
                 {
-                   dataSource.Sql = GenerateSqlForDataSource(dataSource,config.TopLevelKeyColumn);
+                    dataSource.Sql = GenerateSqlForDataSource(dataSource, config.TopLevelKeyColumn);
                 }
             }
 

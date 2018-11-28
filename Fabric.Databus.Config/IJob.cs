@@ -9,7 +9,6 @@
 
 namespace Fabric.Databus.Config
 {
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
 
     /// <summary>

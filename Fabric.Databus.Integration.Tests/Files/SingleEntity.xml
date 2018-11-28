@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Job>
+  <Config>
+    <ConnectionString>Data Source=:memory:</ConnectionString>
+    <LocalSaveFolder>foo</LocalSaveFolder>
+    <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
+    <UseMultipleThreads>false</UseMultipleThreads>
+  </Config>
+  <Data>
+    <DataSource Path="$" Name="First" TableOrView="Text">
+    </DataSource>
+  </Data>
+</Job>

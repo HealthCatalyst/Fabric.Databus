@@ -118,6 +118,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="IntegrationTestFileWriter.cs" />
+    <Compile Include="TestFileLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -148,6 +149,9 @@
       <Project>{efc37d49-40fa-4f53-b956-b63f7eb47244}</Project>
       <Name>QueueItems</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\SingleEntity.xml" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

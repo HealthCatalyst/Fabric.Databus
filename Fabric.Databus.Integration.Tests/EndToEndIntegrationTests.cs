@@ -132,30 +132,9 @@ namespace Fabric.Databus.Integration.Tests
 
                         var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 
-                        var config = new Job
-                                         {
-                                             Config = new QueryConfig
-                                                          {
-                                                              ConnectionString = connectionString,
-                                                              TopLevelKeyColumn = "TextID",
-                                                              UseMultipleThreads = false,
-                                                              LocalSaveFolder = "foo"
-                                                          },
-                                             Data = new JobData
-                                                        {
-                                                            MyDataSources = new List<DataSource>
-                                                                                {
-                                                                                    new DataSource
-                                                                                        {
-                                                                                            Name = "First",
-                                                                                            Path = "$",
-                                                                                            TableOrView = "Text",
-                                                                                            MyRelationships = new List<SqlRelationship>(),
-                                                                                            MySqlEntityColumnMappings = new List<SqlEntityColumnMapping>()
-                                                                                        }
-                                                                                }
-                                                        }
-                                         };
+                        var fileContents = TestFileLoader.GetFileContents("Files", "SingleEntity.xml");
+
+                        var config = new ConfigReader().ReadXmlFromText(fileContents);
 
                         pipelineRunner.RunRestApiPipeline(config);
 

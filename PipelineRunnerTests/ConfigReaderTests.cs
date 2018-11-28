@@ -10,6 +10,7 @@
 namespace PipelineRunnerTests
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Fabric.Databus.Config;
 
@@ -90,6 +91,30 @@ namespace PipelineRunnerTests
             Assert.AreEqual("$", job.Data.DataSources[0].Path);
             Assert.AreEqual("SELECT * FROM Text", job.Data.DataSources[0].Sql);
             Assert.AreEqual("SELECT * FROM TextDate", job.Data.DataSources[1].Sql);
+        }
+
+        /// <summary>
+        /// The read config with tables.
+        /// </summary>
+        [TestMethod]
+        public void ReadConfigWithTables()
+        {
+            var fileContents = TestFileLoader.GetFileContents("Files", "ConfigWithTables.xml");
+
+            Assert.IsNotNull(fileContents);
+            Assert.AreNotEqual(0, fileContents.Length, "Could not read file from assembly.  Did you mark it as Embedded Resource?");
+
+            var job = new ConfigReader().ReadXmlFromText(fileContents);
+
+            Assert.AreEqual(2, job.Data.DataSources.Count);
+            Assert.AreEqual("$", job.Data.DataSources[0].Path);
+            Assert.AreEqual("Text.Text", job.Data.DataSources[0].TableOrView);
+            Assert.AreEqual(0, job.Data.DataSources[0].Relationships.Count());
+
+            Assert.AreEqual("$.patient", job.Data.DataSources[1].Path);
+            Assert.AreEqual("Person.Patient", job.Data.DataSources[1].TableOrView);
+            Assert.AreEqual(1, job.Data.DataSources[1].Relationships.Count());
+            Assert.AreEqual("Text.Text", job.Data.DataSources[1].Relationships.First().SourceEntity);
         }
     }
 }

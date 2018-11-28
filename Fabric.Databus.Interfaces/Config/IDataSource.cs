@@ -52,5 +52,15 @@ namespace Fabric.Databus.Interfaces.Config
         /// Gets or sets the key levels.
         /// </summary>
         IList<string> KeyLevels { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table or view.
+        /// </summary>
+        string TableOrView { get; set; }
+
+        /// <summary>
+        /// Gets the relationships.
+        /// </summary>
+        IEnumerable<ISqlRelationship> Relationships { get; }
     }
 }

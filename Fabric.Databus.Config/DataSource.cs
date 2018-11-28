@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Config
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.Serialization;
     using System.Xml.Serialization;
 
@@ -45,6 +46,11 @@ namespace Fabric.Databus.Config
         public string PropertyType { get; set; }
 
         /// <inheritdoc />
+        [XmlAttribute("TableOrView")]
+        [DataMember]
+        public string TableOrView { get; set; }
+
+        /// <inheritdoc />
         [XmlIgnore]
         public List<IQueryField> Fields { get; set; } = new List<IQueryField>();
 
@@ -54,5 +60,16 @@ namespace Fabric.Databus.Config
         /// <inheritdoc />
         [XmlIgnore]
         public IList<string> KeyLevels { get; set; }
+
+        /// <inheritdoc />
+        [XmlIgnore]
+        public IEnumerable<ISqlRelationship> Relationships => this.MyRelationships.Cast<ISqlRelationship>();
+
+        /// <summary>
+        /// Gets or sets the data sources.
+        /// </summary>
+        [DataMember(Name = "Relationships")]
+        [XmlElement("Relationship")]
+        public List<SqlRelationship> MyRelationships { get; set; }
     }
 }

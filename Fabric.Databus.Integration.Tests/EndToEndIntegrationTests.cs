@@ -93,7 +93,7 @@ namespace Fabric.Databus.Integration.Tests
         /// The can run successfully end to end.
         /// </summary>
         [TestMethod]
-        public void CanRunSuccessfullyEndToEnd()
+        public void CanRunSingleEntityEndToEnd()
         {
             string connectionString = "Data Source=:memory:";
 
@@ -145,6 +145,92 @@ namespace Fabric.Databus.Integration.Tests
                         var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath));
                         Assert.AreEqual(expected, integrationTestFileWriter.GetContents(expectedPath));
+
+                        stopwatch.Stop();
+                    }
+
+                    connection.Close();
+                }
+            }
+        }        
+        
+        /// <summary>
+        /// The can run successfully end to end.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void CanRunMultipleEntitiesEndToEnd()
+        {
+            string connectionString = "Data Source=:memory:";
+
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+
+                // setup the database
+                string sql = "CREATE TABLE Text (TextID varchar(64), PatientID int, TextTXT varchar(255))";
+
+                SQLiteCommand command = connection.CreateCommand();
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
+                sql = "CREATE TABLE Patients (TextID varchar(64), PatientID int, PatientLastNM varchar(255))";
+
+                command = connection.CreateCommand();
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
+                sql = "INSERT INTO Text (TextID, PatientID, TextTXT) values ('1', 9001, 'This is my first note')";
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
+                sql = "INSERT INTO Text (TextID, PatientID, TextTXT) values ('2', 9002, 'This is my second note')";
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
+                sql = "INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('1', 9001, 'Jones')";
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
+                sql = "INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('2', 9002, 'Smith')";
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
+
+                using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
+                {
+                    using (var cancellationTokenSource = new CancellationTokenSource())
+                    {
+                        var container = new UnityContainer();
+                        container.RegisterInstance<IProgressMonitor>(progressMonitor);
+                        container.RegisterInstance<ISqlConnectionFactory>(
+                            new SqlLiteConnectionFactory(new SqlLiteConnectionWrapper(connection)));
+
+                        var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
+                        container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
+                        container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
+
+                        var stopwatch = new Stopwatch();
+                        stopwatch.Start();
+
+                        var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+
+                        var fileContents = TestFileLoader.GetFileContents("Files", "MultipleEntities.xml");
+
+                        var config = new ConfigReader().ReadXmlFromText(fileContents);
+
+                        pipelineRunner.RunRestApiPipeline(config);
+
+                        Assert.AreEqual(2, integrationTestFileWriter.Count);
+                        var expectedPath1 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
+                        var expectedPath2 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "2.json");
+                        Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath1));
+                        Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath2));
+
+                        string expected1 =
+                            @"{""TextID"":""1"",""PatientID"":9001,""TextTXT"":""This is my first note""}";
+
+                        Assert.AreEqual(expected1, integrationTestFileWriter.GetContents(expectedPath1));
 
                         stopwatch.Stop();
                     }

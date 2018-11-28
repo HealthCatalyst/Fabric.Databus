@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<Job>
+<Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
     <ConnectionString>server=HCS-DEV0002;initial catalog=Shared;Trusted_Connection=True;</ConnectionString>
     <MaximumEntitiesToLoad>100</MaximumEntitiesToLoad>

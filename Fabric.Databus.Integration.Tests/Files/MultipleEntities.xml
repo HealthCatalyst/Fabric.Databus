@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Job>
+  <Config>
+    <ConnectionString>Data Source=:memory:</ConnectionString>
+    <LocalSaveFolder>foo</LocalSaveFolder>
+    <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
+    <UseMultipleThreads>false</UseMultipleThreads>
+  </Config>
+  <Data>
+    <DataSource Path="$" Name="First" TableOrView="Text">
+    </DataSource>
+    <DataSource Path="$.patients" Name="Patients" TableOrView="Patients">
+      <Relationship>
+        <Source Entity="Text" Key="TextID"/>
+        <Destination Entity="Patients" Key="TextID"/>
+      </Relationship>
+    </DataSource>
+  </Data>
+</Job>

@@ -1,9 +1,93 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="Fabric"
-    targetNamespace="http://tempuri.org/Fabric.xsd"
-    elementFormDefault="qualified"
-    xmlns="http://tempuri.org/Fabric.xsd"
-    xmlns:mstns="http://tempuri.org/Fabric.xsd"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
->
+﻿<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="propertyType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="object" />
+      <xs:enumeration value="array" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Job">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Config">
+          <xs:complexType>
+            <xs:all minOccurs="0" maxOccurs="1">
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="ConnectionString"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Url"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Index"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Alias"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="EntityType"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="MaximumEntitiesToLoad"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="EntitiesPerBatch"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="EntitiesPerUploadFile"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="DropAndReloadIndex"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="LocalSaveFolder"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="WriteTemporaryFilesToDisk"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="WriteDetailedTemporaryFilesToDisk"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="CompressFiles"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UploadToElasticSearch"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="TopLevelKeyColumn"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="KeepTemporaryLookupColumnsInOutput"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UseMultipleThreads"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="SqlCommandTimeoutInSeconds"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Data">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="DataModel" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="DataSource" maxOccurs="unbounded" minOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Relationship" maxOccurs="unbounded" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Source" minOccurs="1">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute type="xs:string" name="Entity" use="required"/>
+                                  <xs:attribute type="xs:string" name="Key" use="required"/>
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="Destination" minOccurs="1">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute type="xs:string" name="Entity" use="required"/>
+                                  <xs:attribute type="xs:string" name="Key" use="required"/>
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Column" maxOccurs="unbounded" minOccurs="0">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="Name" use="required"/>
+                            <xs:attribute type="xs:string" name="Alias" use="optional"/>
+                            <xs:attribute type="xs:string" name="Entity" use="optional"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element type="xs:string" name="Sql" minOccurs="0" maxOccurs="1"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="Path" use="optional"/>
+                  <xs:attribute type="xs:string" name="TableOrView" use="optional"/>
+                  <xs:attribute type="propertyType" name="PropertyType" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

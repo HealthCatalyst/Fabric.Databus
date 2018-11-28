@@ -1,5 +1,6 @@
 <?xml version="1.0"?> 
-<Job>
+<Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
     <ConnectionString>server=(local);initial catalog=EdwAdmin;Trusted_Connection=True;</ConnectionString>
     <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>

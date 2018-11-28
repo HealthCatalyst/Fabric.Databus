@@ -71,15 +71,15 @@ namespace Fabric.Databus.Interfaces.FileWriters
         /// The write stream.
         /// </summary>
         /// <param name="path">
-        /// The path.
+        ///     The path.
         /// </param>
         /// <param name="stream">
-        /// The stream.
+        ///     The stream.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task WriteStreamAsync(string path, MemoryStream stream);
+        Task WriteStreamAsync(string path, Stream stream);
 
         /// <summary>
         /// The delete directory.
@@ -90,5 +90,19 @@ namespace Fabric.Databus.Interfaces.FileWriters
         /// <exception cref="Exception">exception thrown
         /// </exception>
         void DeleteDirectory(string folder);
+
+        /// <summary>
+        /// The combine path.
+        /// </summary>
+        /// <param name="folder">
+        /// The folder.
+        /// </param>
+        /// <param name="file">
+        /// The file.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        string CombinePath(string folder, string file);
     }
 }

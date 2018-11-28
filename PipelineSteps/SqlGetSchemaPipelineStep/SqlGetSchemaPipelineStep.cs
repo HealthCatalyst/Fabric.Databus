@@ -71,7 +71,7 @@ namespace SqlGetSchemaPipelineStep
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.schemaLoader = schemaLoader ?? throw new ArgumentNullException(nameof(schemaLoader));
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
-            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-{LoggerName}");
+            this.folder = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{LoggerName}");
             this.fileWriter.CreateDirectory(this.folder);
         }
 
@@ -91,7 +91,7 @@ namespace SqlGetSchemaPipelineStep
 
             foreach (var mappingItem in mappingItems)
             {
-                var filePath = Path.Combine(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
+                var filePath = this.fileWriter.CombinePath(this.folder, $"{mappingItem.PropertyPath ?? "main"}.json");
 
                 if (this.fileWriter.IsWritingEnabled)
                 {

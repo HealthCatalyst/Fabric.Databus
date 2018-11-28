@@ -68,15 +68,18 @@ namespace SaveJsonToFilePipelineStep
         {
             var stream = new MemoryStream();
 
-            await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
-
-            this.fileWriter.CreateDirectory(this.Config.LocalSaveFolder);
-
-            string path = Path.Combine(this.Config.LocalSaveFolder, $"{workItem.Id}.json");
-
-            if (this.fileWriter.IsWritingEnabled)
+            if (this.Config.LocalSaveFolder != null)
             {
-                await this.fileWriter.WriteStreamAsync(path, stream);
+                await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
+
+                this.fileWriter.CreateDirectory(this.Config.LocalSaveFolder);
+
+                string path = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{workItem.Id}.json");
+
+                if (this.fileWriter.IsWritingEnabled)
+                {
+                    await this.fileWriter.WriteStreamAsync(path, stream);
+                }
             }
 
             await this.AddToOutputQueueAsync(workItem);

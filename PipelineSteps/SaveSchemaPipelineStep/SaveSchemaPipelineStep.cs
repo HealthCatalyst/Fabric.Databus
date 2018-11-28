@@ -80,7 +80,7 @@ namespace SaveSchemaPipelineStep
         {
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
             this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
-            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-{LoggerName}");
+            this.folder = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{LoggerName}");
             this.fileWriter.CreateDirectory(this.folder);
         }
 
@@ -139,7 +139,7 @@ namespace SaveSchemaPipelineStep
                         Job = workItemJob
                     });
 
-            string path = Path.Combine(
+            string path = this.fileWriter.CombinePath(
                 this.folder,
                 propertyPath != null ? $@"mapping-{mapping.SequenceNumber}-{propertyPath}.json" : "mainmapping.json");
 

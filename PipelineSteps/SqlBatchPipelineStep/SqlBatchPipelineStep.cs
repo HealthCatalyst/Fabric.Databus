@@ -69,7 +69,7 @@ namespace SqlBatchPipelineStep
 
             if (this.fileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
-                this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
+                this.folder = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
             }
         }
 
@@ -109,11 +109,11 @@ namespace SqlBatchPipelineStep
                     var queryName = workItemLoad.Path ?? "Main";
                     var queryId = queryName;
 
-                    var path = Path.Combine(this.folder, queryId);
+                    var path = this.fileWriter.CombinePath(this.folder, queryId);
 
                     this.fileWriter.CreateDirectory(path);
 
-                    var filepath = Path.Combine(path, Convert.ToString(workItem.BatchNumber) + ".txt");
+                    var filepath = this.fileWriter.CombinePath(path, Convert.ToString(workItem.BatchNumber) + ".txt");
 
                     await this.fileWriter.WriteToFileAsync(filepath, $"start: {workItem.Start}, end: {workItem.End}");
                 }

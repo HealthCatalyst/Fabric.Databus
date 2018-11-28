@@ -12,7 +12,6 @@ namespace Fabric.Databus.Shared.FileWriters
     using System.IO;
     using System.Threading.Tasks;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.FileWriters;
 
     /// <summary>
@@ -48,7 +47,7 @@ namespace Fabric.Databus.Shared.FileWriters
         }
 
         /// <inheritdoc />
-        public Task WriteStreamAsync(string path, MemoryStream stream)
+        public Task WriteStreamAsync(string path, Stream stream)
         {
             return Task.CompletedTask;
         }
@@ -56,6 +55,12 @@ namespace Fabric.Databus.Shared.FileWriters
         /// <inheritdoc />
         public void DeleteDirectory(string folder)
         {
+        }
+
+        /// <inheritdoc />
+        public string CombinePath(string folder, string file)
+        {
+            return $"{folder}|{file}";
         }
     }
 }

@@ -63,7 +63,7 @@ namespace Fabric.Databus.Shared.FileWriters
         }
 
         /// <inheritdoc />
-        public async Task WriteStreamAsync(string path, MemoryStream stream)
+        public async Task WriteStreamAsync(string path, Stream stream)
         {
             using (var fileStream = File.Create(path))
             {
@@ -99,6 +99,12 @@ namespace Fabric.Databus.Shared.FileWriters
                     Directory.Delete(directory, true);
                 }
             }
+        }
+
+        /// <inheritdoc />
+        public string CombinePath(string folder, string file)
+        {
+            return Path.Combine(folder, file);
         }
     }
 }

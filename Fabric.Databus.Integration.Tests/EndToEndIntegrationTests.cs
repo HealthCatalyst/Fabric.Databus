@@ -17,6 +17,7 @@ namespace Fabric.Databus.Integration.Tests
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.PipelineRunner;
@@ -107,6 +108,11 @@ namespace Fabric.Databus.Integration.Tests
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
 
+                sql = "INSERT INTO Text (TextID, PatientID, TextTXT) values ('1', 9001, 'This is my first note')";
+
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
 
                 using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
                 {
@@ -114,7 +120,12 @@ namespace Fabric.Databus.Integration.Tests
                     {
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
-                        container.RegisterInstance<ISqlConnectionFactory>(new SqlLiteConnectionFactory(new SqlLiteConnectionWrapper(connection)));
+                        container.RegisterInstance<ISqlConnectionFactory>(
+                            new SqlLiteConnectionFactory(new SqlLiteConnectionWrapper(connection)));
+
+                        var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
+                        container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
+                        container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
 
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
@@ -126,7 +137,9 @@ namespace Fabric.Databus.Integration.Tests
                                              Config = new QueryConfig
                                                           {
                                                               ConnectionString = connectionString,
-                                                              TopLevelKeyColumn = "TextID"
+                                                              TopLevelKeyColumn = "TextID",
+                                                              UseMultipleThreads = false,
+                                                              LocalSaveFolder = "foo"
                                                           },
                                              Data = new JobData
                                                         {
@@ -145,6 +158,14 @@ namespace Fabric.Databus.Integration.Tests
                                          };
 
                         pipelineRunner.RunRestApiPipeline(config);
+
+                        Assert.AreEqual(1, integrationTestFileWriter.Count);
+                        string expected =
+                            @"{""TextID"":""1"",""PatientID"":9001,""TextTXT"":""This is my first note""}";
+
+                        var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
+                        Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath));
+                        Assert.AreEqual(expected, integrationTestFileWriter.GetContents(expectedPath));
 
                         stopwatch.Stop();
                     }

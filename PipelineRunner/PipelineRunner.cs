@@ -423,22 +423,28 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterType<IEntityJsonWriter, EntityJsonWriter>();
             }
 
-            if (config.WriteDetailedTemporaryFilesToDisk)
+            if (!this.container.IsRegistered<IDetailedTemporaryFileWriter>())
             {
-                this.container.RegisterType<IDetailedTemporaryFileWriter, FileWriter>();
-            }
-            else
-            {
-                this.container.RegisterType<IDetailedTemporaryFileWriter, NullFileWriter>();
+                if (config.WriteDetailedTemporaryFilesToDisk)
+                {
+                    this.container.RegisterType<IDetailedTemporaryFileWriter, FileWriter>();
+                }
+                else
+                {
+                    this.container.RegisterType<IDetailedTemporaryFileWriter, NullFileWriter>();
+                }
             }
 
-            if (config.WriteTemporaryFilesToDisk)
+            if (!this.container.IsRegistered<ITemporaryFileWriter>())
             {
-                this.container.RegisterType<ITemporaryFileWriter, FileWriter>();
-            }
-            else
-            {
-                this.container.RegisterType<ITemporaryFileWriter, NullFileWriter>();
+                if (config.WriteTemporaryFilesToDisk)
+                {
+                    this.container.RegisterType<ITemporaryFileWriter, FileWriter>();
+                }
+                else
+                {
+                    this.container.RegisterType<ITemporaryFileWriter, NullFileWriter>();
+                }
             }
 
             if (!this.container.IsRegistered<IFileWriter>())

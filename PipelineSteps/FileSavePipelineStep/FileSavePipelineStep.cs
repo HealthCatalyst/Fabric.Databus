@@ -18,7 +18,6 @@ namespace FileSavePipelineStep
 
     using BasePipelineStep;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Loggers;
@@ -89,7 +88,7 @@ namespace FileSavePipelineStep
         }
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task HandleAsync(FileUploadQueueItem workItem)
+        protected override async Task HandleAsync(FileUploadQueueItem workItem)
         {
             await this.SaveFile(workItem);
         }
@@ -115,7 +114,7 @@ namespace FileSavePipelineStep
             {
                 var fileExtension = this.Config.CompressFiles ? @".json.gz" : @".json";
 
-                var path = Path.Combine(this.Config.LocalSaveFolder, $@"data-{wt.BatchNumber}{fileExtension}");
+                var path = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $@"data-{wt.BatchNumber}{fileExtension}");
 
                 var semaphoreSlim = this.locks.GetOrAdd(path, s => new SemaphoreSlim(1, 1));
 

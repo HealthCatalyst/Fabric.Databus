@@ -81,7 +81,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
         {
             this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
-            this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-ConvertToJson");
+            this.folder = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-ConvertToJson");
         }
 
         /// <inheritdoc />
@@ -124,7 +124,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
                 wt.PropertyName,
                 wt.PropertyTypes);
 
-            var path = Path.Combine(this.folder, wt.PropertyName ?? "main");
+            var path = this.fileWriter.CombinePath(this.folder, wt.PropertyName ?? "main");
 
             this.fileWriter.CreateDirectory(path);
 
@@ -137,7 +137,7 @@ namespace ConvertDatabaseRowToJsonPipelineStep
 
             if (this.fileWriter.IsWritingEnabled)
             {
-                await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{id}.json"), sb.ToString());
+                await this.fileWriter.WriteToFileAsync(this.fileWriter.CombinePath(path, $"{id}.json"), sb.ToString());
             }
 
             await this.AddToOutputQueueAsync(

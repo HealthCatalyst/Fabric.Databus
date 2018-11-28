@@ -88,7 +88,7 @@ namespace SqlImportPipelineStep
         {
             if (this.fileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
-                this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
+                this.folder = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
             }
 
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
@@ -165,10 +165,10 @@ namespace SqlImportPipelineStep
             {
                 if (this.folder != null)
                 {
-                    var path = Path.Combine(this.folder, queryId);
+                    var path = this.fileWriter.CombinePath(this.folder, queryId);
                     this.fileWriter.CreateDirectory(path);
 
-                    var filepath = Path.Combine(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
+                    var filepath = this.fileWriter.CombinePath(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
 
                     await this.fileWriter.WriteToFileAsync(filepath, e.ToString());
                 }
@@ -220,7 +220,7 @@ namespace SqlImportPipelineStep
 
             if (this.fileWriter?.IsWritingEnabled == true && this.folder != null)
             {
-                var path = Path.Combine(Path.Combine(this.folder, queryId), Convert.ToString(batchNumber));
+                var path = this.fileWriter.CombinePath(this.fileWriter.CombinePath(this.folder, queryId), Convert.ToString(batchNumber));
 
                 this.fileWriter.CreateDirectory(path);
 
@@ -228,7 +228,7 @@ namespace SqlImportPipelineStep
                 {
                     var key = frame.Key;
 
-                    var filepath = Path.Combine(path, this.GetSafeFilename(Convert.ToString(key)) + ".csv");
+                    var filepath = this.fileWriter.CombinePath(path, this.GetSafeFilename(Convert.ToString(key)) + ".csv");
 
                     using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
                     {

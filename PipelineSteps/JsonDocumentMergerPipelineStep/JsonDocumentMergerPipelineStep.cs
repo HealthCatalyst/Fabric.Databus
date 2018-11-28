@@ -98,7 +98,7 @@ namespace JsonDocumentMergerPipelineStep
                 throw new ArgumentNullException(nameof(this.Config.LocalSaveFolder));
             }
 
-            this.folder = Path.Combine(configLocalSaveFolder, $"{this.UniqueId}-JsonDocumentMerge");
+            this.folder = this.fileWriter.CombinePath(configLocalSaveFolder, $"{this.UniqueId}-JsonDocumentMerge");
         }
 
         /// <inheritdoc />
@@ -302,7 +302,7 @@ namespace JsonDocumentMergerPipelineStep
 
                 if (this.fileWriter.IsWritingEnabled)
                 {
-                    await this.fileWriter.WriteToFileAsync(Path.Combine(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
+                    await this.fileWriter.WriteToFileAsync(this.fileWriter.CombinePath(path, $"{tuple.Item1}.json"), tuple.Item2.Document.ToString());
                 }
             }
         }

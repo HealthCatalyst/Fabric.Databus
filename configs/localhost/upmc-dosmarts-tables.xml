@@ -34,8 +34,8 @@
         <Source Entity="Text.Text" Key="EdwPatientID"/>
         <Destination Entity="Person.PatientCrossWalk" Key="EdwPatientID"/>
       </Relationship>
-      <Column Name="RowSourceDSC" Alias="root"/>
       <Column Name="PatientID" Alias="extension"/>
+      <Column Name="RowSourceDSC" Alias="root"/>
       <Column Name="PatientFullNM" Alias="last_name"/>
       <Column Name="PatientFullNM" Alias="first_name"/>
       <Column Name="PatientFullNM" Alias="middle_name"/>
@@ -51,10 +51,73 @@
         <Source Entity="Clinical.Encounter" Key="FacilityAccountID"/>
         <Destination Entity="Clinical.FacilityAccount" Key="FacilityAccountID"/>
       </Relationship>
-      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"/>
       <Column Name="EncounterID" Alias="extension"/>
+      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"/>
       <Column Entity="Clinical.FacilityAccount" Name="AdmitDTS" Alias="admitted_at"/>
       <Column Entity="Clinical.FacilityAccount" Name="DischargeDTS" Alias="discharged_at"/>
+    </DataSource>
+    <DataSource Path="$.visit.facility" PropertyType="object" TableOrView="Clinical.FacilityAccount">
+      <Relationship>
+        <Source Entity="Text.Text" Key="EncounterID"/>
+        <Destination Entity="Clinical.Encounter" Key="EncounterID"/>
+      </Relationship>
+      <Relationship>
+        <Source Entity="Clinical.Encounter" Key="FacilityAccountID"/>
+        <Destination Entity="Clinical.FacilityAccount" Key="FacilityAccountID"/>
+      </Relationship>
+      <Column Name="DischargePhysicalLocationID" Alias="extension"/>
+      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"/>
+    </DataSource>
+    <DataSource Path="$.visit.facility.people" PropertyType="array" TableOrView="Person.Provider">
+      <Relationship>
+        <Source Entity="Text.Text" Key="EncounterID"/>
+        <Destination Entity="Clinical.Encounter" Key="EncounterID"/>
+      </Relationship>
+      <Relationship>
+        <Source Entity="Clinical.Encounter" Key="FacilityAccountID"/>
+        <Destination Entity="Clinical.FacilityAccount" Key="FacilityAccountID"/>
+      </Relationship>
+      <Relationship>
+        <Source Entity="Clinical.FacilityAccount" Key="EDWAttendingProviderID"/>
+        <Destination Entity="Person.Provider" Key="EDWProviderID"/>
+      </Relationship>
+      <Column Name="EDWProviderID" Alias="extension"/>
+      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"/>
+      <Column Name="ProviderLastNM" Alias="last_name"/>
+      <Column Name="ProviderFirstNM" Alias="first_name"/>
+      <Column Name="ProviderMiddleNM" Alias="middle_name"/>
+    </DataSource>
+    <DataSource Path="$.document" PropertyType="object" TableOrView="Text.Text">
+      <Column Name="TextID" Alias="extension"/>
+      <Column Name="TextSourceDSC" Alias="root"/>
+      <Column Name="StatusDSC" Alias="Status"/>
+      <Column Name="TextSourceDSC" Alias="type_root"/>
+      <Column Name="TextTypeCD" Alias="type_extension"/>
+      <Column Name="TextTypeDSC" Alias="type_description"/>
+    </DataSource>
+    <DataSource Path="$.document" PropertyType="object" TableOrView="Text.Date">
+      <Column Name="TextID" Alias="extension"/>
+      <Column Name="DateDTS" Alias="date_of_service"/>
+      <Column Name="DateDTS" Alias="source_created_at"/>
+    </DataSource>
+    <DataSource Path="$.document.people" PropertyType="array" TableOrView="Person.Provider">
+      <Relationship>
+        <Source Entity="Text.Text" Key="EncounterID"/>
+        <Destination Entity="Clinical.Encounter" Key="EncounterID"/>
+      </Relationship>
+      <Relationship>
+        <Source Entity="Clinical.Encounter" Key="FacilityAccountID"/>
+        <Destination Entity="Clinical.FacilityAccount" Key="FacilityAccountID"/>
+      </Relationship>
+      <Relationship>
+        <Source Entity="Clinical.FacilityAccount" Key="EDWAttendingProviderID"/>
+        <Destination Entity="Person.Provider" Key="EDWProviderID"/>
+      </Relationship>
+      <Column Name="EDWProviderID" Alias="extension"/>
+      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"/>
+      <Column Name="ProviderLastNM" Alias="last_name"/>
+      <Column Name="ProviderFirstNM" Alias="first_name"/>
+      <Column Name="ProviderMiddleNM" Alias="middle_name"/>
     </DataSource>
   </Data>
 </Job>

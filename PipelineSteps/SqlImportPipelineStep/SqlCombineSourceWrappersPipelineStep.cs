@@ -63,7 +63,11 @@ namespace SqlImportPipelineStep
             var keys = new List<string>();
             for (int i = 0; i < keyLevels + 1; i++)
             {
-                keys.Add($"KeyLevel{i+1}");
+                var keyLevelColumnName = $"KeyLevel{i+1}";
+                if (workItem.Columns.Any(c => c.Name.Equals(keyLevelColumnName)))
+                {
+                    keys.Add(keyLevelColumnName);
+                }
             }
 
             this.sourceWrapperCollection.Add(

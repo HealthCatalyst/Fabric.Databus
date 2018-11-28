@@ -222,7 +222,7 @@ namespace SqlImportPipelineStep
                 {
                     var key = frame.Key;
 
-                    var filepath = Path.Combine(path, Convert.ToString(key) + ".csv");
+                    var filepath = Path.Combine(path, this.GetSafeFilename(Convert.ToString(key)) + ".csv");
 
                     using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
                     {
@@ -268,6 +268,20 @@ namespace SqlImportPipelineStep
             untransformedFields.ForEach(f => { });
 
             this.MyLogger.Verbose($"Finished reading rows for {queryId}");
+        }
+
+        /// <summary>
+        /// The get safe filename.
+        /// </summary>
+        /// <param name="filename">
+        /// The filename.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        private string GetSafeFilename(string filename)
+        {
+            return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
     }
 }

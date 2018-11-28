@@ -121,18 +121,18 @@ namespace Fabric.Databus.Shared
                 var joinColumnIndex = 0;
 
                 // add any calculated fields
-                var calculatedFields = load.Fields.Where(f => f.Destination != null)
-                    .Select(f => new ColumnInfo
-                    {
-                        sourceIndex =
-                                             columnList.FirstOrDefault(c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
-                        index = numberOfColumns++,
-                        Name = f.Destination,
-                        ElasticSearchType = f.DestinationType.ToString(),
-                        IsCalculated = true,
-                        Transform = f.Transform.ToString()
-                    })
-                    .ToList();
+                var calculatedFields = load.Fields.Where(f => f.Destination != null).Select(
+                    f => new ColumnInfo
+                             {
+                                 sourceIndex =
+                                     columnList.FirstOrDefault(
+                                         c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
+                                 index = numberOfColumns++,
+                                 Name = f.Destination,
+                                 ElasticSearchType = f.DestinationType.ToString(),
+                                 IsCalculated = true,
+                                 Transform = f.Transform.ToString()
+                             }).ToList();
 
                 calculatedFields.ForEach(c => columnList.Add(c));
 

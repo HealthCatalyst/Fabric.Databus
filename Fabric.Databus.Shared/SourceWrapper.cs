@@ -219,7 +219,8 @@ namespace Fabric.Databus.Shared
                 foreach (var sibling in this.Siblings)
                 {
                     // find sibling rows matched by key
-                    var keyValuePairs = this.keyColumns.Select(
+                    var keyValuePairs =
+                        this.keyColumns.Select(
                         keyColumnName => new KeyValuePair<string, object>(
                             keyColumnName,
                             row[this.GetIndexOfColumn(keyColumnName)])).ToList();

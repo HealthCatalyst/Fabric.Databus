@@ -11,7 +11,6 @@ namespace BasePipelineStep
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
@@ -40,6 +39,11 @@ namespace BasePipelineStep
         /// </summary>
         // ReSharper disable once StaticMemberInGenericType
         private static readonly ConcurrentDictionary<string, TimeSpan> ProcessingTimeByQueryId = new ConcurrentDictionary<string, TimeSpan>();
+
+        /// <summary>
+        /// The total items added to output queue by query id.
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, int> TotalItemsAddedToOutputQueueByQueryId = new ConcurrentDictionary<string, int>();
 
         /// <summary>
         /// The _total items processed.

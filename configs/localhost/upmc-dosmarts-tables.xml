@@ -17,18 +17,31 @@
   <Data>
     <DataSource Path="$" TableOrView="Text.Text">
       <Column Name="TextID"></Column>
-      <Column Name="TextID" Alias="extension"></Column>
       <Column Name="TextSourceDSC" Alias="root"></Column>
+      <Column Name="TextID" Alias="extension"></Column>
+      <Column Name="TextOriginTableNM" Alias="extension_suffix"></Column>
+      <Column Name="TextTXT" Alias="data"></Column>
     </DataSource>
     <DataSource Path="$.patient" PropertyType="object" TableOrView="Person.Patient">
       <Relationship>
-        <SourceEntity>Text.Text</SourceEntity>
-        <SourceEntityKey>EdwPatientID</SourceEntityKey>
-        <DestinationEntity>Person.Patient</DestinationEntity>
-        <DestinationEntityKey>EdwPatientID</DestinationEntityKey>
+        <Source Entity="Text.Text" Key="EdwPatientID"></Source>
+        <Destination Entity="Person.Patient" Key="EdwPatientID"></Destination>
       </Relationship>
       <Column Entity="Text.Text" Name="TextID"></Column>
       <Column Name="PatientFullNM"></Column>
+    </DataSource>
+    <DataSource Path="$.visit" PropertyType="object" TableOrView="Clinical.Encounter">
+      <Relationship>
+        <Source Entity="Text.Text" Key="EncounterID"></Source>
+        <Destination Entity="Clinical.Encounter" Key="EncounterID"></Destination>
+      </Relationship>
+      <Relationship>
+        <Source Entity="Clinical.Encounter" Key="FacilityAccountID"></Source>
+        <Destination Entity="Clinical.FacilityAccount" Key="FacilityAccountID"></Destination>
+      </Relationship>
+      <Column Entity="Text.Text" Name="TextID"></Column>
+      <Column Entity="Clinical.FacilityAccount" Name="RowSourceDSC" Alias="root"></Column>
+      <Column Name="EncounterID" Alias="extension"></Column>
     </DataSource>
   </Data>
 </Job>

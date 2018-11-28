@@ -1,27 +1,27 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ISqlRelationship.cs" company="">
+// <copyright file="ISqlRelationshipEntity.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the ISqlRelationship type.
+//   Defines the ISqlRelationshipEntity type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.Interfaces.Config
 {
     /// <summary>
-    /// The SqlRelationship interface.
+    /// The SqlRelationshipEntity interface.
     /// </summary>
-    public interface ISqlRelationship
+    public interface ISqlRelationshipEntity
     {
         /// <summary>
-        /// Gets the source.
+        /// Gets or sets the entity.
         /// </summary>
-        ISqlRelationshipEntity Source { get; }
+        string Entity { get; set; }
 
         /// <summary>
-        /// Gets the destination.
+        /// Gets or sets the key.
         /// </summary>
-        ISqlRelationshipEntity Destination { get; }
+        string Key { get; set; }
     }
 }

@@ -21,10 +21,8 @@
     </DataSource>
     <DataSource Path="$.patient" PropertyType="object" TableOrView="Person.Patient">
       <Relationship>
-        <SourceEntity>Text.Text</SourceEntity>
-        <SourceEntityKey>EdwPatientID</SourceEntityKey>
-        <DestinationEntity>Person.Patient</DestinationEntity>
-        <DestinationEntityKey>EdwPatientID</DestinationEntityKey>
+        <Source Entity="Text.Text" Key="EdwPatientID"></Source>
+        <Destination Entity="Person.Patient" Key="EdwPatientID"></Destination>
       </Relationship>
     </DataSource>
   </Data>

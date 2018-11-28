@@ -9,6 +9,9 @@
 
 namespace Fabric.Databus.Config
 {
+    using System.Xml;
+    using System.Xml.Serialization;
+
     using Fabric.Databus.Interfaces.Config;
 
     /// <inheritdoc />
@@ -18,15 +21,21 @@ namespace Fabric.Databus.Config
     public class SqlRelationship : ISqlRelationship
     {
         /// <inheritdoc />
-        public string SourceEntity { get; set; }
+        public ISqlRelationshipEntity Source => this.MySource;
+
+        /// <summary>
+        /// Gets or sets the my source.
+        /// </summary>
+        [XmlElement("Source")]
+        public SqlRelationshipEntity MySource { get; set; }
 
         /// <inheritdoc />
-        public string SourceEntityKey { get; set; }
+        public ISqlRelationshipEntity Destination => this.MyDestination;
 
-        /// <inheritdoc />
-        public string DestinationEntity { get; set; }
-
-        /// <inheritdoc />
-        public string DestinationEntityKey { get; set; }
+        /// <summary>
+        /// Gets or sets the my destination.
+        /// </summary>
+        [XmlElement("Destination")]
+        public SqlRelationshipEntity MyDestination { get; set; }
     }
 }

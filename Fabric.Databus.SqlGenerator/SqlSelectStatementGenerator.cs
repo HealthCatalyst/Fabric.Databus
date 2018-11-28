@@ -75,7 +75,7 @@ namespace Fabric.Databus.SqlGenerator
 
             var sqlRelationshipsCount = sqlRelationships1.Count();
 
-            var destinationEntity = sqlRelationships1.First().DestinationEntity;
+            var destinationEntity = sqlRelationships1.First().Destination.Entity;
 
             var sqlGenerator = new SqlGenerator(destinationEntity);
             if (sqlEntityColumnMappings.Any())
@@ -97,18 +97,18 @@ namespace Fabric.Databus.SqlGenerator
             foreach (var sqlRelationship in sqlRelationships1)
             {
                 relationshipIndex--;
-                sqlGenerator.AddColumn(sqlRelationship.DestinationEntity, sqlRelationship.DestinationEntityKey, $"KeyLevel{relationshipIndex}");
+                sqlGenerator.AddColumn(sqlRelationship.Destination.Entity, sqlRelationship.Destination.Key, $"KeyLevel{relationshipIndex}");
                 sqlGenerator.AddJoin(
                     new SqlGeneratorJoin
                     {
-                        SourceEntity = sqlRelationship.SourceEntity,
-                        SourceEntityKey = sqlRelationship.SourceEntityKey,
-                        DestinationEntity = sqlRelationship.DestinationEntity,
-                        DestinationEntityKey = sqlRelationship.DestinationEntityKey
+                        SourceEntity = sqlRelationship.Source.Entity,
+                        SourceEntityKey = sqlRelationship.Source.Key,
+                        DestinationEntity = sqlRelationship.Destination.Entity,
+                        DestinationEntityKey = sqlRelationship.Destination.Key
                     });
             }
 
-            sqlGenerator.AddColumn(sqlRelationships1.Last().SourceEntity, topLevelKey, "KeyLevel1");
+            sqlGenerator.AddColumn(sqlRelationships1.Last().Source.Entity, topLevelKey, "KeyLevel1");
 
             string result = sqlGenerator.ToString();
             return result;

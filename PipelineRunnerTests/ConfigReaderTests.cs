@@ -116,7 +116,7 @@ namespace PipelineRunnerTests
             Assert.AreEqual("$.patient", job.Data.DataSources[1].Path);
             Assert.AreEqual("Person.Patient", job.Data.DataSources[1].TableOrView);
             Assert.AreEqual(1, job.Data.DataSources[1].Relationships.Count());
-            Assert.AreEqual("Text.Text", job.Data.DataSources[1].Relationships.First().SourceEntity);
+            Assert.AreEqual("Text.Text", job.Data.DataSources[1].Relationships.First().Source.Entity);
         }
     }
 }

@@ -56,7 +56,6 @@ FROM Text.Text
                             }
                     });
 
-
             string expected = @"SELECT
 Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
 FROM Text.Text
@@ -82,7 +81,6 @@ FROM Text.Text
                                 Name = "TextSourceDSC"
                             }
                     });
-
 
             string expected = @"SELECT
 Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
@@ -110,7 +108,6 @@ FROM Text.Text
                             }
                     });
 
-
             string expected = @"SELECT
 Text.Text.[TextSourceDSC] AS [extension],Text.Text.[TextID] AS [KeyLevel1]
 FROM Text.Text
@@ -125,12 +122,18 @@ FROM Text.Text
         public void TestSingleLevelRelationship()
         {
             var sqlRelationship = new SqlRelationship
-                                      {
-                                          SourceEntity = "Text.Text",
-                                          SourceEntityKey = "EdwPatientID",
-                                          DestinationEntity = "Person.Patient",
-                                          DestinationEntityKey = "EdwPatientID"
-                                      };
+            {
+                MySource = new SqlRelationshipEntity
+                {
+                    Entity = "Text.Text",
+                    Key = "EdwPatientID",
+                },
+                MyDestination = new SqlRelationshipEntity
+                {
+                    Entity = "Person.Patient",
+                    Key = "EdwPatientID"
+                }
+            };
 
             var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
                 "Person.Patient",
@@ -154,19 +157,31 @@ INNER JOIN Text.Text ON Text.Text.[EdwPatientID] = Person.Patient.[EdwPatientID]
         public void TestTwoLevelRelationship()
         {
             var sqlRelationship1 = new SqlRelationship
-                                      {
-                                          SourceEntity = "Text.Text",
-                                          SourceEntityKey = "EncounterID",
-                                          DestinationEntity = "Clinical.Encounter",
-                                          DestinationEntityKey = "EncounterID"
+            {
+                MySource = new SqlRelationshipEntity
+                {
+                    Entity = "Text.Text",
+                    Key = "EncounterID",
+                },
+                MyDestination = new SqlRelationshipEntity
+                {
+                    Entity = "Clinical.Encounter",
+                    Key = "EncounterID"
+                }
             };
 
             var sqlRelationship2 = new SqlRelationship
-                                      {
-                                          SourceEntity = "Clinical.Encounter",
-                                          SourceEntityKey = "FacilityAccountID",
-                                          DestinationEntity = "Clinical.FacilityAccount",
-                                          DestinationEntityKey = "FacilityAccountID"
+            {
+                MySource = new SqlRelationshipEntity
+                {
+                    Entity = "Clinical.Encounter",
+                    Key = "FacilityAccountID"
+                },
+                MyDestination = new SqlRelationshipEntity
+                {
+                    Entity = "Clinical.FacilityAccount",
+                    Key = "FacilityAccountID"
+                }
             };
 
             var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
@@ -192,28 +207,46 @@ INNER JOIN Text.Text ON Text.Text.[EncounterID] = Clinical.Encounter.[EncounterI
         public void TestThreeLevelRelationship()
         {
             var sqlRelationship1 = new SqlRelationship
-                                       {
-                                           SourceEntity = "Text.Text",
-                                           SourceEntityKey = "EncounterID",
-                                           DestinationEntity = "Clinical.Encounter",
-                                           DestinationEntityKey = "EncounterID"
-                                       };
+            {
+                MySource = new SqlRelationshipEntity
+                {
+                    Entity = "Text.Text",
+                    Key = "EncounterID",
+                },
+                MyDestination = new SqlRelationshipEntity
+                {
+                    Entity = "Clinical.Encounter",
+                    Key = "EncounterID"
+                }
+            };
 
             var sqlRelationship2 = new SqlRelationship
-                                       {
-                                           SourceEntity = "Clinical.Encounter",
-                                           SourceEntityKey = "FacilityAccountID",
-                                           DestinationEntity = "Clinical.FacilityAccount",
-                                           DestinationEntityKey = "FacilityAccountID"
-                                       };
+            {
+                MySource = new SqlRelationshipEntity
+                {
+                    Entity = "Clinical.Encounter",
+                    Key = "FacilityAccountID",
+                },
+                MyDestination = new SqlRelationshipEntity
+                {
+                    Entity = "Clinical.FacilityAccount",
+                    Key = "FacilityAccountID"
+                }
+            };
 
             var sqlRelationship3 = new SqlRelationship
-                                       {
-                                           SourceEntity = "Clinical.FacilityAccount",
-                                           SourceEntityKey = "EDWAttendingProviderID",
-                                           DestinationEntity = "Person.Provider",
-                                           DestinationEntityKey = "EDWProviderID"
-                                       };
+            {
+                MySource = new SqlRelationshipEntity
+                {
+                    Entity = "Clinical.FacilityAccount",
+                    Key = "EDWAttendingProviderID",
+                },
+                MyDestination = new SqlRelationshipEntity
+                {
+                    Entity = "Person.Provider",
+                    Key = "EDWProviderID"
+                }
+            };
 
             var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
                 "Person.Provider",

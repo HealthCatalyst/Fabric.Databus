@@ -12,7 +12,6 @@ namespace Fabric.Databus.Schema
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.SqlClient;
     using System.Linq;
 
     using Fabric.Databus.Interfaces.Config;
@@ -32,7 +31,15 @@ namespace Fabric.Databus.Schema
         /// </summary>
         private readonly string topLevelKeyColumn;
 
+        /// <summary>
+        /// The sql connection factory.
+        /// </summary>
         private readonly ISqlConnectionFactory sqlConnectionFactory;
+
+        /// <summary>
+        /// The sql generator factory.
+        /// </summary>
+        private readonly ISqlGeneratorFactory sqlGeneratorFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SchemaLoader"/> class.
@@ -46,11 +53,15 @@ namespace Fabric.Databus.Schema
         /// <param name="sqlConnectionFactory">
         /// The sql Connection Factory.
         /// </param>
-        public SchemaLoader(string connectionString, string topLevelKeyColumn, ISqlConnectionFactory sqlConnectionFactory)
+        /// <param name="sqlGeneratorFactory">
+        /// The sql Generator Factory.
+        /// </param>
+        public SchemaLoader(string connectionString, string topLevelKeyColumn, ISqlConnectionFactory sqlConnectionFactory, ISqlGeneratorFactory sqlGeneratorFactory)
         {
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             this.topLevelKeyColumn = topLevelKeyColumn ?? throw new ArgumentNullException(nameof(topLevelKeyColumn));
             this.sqlConnectionFactory = sqlConnectionFactory;
+            this.sqlGeneratorFactory = sqlGeneratorFactory;
         }
 
         /// <inheritdoc />
@@ -65,9 +76,8 @@ namespace Fabric.Databus.Schema
                 {
                     conn.Open();
                     var cmd = conn.CreateCommand();
-                    //cmd.CommandText = "SELECT TOP 10 * FROM [CatalystDevSubset].[dbo].[Patients]";
 
-                    cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT top 0 * from CTE;";
+                    cmd.CommandText = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddTopFilter(0).ToSqlString();
 
                     try
                     {

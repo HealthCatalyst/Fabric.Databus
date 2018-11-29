@@ -45,6 +45,8 @@ namespace Fabric.Databus.Shared
         /// </summary>
         private readonly ISqlConnectionFactory sqlConnectionFactory;
 
+        private readonly ISqlGeneratorFactory sqlGeneratorFactory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabusSqlReader"/> class.
         /// </summary>
@@ -57,7 +59,10 @@ namespace Fabric.Databus.Shared
         /// <param name="sqlConnectionFactory">
         /// The sql Connection Factory.
         /// </param>
-        public DatabusSqlReader(string connectionString, int sqlCommandTimeoutInSeconds, ISqlConnectionFactory sqlConnectionFactory)
+        /// <param name="sqlGeneratorFactory">
+        /// The sql Generator Factory.
+        /// </param>
+        public DatabusSqlReader(string connectionString, int sqlCommandTimeoutInSeconds, ISqlConnectionFactory sqlConnectionFactory, ISqlGeneratorFactory sqlGeneratorFactory)
         {
             if (sqlCommandTimeoutInSeconds < 0)
             {
@@ -67,6 +72,7 @@ namespace Fabric.Databus.Shared
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             this.sqlCommandTimeoutInSeconds = sqlCommandTimeoutInSeconds;
             this.sqlConnectionFactory = sqlConnectionFactory;
+            this.sqlGeneratorFactory = sqlGeneratorFactory;
         }
 
         /// <inheritdoc />
@@ -89,13 +95,18 @@ namespace Fabric.Databus.Shared
 
                 if (start == null)
                 {
-                    cmd.CommandText =
-                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE ORDER BY KeyLevel1 ASC;";
+                    cmd.CommandText = this.sqlGeneratorFactory.Create()
+                        .AddCTE(load.Sql)
+                        .AddOrderByAscending("KeyLevel1")
+                        .ToSqlString();
                 }
                 else
                 {
-                    cmd.CommandText =
-                        $";WITH CTE AS ( {load.Sql} )  SELECT * from CTE WHERE KeyLevel1 BETWEEN @start AND @end ORDER BY KeyLevel1 ASC;";
+                    cmd.CommandText = this.sqlGeneratorFactory.Create()
+                        .AddCTE(load.Sql)
+                        .AddOrderByAscending("KeyLevel1")
+                        .AddRangeFilter("KeyLevel1", "@start", "@end")
+                        .ToSqlString();
 
                     cmd.AddParameterWithValue("@start", start);
                     cmd.AddParameterWithValue("@end", end);
@@ -243,9 +254,15 @@ namespace Fabric.Databus.Shared
                     cmd.CommandTimeout = this.sqlCommandTimeoutInSeconds;
                 }
 
-                cmd.CommandText = maximumEntitiesToLoad > 0
-                                      ? $";WITH CTE AS ( {load.Sql} )  SELECT TOP {maximumEntitiesToLoad} {topLevelKeyColumn} from CTE ORDER BY {topLevelKeyColumn} ASC;"
-                                      : $";WITH CTE AS ( {load.Sql} )  SELECT {topLevelKeyColumn} from CTE ORDER BY {topLevelKeyColumn} ASC;";
+                var sqlGenerator = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddColumn(null, topLevelKeyColumn, null)
+                    .AddOrderByAscending(topLevelKeyColumn);
+
+                if (maximumEntitiesToLoad > 0)
+                {
+                    sqlGenerator.AddTopFilter(maximumEntitiesToLoad);
+                }
+
+                cmd.CommandText = sqlGenerator.ToSqlString();
 
                 // Logger.Verbose($"Start: {cmd.CommandText}");
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);

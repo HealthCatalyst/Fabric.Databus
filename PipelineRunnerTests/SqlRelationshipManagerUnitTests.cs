@@ -29,7 +29,12 @@ namespace PipelineRunnerTests
         [TestMethod]
         public void TestNoRelationships()
         {
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement("Text.Text", "TextID", new List<ISqlRelationship>(), new List<ISqlEntityColumnMapping>());
+            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+                "Text.Text",
+                "TextID",
+                new List<ISqlRelationship>(),
+                new List<ISqlEntityColumnMapping>(),
+                new SqlGeneratorFactory());
 
             string expected = @"SELECT
 Text.Text.*,Text.Text.[TextID] AS [KeyLevel1]
@@ -48,13 +53,8 @@ FROM Text.Text
                 "Text.Text",
                 "TextID",
                 new List<ISqlRelationship>(),
-                new List<ISqlEntityColumnMapping>
-                    {
-                        new SqlEntityColumnMapping
-                            {
-                                Name = "TextSourceDSC"
-                            }
-                    });
+                new List<ISqlEntityColumnMapping> { new SqlEntityColumnMapping { Name = "TextSourceDSC" } },
+                new SqlGeneratorFactory());
 
             string expected = @"SELECT
 Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
@@ -75,12 +75,9 @@ FROM Text.Text
                 new List<ISqlRelationship>(),
                 new List<ISqlEntityColumnMapping>
                     {
-                        new SqlEntityColumnMapping
-                            {
-                                Entity = "Text.Text",
-                                Name = "TextSourceDSC"
-                            }
-                    });
+                        new SqlEntityColumnMapping { Entity = "Text.Text", Name = "TextSourceDSC" }
+                    },
+                new SqlGeneratorFactory());
 
             string expected = @"SELECT
 Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
@@ -101,12 +98,9 @@ FROM Text.Text
                 new List<ISqlRelationship>(),
                 new List<ISqlEntityColumnMapping>
                     {
-                        new SqlEntityColumnMapping
-                            {
-                                Name = "TextSourceDSC",
-                                Alias = "extension"
-                            }
-                    });
+                        new SqlEntityColumnMapping { Name = "TextSourceDSC", Alias = "extension" }
+                    },
+                new SqlGeneratorFactory());
 
             string expected = @"SELECT
 Text.Text.[TextSourceDSC] AS [extension],Text.Text.[TextID] AS [KeyLevel1]
@@ -139,7 +133,8 @@ FROM Text.Text
                 "Person.Patient",
                 "TextID",
                 new List<ISqlRelationship> { sqlRelationship },
-                new List<ISqlEntityColumnMapping>());
+                new List<ISqlEntityColumnMapping>(),
+                new SqlGeneratorFactory());
 
             string expected = @"SELECT
 Person.Patient.*,Person.Patient.[EdwPatientID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]
@@ -188,7 +183,8 @@ INNER JOIN Text.Text ON Text.Text.[EdwPatientID] = Person.Patient.[EdwPatientID]
                 "Clinical.FacilityAccount",
                 "TextID",
                 new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2 },
-                new List<ISqlEntityColumnMapping>());
+                new List<ISqlEntityColumnMapping>(),
+                new SqlGeneratorFactory());
 
             string expected = @"SELECT
 Clinical.FacilityAccount.*,Clinical.FacilityAccount.[FacilityAccountID] AS [KeyLevel3],Clinical.Encounter.[EncounterID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]
@@ -252,7 +248,8 @@ INNER JOIN Text.Text ON Text.Text.[EncounterID] = Clinical.Encounter.[EncounterI
                 "Person.Provider",
                 "TextID",
                 new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2, sqlRelationship3 },
-                new List<ISqlEntityColumnMapping>());
+                new List<ISqlEntityColumnMapping>(),
+                new SqlGeneratorFactory());
 
             string expected = @"SELECT
 Person.Provider.*,Person.Provider.[EDWProviderID] AS [KeyLevel4],Clinical.FacilityAccount.[FacilityAccountID] AS [KeyLevel3],Clinical.Encounter.[EncounterID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]

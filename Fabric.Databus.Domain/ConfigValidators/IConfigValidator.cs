@@ -37,5 +37,7 @@ namespace Fabric.Databus.Domain.ConfigValidators
         /// The job.
         /// </param>
         void ValidateJob(IJob job);
+
+        void ValidateDataSources(IJob job);
     }
 }

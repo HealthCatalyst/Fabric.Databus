@@ -118,6 +118,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="IntegrationTestFileWriter.cs" />
+    <Compile Include="SqlLiteGenerator.cs" />
+    <Compile Include="SqlLiteGeneratorFactory.cs" />
     <Compile Include="TestFileLoader.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +142,14 @@
     <ProjectReference Include="..\Fabric.Databus.Shared\Fabric.Databus.Shared.csproj">
       <Project>{ade06c2e-4dd9-4c82-ace2-bfeb881f74ef}</Project>
       <Name>Fabric.Databus.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj">
+      <Project>{104c7335-d0b6-4587-a1a9-843c69042ae2}</Project>
+      <Name>Fabric.Databus.SqlGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj">
+      <Project>{bb878905-9592-4a9d-a811-46e73d9f7f6a}</Project>
+      <Name>Fabric.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
       <Project>{af1adf05-ec10-43ea-877e-ad504a113b58}</Project>

@@ -1,26 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlGenerator.cs" company="">
+// <copyright file="SqlLiteGeneratorFactory.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlGeneratorColumn type.
+//   Defines the SqlLiteGeneratorFactory type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.SqlGenerator
+namespace Fabric.Databus.Integration.Tests
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     using Fabric.Databus.Interfaces.Sql;
-    using Fabric.Shared;
 
     /// <inheritdoc />
-    /// <summary>
-    /// The sql generator.
-    /// </summary>
-    public class SqlGenerator : AbstractBaseSqlGenerator
+    public class SqlLiteGeneratorFactory : ISqlGeneratorFactory
     {
+        /// <inheritdoc />
+        public ISqlGenerator Create()
+        {
+            return new SqlLiteGenerator();
+        }
     }
 }

@@ -115,6 +115,12 @@ namespace Fabric.Databus.Integration.Tests
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
 
+                string foo = @";WITH CTE AS ( SELECT
+Text.*,Text.[TextID] AS [KeyLevel1]
+FROM Text
+ )  SELECT * from CTE LIMIT 1";
+                command.CommandText = foo;
+                command.ExecuteNonQuery();
 
                 using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
                 {
@@ -128,6 +134,8 @@ namespace Fabric.Databus.Integration.Tests
                         var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
                         container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
                         container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
+
+                        container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
 
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
@@ -217,6 +225,8 @@ namespace Fabric.Databus.Integration.Tests
                         var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
                         container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
                         container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
+
+                        container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
 
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();

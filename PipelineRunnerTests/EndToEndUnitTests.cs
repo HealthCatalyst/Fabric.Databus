@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EndToEndTests.cs" company="Health Catalyst">
+// <copyright file="EndToEndUnitTests.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the EndToEndTests type.
+//   Defines the EndToEndUnitTests type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,6 +16,7 @@ namespace PipelineRunnerTests
     using System.Threading.Tasks;
 
     using Fabric.Databus.Config;
+    using Fabric.Databus.Domain.ConfigValidators;
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
@@ -36,7 +37,7 @@ namespace PipelineRunnerTests
     /// The end to end tests.
     /// </summary>
     [TestClass]
-    public class EndToEndTests
+    public class EndToEndUnitTests
     {
         /// <summary>
         /// The test elastic search pipeline.
@@ -105,6 +106,10 @@ namespace PipelineRunnerTests
                                    }
                 });
 
+            var mockConfigValidator = mockRepository.Create<IConfigValidator>();
+            mockConfigValidator.Setup(service => service.ValidateJob(It.IsAny<IJob>()));
+            mockConfigValidator.Setup(service => service.ValidateDataSources(It.IsAny<IJob>()));
+
             var mockFileUploaderFactory = mockRepository.Create<IElasticSearchUploaderFactory>();
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
@@ -137,6 +142,7 @@ namespace PipelineRunnerTests
                     container.RegisterInstance<IProgressMonitor>(progressMonitor);
                     container.RegisterInstance(mockDatabusSqlReader.Object);
                     container.RegisterInstance(mockFileUploaderFactory.Object);
+                    container.RegisterInstance(mockConfigValidator.Object);
                     container.RegisterInstance(logger);
                     container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
 
@@ -231,6 +237,10 @@ namespace PipelineRunnerTests
                                    }
                 });
 
+            var mockConfigValidator = mockRepository.Create<IConfigValidator>();
+            mockConfigValidator.Setup(service => service.ValidateJob(It.IsAny<IJob>()));
+            mockConfigValidator.Setup(service => service.ValidateDataSources(It.IsAny<IJob>()));
+
             var mockFileUploaderFactory = mockRepository.Create<IElasticSearchUploaderFactory>();
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
@@ -263,6 +273,7 @@ namespace PipelineRunnerTests
                     container.RegisterInstance<IProgressMonitor>(progressMonitor);
                     container.RegisterInstance(mockDatabusSqlReader.Object);
                     container.RegisterInstance(mockFileUploaderFactory.Object);
+                    container.RegisterInstance(mockConfigValidator.Object);
                     container.RegisterInstance(logger);
                     container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
 

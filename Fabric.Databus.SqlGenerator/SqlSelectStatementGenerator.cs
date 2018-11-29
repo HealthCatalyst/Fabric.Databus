@@ -16,6 +16,7 @@ namespace Fabric.Databus.SqlGenerator
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Sql;
 
     /// <summary>
     /// The sql select statement generator.
@@ -37,6 +38,8 @@ namespace Fabric.Databus.SqlGenerator
         /// <param name="entityColumnMappings">
         /// entity column mappings
         /// </param>
+        /// <param name="sqlGeneratorFactory">
+        /// sql Generator factory</param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -45,7 +48,8 @@ namespace Fabric.Databus.SqlGenerator
             string entityName,
             string topLevelKey,
             IEnumerable<ISqlRelationship> sqlRelationships,
-            IEnumerable<ISqlEntityColumnMapping> entityColumnMappings)
+            IEnumerable<ISqlEntityColumnMapping> entityColumnMappings,
+            ISqlGeneratorFactory sqlGeneratorFactory)
         {
             if (sqlRelationships == null)
             {
@@ -63,7 +67,8 @@ namespace Fabric.Databus.SqlGenerator
 
             if (!sqlRelationships1.Any())
             {
-                var generator = new SqlGenerator(entityName);
+                var generator = sqlGeneratorFactory.Create().SetEntity(entityName);
+
                 if (sqlEntityColumnMappings.Any())
                 {
                     foreach (var sqlEntityColumnMapping in sqlEntityColumnMappings)
@@ -81,14 +86,15 @@ namespace Fabric.Databus.SqlGenerator
 
                 generator.AddColumn(entityName, topLevelKey, "KeyLevel1");
 
-                return generator.ToString();
+                return generator.ToSqlString();
             }
 
             var sqlRelationshipsCount = sqlRelationships1.Count();
 
             var destinationEntity = sqlRelationships1.First().Destination.Entity;
 
-            var sqlGenerator = new SqlGenerator(destinationEntity);
+            var sqlGenerator = sqlGeneratorFactory.Create().SetEntity(destinationEntity);
+
             if (sqlEntityColumnMappings.Any())
             {
                 foreach (var sqlEntityColumnMapping in sqlEntityColumnMappings)
@@ -121,7 +127,7 @@ namespace Fabric.Databus.SqlGenerator
 
             sqlGenerator.AddColumn(sqlRelationships1.Last().Source.Entity, topLevelKey, "KeyLevel1");
 
-            string result = sqlGenerator.ToString();
+            string result = sqlGenerator.ToSqlString();
             return result;
         }
     }

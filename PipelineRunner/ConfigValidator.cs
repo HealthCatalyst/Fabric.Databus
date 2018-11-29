@@ -21,9 +21,7 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
 
-    /// <summary>
-    /// The config validator.
-    /// </summary>
+    /// <inheritdoc />
     public class ConfigValidator : IConfigValidator
     {
         /// <summary>
@@ -32,14 +30,23 @@ namespace Fabric.Databus.PipelineRunner
         private readonly ISqlConnectionFactory sqlConnectionFactory;
 
         /// <summary>
+        /// The sql generator factory.
+        /// </summary>
+        private readonly ISqlGeneratorFactory sqlGeneratorFactory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ConfigValidator"/> class.
         /// </summary>
         /// <param name="sqlConnectionFactory">
         /// The sql connection factory.
         /// </param>
-        public ConfigValidator(ISqlConnectionFactory sqlConnectionFactory)
+        /// <param name="sqlGeneratorFactory">
+        /// The sql Generator Factory.
+        /// </param>
+        public ConfigValidator(ISqlConnectionFactory sqlConnectionFactory, ISqlGeneratorFactory sqlGeneratorFactory)
         {
             this.sqlConnectionFactory = sqlConnectionFactory;
+            this.sqlGeneratorFactory = sqlGeneratorFactory;
         }
 
         /// <inheritdoc />
@@ -126,6 +133,11 @@ namespace Fabric.Databus.PipelineRunner
         /// </returns>
         public Task<bool> CheckDatabaseConnectionStringIsValid(IJob job)
         {
+            if (string.IsNullOrWhiteSpace(job.Config.ConnectionString))
+            {
+                throw new Exception("Connection String is empty or null");
+            }
+
             using (var conn = this.sqlConnectionFactory.GetConnection(job.Config.ConnectionString))
             {
                 conn.Open();
@@ -180,7 +192,7 @@ namespace Fabric.Databus.PipelineRunner
                     cmd.CommandTimeout = job.Config.SqlCommandTimeoutInSeconds;
                 }
 
-                cmd.CommandText = $";WITH CTE AS ( {load.Sql} )  SELECT TOP 1 * from CTE;";
+                cmd.CommandText = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddTopFilter(1).ToSqlString();
 
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
@@ -191,7 +203,6 @@ namespace Fabric.Databus.PipelineRunner
                     foundRow = true;
                 }
 
-
                 var numberOfColumns = reader.FieldCount;
 
                 var columnNames = new List<string>();
@@ -200,11 +211,6 @@ namespace Fabric.Databus.PipelineRunner
                 {
                     var columnName = reader.GetName(columnNumber);
                     columnNames.Add(columnName.ToUpper());
-                }
-
-                if (!columnNames.Contains(job.Config.TopLevelKeyColumn.ToUpper()))
-                {
-                    throw new Exception($"{job.Config.TopLevelKeyColumn} column not found in {load.Path} query");
                 }
 
                 for (int i = 1; i <= numberOfLevels; i++)
@@ -277,6 +283,26 @@ namespace Fabric.Databus.PipelineRunner
                 if (dataSource.SqlEntityColumnMappings == null)
                 {
                     throw new Exception("dataSource.SqlEntityColumnMappings cannot be null");
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public void ValidateDataSources(IJob job)
+        {
+            int i = 0;
+            foreach (var dataSource in job.Data.DataSources)
+            {
+                i++;
+                try
+                {
+                    this.CheckQueryIsValid(job, dataSource).Wait();
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(
+                        $"Error in dataSource index {i} with name [{dataSource.Name}] and path [{dataSource.Path}] and Sql [{dataSource.Sql}]",
+                        e);
                 }
             }
         }

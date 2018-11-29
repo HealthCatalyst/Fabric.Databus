@@ -91,6 +91,11 @@ namespace Fabric.Databus.PipelineRunner
         private const int TimeoutInMilliseconds = 30 * 60 * 1000; // 5 * 60 * 60 * 1000;
 
         /// <summary>
+        /// The default sql command timeout in seconds.
+        /// </summary>
+        private const int DefaultSqlCommandTimeoutInSeconds = 120;
+
+        /// <summary>
         /// The unity container.
         /// </summary>
         private readonly IUnityContainer container;
@@ -190,6 +195,8 @@ namespace Fabric.Databus.PipelineRunner
                     dataSource.Sql = GenerateSqlForDataSource(dataSource, config.TopLevelKeyColumn);
                 }
             }
+
+            this.container.Resolve<IConfigValidator>().ValidateDataSources(job);
 
             var sqlJobQueue = this.container.Resolve<IQueueManager>()
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
@@ -326,6 +333,8 @@ namespace Fabric.Databus.PipelineRunner
                 }
             }
 
+            this.container.Resolve<IConfigValidator>().ValidateDataSources(job);
+
             // add job to the first queue
             var sqlJobQueue = this.container.Resolve<IQueueManager>()
                 .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
@@ -382,9 +391,14 @@ namespace Fabric.Databus.PipelineRunner
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        private static string GenerateSqlForDataSource(IDataSource dataSource, string topLevelKeyColumn)
+        private string GenerateSqlForDataSource(IDataSource dataSource, string topLevelKeyColumn)
         {
-            return SqlSelectStatementGenerator.GetSqlStatement(dataSource.TableOrView, topLevelKeyColumn, dataSource.Relationships, dataSource.SqlEntityColumnMappings);
+            return SqlSelectStatementGenerator.GetSqlStatement(
+                dataSource.TableOrView,
+                topLevelKeyColumn,
+                dataSource.Relationships,
+                dataSource.SqlEntityColumnMappings,
+                this.container.Resolve<ISqlGeneratorFactory>());
         }
 
 
@@ -396,6 +410,11 @@ namespace Fabric.Databus.PipelineRunner
         /// </param>
         private void InitContainerWithDefaults(IQueryConfig config)
         {
+            if (!this.container.IsRegistered<ISqlGeneratorFactory>())
+            {
+                this.container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
+            }
+
             if (!this.container.IsRegistered<IQueueManager>())
             {
                 var queueManager = new QueueManager();
@@ -466,14 +485,20 @@ namespace Fabric.Databus.PipelineRunner
             if (!this.container.IsRegistered<IDatabusSqlReader>())
             {
                 var sqlConnectionFactory = this.container.Resolve<ISqlConnectionFactory>();
-                var databusSqlReader = new DatabusSqlReader(config.ConnectionString, config.SqlCommandTimeoutInSeconds, sqlConnectionFactory);
+                var sqlGeneratorFactory = this.container.Resolve<ISqlGeneratorFactory>();
+                var databusSqlReader = new DatabusSqlReader(
+                    config.ConnectionString,
+                    (config.SqlCommandTimeoutInSeconds == default(int)) ? DefaultSqlCommandTimeoutInSeconds : config.SqlCommandTimeoutInSeconds,
+                    sqlConnectionFactory,
+                    sqlGeneratorFactory);
                 this.container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
             }
 
             if (!this.container.IsRegistered<ISchemaLoader>())
             {
                 var sqlConnectionFactory = this.container.Resolve<ISqlConnectionFactory>();
-                var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn, sqlConnectionFactory);
+                var sqlGeneratorFactory = this.container.Resolve<ISqlGeneratorFactory>();
+                var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn, sqlConnectionFactory, sqlGeneratorFactory);
                 this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
             }
 

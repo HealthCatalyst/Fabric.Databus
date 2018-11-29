@@ -9,7 +9,6 @@
 
 namespace Fabric.Databus.Integration.Tests
 {
-    using System.Collections.Generic;
     using System.Data.Common;
     using System.Data.SQLite;
     using System.Diagnostics;
@@ -211,7 +210,6 @@ FROM Text
                 sql = "INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('2', 9002, 'Smith')";
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
-
 
                 using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
                 {

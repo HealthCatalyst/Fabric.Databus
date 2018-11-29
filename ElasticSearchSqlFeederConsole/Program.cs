@@ -24,7 +24,6 @@ namespace Fabric.Databus.Console
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
-    using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.JsonSchema;
     using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.Loggers;
@@ -102,22 +101,7 @@ namespace Fabric.Databus.Console
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
 
-                        container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
-                        container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
-                        container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
-                        container.RegisterType<IFileUploader, FileUploader>();
-
-                        container.RegisterType<IHttpClientFactory, HttpClientFactory>();
                         container.RegisterInstance(logger);
-
-                        if (config.Config.UseMultipleThreads)
-                        {
-                            container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
-                        }
-                        else
-                        {
-                            container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
-                        }
 
                         var pipelineRunner = new DatabusRunner();
 

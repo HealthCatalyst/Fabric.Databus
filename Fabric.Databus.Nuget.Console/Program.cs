@@ -18,14 +18,7 @@ namespace Fabric.Databus.Nuget.Console
     using Fabric.Databus.Client;
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
-    using Fabric.Databus.ElasticSearch;
-    using Fabric.Databus.Http;
-    using Fabric.Databus.Interfaces.ElasticSearch;
-    using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
-    using Fabric.Databus.Interfaces.Sql;
-    using Fabric.Databus.PipelineRunner;
-    using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.Loggers;
 
     using Serilog;
@@ -77,24 +70,7 @@ namespace Fabric.Databus.Nuget.Console
                     var container = new UnityContainer();
                     container.RegisterInstance<IProgressMonitor>(progressMonitor);
 
-                    var databusSqlReader = new DatabusSqlReader(config.Config.ConnectionString, 0);
-                    container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
-                    container.RegisterType<IElasticSearchUploaderFactory, ElasticSearchUploaderFactory>();
-                    container.RegisterType<IFileUploaderFactory, FileUploaderFactory>();
-                    container.RegisterType<IElasticSearchUploader, ElasticSearchUploader>();
-                    container.RegisterType<IFileUploader, FileUploader>();
-
-                    container.RegisterType<IHttpClientFactory, HttpClientFactory>();
                     container.RegisterInstance(logger);
-
-                    if (config.Config.UseMultipleThreads)
-                    {
-                        container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
-                    }
-                    else
-                    {
-                        container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
-                    }
 
                     var pipelineRunner = new DatabusRunner();
 

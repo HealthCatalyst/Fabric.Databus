@@ -127,6 +127,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Files\SingleEntity.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\MultipleEntities.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj">
       <Project>{c0ed4050-e7fb-4c68-adf1-6c8e290a2950}</Project>
       <Name>Fabric.Databus.Config</Name>
@@ -147,24 +153,14 @@
       <Project>{104c7335-d0b6-4587-a1a9-843c69042ae2}</Project>
       <Name>Fabric.Databus.SqlGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj">
-      <Project>{bb878905-9592-4a9d-a811-46e73d9f7f6a}</Project>
-      <Name>Fabric.Shared</Name>
+    <ProjectReference Include="..\Fabric.Shared.Tests\Fabric.Shared.Tests.csproj">
+      <Project>{95cd492e-6d4a-4d9f-a307-1ccadd7bb0ed}</Project>
+      <Name>Fabric.Shared.Tests</Name>
     </ProjectReference>
     <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
       <Project>{af1adf05-ec10-43ea-877e-ad504a113b58}</Project>
       <Name>Fabric.Databus.PipelineRunner</Name>
     </ProjectReference>
-    <ProjectReference Include="..\QueueItems\QueueItems.csproj">
-      <Project>{efc37d49-40fa-4f53-b956-b63f7eb47244}</Project>
-      <Name>QueueItems</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Files\SingleEntity.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Files\MultipleEntities.xml" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

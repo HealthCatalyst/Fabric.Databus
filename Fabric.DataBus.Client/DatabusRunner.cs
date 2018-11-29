@@ -51,15 +51,6 @@ namespace Fabric.Databus.Client
 
                 container.RegisterInstance(logger);
 
-                if (config.Config.UseMultipleThreads)
-                {
-                    container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
-                }
-                else
-                {
-                    container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
-                }
-
                 this.RunElasticSearchPipeline(container, config, cancellationToken);
             }
         }
@@ -125,6 +116,5 @@ namespace Fabric.Databus.Client
             var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
             container.Resolve<ILogger>().Verbose($"Finished in {timeElapsed} using {threadText}");
         }
-
     }
 }

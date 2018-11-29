@@ -12,7 +12,6 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Data.SqlClient;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -43,6 +42,7 @@ namespace Fabric.Databus.PipelineRunner
             this.sqlConnectionFactory = sqlConnectionFactory;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// The validate from text.
         /// </summary>
@@ -50,9 +50,9 @@ namespace Fabric.Databus.PipelineRunner
         /// The file contents.
         /// </param>
         /// <returns>
-        /// The <see cref="Task"/>.
+        /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        /// <exception cref="ArgumentNullException">exception thrown
+        /// <exception cref="T:System.ArgumentNullException">exception thrown
         /// </exception>
         public async Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents)
         {
@@ -239,14 +239,14 @@ namespace Fabric.Databus.PipelineRunner
                 throw new Exception("No connection string was passed");
             }
 
+            if (!this.CheckDatabaseConnectionStringIsValid(job).Result)
+            {
+                throw new Exception($"Unable to connect to connection string: [{job.Config.ConnectionString}]");
+            }
+
             if (string.IsNullOrWhiteSpace(job.Config.TopLevelKeyColumn))
             {
                 throw new Exception("No TopLevelKeyColumn was specified");
-            }
-
-            if (string.IsNullOrWhiteSpace(job.Config.LocalSaveFolder))
-            {
-
             }
 
             if (job.Data == null)

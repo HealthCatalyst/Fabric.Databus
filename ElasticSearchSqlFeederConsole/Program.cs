@@ -50,12 +50,7 @@ namespace Fabric.Databus.Console
         /// </exception>
         public static void Main(string[] args)
         {
-            if (!args.Any())
-            {
-                throw new Exception("Please pass the job.xml file as a parameter");
-            }
-
-            if (args[0] == "-generateschema")
+            if (args.Any() && args[0] == "-generateschema")
             {
                 if (args.Length < 2 || string.IsNullOrEmpty(args[1]))
                 {
@@ -72,7 +67,25 @@ namespace Fabric.Databus.Console
 
             try
             {
-                string inputFile = args[0];
+                string inputFile;
+                if (!args.Any())
+                {
+                    do
+                    {
+                        Console.Write("Enter path to xml file: ");
+                        inputFile = Console.ReadLine();
+                    }
+                    while (!File.Exists(inputFile));
+                }
+                else
+                {
+                    inputFile = args[0];
+                }
+
+                if (!File.Exists(inputFile))
+                {
+                    throw new Exception($"input file {inputFile} does not exist");
+                }
 
                 var config = new ConfigReader().ReadXml(inputFile);
 

@@ -49,7 +49,7 @@ namespace SqlImportPipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IDetailedTemporaryFileWriter fileWriter;
+        private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
 
         /// <inheritdoc />
         /// <summary>
@@ -70,7 +70,7 @@ namespace SqlImportPipelineStep
         /// <param name="progressMonitor">
         /// The progress monitor
         /// </param>
-        /// <param name="fileWriter">
+        /// <param name="detailedTemporaryFileWriter">
         /// file writer
         /// </param>
         /// <param name="cancellationToken">
@@ -82,17 +82,16 @@ namespace SqlImportPipelineStep
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
-            IDetailedTemporaryFileWriter fileWriter,
+            IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
-            if (this.fileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
-            {
-                this.folder = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
-            }
-
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
-            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
+            this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            {
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
+            }
         }
 
         /// <inheritdoc />
@@ -165,12 +164,12 @@ namespace SqlImportPipelineStep
             {
                 if (this.folder != null)
                 {
-                    var path = this.fileWriter.CombinePath(this.folder, queryId);
-                    this.fileWriter.CreateDirectory(path);
+                    var path = this.detailedTemporaryFileWriter.CombinePath(this.folder, queryId);
+                    this.detailedTemporaryFileWriter.CreateDirectory(path);
 
-                    var filepath = this.fileWriter.CombinePath(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
+                    var filepath = this.detailedTemporaryFileWriter.CombinePath(path, Convert.ToString(workItemBatchNumber) + "-exceptions.txt");
 
-                    await this.fileWriter.WriteToFileAsync(filepath, e.ToString());
+                    await this.detailedTemporaryFileWriter.WriteToFileAsync(filepath, e.ToString());
                 }
 
                 throw;
@@ -218,19 +217,19 @@ namespace SqlImportPipelineStep
                 this.MyLogger,
                 this.Config.TopLevelKeyColumn);
 
-            if (this.fileWriter?.IsWritingEnabled == true && this.folder != null)
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {
-                var path = this.fileWriter.CombinePath(this.fileWriter.CombinePath(this.folder, queryId), Convert.ToString(batchNumber));
+                var path = this.detailedTemporaryFileWriter.CombinePath(this.detailedTemporaryFileWriter.CombinePath(this.folder, queryId), Convert.ToString(batchNumber));
 
-                this.fileWriter.CreateDirectory(path);
+                this.detailedTemporaryFileWriter.CreateDirectory(path);
 
                 foreach (var frame in result.Data)
                 {
                     var key = frame.Key;
 
-                    var filepath = this.fileWriter.CombinePath(path, this.GetSafeFilename(Convert.ToString(key)) + ".csv");
+                    var filepath = this.detailedTemporaryFileWriter.CombinePath(path, this.GetSafeFilename(Convert.ToString(key)) + ".csv");
 
-                    using (var stream = this.fileWriter.OpenStreamForWriting(filepath))
+                    using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
                     {
                         using (var streamWriter = new StreamWriter(stream))
                         {

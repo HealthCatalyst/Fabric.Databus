@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlCombineSourceWrappersPipelineStep.cs" company="">
+// <copyright file="SqlCreateSourceWrappersPipelineStep.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlCombineSourceWrappersPipelineStep type.
+//   Defines the SqlCreateSourceWrappersPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,6 +11,7 @@ namespace SqlImportPipelineStep
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace SqlImportPipelineStep
     using BasePipelineStep;
 
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Shared;
@@ -30,12 +32,22 @@ namespace SqlImportPipelineStep
     /// <summary>
     /// The sql combine source wrappers pipeline step.
     /// </summary>
-    public class SqlCombineSourceWrappersPipelineStep : BasePipelineStep<SqlDataLoadedQueueItem, SourceWrapperCollectionQueueItem>
+    public class SqlCreateSourceWrappersPipelineStep : BasePipelineStep<SqlDataLoadedQueueItem, SourceWrapperCollectionQueueItem>
     {
+        /// <summary>
+        /// The detailed temporary file writer.
+        /// </summary>
+        private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
+
         /// <summary>
         /// The source wrapper collection.
         /// </summary>
         private readonly SourceWrapperCollection sourceWrapperCollection = new SourceWrapperCollection();
+
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
 
         /// <summary>
         /// Gets or sets the batch number.
@@ -43,26 +55,33 @@ namespace SqlImportPipelineStep
         private int batchNumber;
 
         /// <inheritdoc />
-        public SqlCombineSourceWrappersPipelineStep(
+        public SqlCreateSourceWrappersPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
+            IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
+            this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
+
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            {
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
+            }
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "SqlCombineSourceWrappers";
+        protected override sealed string LoggerName => "SqlCreateSourceWrappers";
 
         /// <inheritdoc />
-        protected override Task HandleAsync(SqlDataLoadedQueueItem workItem)
+        protected override async Task HandleAsync(SqlDataLoadedQueueItem workItem)
         {
             var keyLevels = workItem.PropertyName.Count(c => c == '.');
 
             var keys = new List<string>();
-            for (int i = 0; i < keyLevels + 1; i++)
+            for (var i = 0; i < keyLevels + 1; i++)
             {
                 var keyLevelColumnName = $"KeyLevel{i + 1}";
                 if (workItem.Columns.Any(c => c.Name.Equals(keyLevelColumnName)))
@@ -81,8 +100,31 @@ namespace SqlImportPipelineStep
                     workItem.PropertyType != "object",
                     this.Config.KeepTemporaryLookupColumnsInOutput));
 
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                var filepath = this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.QueryId}.csv");
+
+                this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
+
+                using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
+                {
+                    using (var streamWriter = new StreamWriter(stream))
+                    {
+                        var columns = workItem.Columns.Select(c => c.Name).ToList();
+                        var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
+
+                        await streamWriter.WriteLineAsync(text);
+
+                        var lines = workItem.Rows.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
+                        foreach (var line in lines)
+                        {
+                            await streamWriter.WriteLineAsync(line);
+                        }
+                    }
+                }
+            }
+
             this.batchNumber = workItem.BatchNumber;
-            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -107,7 +149,6 @@ namespace SqlImportPipelineStep
                     BatchNumber = this.batchNumber,
                     SourceWrapperCollection = this.sourceWrapperCollection
                 });
-
             }
 
             return base.CompleteAsync(queryId, isLastThreadForThisTask);

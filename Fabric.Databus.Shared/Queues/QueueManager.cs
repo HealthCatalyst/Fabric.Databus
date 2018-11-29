@@ -12,10 +12,12 @@ namespace Fabric.Databus.Shared.Queues
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
 
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Shared;
 
     /// <summary>
     /// The queue manager.
@@ -157,7 +159,7 @@ namespace Fabric.Databus.Shared.Queues
             var queueName = this.GetQueueName<T>(id);
             if (!this.queues.ContainsKey(queueName))
             {
-                throw new ArgumentException($"No queue found with name: {queueName}");
+                throw new ArgumentException($"No queue found with name: {queueName}.  Current queues: {this.queues.OrderBy(q=>q.Key).Select(q=>q.Key).ToCsv()}");
             }
 
             var blockingCollection = this.queues[queueName];

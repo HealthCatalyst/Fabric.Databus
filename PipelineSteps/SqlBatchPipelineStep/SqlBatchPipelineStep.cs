@@ -10,13 +10,11 @@
 namespace SqlBatchPipelineStep
 {
     using System;
-    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
     using BasePipelineStep;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Loggers;
@@ -35,7 +33,7 @@ namespace SqlBatchPipelineStep
         /// <summary>
         /// The file writer.
         /// </summary>
-        private readonly IDetailedTemporaryFileWriter fileWriter;
+        private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
 
         /// <summary>
         /// The folder.
@@ -54,22 +52,22 @@ namespace SqlBatchPipelineStep
         /// </param>
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
-        /// <param name="fileWriter"></param>
+        /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="cancellationToken"></param>
         public SqlBatchPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
-            IDetailedTemporaryFileWriter fileWriter,
+            IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
-            this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
+            this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
 
-            if (this.fileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
-                this.folder = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
             }
         }
 
@@ -102,20 +100,22 @@ namespace SqlBatchPipelineStep
                     });
             }
 
-            if (this.fileWriter?.IsWritingEnabled == true && this.folder != null)
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {
                 foreach (var workItemLoad in workItem.Loads)
                 {
                     var queryName = workItemLoad.Path ?? "Main";
                     var queryId = queryName;
 
-                    var path = this.fileWriter.CombinePath(this.folder, queryId);
+                    var path = this.detailedTemporaryFileWriter.CombinePath(this.folder, queryId);
 
-                    this.fileWriter.CreateDirectory(path);
+                    this.detailedTemporaryFileWriter.CreateDirectory(path);
 
-                    var filepath = this.fileWriter.CombinePath(path, Convert.ToString(workItem.BatchNumber) + ".txt");
+                    var filepath = this.detailedTemporaryFileWriter.CombinePath(path, Convert.ToString(workItem.BatchNumber) + ".xml");
 
-                    await this.fileWriter.WriteToFileAsync(filepath, $"start: {workItem.Start}, end: {workItem.End}");
+                    await this.detailedTemporaryFileWriter.WriteToFileAsync(
+                        filepath,
+                        $@"<?xml version=""1.0""?><batch><start>{workItem.Start}</start><end>{workItem.End}</end><sql>{workItemLoad.Sql}</sql></batch>");
                 }
             }
 

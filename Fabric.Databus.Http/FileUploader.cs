@@ -136,7 +136,7 @@ namespace Fabric.Databus.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        virtual protected async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        protected virtual async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             try
             {

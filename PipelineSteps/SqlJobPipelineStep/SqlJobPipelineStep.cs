@@ -18,8 +18,8 @@ namespace SqlJobPipelineStep
     using BasePipelineStep;
 
     using Fabric.Databus.Config;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
@@ -39,6 +39,16 @@ namespace SqlJobPipelineStep
         /// </summary>
         private readonly IDatabusSqlReader databusSqlReader;
 
+        /// <summary>
+        /// The file writer.
+        /// </summary>
+        private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
+
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private readonly string folder;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:SqlJobPipelineStep.SqlJobPipelineStep" /> class.
@@ -56,6 +66,7 @@ namespace SqlJobPipelineStep
         /// The progress Monitor.
         /// </param>
         /// <param name="databusSqlReader"></param>
+        /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="cancellationToken"></param>
         public SqlJobPipelineStep(
             IJobConfig jobConfig, 
@@ -63,14 +74,20 @@ namespace SqlJobPipelineStep
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
             IDatabusSqlReader databusSqlReader,
+            IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
+            this.detailedTemporaryFileWriter = detailedTemporaryFileWriter;
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            {
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
+            }
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "SqlJob";
+        protected override sealed string LoggerName => "SqlJob";
 
         /// <inheritdoc />
         /// <summary>
@@ -92,6 +109,15 @@ namespace SqlJobPipelineStep
                                               End = null,
                                               Loads = workItem.Job.Data.DataSources,
                                           });
+
+                if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+                {
+                    this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
+
+                    await this.detailedTemporaryFileWriter.WriteToFileAsync(
+                        this.detailedTemporaryFileWriter.CombinePath(this.folder, "1.txt"),
+                        "start=null, end=null");
+                }
             }
             else
             {
@@ -114,6 +140,15 @@ namespace SqlJobPipelineStep
                                     .Select(g => g.First())
                                     .ToDictionary(a => a.Path, a => a.PropertyType)
                             });
+
+                    if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+                    {
+                        this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
+
+                        await this.detailedTemporaryFileWriter.WriteToFileAsync(
+                            this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{currentBatchNumber}.txt"),
+                            $"start={range.Item1}, end={range.Item2}");
+                    }
                 }
             }
         }
@@ -141,7 +176,7 @@ namespace SqlJobPipelineStep
         /// The job.
         /// </param>
         /// <returns>
-        /// The <see cref="IEnumerable"/>.
+        /// The <see cref="IEnumerable{T}"/>.
         /// </returns>
         private async Task<IEnumerable<Tuple<string, string>>> CalculateRangesAsync(IJob job)
         {

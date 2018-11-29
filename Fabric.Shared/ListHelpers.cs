@@ -111,7 +111,7 @@ namespace Fabric.Shared
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        public static string ToCsv(this List<string> list)
+        public static string ToCsv(this IEnumerable<string> list)
         {
             return string.Join(",", list);
         }

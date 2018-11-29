@@ -18,7 +18,8 @@
         <xs:element name="Config">
           <xs:complexType>
             <xs:all minOccurs="0" maxOccurs="1">
-                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="ConnectionString"/>
+                <xs:element minOccurs="1" maxOccurs="1" type="xs:string" name="ConnectionString"/>
+                <xs:element minOccurs="1" maxOccurs="1" type="xs:string" name="TopLevelKeyColumn"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Url"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Index"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Alias"/>
@@ -32,7 +33,6 @@
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="WriteDetailedTemporaryFilesToDisk"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="CompressFiles"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UploadToElasticSearch"/>
-                <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="TopLevelKeyColumn"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="KeepTemporaryLookupColumnsInOutput"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UseMultipleThreads"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="SqlCommandTimeoutInSeconds"/>

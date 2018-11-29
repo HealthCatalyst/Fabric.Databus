@@ -276,7 +276,7 @@ namespace Fabric.Databus.PipelineRunner
                         new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 5 },
-                        new PipelineStepInfo { Type = typeof(SqlCombineSourceWrappersPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlCreateSourceWrappersPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(WriteSourceWrapperCollectionToJsonPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(SaveJsonToFilePipelineStep), Count = 1 }
                     });
@@ -291,15 +291,15 @@ namespace Fabric.Databus.PipelineRunner
                         });
             }
 
-            if (config.WriteTemporaryFilesToDisk)
-            {
-                processors.Add(new PipelineStepInfo { Type = typeof(FileSavePipelineStep), Count = 1 });
-            }
-
             if (config.UploadToElasticSearch)
             {
                 if (name == PipelineNames.ElasticSearch)
                 {
+                    if (config.WriteTemporaryFilesToDisk)
+                    {
+                        processors.Add(new PipelineStepInfo { Type = typeof(FileSavePipelineStep), Count = 1 });
+                    }
+
                     processors.Add(new PipelineStepInfo { Type = typeof(FileUploadPipelineStep), Count = 1 });
                 }
                 else

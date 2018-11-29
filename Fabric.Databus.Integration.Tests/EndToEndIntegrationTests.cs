@@ -25,6 +25,8 @@ namespace Fabric.Databus.Integration.Tests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using Newtonsoft.Json.Linq;
+
     using Unity;
 
     /// <summary>
@@ -139,12 +141,19 @@ namespace Fabric.Databus.Integration.Tests
                         pipelineRunner.RunRestApiPipeline(config);
 
                         Assert.AreEqual(1, integrationTestFileWriter.Count);
-                        string expected =
-                            @"{""TextID"":""1"",""PatientID"":9001,""TextTXT"":""This is my first note""}";
+
+                        JObject expectedJson = new JObject(
+                            new JProperty("TextID", "1"),
+                            new JProperty("PatientID", 9001),
+                            new JProperty("TextTXT", "This is my first note"));
 
                         var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath));
-                        Assert.AreEqual(expected, integrationTestFileWriter.GetContents(expectedPath));
+
+                        Assert.IsTrue(
+                            JToken.DeepEquals(
+                                expectedJson,
+                                JObject.Parse(integrationTestFileWriter.GetContents(expectedPath))));
 
                         stopwatch.Stop();
                     }
@@ -152,13 +161,12 @@ namespace Fabric.Databus.Integration.Tests
                     connection.Close();
                 }
             }
-        }        
-        
+        }
+
         /// <summary>
         /// The can run successfully end to end.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void CanRunMultipleEntitiesEndToEnd()
         {
             string connectionString = "Data Source=:memory:";
@@ -223,14 +231,39 @@ namespace Fabric.Databus.Integration.Tests
 
                         Assert.AreEqual(2, integrationTestFileWriter.Count);
                         var expectedPath1 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
-                        var expectedPath2 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "2.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath1));
+
+                        JObject expectedJson1 = new JObject(
+                            new JProperty("TextID", "1"),
+                            new JProperty("PatientID", 9001),
+                            new JProperty("TextTXT", "This is my first note"),
+                            new JProperty(
+                                "patients",
+                                new JObject(
+                                    new JProperty("TextID", "1"),
+                                    new JProperty("PatientID", 9001),
+                                    new JProperty("PatientLastNM", "Jones"))));
+
+                        var contents = integrationTestFileWriter.GetContents(expectedPath1);
+                        var actualJson1 = JObject.Parse(contents);
+                        Assert.IsTrue(JToken.DeepEquals(expectedJson1, actualJson1), $"Expected:<{expectedJson1}>. Actual<{actualJson1}>");
+
+                        var expectedPath2 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "2.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath2));
+                        JObject expectedJson2 = new JObject(
+                            new JProperty("TextID", "2"),
+                            new JProperty("PatientID", 9002),
+                            new JProperty("TextTXT", "This is my second note"),
+                            new JProperty(
+                                "patients",
+                                new JObject(
+                                    new JProperty("TextID", "2"),
+                                    new JProperty("PatientID", 9002),
+                                    new JProperty("PatientLastNM", "Smith"))));
 
-                        string expected1 =
-                            @"{""TextID"":""1"",""PatientID"":9001,""TextTXT"":""This is my first note""}";
-
-                        Assert.AreEqual(expected1, integrationTestFileWriter.GetContents(expectedPath1));
+                        var contents2 = integrationTestFileWriter.GetContents(expectedPath2);
+                        var actualJson2 = JObject.Parse(contents2);
+                        Assert.IsTrue(JToken.DeepEquals(expectedJson2, actualJson2), $"Expected:<{expectedJson2}>. Actual<{actualJson2}>");
 
                         stopwatch.Stop();
                     }

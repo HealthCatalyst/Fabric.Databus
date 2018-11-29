@@ -35,7 +35,7 @@
         </xs:element>
         <xs:element name="Data">
           <xs:complexType>
-            <xs:all>
+            <xs:sequence>
               <xs:element name="DataModel" minOccurs="0" maxOccurs="1"/>
               <xs:element name="DataSource" maxOccurs="unbounded" minOccurs="1">
                 <xs:complexType>
@@ -79,12 +79,13 @@
                     </xs:element>
                     <xs:element type="xs:string" name="Sql" minOccurs="0" maxOccurs="1"/>
                   </xs:sequence>
+                  <xs:attribute type="xs:string" name="Name" use="optional"/>
                   <xs:attribute type="xs:string" name="Path" use="optional"/>
                   <xs:attribute type="xs:string" name="TableOrView" use="optional"/>
                   <xs:attribute type="propertyType" name="PropertyType" use="optional"/>
                 </xs:complexType>
               </xs:element>
-            </xs:all>
+            </xs:sequence>
           </xs:complexType>
         </xs:element>
       </xs:sequence>

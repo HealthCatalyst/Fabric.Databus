@@ -3,7 +3,6 @@
      xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
     <ConnectionString>server=(local);initial catalog=DatabusTest;Trusted_Connection=True;</ConnectionString>
-    <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <Url>http://localhost:9200</Url>
     <MaximumEntitiesToLoad>1000</MaximumEntitiesToLoad>
     <EntitiesPerBatch>100</EntitiesPerBatch>

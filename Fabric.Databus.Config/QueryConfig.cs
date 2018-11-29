@@ -20,6 +20,12 @@ namespace Fabric.Databus.Config
     [DataContract(Name = "Config", Namespace = "")]
     public class QueryConfig : IQueryConfig
     {
+        /// <summary>
+        /// The default sql command timeout in seconds.
+        /// </summary>
+        private const int DefaultSqlCommandTimeoutInSeconds = 120;
+
+
         /// <inheritdoc />
         [DataMember]
         public string Name { get; set; }
@@ -102,7 +108,7 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public int SqlCommandTimeoutInSeconds { get; set; }
+        public int SqlCommandTimeoutInSeconds { get; set; } = DefaultSqlCommandTimeoutInSeconds;
 
         /// <inheritdoc />
         [DataMember]

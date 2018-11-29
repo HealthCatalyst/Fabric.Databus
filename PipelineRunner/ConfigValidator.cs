@@ -203,26 +203,6 @@ namespace Fabric.Databus.PipelineRunner
                     foundRow = true;
                 }
 
-                var numberOfColumns = reader.FieldCount;
-
-                var columnNames = new List<string>();
-
-                for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++)
-                {
-                    var columnName = reader.GetName(columnNumber);
-                    columnNames.Add(columnName.ToUpper());
-                }
-
-                for (int i = 1; i <= numberOfLevels; i++)
-                {
-                    var keyColumnName = ("KeyLevel" + i).ToUpper();
-
-                    if (!columnNames.Contains(keyColumnName))
-                    {
-                        throw new Exception($"{keyColumnName} column not found in {load.Path} query");
-                    }
-                }
-
                 return foundRow;
             }
         }

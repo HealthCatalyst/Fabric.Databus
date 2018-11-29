@@ -91,11 +91,6 @@ namespace Fabric.Databus.PipelineRunner
         private const int TimeoutInMilliseconds = 30 * 60 * 1000; // 5 * 60 * 60 * 1000;
 
         /// <summary>
-        /// The default sql command timeout in seconds.
-        /// </summary>
-        private const int DefaultSqlCommandTimeoutInSeconds = 120;
-
-        /// <summary>
         /// The unity container.
         /// </summary>
         private readonly IUnityContainer container;
@@ -488,7 +483,7 @@ namespace Fabric.Databus.PipelineRunner
                 var sqlGeneratorFactory = this.container.Resolve<ISqlGeneratorFactory>();
                 var databusSqlReader = new DatabusSqlReader(
                     config.ConnectionString,
-                    (config.SqlCommandTimeoutInSeconds == default(int)) ? DefaultSqlCommandTimeoutInSeconds : config.SqlCommandTimeoutInSeconds,
+                    config.SqlCommandTimeoutInSeconds,
                     sqlConnectionFactory,
                     sqlGeneratorFactory);
                 this.container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);

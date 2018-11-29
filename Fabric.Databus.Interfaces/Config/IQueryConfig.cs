@@ -71,5 +71,10 @@ namespace Fabric.Databus.Interfaces.Config
         /// Gets or sets a value indicating whether use multiple threads.
         /// </summary>
         bool UseMultipleThreads { get; set; }
+
+        /// <summary>
+        /// Gets or sets the pipeline.
+        /// </summary>
+        PipelineNames Pipeline { get; set; }
     }
 }

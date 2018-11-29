@@ -5,6 +5,12 @@
       <xs:enumeration value="array" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="pipelineName">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ElasticSearch" />
+      <xs:enumeration value="RestApi" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:element name="Job">
     <xs:complexType>
@@ -30,6 +36,7 @@
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="KeepTemporaryLookupColumnsInOutput"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UseMultipleThreads"/>
                 <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="SqlCommandTimeoutInSeconds"/>
+                <xs:element minOccurs="0" maxOccurs="1" type="pipelineName" name="Pipeline"/>
             </xs:all>
           </xs:complexType>
         </xs:element>

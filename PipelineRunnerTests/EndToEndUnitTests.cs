@@ -63,7 +63,8 @@ namespace PipelineRunnerTests
                     TopLevelKeyColumn = "AliasPatientID",
                     Url = "http://foo",
                     UploadToElasticSearch = false,
-                    EntitiesPerUploadFile = 1
+                    EntitiesPerUploadFile = 1,
+                    Pipeline = PipelineNames.ElasticSearch
                 },
                 Data = new JobData
                 {
@@ -149,7 +150,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunElasticSearchPipeline(job);
+                        pipelineRunner.RunPipeline(job);
                     }
                     catch (OperationCanceledException e)
                     {
@@ -194,7 +195,8 @@ namespace PipelineRunnerTests
                     TopLevelKeyColumn = "AliasPatientID",
                     Url = "http://foo",
                     UploadToElasticSearch = false,
-                    EntitiesPerUploadFile = 1
+                    EntitiesPerUploadFile = 1,
+                    Pipeline = PipelineNames.ElasticSearch
                 },
                 Data = new JobData
                 {
@@ -280,7 +282,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunElasticSearchPipeline(job);
+                        pipelineRunner.RunPipeline(job);
                     }
                     catch (OperationCanceledException e)
                     {

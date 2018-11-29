@@ -13,6 +13,7 @@
     <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
     <SqlCommandTimeoutInSeconds>300</SqlCommandTimeoutInSeconds>
+    <Pipeline>RestApi</Pipeline>
   </Config>
 
   <Data>

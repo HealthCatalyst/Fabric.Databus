@@ -12,7 +12,6 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Threading;
 
     using CreateBatchItemsPipelineStep;
@@ -49,8 +48,6 @@ namespace Fabric.Databus.PipelineRunner
     using JsonDocumentMergerPipelineStep;
 
     using MappingUploadPipelineStep;
-
-    using Nest;
 
     using QueueItems;
 
@@ -121,12 +118,12 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public void RunElasticSearchPipeline(IJob config, IJobStatusTracker jobStatusTracker)
+        public void RunPipeline(IJob job, IJobStatusTracker jobStatusTracker)
         {
             jobStatusTracker.TrackStart();
             try
             {
-                this.RunElasticSearchPipeline(config);
+                this.RunPipeline(job);
             }
             catch (Exception e)
             {
@@ -137,151 +134,8 @@ namespace Fabric.Databus.PipelineRunner
             jobStatusTracker.TrackCompletion();
         }
 
-        /// <summary>
-        /// The run pipeline.
-        /// </summary>
-        /// <param name="job">
-        /// The job.
-        /// </param>
-        public void RunElasticSearchPipeline(IJob job)
-        {
-            if (job == null)
-            {
-                throw new ArgumentNullException(nameof(job));
-            }
-            if (job.Config == null)
-            {
-                throw new ArgumentNullException(nameof(job.Config));
-            }
-
-
-            var config = job.Config;
-            this.InitContainerWithDefaults(config);
-
-            this.container.Resolve<IConfigValidator>().ValidateJob(job);
-
-            if (config.WriteTemporaryFilesToDisk)
-            {
-                this.container.Resolve<IFileWriter>().DeleteDirectory(config.LocalSaveFolder);
-            }
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            int loadNumber = 0;
-
-            // add sequence number to every load
-            foreach (var dataSource in job.Data.DataSources)
-            {
-                dataSource.SequenceNumber = ++loadNumber;
-
-                // support older syntax
-                if (dataSource.Path == null)
-                {
-                    dataSource.Path = "$";
-                }
-                else if (!dataSource.Path.StartsWith("$"))
-                {
-                    dataSource.Path = $"$.{dataSource.Path}";
-                }
-
-                if (string.IsNullOrEmpty(dataSource.Sql))
-                {
-                    dataSource.Sql = GenerateSqlForDataSource(dataSource, config.TopLevelKeyColumn);
-                }
-            }
-
-            this.container.Resolve<IConfigValidator>().ValidateDataSources(job);
-
-            var sqlJobQueue = this.container.Resolve<IQueueManager>()
-                .CreateInputQueue<SqlJobQueueItem>(++this.stepNumber);
-
-            sqlJobQueue.Add(new SqlJobQueueItem
-            {
-                Job = job
-            });
-
-            sqlJobQueue.CompleteAdding();
-
-            var processors = new List<PipelineStepInfo>();
-
-            if (config.DropAndReloadIndex)
-            {
-                processors.AddRange(
-                    new List<PipelineStepInfo>
-                        {
-                            new PipelineStepInfo { Type = typeof(SqlGetSchemaPipelineStep), Count = 1 },
-                            new PipelineStepInfo { Type = typeof(SaveSchemaPipelineStep), Count = 1 },
-                            new PipelineStepInfo
-                                {
-                                    Type = config.UploadToElasticSearch
-                                               ? typeof(MappingUploadPipelineStep)
-                                               : typeof(DummyMappingUploadPipelineStep),
-                                    Count = 1
-                                }
-                        });
-            }
-
-            processors.AddRange(
-                new List<PipelineStepInfo>
-                    {
-                        new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 15 },
-                        new PipelineStepInfo { Type = typeof(SqlCombineSourceWrappersPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(WriteSourceWrapperCollectionToJsonPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(CreateBatchItemsPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }
-                    });
-
-            if (config.WriteTemporaryFilesToDisk)
-            {
-                processors.Add(new PipelineStepInfo
-                {
-                    Type = typeof(FileSavePipelineStep),
-                    Count = 1
-                });
-            }
-
-            if (config.UploadToElasticSearch)
-            {
-                processors.Add(new PipelineStepInfo
-                {
-                    Type = typeof(FileUploadPipelineStep),
-                    Count = 1
-                });
-            }
-
-            var elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
-            IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(
-                                                            config.ElasticSearchUserName,
-                                                            config.ElasticSearchPassword,
-                                                            false,
-                                                            config.Urls,
-                                                            config.Index,
-                                                            config.Alias,
-                                                            config.EntityType);
-
-            this.container.RegisterInstance(elasticSearchUploader);
-
-            var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
-
-            var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
-
-            pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
-
-            var stopwatchElapsed = stopwatch.Elapsed;
-            stopwatch.Stop();
-            Console.WriteLine(stopwatchElapsed);
-        }
-
-        /// <summary>
-        /// The run pipeline.
-        /// </summary>
-        /// <param name="job">
-        /// The job.
-        /// </param>
-        public void RunRestApiPipeline(IJob job)
+        /// <inheritdoc />
+        public void RunPipeline(IJob job)
         {
             if (job == null)
             {
@@ -324,7 +178,7 @@ namespace Fabric.Databus.PipelineRunner
 
                 if (string.IsNullOrEmpty(dataSource.Sql))
                 {
-                    dataSource.Sql = GenerateSqlForDataSource(dataSource, config.TopLevelKeyColumn);
+                    dataSource.Sql = this.GenerateSqlForDataSource(dataSource, config.TopLevelKeyColumn);
                 }
             }
 
@@ -341,23 +195,7 @@ namespace Fabric.Databus.PipelineRunner
 
             sqlJobQueue.CompleteAdding();
 
-            var processors = new List<PipelineStepInfo>();
-
-            processors.AddRange(
-                new List<PipelineStepInfo>
-                    {
-                        new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 5 },
-                        new PipelineStepInfo { Type = typeof(SqlCombineSourceWrappersPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(WriteSourceWrapperCollectionToJsonPipelineStep), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(SaveJsonToFilePipelineStep), Count = 1 }
-                    });
-
-            if (config.UploadToElasticSearch)
-            {
-                processors.Add(new PipelineStepInfo { Type = typeof(SendToRestApiPipelineStep), Count = 1 });
-            }
+            var processors = this.GetPipelineByName(config.Pipeline, config);
 
             var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
             var fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, config.Urls);
@@ -396,6 +234,97 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.Resolve<ISqlGeneratorFactory>());
         }
 
+        /// <summary>
+        /// The get pipeline by name.
+        /// </summary>
+        /// <param name="name">
+        /// The name.
+        /// </param>
+        /// <param name="config">
+        /// The config.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IList{T}"/>.
+        /// </returns>
+        private IList<PipelineStepInfo> GetPipelineByName(PipelineNames name, IQueryConfig config)
+        {
+            var processors = new List<PipelineStepInfo>();
+
+            if (name == PipelineNames.ElasticSearch)
+            {
+                if (config.DropAndReloadIndex)
+                {
+                    processors.AddRange(
+                        new List<PipelineStepInfo>
+                            {
+                                new PipelineStepInfo { Type = typeof(SqlGetSchemaPipelineStep), Count = 1 },
+                                new PipelineStepInfo { Type = typeof(SaveSchemaPipelineStep), Count = 1 },
+                                new PipelineStepInfo
+                                    {
+                                        Type = config.UploadToElasticSearch
+                                                   ? typeof(MappingUploadPipelineStep)
+                                                   : typeof(DummyMappingUploadPipelineStep),
+                                        Count = 1
+                                    }
+                            });
+                }
+            }
+
+            processors.AddRange(
+                new List<PipelineStepInfo>
+                    {
+                        new PipelineStepInfo { Type = typeof(SqlJobPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlBatchPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SqlImportPipelineStep), Count = 5 },
+                        new PipelineStepInfo { Type = typeof(SqlCombineSourceWrappersPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(WriteSourceWrapperCollectionToJsonPipelineStep), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(SaveJsonToFilePipelineStep), Count = 1 }
+                    });
+
+            if (name == PipelineNames.ElasticSearch)
+            {
+                processors.AddRange(
+                    new List<PipelineStepInfo>
+                        {
+                            new PipelineStepInfo { Type = typeof(CreateBatchItemsPipelineStep), Count = 1 },
+                            new PipelineStepInfo { Type = typeof(SaveBatchPipelineStep), Count = 1 }
+                        });
+            }
+
+            if (config.WriteTemporaryFilesToDisk)
+            {
+                processors.Add(new PipelineStepInfo { Type = typeof(FileSavePipelineStep), Count = 1 });
+            }
+
+            if (config.UploadToElasticSearch)
+            {
+                if (name == PipelineNames.ElasticSearch)
+                {
+                    processors.Add(new PipelineStepInfo { Type = typeof(FileUploadPipelineStep), Count = 1 });
+                }
+                else
+                {
+                    processors.Add(new PipelineStepInfo { Type = typeof(SendToRestApiPipelineStep), Count = 1 });
+                }
+            }
+
+            if (name == PipelineNames.ElasticSearch)
+            {
+                var elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
+                IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(
+                    config.ElasticSearchUserName,
+                    config.ElasticSearchPassword,
+                    false,
+                    config.Urls,
+                    config.Index,
+                    config.Alias,
+                    config.EntityType);
+
+                this.container.RegisterInstance(elasticSearchUploader);
+            }
+
+            return processors;
+        }
 
         /// <summary>
         /// The init container with defaults.

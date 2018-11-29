@@ -114,10 +114,11 @@ namespace Fabric.Databus.Config
         [DataMember]
         public bool KeepIndexOnline { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether use multiple threads.
-        /// </summary>
+        /// <inheritdoc />
         [DataMember]
         public bool UseMultipleThreads { get; set; }
+
+        /// <inheritdoc />
+        public PipelineNames Pipeline { get; set; } = PipelineNames.RestApi;
     }
 }

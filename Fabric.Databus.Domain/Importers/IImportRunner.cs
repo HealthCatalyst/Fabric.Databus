@@ -11,7 +11,6 @@ namespace Fabric.Databus.Domain.Importers
 {
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Jobs;
-    using Fabric.Databus.Interfaces;
 
     /// <summary>
     /// The ImportRunner interface.
@@ -21,12 +20,20 @@ namespace Fabric.Databus.Domain.Importers
         /// <summary>
         /// The run pipeline.
         /// </summary>
-        /// <param name="config">
-        /// The config.
+        /// <param name="job">
+        /// The job.
+        /// </param>
+        void RunPipeline(IJob job);
+
+        /// <summary>
+        /// The run pipeline.
+        /// </summary>
+        /// <param name="job">
+        /// The job.
         /// </param>
         /// <param name="jobStatusTracker">
         /// The job status tracker.
         /// </param>
-        void RunElasticSearchPipeline(IJob config, IJobStatusTracker jobStatusTracker);
+        void RunPipeline(IJob job, IJobStatusTracker jobStatusTracker);
     }
 }

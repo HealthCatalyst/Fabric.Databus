@@ -145,7 +145,7 @@ FROM Text
 
                         var config = new ConfigReader().ReadXmlFromText(fileContents);
 
-                        pipelineRunner.RunRestApiPipeline(config);
+                        pipelineRunner.RunPipeline(config);
 
                         Assert.AreEqual(1, integrationTestFileWriter.Count);
 
@@ -235,7 +235,7 @@ FROM Text
 
                         var config = new ConfigReader().ReadXmlFromText(fileContents);
 
-                        pipelineRunner.RunRestApiPipeline(config);
+                        pipelineRunner.RunPipeline(config);
 
                         Assert.AreEqual(2, integrationTestFileWriter.Count);
                         var expectedPath1 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");

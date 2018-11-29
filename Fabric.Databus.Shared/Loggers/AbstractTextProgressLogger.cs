@@ -9,7 +9,10 @@
 
 namespace Fabric.Databus.Shared.Loggers
 {
+    using System;
+
     using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Shared;
 
     /// <inheritdoc />
     /// <summary>
@@ -80,6 +83,13 @@ namespace Fabric.Databus.Shared.Loggers
                 $"{Key,30} {LoggerName,25}({QueueProcessorCount,3}/{MaxQueueProcessorCount,3}) {InQueueCount,7} {Processed,10} {Out,7} {Time,15} {Dictionary,7} {Complete}";
 
             this.AppendLine(text);
+        }
+
+        /// <inheritdoc />
+        public void LogFooter()
+        {
+            var memoryInBytes = GC.GetTotalMemory(false);
+            this.AppendLine($"Memory Working set: {memoryInBytes.ToDisplayString()}");
         }
     }
 }

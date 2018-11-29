@@ -40,5 +40,10 @@ namespace Fabric.Databus.Shared.Loggers
         public void LogHeader()
         {
         }
+
+        /// <inheritdoc />
+        public void LogFooter()
+        {
+        }
     }
 }

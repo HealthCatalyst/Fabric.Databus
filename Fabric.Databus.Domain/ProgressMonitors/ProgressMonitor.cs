@@ -159,6 +159,8 @@ namespace Fabric.Databus.Domain.ProgressMonitors
             {
                 this.progressLogger.LogProgressMonitorItem(progressMonitorItem.Key, progressMonitorItem.Value);
             }
+
+            this.progressLogger.LogFooter();
         }
     }
 }

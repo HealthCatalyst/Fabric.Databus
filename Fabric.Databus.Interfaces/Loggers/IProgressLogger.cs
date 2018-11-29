@@ -42,5 +42,10 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// The log header.
         /// </summary>
         void LogHeader();
+
+        /// <summary>
+        /// The log footer.
+        /// </summary>
+        void LogFooter();
     }
 }

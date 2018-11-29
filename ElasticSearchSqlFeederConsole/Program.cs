@@ -27,6 +27,7 @@ namespace Fabric.Databus.Console
     using Fabric.Databus.JsonSchema;
     using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.Loggers;
+    using Fabric.Shared;
 
     using PipelineRunner;
 
@@ -117,9 +118,13 @@ namespace Fabric.Databus.Console
                 }
 
                 stopwatch.Stop();
+
+                GC.Collect();
+
                 var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
                 var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
-                Console.WriteLine($"Finished in {timeElapsed} using {threadText}");
+                var memoryInBytes = GC.GetTotalMemory(true);
+                Console.WriteLine($"Finished in {timeElapsed} using {threadText}, Memory Working set: {memoryInBytes.ToDisplayString()}");
 
 #if TRUE
                 logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);

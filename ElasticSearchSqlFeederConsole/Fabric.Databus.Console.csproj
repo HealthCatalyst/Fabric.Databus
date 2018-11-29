@@ -219,6 +219,10 @@
       <Project>{104c7335-d0b6-4587-a1a9-843c69042ae2}</Project>
       <Name>Fabric.Databus.SqlGenerator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj">
+      <Project>{bb878905-9592-4a9d-a811-46e73d9f7f6a}</Project>
+      <Name>Fabric.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
       <Project>{AF1ADF05-EC10-43EA-877E-AD504A113B58}</Project>
       <Name>Fabric.Databus.PipelineRunner</Name>

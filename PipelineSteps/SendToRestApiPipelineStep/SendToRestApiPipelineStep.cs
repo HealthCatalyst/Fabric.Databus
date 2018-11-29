@@ -10,7 +10,6 @@
 namespace SendToRestApiPipelineStep
 {
     using System.IO;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -20,8 +19,6 @@ namespace SendToRestApiPipelineStep
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
-
-    using Newtonsoft.Json;
 
     using QueueItems;
 
@@ -33,7 +30,14 @@ namespace SendToRestApiPipelineStep
     /// </summary>
     public class SendToRestApiPipelineStep : BasePipelineStep<IJsonObjectQueueItem, EndPointQueueItem>
     {
+        /// <summary>
+        /// The file uploader.
+        /// </summary>
         private readonly IFileUploader fileUploader;
+
+        /// <summary>
+        /// The entity json writer.
+        /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
 
         /// <inheritdoc />
@@ -62,7 +66,7 @@ namespace SendToRestApiPipelineStep
             await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
             // now send to Rest Api
-            await fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
+            await this.fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
         }
 
         /// <inheritdoc />

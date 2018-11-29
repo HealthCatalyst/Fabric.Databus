@@ -14,13 +14,11 @@ namespace Fabric.Databus.Http
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
     using System.Net.Http;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Fabric.Databus.Interfaces.Http;
-    using Newtonsoft.Json;
 
     using Serilog;
 

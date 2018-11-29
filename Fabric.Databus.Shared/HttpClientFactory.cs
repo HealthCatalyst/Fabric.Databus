@@ -11,7 +11,6 @@ namespace Fabric.Databus.Shared
 {
     using System.Net.Http;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Http;
 
     /// <inheritdoc />

@@ -9,21 +9,15 @@
 
 namespace PipelineStep.Tests
 {
-    using System;
     using System.IO;
     using System.Threading;
 
-    using CreateBatchItemsPipelineStep;
-
     using Fabric.Databus.Config;
-    using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Serilog;
-
-    using SqlImportPipelineStep;
 
     /// <summary>
     /// The sql importer unit tests.

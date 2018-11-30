@@ -1,3 +1,12 @@
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="JobScheduler.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the JobScheduler type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
+
 namespace Fabric.Databus.Domain.Jobs
 {
     using System;
@@ -13,106 +22,203 @@ namespace Fabric.Databus.Domain.Jobs
 
     using Serilog;
 
+    /// <summary>
+    /// The job scheduler.
+    /// </summary>
     public class JobScheduler : IJobScheduler
     {
-        private readonly ILogger _logger;
-        private readonly IJobHistoryStore _jobHistoryStore;
-        private readonly IImportRunner _importRunner;
-        private readonly IConfigValidator _configValidator;
-        private readonly IJobStatusTrackerFactory _jobStatusTrackerFactory;
+        /// <summary>
+        /// The _logger.
+        /// </summary>
+        private readonly ILogger logger;
 
-        public JobScheduler(ILogger logger, 
-            IJobHistoryStore jobHistoryStore, 
+        /// <summary>
+        /// The _job history store.
+        /// </summary>
+        private readonly IJobHistoryStore jobHistoryStore;
+
+        /// <summary>
+        /// The import runner.
+        /// </summary>
+        private readonly IImportRunner importRunner;
+
+        /// <summary>
+        /// The _config validator.
+        /// </summary>
+        private readonly IConfigValidator configValidator;
+
+        /// <summary>
+        /// The job status tracker factory.
+        /// </summary>
+        private readonly IJobStatusTrackerFactory jobStatusTrackerFactory;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JobScheduler"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        /// <param name="jobHistoryStore">
+        /// The job history store.
+        /// </param>
+        /// <param name="jobStatusTrackerFactory">
+        /// The job status tracker factory.
+        /// </param>
+        /// <param name="importRunner">
+        /// The import runner.
+        /// </param>
+        /// <param name="configValidator">
+        /// The config validator.
+        /// </param>
+        /// <exception cref="ArgumentNullException">argument exception
+        /// </exception>
+        public JobScheduler(
+            ILogger logger,
+            IJobHistoryStore jobHistoryStore,
             IJobStatusTrackerFactory jobStatusTrackerFactory,
             IImportRunner importRunner,
             IConfigValidator configValidator)
         {
-            if (logger == null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-            if (jobHistoryStore == null)
-            {
-                throw new ArgumentNullException(nameof(jobHistoryStore));
-            }
-            if (importRunner == null)
-            {
-                throw new ArgumentNullException(nameof(importRunner));
-            }
-            if (configValidator == null)
-            {
-                throw new ArgumentNullException(nameof(configValidator));
-            }
-            if (jobStatusTrackerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(jobStatusTrackerFactory));
-            }
-            _logger = logger;
-            _jobHistoryStore = jobHistoryStore;
-            _importRunner = importRunner;
-            _configValidator = configValidator;
-            _jobStatusTrackerFactory = jobStatusTrackerFactory;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            this.jobHistoryStore = jobHistoryStore ?? throw new ArgumentNullException(nameof(jobHistoryStore));
+            this.importRunner = importRunner ?? throw new ArgumentNullException(nameof(importRunner));
+            this.configValidator = configValidator ?? throw new ArgumentNullException(nameof(configValidator));
+            this.jobStatusTrackerFactory = jobStatusTrackerFactory ?? throw new ArgumentNullException(nameof(jobStatusTrackerFactory));
         }
 
+        /// <summary>
+        /// The schedule job.
+        /// </summary>
+        /// <param name="queryConfig">
+        /// The query config.
+        /// </param>
+        /// <param name="jobName">
+        /// The job name.
+        /// </param>
+        /// <exception cref="NotImplementedException">not implemented exception
+        /// </exception>
         public void ScheduleJob(QueryConfig queryConfig, string jobName)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// The execute job immediately.
+        /// </summary>
+        /// <param name="query">
+        /// The query.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Guid"/>.
+        /// </returns>
         public Guid ExecuteJobImmediately(Job query)
         {
-            var jobHistoryItem = CreateJobHistoryItem(query);
-            _jobHistoryStore.AddJobHistoryItem(jobHistoryItem);
-            var jobStatusTracker = _jobStatusTrackerFactory.GetTracker(_jobHistoryStore, jobHistoryItem);
+            var jobHistoryItem = this.CreateJobHistoryItem(query);
+            this.jobHistoryStore.AddJobHistoryItem(jobHistoryItem);
+            var jobStatusTracker = this.jobStatusTrackerFactory.GetTracker(this.jobHistoryStore, jobHistoryItem);
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                Task.Run(() => _importRunner.RunPipeline(query, jobStatusTracker));
+                Task.Run(() => this.importRunner.RunPipeline(query, jobStatusTracker), cancellationTokenSource.Token);
             }
             return jobHistoryItem.Id;
         }
 
+        /// <summary>
+        /// The validate job.
+        /// </summary>
+        /// <param name="queryConfig">
+        /// The query config.
+        /// </param>
+        /// <param name="jobName">
+        /// The job name.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         public async Task<ConfigValidationResult> ValidateJob(string queryConfig, string jobName)
         {
-            var result = await _configValidator.ValidateFromTextAsync(queryConfig);
+            var result = await this.configValidator.ValidateFromTextAsync(queryConfig);
 
             return result;
         }
 
+        /// <summary>
+        /// The get job status.
+        /// </summary>
+        /// <param name="jobGuid">
+        /// The job guid.
+        /// </param>
+        /// <returns>
+        /// The <see cref="JobHistoryItem"/>.
+        /// </returns>
         public JobHistoryItem GetJobStatus(Guid jobGuid)
         {
-            return _jobHistoryStore.GetJobHistoryItem(jobGuid);
+            return this.jobHistoryStore.GetJobHistoryItem(jobGuid);
         }
 
+        /// <summary>
+        /// The get job status.
+        /// </summary>
+        /// <param name="jobName">
+        /// The job name.
+        /// </param>
+        /// <returns>
+        /// The <see cref="JobHistoryItem"/>.
+        /// </returns>
         public JobHistoryItem GetJobStatus(string jobName)
         {
-            return _jobHistoryStore.GetLatestJobHistoryItem(jobName);
+            return this.jobHistoryStore.GetLatestJobHistoryItem(jobName);
         }
 
+        /// <summary>
+        /// The get job history.
+        /// </summary>
+        /// <param name="jobName">
+        /// The job name.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ICollection{T}"/>.
+        /// </returns>
         public ICollection<JobHistoryItem> GetJobHistory(string jobName)
         {
-            return _jobHistoryStore.GetJobHistory(jobName);
+            return this.jobHistoryStore.GetJobHistory(jobName);
         }
 
-        public ICollection<JobHistoryItem> GetMostRecentJobs(int numberofJobs)
+        /// <summary>
+        /// The get most recent jobs.
+        /// </summary>
+        /// <param name="numberOfJobs">
+        /// The number of jobs.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ICollection{T}"/>.
+        /// </returns>
+        public ICollection<JobHistoryItem> GetMostRecentJobs(int numberOfJobs)
         {
-            return _jobHistoryStore.GetMostRecentJobs(numberofJobs);
+            return this.jobHistoryStore.GetMostRecentJobs(numberOfJobs);
         }
-        
 
+        /// <summary>
+        /// The create job history item.
+        /// </summary>
+        /// <param name="query">
+        /// The query.
+        /// </param>
+        /// <returns>
+        /// The <see cref="JobHistoryItem"/>.
+        /// </returns>
         private JobHistoryItem CreateJobHistoryItem(Job query)
         {
             var jobHistoryItem = new JobHistoryItem
-            {
-                Id = Guid.NewGuid(),
-                ExecutedQuery = query,
-                Name = query.Config.Name,
-                Status = JobHistoryItem.ScheduledStatus,
-            };
-
-            jobHistoryItem.ProgressMonitor = new ProgressMonitor(null);
+                                     {
+                                         Id = Guid.NewGuid(),
+                                         ExecutedQuery = query,
+                                         Name = query.Config.Name,
+                                         Status = JobHistoryItem.ScheduledStatus,
+                                         ProgressMonitor = new ProgressMonitor(null)
+                                     };
 
             return jobHistoryItem;
         }
-        
     }
 }

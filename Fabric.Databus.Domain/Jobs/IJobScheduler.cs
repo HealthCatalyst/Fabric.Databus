@@ -20,7 +20,7 @@ namespace Fabric.Databus.Domain.Jobs
 
         ICollection<JobHistoryItem> GetJobHistory(string jobName);
 
-        ICollection<JobHistoryItem> GetMostRecentJobs(int numberofJobs);
+        ICollection<JobHistoryItem> GetMostRecentJobs(int numberOfJobs);
 
         Task<ConfigValidationResult> ValidateJob(string queryConfig, string jobName);
     }

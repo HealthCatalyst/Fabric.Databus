@@ -14,6 +14,7 @@ namespace Fabric.Databus.Http
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Net;
     using System.Net.Http;
     using System.Text;
     using System.Threading;
@@ -106,13 +107,13 @@ namespace Fabric.Databus.Http
         }
 
         /// <inheritdoc />
-        public async Task SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
+        public async Task<HttpStatusCode> SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             var hostNumber = batch % this.hosts.Count;
 
             var url = this.hosts[hostNumber] + relativeUrl;
 
-            await this.SendStreamToUrl(url, batch, stream, doLogContent, doCompress);
+            return await this.SendStreamToUrl(url, batch, stream, doLogContent, doCompress);
         }
 
         /// <summary>
@@ -136,14 +137,13 @@ namespace Fabric.Databus.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected virtual async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        protected virtual async Task<HttpStatusCode> SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             try
             {
                 this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
-
                 var baseUri = url;
                 string requestContent;
 
@@ -162,7 +162,7 @@ namespace Fabric.Databus.Http
                 }
 
                 Interlocked.Increment(ref this.currentRequests);
-                var requestStartTimeMillisecs = this.stopwatch.ElapsedMilliseconds;
+                var requestStartTimeMilliseconds = this.stopwatch.ElapsedMilliseconds;
 
                 var response = doCompress
                                    ? await this.httpClient.PutAsyncStreamCompressed(baseUri, url, stream)
@@ -177,7 +177,7 @@ namespace Fabric.Databus.Http
                     var stopwatchElapsed = this.stopwatch.ElapsedMilliseconds;
 
                     // var millisecsPerFile = 0; // Convert.ToInt32(stopwatchElapsed / (_totalFiles - _queuedFiles.Count));
-                    var millisecsForThisFile = stopwatchElapsed - requestStartTimeMillisecs;
+                    var millisecsForThisFile = stopwatchElapsed - requestStartTimeMilliseconds;
                 }
                 else
                 {
@@ -190,6 +190,8 @@ namespace Fabric.Databus.Http
 
                     // logger.Verbose("========= Error =================");
                 }
+
+                return response.StatusCode;
             }
             catch (Exception ex)
             {

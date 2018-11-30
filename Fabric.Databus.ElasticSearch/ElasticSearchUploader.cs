@@ -13,6 +13,7 @@ namespace Fabric.Databus.ElasticSearch
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -423,14 +424,13 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        override protected async Task SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        protected override async Task<HttpStatusCode> SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             try
             {
                 this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
-
                 var baseUri = url;
                 string requestContent;
 
@@ -496,6 +496,8 @@ namespace Fabric.Databus.ElasticSearch
 
                     // logger.Verbose("========= Error =================");
                 }
+
+                return response.StatusCode;
             }
             catch (Exception ex)
             {

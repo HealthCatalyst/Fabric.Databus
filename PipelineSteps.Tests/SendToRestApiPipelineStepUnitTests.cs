@@ -28,6 +28,7 @@ namespace PipelineStep.Tests
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Json;
+    using Fabric.Databus.Shared.FileWriters;
     using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -110,6 +111,7 @@ namespace PipelineStep.Tests
                     queueManager,
                     new MockProgressMonitor(),
                     fileUploader,
+                    new NullFileWriter(), 
                     entityJsonWriter,
                     cancellationTokenSource.Token);
 

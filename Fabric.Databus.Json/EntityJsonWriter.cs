@@ -351,66 +351,6 @@ namespace Fabric.Databus.Json
         }
 
         /// <summary>
-        /// The get json for rows.
-        /// </summary>
-        /// <param name="columns">
-        /// The columns.
-        /// </param>
-        /// <param name="jsonValueWriter">
-        /// The json value writer.
-        /// </param>
-        /// <param name="rows">
-        /// The rows.
-        /// </param>
-        /// <param name="propertyName">
-        /// The property name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="JObject[]"/>.
-        /// </returns>
-        private JObject[] GetJsonForRows(List<ColumnInfo> columns, IJsonValueWriter jsonValueWriter, List<object[]> rows, string propertyName)
-        {
-            // ReSharper disable once StyleCop.SA1305
-            var jObjects = new List<JObject>();
-
-            foreach (var row in rows)
-            {
-                // ReSharper disable once StyleCop.SA1305
-                var jObject = new JObject();
-                foreach (var col in columns)
-                {
-                    var value = row[col.index];
-
-                    var shouldWriteColumn = value != null && value != DBNull.Value;
-
-                    // only write if it is not the default
-                    if (col.ElasticSearchType.Equals("keyword", StringComparison.OrdinalIgnoreCase)
-                        || col.ElasticSearchType.Equals("text", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (value == null
-                            || value == DBNull.Value
-                            || string.IsNullOrEmpty((string)value)
-                            || ((string)value).Equals("NULL", StringComparison.OrdinalIgnoreCase))
-                        {
-                            shouldWriteColumn = false;
-                        }
-                    }
-
-                    if (shouldWriteColumn)
-                    {
-                        jObject.Add(col.Name, value != null ? JToken.FromObject(value) : null);
-
-                        //jsonValueWriter.WriteValue(writer, col.ElasticSearchType, value);
-                    }
-                }
-
-                jObjects.Add(jObject);
-            }
-
-            return jObjects.ToArray();
-        }
-
-        /// <summary>
         /// The merge with document fast.
         /// </summary>
         /// <param name="originalJObject">
@@ -439,7 +379,7 @@ namespace Fabric.Databus.Json
 
             await this.CopyAllProperties(originalJObject, newJObject);
 
-            foreach (KeyValuePair<string, JToken> property in newJObject)
+            foreach (var property in newJObject)
             {
                 if (property.Value.Type == JTokenType.Array)
                 {
@@ -452,9 +392,9 @@ namespace Fabric.Databus.Json
                         selectProperty = new JArray { };
                         originalJObject.Add(property.Key, selectProperty);
                     }
+
                     await this.MergeArrayFast(selectProperty, array, level);
                 }
-
             }
         }
 

@@ -9,6 +9,7 @@
 
 namespace SendToRestApiPipelineStep
 {
+    using System;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace SendToRestApiPipelineStep
     using BasePipelineStep;
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
@@ -36,9 +38,19 @@ namespace SendToRestApiPipelineStep
         private readonly IFileUploader fileUploader;
 
         /// <summary>
+        /// The detailed temporary file writer.
+        /// </summary>
+        private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
+
+        /// <summary>
         /// The entity json writer.
         /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
+
+        /// <summary>
+        /// The folder.
+        /// </summary>
+        private string folder;
 
         /// <inheritdoc />
         public SendToRestApiPipelineStep(
@@ -47,16 +59,22 @@ namespace SendToRestApiPipelineStep
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IFileUploader fileUploader,
+            IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             IEntityJsonWriter entityJsonWriter,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
-            this.fileUploader = fileUploader ?? throw new System.ArgumentNullException(nameof(fileUploader));
-            this.entityJsonWriter = entityJsonWriter ?? throw new System.ArgumentNullException(nameof(entityJsonWriter));
+            this.fileUploader = fileUploader ?? throw new ArgumentNullException(nameof(fileUploader));
+            this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
+            this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            {
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
+            }
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "SendToRestApi";
+        protected override sealed string LoggerName => "SendToRestApi";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(IJsonObjectQueueItem workItem)
@@ -65,8 +83,17 @@ namespace SendToRestApiPipelineStep
 
             await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                var path = this.detailedTemporaryFileWriter.CombinePath(
+                    this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.BatchNumber}.txt"),
+                    Convert.ToString(workItem.BatchNumber));
+
+                this.detailedTemporaryFileWriter.CreateDirectory(path);
+            }
+
             // now send to Rest Api
-            await this.fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
+                await this.fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
         }
 
         /// <inheritdoc />

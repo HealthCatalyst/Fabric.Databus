@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Interfaces.Http
 {
     using System.IO;
+    using System.Net;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -38,6 +39,6 @@ namespace Fabric.Databus.Interfaces.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress);
+        Task<HttpStatusCode> SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress);
     }
 }

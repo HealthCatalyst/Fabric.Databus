@@ -12,6 +12,7 @@ namespace PipelineRunnerTests
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -124,7 +125,7 @@ namespace PipelineRunnerTests
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),
                     It.IsAny<bool>(),
-                    It.IsAny<bool>())).Returns(Task.CompletedTask);
+                    It.IsAny<bool>())).Returns(Task.FromResult(HttpStatusCode.OK));
 
             mockFileUploader
                 .Setup(service => service.StartUploadAsync())
@@ -256,7 +257,7 @@ namespace PipelineRunnerTests
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),
                     It.IsAny<bool>(),
-                    It.IsAny<bool>())).Returns(Task.CompletedTask);
+                    It.IsAny<bool>())).Returns(Task.FromResult(HttpStatusCode.OK));
 
             mockFileUploader
                 .Setup(service => service.StartUploadAsync())

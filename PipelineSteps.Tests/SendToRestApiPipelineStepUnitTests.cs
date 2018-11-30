@@ -100,7 +100,7 @@ namespace PipelineStep.Tests
                 handlerMock
                     .Protected()
                     .Setup<Task<HttpResponseMessage>>(
-                        "SendAsync",add check for 
+                        "SendAsync",
                         ItExpr.IsAny<HttpRequestMessage>(),
                         ItExpr.IsAny<CancellationToken>())
                     .Callback<HttpRequestMessage, CancellationToken>((request, token) =>

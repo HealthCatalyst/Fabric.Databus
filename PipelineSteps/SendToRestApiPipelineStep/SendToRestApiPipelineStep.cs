@@ -93,7 +93,7 @@ namespace SendToRestApiPipelineStep
             }
 
             // now send to Rest Api
-                await this.fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
+            await this.fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
         }
 
         /// <inheritdoc />

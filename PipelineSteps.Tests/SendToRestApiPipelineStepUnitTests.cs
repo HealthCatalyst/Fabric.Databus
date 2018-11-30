@@ -85,21 +85,39 @@ namespace PipelineStep.Tests
                                            Content = new StringContent(string.Empty),
                                        };
 
+                string queryId = "1";
+
+                var jsonObjectQueueItem1 = new JsonObjectQueueItem
+                                               {
+                                                   Document = JObject.Parse(@"{test:'ff'}"),
+                                                   PropertyName = "foo",
+                                                   QueryId = queryId
+                                               };
+
+                var expectedRequestMessageContent = "{\"test\":\"ff\"}";
+
                 var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
                 handlerMock
                     .Protected()
                     .Setup<Task<HttpResponseMessage>>(
-                        "SendAsync",
+                        "SendAsync",add check for 
                         ItExpr.IsAny<HttpRequestMessage>(),
                         ItExpr.IsAny<CancellationToken>())
+                    .Callback<HttpRequestMessage, CancellationToken>((request, token) =>
+                        {
+                            var result = request.Content.ReadAsStringAsync().Result;
+                            Assert.AreEqual(expectedRequestMessageContent, result);
+                        })
                     .ReturnsAsync(mockResponse)
                     .Verifiable();
+
+                var fullUri = new Uri("http://foo");
 
                 var mockHttpClientFactory = mockRepository.Create<IHttpClientFactory>();
                 mockHttpClientFactory.Setup(service => service.Create())
                     .Returns(new HttpClient(handlerMock.Object));
 
-                var hosts = new List<string> { "http://foo" };
+                var hosts = new List<string> { fullUri.ToString() };
 
                 var fileUploader = new FileUploader(logger, hosts, mockHttpClientFactory.Object, "username", "password");
 
@@ -122,15 +140,6 @@ namespace PipelineStep.Tests
 
                 sendToRestApiPipelineStep.InitializeWithStepNumber(stepNumber);
 
-                string queryId = "1";
-
-                var jsonObjectQueueItem1 = new JsonObjectQueueItem
-                {
-                    Document = JObject.Parse(@"{test:'ff'}"),
-                    PropertyName = "foo",
-                    QueryId = queryId
-                };
-
                 await sendToRestApiPipelineStep.InternalHandleAsync(jsonObjectQueueItem1);
 
                 // Assert
@@ -140,8 +149,16 @@ namespace PipelineStep.Tests
 
                 var meteredBlockingCollection = queues.First(queue => queue.Key == "EndPointQueueItem2").Value;
                 var outputQueue = meteredBlockingCollection as IQueue<EndPointQueueItem>;
-            }
 
+                handlerMock.Protected()
+                    .Verify(
+                        "SendAsync",
+                        Times.Exactly(1),
+                        ItExpr.Is<HttpRequestMessage>(
+                            req => req.Method == HttpMethod.Put
+                                   && req.RequestUri == fullUri),
+                        ItExpr.IsAny<CancellationToken>());
+            }
         }
     }
 }

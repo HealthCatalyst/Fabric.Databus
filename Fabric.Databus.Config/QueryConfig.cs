@@ -44,7 +44,7 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public List<string> Urls => new List<string> { this.Url};
+        public List<string> Urls => new List<string> { this.Url };
 
         /// <inheritdoc />
         [DataMember]

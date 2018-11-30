@@ -9,20 +9,28 @@
 
 namespace Fabric.Databus.Integration.Tests
 {
+    using System;
     using System.Data.Common;
     using System.Data.SQLite;
     using System.Diagnostics;
+    using System.Net;
+    using System.Net.Http;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared.Loggers;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+    using Moq.Protected;
 
     using Newtonsoft.Json.Linq;
 
@@ -114,11 +122,11 @@ namespace Fabric.Databus.Integration.Tests
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
 
-                string foo = @";WITH CTE AS ( SELECT
+                sql = @";WITH CTE AS ( SELECT
 Text.*,Text.[TextID] AS [KeyLevel1]
 FROM Text
  )  SELECT * from CTE LIMIT 1";
-                command.CommandText = foo;
+                command.CommandText = sql;
                 command.ExecuteNonQuery();
 
                 using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
@@ -136,6 +144,40 @@ FROM Text
 
                         container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
 
+                        // set up a mock web service
+                        var mockRepository = new MockRepository(MockBehavior.Strict);
+                        JObject expectedJson = new JObject(
+                            new JProperty("TextID", "1"),
+                            new JProperty("PatientID", 9001),
+                            new JProperty("TextTXT", "This is my first note"));
+
+                        var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+                        handlerMock
+                            .Protected()
+                            .Setup<Task<HttpResponseMessage>>(
+                                "SendAsync",
+                                ItExpr.IsAny<HttpRequestMessage>(),
+                                ItExpr.IsAny<CancellationToken>())
+                            .Callback<HttpRequestMessage, CancellationToken>((request, token) =>
+                                {
+                                    var content = request.Content.ReadAsStringAsync().Result;
+                                    Assert.IsTrue(JToken.DeepEquals(expectedJson, JObject.Parse(content)), content);
+                                })
+                            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                                              {
+                                                  Content = new StringContent(string.Empty)
+                                              })
+                            .Verifiable();
+
+                        var expectedUri = new Uri("http://foo");
+
+                        var mockHttpClientFactory = mockRepository.Create<IHttpClientFactory>();
+                        mockHttpClientFactory.Setup(service => service.Create())
+                            .Returns(new HttpClient(handlerMock.Object));
+
+                        container.RegisterInstance(mockHttpClientFactory.Object);
+
+                        // Act
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
 
@@ -147,20 +189,25 @@ FROM Text
 
                         pipelineRunner.RunPipeline(config);
 
+                        // Assert
                         Assert.AreEqual(1, integrationTestFileWriter.Count);
 
-                        JObject expectedJson = new JObject(
-                            new JProperty("TextID", "1"),
-                            new JProperty("PatientID", 9001),
-                            new JProperty("TextTXT", "This is my first note"));
-
-                        var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
+                       var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath));
 
                         Assert.IsTrue(
                             JToken.DeepEquals(
                                 expectedJson,
                                 JObject.Parse(integrationTestFileWriter.GetContents(expectedPath))));
+                        
+                        handlerMock.Protected()
+                            .Verify(
+                                "SendAsync",
+                                Times.Exactly(1),
+                                ItExpr.Is<HttpRequestMessage>(
+                                    req => req.Method == HttpMethod.Put
+                                           && req.RequestUri == expectedUri),
+                                ItExpr.IsAny<CancellationToken>());
 
                         stopwatch.Stop();
                     }
@@ -226,6 +273,62 @@ FROM Text
 
                         container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
 
+                        JObject expectedJson1 = new JObject(
+                            new JProperty("TextID", "1"),
+                            new JProperty("PatientID", 9001),
+                            new JProperty("TextTXT", "This is my first note"),
+                            new JProperty(
+                                "patients",
+                                new JObject(
+                                    new JProperty("TextID", "1"),
+                                    new JProperty("PatientID", 9001),
+                                    new JProperty("PatientLastNM", "Jones"))));
+
+                        JObject expectedJson2 = new JObject(
+                            new JProperty("TextID", "2"),
+                            new JProperty("PatientID", 9002),
+                            new JProperty("TextTXT", "This is my second note"),
+                            new JProperty(
+                                "patients",
+                                new JObject(
+                                    new JProperty("TextID", "2"),
+                                    new JProperty("PatientID", 9002),
+                                    new JProperty("PatientLastNM", "Smith"))));
+
+
+                        // set up a mock web service
+                        var mockRepository = new MockRepository(MockBehavior.Strict);
+
+                        int numHttpCall = 0;
+                        var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+                        httpMessageHandlerMock
+                            .Protected()
+                            .Setup<Task<HttpResponseMessage>>(
+                                "SendAsync",
+                                ItExpr.IsAny<HttpRequestMessage>(),
+                                ItExpr.IsAny<CancellationToken>())
+                            .Callback<HttpRequestMessage, CancellationToken>((request, token) =>
+                                {
+                                    numHttpCall++;
+                                    var content = request.Content.ReadAsStringAsync().Result;
+                                    var expectedJson = numHttpCall == 1 ? expectedJson1 : expectedJson2;
+                                    Assert.IsTrue(JToken.DeepEquals(expectedJson, JObject.Parse(content)), content);
+                                })
+                            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                                              {
+                                                  Content = new StringContent(string.Empty)
+                                              })
+                            .Verifiable();
+
+                        var expectedUri = new Uri("http://foo");
+
+                        var mockHttpClientFactory = mockRepository.Create<IHttpClientFactory>();
+                        mockHttpClientFactory.Setup(service => service.Create())
+                            .Returns(new HttpClient(httpMessageHandlerMock.Object));
+
+                        container.RegisterInstance(mockHttpClientFactory.Object);
+
+                        // Act
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
 
@@ -241,37 +344,24 @@ FROM Text
                         var expectedPath1 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath1));
 
-                        JObject expectedJson1 = new JObject(
-                            new JProperty("TextID", "1"),
-                            new JProperty("PatientID", 9001),
-                            new JProperty("TextTXT", "This is my first note"),
-                            new JProperty(
-                                "patients",
-                                new JObject(
-                                    new JProperty("TextID", "1"),
-                                    new JProperty("PatientID", 9001),
-                                    new JProperty("PatientLastNM", "Jones"))));
-
                         var contents = integrationTestFileWriter.GetContents(expectedPath1);
                         var actualJson1 = JObject.Parse(contents);
                         Assert.IsTrue(JToken.DeepEquals(expectedJson1, actualJson1), $"Expected:<{expectedJson1}>. Actual<{actualJson1}>");
 
                         var expectedPath2 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "2.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath2));
-                        JObject expectedJson2 = new JObject(
-                            new JProperty("TextID", "2"),
-                            new JProperty("PatientID", 9002),
-                            new JProperty("TextTXT", "This is my second note"),
-                            new JProperty(
-                                "patients",
-                                new JObject(
-                                    new JProperty("TextID", "2"),
-                                    new JProperty("PatientID", 9002),
-                                    new JProperty("PatientLastNM", "Smith"))));
-
                         var contents2 = integrationTestFileWriter.GetContents(expectedPath2);
                         var actualJson2 = JObject.Parse(contents2);
                         Assert.IsTrue(JToken.DeepEquals(expectedJson2, actualJson2), $"Expected:<{expectedJson2}>. Actual<{actualJson2}>");
+
+                        httpMessageHandlerMock.Protected()
+                            .Verify(
+                                "SendAsync",
+                                Times.Exactly(2),
+                                ItExpr.Is<HttpRequestMessage>(
+                                    req => req.Method == HttpMethod.Put
+                                           && req.RequestUri == expectedUri),
+                                ItExpr.IsAny<CancellationToken>());
 
                         stopwatch.Stop();
                     }

@@ -13,6 +13,7 @@ namespace PipelineRunnerTests
     using System.Collections.Generic;
     using System.IO;
     using System.Net;
+    using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -29,6 +30,9 @@ namespace PipelineRunnerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Moq.Protected;
+
+    using Newtonsoft.Json.Linq;
 
     using Serilog;
 
@@ -46,14 +50,7 @@ namespace PipelineRunnerTests
         [TestMethod]
         public void TestElasticSearchPipelineSingleThreaded()
         {
-            var sql = @"SELECT
-                      CustomerNM
-                      ,CustomerID
-                      ,	AliasPatientID
-                      ,	GenderNormDSC
-                      ,RaceNormDSC
-                      ,MaritalStatusNormDSC  
-                      FROM CAFEEDW.SharedClinicalUnion.ElasticsearchInputPatient where CustomerID = 4";
+            var sql = @"fake sql";
 
             var job = new Job
             {
@@ -131,6 +128,13 @@ namespace PipelineRunnerTests
                 .Setup(service => service.StartUploadAsync())
                 .Returns(Task.CompletedTask);
 
+            mockFileUploader
+                .Setup(service => service.FinishUploadAsync())
+                .Returns(Task.CompletedTask);
+
+            mockFileUploader.Setup(service => service.SendDataToHostsAsync(1, It.IsAny<Stream>(), false, false))
+                .Returns(Task.CompletedTask);
+
             ILogger logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.Debug()
@@ -178,14 +182,7 @@ namespace PipelineRunnerTests
         [TestMethod]
         public void TestElasticSearchPipelineMultiThreaded()
         {
-            var sql = @"SELECT
-                      CustomerNM
-                      ,CustomerID
-                      ,	AliasPatientID
-                      ,	GenderNormDSC
-                      ,RaceNormDSC
-                      ,MaritalStatusNormDSC  
-                      FROM CAFEEDW.SharedClinicalUnion.ElasticsearchInputPatient where CustomerID = 4";
+            var sql = @"fake sql";
 
             var job = new Job
             {
@@ -261,6 +258,13 @@ namespace PipelineRunnerTests
 
             mockFileUploader
                 .Setup(service => service.StartUploadAsync())
+                .Returns(Task.CompletedTask);
+
+            mockFileUploader
+                .Setup(service => service.FinishUploadAsync())
+                .Returns(Task.CompletedTask);
+
+            mockFileUploader.Setup(service => service.SendDataToHostsAsync(It.IsAny<int>(), It.IsAny<Stream>(), false, false))
                 .Returns(Task.CompletedTask);
 
             ILogger logger = new LoggerConfiguration()

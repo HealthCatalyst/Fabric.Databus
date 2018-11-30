@@ -3,6 +3,7 @@
      xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
     <ConnectionString>Data Source=:memory:</ConnectionString>
+    <Url>http://foo</Url>
     <LocalSaveFolder>foo</LocalSaveFolder>
     <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
     <UseMultipleThreads>false</UseMultipleThreads>

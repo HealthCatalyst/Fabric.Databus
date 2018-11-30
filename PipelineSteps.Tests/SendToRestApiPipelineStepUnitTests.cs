@@ -79,12 +79,6 @@ namespace PipelineStep.Tests
             {
                 var mockRepository = new MockRepository(MockBehavior.Strict);
 
-                var mockResponse = new HttpResponseMessage(HttpStatusCode.OK)
-                                       {
-                                           StatusCode = HttpStatusCode.NoContent,
-                                           Content = new StringContent(string.Empty),
-                                       };
-
                 string queryId = "1";
 
                 var jsonObjectQueueItem1 = new JsonObjectQueueItem
@@ -108,7 +102,10 @@ namespace PipelineStep.Tests
                             var result = request.Content.ReadAsStringAsync().Result;
                             Assert.AreEqual(expectedRequestMessageContent, result);
                         })
-                    .ReturnsAsync(mockResponse)
+                    .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(string.Empty)
+                    })
                     .Verifiable();
 
                 var fullUri = new Uri("http://foo");

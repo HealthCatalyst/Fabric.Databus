@@ -12,6 +12,7 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
 
     using CreateBatchItemsPipelineStep;
@@ -291,7 +292,7 @@ namespace Fabric.Databus.PipelineRunner
                         });
             }
 
-            if (config.UploadToElasticSearch)
+            if (!string.IsNullOrWhiteSpace(config.Url))
             {
                 if (name == PipelineNames.ElasticSearch)
                 {

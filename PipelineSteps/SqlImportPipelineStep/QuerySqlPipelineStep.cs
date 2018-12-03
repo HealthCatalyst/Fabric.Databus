@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlImportPipelineStep.cs" company="Health Catalyst">
+// <copyright file="QuerySqlPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlImportPipelineStep type.
+//   Defines the QuerySqlPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ namespace SqlImportPipelineStep
     /// <summary>
     /// Reads a SqlImportQueueItem and calls SqlServer to load the data for that query and put it in a SqlDataLoadedQueueItem
     /// </summary>
-    public class SqlImportPipelineStep : BasePipelineStep<SqlImportQueueItem, SqlDataLoadedQueueItem>
+    public class QuerySqlPipelineStep : BasePipelineStep<SqlImportQueueItem, SqlDataLoadedQueueItem>
     {
         /// <summary>
         /// The folder.
@@ -53,7 +53,7 @@ namespace SqlImportPipelineStep
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SqlImportPipelineStep.SqlImportPipelineStep" /> class.
+        /// Initializes a new instance of the <see cref="T:QuerySqlPipelineStep.QuerySqlPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -76,7 +76,7 @@ namespace SqlImportPipelineStep
         /// <param name="cancellationToken">
         /// cancellation token
         /// </param>
-        public SqlImportPipelineStep(
+        public QuerySqlPipelineStep(
             IJobConfig jobConfig, 
             IDatabusSqlReader databusSqlReader, 
             ILogger logger, 
@@ -90,12 +90,12 @@ namespace SqlImportPipelineStep
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
-                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlImport");
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
             }
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "SqlImport";
+        protected override sealed string LoggerName => "QuerySql";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(SqlImportQueueItem workItem)

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlBatchPipelineStep.cs" company="Health Catalyst">
+// <copyright file="CreateBatchesForEachDataSource.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
@@ -28,7 +28,7 @@ namespace SqlBatchPipelineStep
     /// <summary>
     /// Reads a SqlBatchQueueItem with a number of queries and splits it into one SqlImportQueueItem for each query
     /// </summary>
-    public class SqlBatchPipelineStep : BasePipelineStep<SqlBatchQueueItem, SqlImportQueueItem>
+    public class CreateBatchesForEachDataSource : BasePipelineStep<SqlBatchQueueItem, SqlImportQueueItem>
     {
         /// <summary>
         /// The file writer.
@@ -42,7 +42,7 @@ namespace SqlBatchPipelineStep
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SqlBatchPipelineStep.SqlBatchPipelineStep" /> class.
+        /// Initializes a new instance of the <see cref="T:CreateBatchesForEachDataSource.CreateBatchesForEachDataSource" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -54,7 +54,7 @@ namespace SqlBatchPipelineStep
         /// <param name="progressMonitor"></param>
         /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="cancellationToken"></param>
-        public SqlBatchPipelineStep(
+        public CreateBatchesForEachDataSource(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
@@ -67,12 +67,12 @@ namespace SqlBatchPipelineStep
 
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
-                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-SqlBatch");
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
             }
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "SqlBatch";
+        protected override sealed string LoggerName => "CreateDataSourceBatches";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(SqlBatchQueueItem workItem)

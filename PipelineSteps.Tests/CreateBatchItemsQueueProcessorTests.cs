@@ -58,7 +58,7 @@ namespace PipelineStep.Tests
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                var createBatchItemsQueueProcessor = new CreateBatchItemsPipelineStep(
+                var createBatchItemsQueueProcessor = new CreateJsonBatchesPipelineStep(
                     job.Config,
                     logger,
                     queueManager,

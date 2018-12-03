@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlJobPipelineStep.cs" company="Health Catalyst">
+// <copyright file="CreateBatchesPipelineJob.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlJobPipelineStep type.
+//   Defines the CreateBatchesPipelineJob type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ namespace SqlJobPipelineStep
     /// <summary>
     /// Reads a SqlJobQueueItem and creates a set of SqlBatchQueueItems based on EntitiesPerBatch config
     /// </summary>
-    public class SqlJobPipelineStep : BasePipelineStep<SqlJobQueueItem, SqlBatchQueueItem>
+    public class CreateBatchesPipelineJob : BasePipelineStep<SqlJobQueueItem, SqlBatchQueueItem>
     {
         /// <summary>
         /// The databus sql reader.
@@ -51,7 +51,7 @@ namespace SqlJobPipelineStep
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:SqlJobPipelineStep.SqlJobPipelineStep" /> class.
+        /// Initializes a new instance of the <see cref="T:CreateBatchesPipelineJob.CreateBatchesPipelineJob" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -68,7 +68,7 @@ namespace SqlJobPipelineStep
         /// <param name="databusSqlReader"></param>
         /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="cancellationToken"></param>
-        public SqlJobPipelineStep(
+        public CreateBatchesPipelineJob(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
@@ -87,7 +87,7 @@ namespace SqlJobPipelineStep
         }
 
         /// <inheritdoc />
-        protected override sealed string LoggerName => "SqlJob";
+        protected override sealed string LoggerName => "CreateBatches";
 
         /// <inheritdoc />
         /// <summary>

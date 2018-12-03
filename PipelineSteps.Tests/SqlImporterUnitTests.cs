@@ -43,7 +43,7 @@ namespace PipelineStep.Tests
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                //var createBatchItemsQueueProcessor = new SqlImportPipelineStep(
+                //var createBatchItemsQueueProcessor = new QuerySqlPipelineStep(
                 //    job.Config,
                 //    logger,
                 //    queueManager,

@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateBatchItemsPipelineStep.cs" company="Health Catalyst">
+// <copyright file="CreateJsonBatchesPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the CreateBatchItemsPipelineStep type.
+//   Defines the CreateJsonBatchesPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ namespace CreateBatchItemsPipelineStep
     /// <summary>
     /// The create batch items queue processor.
     /// </summary>
-    public class CreateBatchItemsPipelineStep : BasePipelineStep<IJsonObjectQueueItem, SaveBatchQueueItem>
+    public class CreateJsonBatchesPipelineStep : BasePipelineStep<IJsonObjectQueueItem, SaveBatchQueueItem>
     {
         /// <summary>
         /// The temporary cache.
@@ -38,7 +38,7 @@ namespace CreateBatchItemsPipelineStep
         private readonly Queue<IJsonObjectQueueItem> temporaryCache = new Queue<IJsonObjectQueueItem>();
 
         /// <inheritdoc />
-        public CreateBatchItemsPipelineStep(
+        public CreateJsonBatchesPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
@@ -53,7 +53,7 @@ namespace CreateBatchItemsPipelineStep
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "CreateBatchItems";
+        protected override string LoggerName => "CreateBatchesOfJson";
 
         /// <summary>
         /// The flush all documents.

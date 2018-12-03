@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlCreateSourceWrappersPipelineStep.cs" company="">
+// <copyright file="CreateSourceWrappersPipelineStep.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlCreateSourceWrappersPipelineStep type.
+//   Defines the CreateSourceWrappersPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ namespace SqlImportPipelineStep
     /// <summary>
     /// The sql combine source wrappers pipeline step.
     /// </summary>
-    public class SqlCreateSourceWrappersPipelineStep : BasePipelineStep<SqlDataLoadedQueueItem, SourceWrapperCollectionQueueItem>
+    public class CreateSourceWrappersPipelineStep : BasePipelineStep<SqlDataLoadedQueueItem, SourceWrapperCollectionQueueItem>
     {
         /// <summary>
         /// The detailed temporary file writer.
@@ -55,7 +55,7 @@ namespace SqlImportPipelineStep
         private int batchNumber;
 
         /// <inheritdoc />
-        public SqlCreateSourceWrappersPipelineStep(
+        public CreateSourceWrappersPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
@@ -73,7 +73,7 @@ namespace SqlImportPipelineStep
         }
 
         /// <inheritdoc />
-        protected override sealed string LoggerName => "SqlCreateSourceWrappers";
+        protected override sealed string LoggerName => "CreateSourceWrappers";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(SqlDataLoadedQueueItem workItem)

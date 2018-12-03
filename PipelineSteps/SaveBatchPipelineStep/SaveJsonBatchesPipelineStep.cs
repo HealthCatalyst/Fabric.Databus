@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SaveBatchPipelineStep.cs" company="">
+// <copyright file="SaveJsonBatchesPipelineStep.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SaveBatchPipelineStep type.
+//   Defines the SaveJsonBatchesPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ namespace SaveBatchPipelineStep
     using Serilog;
 
     /// <inheritdoc />
-    public class SaveBatchPipelineStep : BasePipelineStep<SaveBatchQueueItem, FileUploadQueueItem>
+    public class SaveJsonBatchesPipelineStep : BasePipelineStep<SaveBatchQueueItem, FileUploadQueueItem>
     {
         /// <summary>
         /// The current batch file number.
@@ -40,7 +40,7 @@ namespace SaveBatchPipelineStep
         private static int currentBatchFileNumber = 0;
 
         /// <inheritdoc />
-        public SaveBatchPipelineStep(
+        public SaveJsonBatchesPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
@@ -51,7 +51,7 @@ namespace SaveBatchPipelineStep
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "SaveBatch";
+        protected override string LoggerName => "SaveJsonBatch";
 
         /// <inheritdoc />
         protected override string GetId(SaveBatchQueueItem workItem)

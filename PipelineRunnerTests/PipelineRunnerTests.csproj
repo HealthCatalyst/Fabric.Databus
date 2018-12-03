@@ -288,7 +288,7 @@
       <Project>{bb878905-9592-4a9d-a811-46e73d9f7f6a}</Project>
       <Name>Fabric.Shared</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
+    <ProjectReference Include="..\Fabric.Databus.PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
       <Project>{af1adf05-ec10-43ea-877e-ad504a113b58}</Project>
       <Name>Fabric.Databus.PipelineRunner</Name>
     </ProjectReference>

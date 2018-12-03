@@ -15,12 +15,8 @@ namespace PipelineStep.Tests
     using System.Linq;
     using System.Net;
     using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
-    using CreateBatchItemsPipelineStep;
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Http;
@@ -28,6 +24,7 @@ namespace PipelineStep.Tests
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Json;
+    using Fabric.Databus.PipelineSteps;
     using Fabric.Databus.Shared.FileWriters;
     using Fabric.Databus.Shared.Queues;
 
@@ -39,8 +36,6 @@ namespace PipelineStep.Tests
     using Newtonsoft.Json.Linq;
 
     using QueueItems;
-
-    using SendToRestApiPipelineStep;
 
     using Serilog;
 

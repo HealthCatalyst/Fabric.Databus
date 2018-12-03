@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Unity" Version="5.8.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.ElasticSearch\Fabric.Databus.ElasticSearch.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Http\Fabric.Databus.Http.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.PipelineSteps\Fabric.Databus.PipelineSteps.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.Schema\Fabric.Databus.Schema.csproj" />
+    <ProjectReference Include="..\Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -127,6 +127,10 @@
       <Project>{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}</Project>
       <Name>Fabric.Databus.Interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.PipelineSteps\Fabric.Databus.PipelineSteps.csproj">
+      <Project>{D38A68BD-CA60-4774-9E4D-CFFC36E70D4E}</Project>
+      <Name>Fabric.Databus.PipelineSteps</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Shared\Fabric.Databus.Shared.csproj">
       <Project>{ADE06C2E-4DD9-4C82-ACE2-BFEB881F74EF}</Project>
       <Name>Fabric.Databus.Shared</Name>
@@ -135,29 +139,9 @@
       <Project>{C0ED4050-E7FB-4C68-ADF1-6C8E290A2950}</Project>
       <Name>Fabric.Databus.Config</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PipelineSteps\SendToRestApiPipelineStep\SendToRestApiPipelineStep.csproj">
-      <Project>{8f068cf4-b01f-4c0b-87e6-f39361c6cb3f}</Project>
-      <Name>SendToRestApiPipelineStep</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PipelineSteps\SqlImportPipelineStep\SqlImportPipelineStep.csproj">
-      <Project>{006D43E7-A1EB-4C7A-B200-E5AEB77F3DAC}</Project>
-      <Name>SqlImportPipelineStep</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\QueueItems\QueueItems.csproj">
+    <ProjectReference Include="..\Fabric.Databus.QueueItems\Fabric.Databus.QueueItems.csproj">
       <Project>{EFC37D49-40FA-4F53-B956-B63F7EB47244}</Project>
-      <Name>QueueItems</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PipelineSteps\BasePipelineStep\BasePipelineStep.csproj">
-      <Project>{CFD6967D-8547-42ED-8EED-CBAA607CDDED}</Project>
-      <Name>BasePipelineStep</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PipelineSteps\CreateBatchItemsPipelineStep\CreateBatchItemsPipelineStep.csproj">
-      <Project>{E6B53794-9D7D-4688-AC87-B229E49D681B}</Project>
-      <Name>CreateBatchItemsPipelineStep</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PipelineSteps\JsonDocumentMergerPipelineStep\JsonDocumentMergerPipelineStep.csproj">
-      <Project>{2D062F58-8DA2-4993-8EA5-D596544E1D72}</Project>
-      <Name>JsonDocumentMergerPipelineStep</Name>
+      <Name>Fabric.Databus.QueueItems</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

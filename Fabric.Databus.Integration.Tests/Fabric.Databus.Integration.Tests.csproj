@@ -171,7 +171,7 @@
       <Project>{95cd492e-6d4a-4d9f-a307-1ccadd7bb0ed}</Project>
       <Name>Fabric.Shared.Tests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
+    <ProjectReference Include="..\Fabric.Databus.PipelineRunner\Fabric.Databus.PipelineRunner.csproj">
       <Project>{af1adf05-ec10-43ea-877e-ad504a113b58}</Project>
       <Name>Fabric.Databus.PipelineRunner</Name>
     </ProjectReference>

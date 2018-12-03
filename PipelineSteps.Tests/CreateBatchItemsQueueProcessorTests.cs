@@ -14,10 +14,9 @@ namespace PipelineStep.Tests
     using System.Threading;
     using System.Threading.Tasks;
 
-    using CreateBatchItemsPipelineStep;
-
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Databus.PipelineSteps;
     using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -37,6 +36,9 @@ namespace PipelineStep.Tests
         /// <summary>
         /// The test success.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         [TestMethod]
         public async Task TestSuccess()
         {

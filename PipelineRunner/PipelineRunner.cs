@@ -275,7 +275,7 @@ namespace Fabric.Databus.PipelineRunner
                 new List<PipelineStepInfo>
                     {
                         new PipelineStepInfo { Type = typeof(CreateBatchesPipelineJob), Count = 1 },
-                        new PipelineStepInfo { Type = typeof(CreateBatchesForEachDataSource), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(CreateBatchesForEachDataSourcePipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(QuerySqlPipelineStep), Count = 5 },
                         new PipelineStepInfo { Type = typeof(CreateSourceWrappersPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(WriteSourceWrapperCollectionToJsonPipelineStep), Count = 1 },

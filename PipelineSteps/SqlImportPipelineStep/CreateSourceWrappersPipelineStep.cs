@@ -100,29 +100,7 @@ namespace SqlImportPipelineStep
                     workItem.PropertyType != "object",
                     this.Config.KeepTemporaryLookupColumnsInOutput));
 
-            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
-            {
-                var filepath = this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.QueryId}.csv");
-
-                this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
-
-                using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
-                {
-                    using (var streamWriter = new StreamWriter(stream))
-                    {
-                        var columns = workItem.Columns.Select(c => c.Name).ToList();
-                        var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
-
-                        await streamWriter.WriteLineAsync(text);
-
-                        var lines = workItem.Rows.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
-                        foreach (var line in lines)
-                        {
-                            await streamWriter.WriteLineAsync(line);
-                        }
-                    }
-                }
-            }
+            await this.WriteDiagnostics(workItem);
 
             this.batchNumber = workItem.BatchNumber;
         }
@@ -158,6 +136,42 @@ namespace SqlImportPipelineStep
         protected override string GetId(SqlDataLoadedQueueItem workItem)
         {
             return workItem.QueryId;
+        }
+
+        /// <summary>
+        /// The write diagnostics.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteDiagnostics(SqlDataLoadedQueueItem workItem)
+        {
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                var filepath = this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.QueryId}.csv");
+
+                this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
+
+                using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
+                {
+                    using (var streamWriter = new StreamWriter(stream))
+                    {
+                        var columns = workItem.Columns.Select(c => c.Name).ToList();
+                        var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
+
+                        await streamWriter.WriteLineAsync(text);
+
+                        var lines = workItem.Rows.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
+                        foreach (var line in lines)
+                        {
+                            await streamWriter.WriteLineAsync(line);
+                        }
+                    }
+                }
+            }
         }
     }
 }

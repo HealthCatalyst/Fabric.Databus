@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateBatchesForEachDataSource.cs" company="Health Catalyst">
+// <copyright file="CreateBatchesForEachDataSourcePipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
@@ -28,7 +28,7 @@ namespace SqlBatchPipelineStep
     /// <summary>
     /// Reads a SqlBatchQueueItem with a number of queries and splits it into one SqlImportQueueItem for each query
     /// </summary>
-    public class CreateBatchesForEachDataSource : BasePipelineStep<SqlBatchQueueItem, SqlImportQueueItem>
+    public class CreateBatchesForEachDataSourcePipelineStep : BasePipelineStep<SqlBatchQueueItem, SqlImportQueueItem>
     {
         /// <summary>
         /// The file writer.
@@ -42,7 +42,7 @@ namespace SqlBatchPipelineStep
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:CreateBatchesForEachDataSource.CreateBatchesForEachDataSource" /> class.
+        /// Initializes a new instance of the <see cref="T:CreateBatchesForEachDataSourcePipelineStep.CreateBatchesForEachDataSourcePipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -54,7 +54,7 @@ namespace SqlBatchPipelineStep
         /// <param name="progressMonitor"></param>
         /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="cancellationToken"></param>
-        public CreateBatchesForEachDataSource(
+        public CreateBatchesForEachDataSourcePipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
@@ -100,24 +100,7 @@ namespace SqlBatchPipelineStep
                     });
             }
 
-            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
-            {
-                foreach (var workItemLoad in workItem.Loads)
-                {
-                    var queryName = workItemLoad.Path ?? "Main";
-                    var queryId = queryName;
-
-                    var path = this.detailedTemporaryFileWriter.CombinePath(this.folder, queryId);
-
-                    this.detailedTemporaryFileWriter.CreateDirectory(path);
-
-                    var filepath = this.detailedTemporaryFileWriter.CombinePath(path, Convert.ToString(workItem.BatchNumber) + ".xml");
-
-                    await this.detailedTemporaryFileWriter.WriteToFileAsync(
-                        filepath,
-                        $@"<?xml version=""1.0""?><batch><start>{workItem.Start}</start><end>{workItem.End}</end><sql>{workItemLoad.Sql}</sql></batch>");
-                }
-            }
+            await this.WriteDiagnostics(workItem);
 
             // wait until the other queues are cleared up
 
@@ -129,5 +112,39 @@ namespace SqlBatchPipelineStep
         {
             return workItem.QueryId;
         }
+
+        /// <summary>
+        /// The write diagnostics.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteDiagnostics(SqlBatchQueueItem workItem)
+        {
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                foreach (var workItemLoad in workItem.Loads)
+                {
+                    var queryName = workItemLoad.Path ?? "Main";
+                    var queryId = queryName;
+
+                    var path = this.detailedTemporaryFileWriter.CombinePath(this.folder, queryId);
+
+                    this.detailedTemporaryFileWriter.CreateDirectory(path);
+
+                    var filepath = this.detailedTemporaryFileWriter.CombinePath(
+                        path,
+                        Convert.ToString(workItem.BatchNumber) + ".xml");
+
+                    await this.detailedTemporaryFileWriter.WriteToFileAsync(
+                        filepath,
+                        $@"<?xml version=""1.0""?><batch><start>{workItem.Start}</start><end>{workItem.End}</end><sql>{workItemLoad.Sql}</sql></batch>");
+                }
+            }
+        }
+
     }
 }

@@ -217,36 +217,7 @@ namespace SqlImportPipelineStep
                 this.MyLogger,
                 this.Config.TopLevelKeyColumn);
 
-            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
-            {
-                var path = this.detailedTemporaryFileWriter.CombinePath(this.detailedTemporaryFileWriter.CombinePath(this.folder, queryId), Convert.ToString(batchNumber));
-
-                this.detailedTemporaryFileWriter.CreateDirectory(path);
-
-                foreach (var frame in result.Data)
-                {
-                    var key = frame.Key;
-
-                    var filepath = this.detailedTemporaryFileWriter.CombinePath(path, this.GetSafeFilename(Convert.ToString(key)) + ".csv");
-
-                    using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
-                    {
-                        using (var streamWriter = new StreamWriter(stream))
-                        {
-                            var columns = result.ColumnList.Select(c => c.Name).ToList();
-                            var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
-
-                            await streamWriter.WriteLineAsync(text);
-
-                            var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
-                            foreach (var item in list)
-                            {
-                                await streamWriter.WriteLineAsync($@"""{key}""," + item);
-                            }
-                        }
-                    }
-                }
-            }
+            await this.WriteDiagnostics(queryId, batchNumber, result);
 
             foreach (var frame in result.Data)
             {
@@ -273,6 +244,59 @@ namespace SqlImportPipelineStep
             untransformedFields.ForEach(f => { });
 
             this.MyLogger.Verbose($"Finished reading rows for {queryId}");
+        }
+
+        /// <summary>
+        /// The write diagnostics.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="batchNumber">
+        /// The batch number.
+        /// </param>
+        /// <param name="result">
+        /// The result.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteDiagnostics(string queryId, int batchNumber, ReadSqlDataResult result)
+        {
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                var path = this.detailedTemporaryFileWriter.CombinePath(
+                    this.detailedTemporaryFileWriter.CombinePath(this.folder, queryId),
+                    Convert.ToString(batchNumber));
+
+                this.detailedTemporaryFileWriter.CreateDirectory(path);
+
+                foreach (var frame in result.Data)
+                {
+                    var key = frame.Key;
+
+                    var filepath = this.detailedTemporaryFileWriter.CombinePath(
+                        path,
+                        this.GetSafeFilename(Convert.ToString(key)) + ".csv");
+
+                    using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
+                    {
+                        using (var streamWriter = new StreamWriter(stream))
+                        {
+                            var columns = result.ColumnList.Select(c => c.Name).ToList();
+                            var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
+
+                            await streamWriter.WriteLineAsync(text);
+
+                            var list = frame.Value.Select(c => string.Join(",", c.Select(c1 => $@"""{c1}"""))).ToList();
+                            foreach (var item in list)
+                            {
+                                await streamWriter.WriteLineAsync($@"""{key}""," + item);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

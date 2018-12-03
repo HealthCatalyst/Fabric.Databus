@@ -110,14 +110,7 @@ namespace SqlJobPipelineStep
                                               Loads = workItem.Job.Data.DataSources,
                                           });
 
-                if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
-                {
-                    this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
-
-                    await this.detailedTemporaryFileWriter.WriteToFileAsync(
-                        this.detailedTemporaryFileWriter.CombinePath(this.folder, "1.txt"),
-                        "start=null, end=null");
-                }
+                await this.WriteDiagnosticsWithNoBatches();
             }
             else
             {
@@ -141,14 +134,7 @@ namespace SqlJobPipelineStep
                                     .ToDictionary(a => a.Path, a => a.PropertyType)
                             });
 
-                    if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
-                    {
-                        this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
-
-                        await this.detailedTemporaryFileWriter.WriteToFileAsync(
-                            this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{currentBatchNumber}.txt"),
-                            $"start={range.Item1}, end={range.Item2}");
-                    }
+                    await this.WriteDiagnostics(currentBatchNumber, range);
                 }
             }
         }
@@ -200,6 +186,48 @@ namespace SqlJobPipelineStep
             }
 
             return ranges;
+        }
+
+        /// <summary>
+        /// The write diagnostics with no batches.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteDiagnosticsWithNoBatches()
+        {
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
+
+                await this.detailedTemporaryFileWriter.WriteToFileAsync(
+                    this.detailedTemporaryFileWriter.CombinePath(this.folder, "1.txt"),
+                    "start=null, end=null");
+            }
+        }
+
+        /// <summary>
+        /// The write diagnostics.
+        /// </summary>
+        /// <param name="currentBatchNumber">
+        /// The current batch number.
+        /// </param>
+        /// <param name="range">
+        /// The range.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteDiagnostics(int currentBatchNumber, Tuple<string, string> range)
+        {
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
+
+                await this.detailedTemporaryFileWriter.WriteToFileAsync(
+                    this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{currentBatchNumber}.txt"),
+                    $"start={range.Item1}, end={range.Item2}");
+            }
         }
     }
 }

@@ -27,6 +27,7 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Pipeline;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Json;

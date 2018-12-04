@@ -23,6 +23,7 @@ namespace PipelineRunnerTests
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Pipeline;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared.Loggers;

@@ -11,6 +11,8 @@ namespace Fabric.Databus.PipelineRunner
 {
     using System.Threading;
 
+    using Fabric.Databus.Interfaces.Pipeline;
+
     using Unity;
 
     /// <inheritdoc />

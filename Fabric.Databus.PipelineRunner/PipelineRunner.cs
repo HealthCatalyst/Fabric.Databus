@@ -172,7 +172,8 @@ namespace Fabric.Databus.PipelineRunner
             var processors = this.GetPipelineByName(config.Pipeline, config);
 
             var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
-            var fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, config.Urls);
+            var httpRequestInjector = this.container.Resolve<IHttpRequestInterceptor>();
+            var fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, config.Urls, httpRequestInjector);
             this.container.RegisterInstance(fileUploader);
 
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
@@ -435,6 +436,11 @@ namespace Fabric.Databus.PipelineRunner
             if (!this.container.IsRegistered<IHttpClientFactory>())
             {
                 this.container.RegisterType<IHttpClientFactory, HttpClientFactory>();
+            }
+
+            if (!this.container.IsRegistered<IHttpRequestInterceptor>())
+            {
+                this.container.RegisterType<IHttpRequestInterceptor, DummyHttpRequestInterceptor>();
             }
 
             if (config.UseMultipleThreads)

@@ -82,14 +82,7 @@ namespace Fabric.Databus.PipelineSteps
 
             await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
-            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
-            {
-                var path = this.detailedTemporaryFileWriter.CombinePath(
-                    this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.BatchNumber}.txt"),
-                    Convert.ToString(workItem.BatchNumber));
-
-                this.detailedTemporaryFileWriter.CreateDirectory(path);
-            }
+            this.WriteDiagnostics(workItem);
 
             // now send to Rest Api
             await this.fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
@@ -100,5 +93,24 @@ namespace Fabric.Databus.PipelineSteps
         {
             return workItem.Id;
         }
+
+        /// <summary>
+        /// The write diagnostics.
+        /// </summary>
+        /// <param name="workItem">
+        /// The work item.
+        /// </param>
+        private void WriteDiagnostics(IJsonObjectQueueItem workItem)
+        {
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            {
+                var path = this.detailedTemporaryFileWriter.CombinePath(
+                    this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.BatchNumber}.txt"),
+                    Convert.ToString(workItem.BatchNumber));
+
+                this.detailedTemporaryFileWriter.CreateDirectory(path);
+            }
+        }
+
     }
 }

@@ -33,6 +33,11 @@ namespace Fabric.Databus.ElasticSearch
         private readonly IHttpClientFactory httpClientFactory;
 
         /// <summary>
+        /// The http request injector.
+        /// </summary>
+        private readonly IHttpRequestInterceptor httpRequestInterceptor;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElasticSearchUploaderFactory"/> class.
         /// </summary>
         /// <param name="logger">
@@ -41,16 +46,37 @@ namespace Fabric.Databus.ElasticSearch
         /// <param name="httpClientFactory">
         /// The http Client Factory.
         /// </param>
-        public ElasticSearchUploaderFactory(ILogger logger, IHttpClientFactory httpClientFactory)
+        /// <param name="httpRequestInterceptor">
+        /// The http Request Injector.
+        /// </param>
+        public ElasticSearchUploaderFactory(ILogger logger, IHttpClientFactory httpClientFactory, IHttpRequestInterceptor httpRequestInterceptor)
         {
             this.logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            this.httpRequestInterceptor = httpRequestInterceptor;
         }
 
         /// <inheritdoc />
-        public IElasticSearchUploader Create(string userName, string password, bool keepIndexOnline, List<string> urls, string index, string alias, string entityType)
+        public IElasticSearchUploader Create(
+            string userName,
+            string password,
+            bool keepIndexOnline,
+            List<string> urls,
+            string index,
+            string alias,
+            string entityType)
         {
-            return new ElasticSearchUploader(userName, password, keepIndexOnline, this.logger, urls, index, alias, entityType, this.httpClientFactory);
+            return new ElasticSearchUploader(
+                userName,
+                password,
+                keepIndexOnline,
+                this.logger,
+                urls,
+                index,
+                alias,
+                entityType,
+                this.httpClientFactory,
+                this.httpRequestInterceptor);
         }
     }
 }

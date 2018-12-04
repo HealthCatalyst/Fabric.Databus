@@ -11,6 +11,11 @@ namespace Fabric.Databus.Interfaces.Http
 {
     using System.Collections.Generic;
 
+    using Fabric.Databus.Http;
+
+    /// <summary>
+    /// The FileUploaderFactory interface.
+    /// </summary>
     public interface IFileUploaderFactory
     {
         /// <summary>
@@ -22,24 +27,15 @@ namespace Fabric.Databus.Interfaces.Http
         /// <param name="password">
         /// The config elastic search password.
         /// </param>
-        /// <param name="keepIndexOnline">
-        /// The config keep index online.
-        /// </param>
         /// <param name="urls">
         /// The config Urls.
         /// </param>
-        /// <param name="index">
-        /// The config Index.
-        /// </param>
-        /// <param name="alias">
-        /// The config Alias.
-        /// </param>
-        /// <param name="entityType">
-        /// The entity Type.
+        /// <param name="httpRequestInterceptor">
+        /// The http Request Injector.
         /// </param>
         /// <returns>
         /// The <see cref="FileUploader"/>.
         /// </returns>
-        IFileUploader Create(string userName, string password, List<string> urls);
+        IFileUploader Create(string userName, string password, List<string> urls, IHttpRequestInterceptor httpRequestInterceptor);
     }
 }

@@ -10,4 +10,10 @@
     <PackageReference Include="Unity.Container" Version="5.8.12" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Fabric.Databus.Http">
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18332.13\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Http.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

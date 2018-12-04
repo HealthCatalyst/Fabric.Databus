@@ -30,6 +30,16 @@ namespace Fabric.Databus.Http
     public class FileUploader : IFileUploader
     {
         /// <summary>
+        /// The stopwatch.
+        /// </summary>
+        protected readonly Stopwatch stopwatch = new Stopwatch();
+
+        /// <summary>
+        /// The queued files.
+        /// </summary>
+        protected readonly ConcurrentQueue<string> queuedFiles = new ConcurrentQueue<string>();
+
+        /// <summary>
         /// The logger.
         /// </summary>
         protected ILogger logger;
@@ -39,14 +49,22 @@ namespace Fabric.Databus.Http
         /// </summary>
         protected List<string> hosts;
 
+        /// <summary>
+        /// The username.
+        /// </summary>
         private readonly string username;
 
+        /// <summary>
+        /// The password.
+        /// </summary>
         private readonly string password;
+
+        private readonly IHttpRequestInterceptor httpRequestInterceptor;
 
         /// <summary>
         /// The http client.
         /// </summary>
-        protected HttpClient httpClient;
+        private readonly HttpClient httpClient;
 
         /// <summary>
         /// The request failures.
@@ -59,19 +77,14 @@ namespace Fabric.Databus.Http
         protected int currentRequests = 0;
 
         /// <summary>
-        /// The stopwatch.
-        /// </summary>
-        protected readonly Stopwatch stopwatch = new Stopwatch();
-
-        /// <summary>
-        /// The queued files.
-        /// </summary>
-        protected readonly ConcurrentQueue<string> queuedFiles = new ConcurrentQueue<string>();
-
-        /// <summary>
         /// The total files.
         /// </summary>
         protected int totalFiles;
+
+        /// <summary>
+        /// The http client helper.
+        /// </summary>
+        protected readonly HttpClientHelper httpClientHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileUploader"/> class.
@@ -91,19 +104,29 @@ namespace Fabric.Databus.Http
         /// <param name="password">
         /// The password.
         /// </param>
-        public FileUploader(ILogger logger, List<string> hosts, IHttpClientFactory httpClientFactory, string username, string password)
+        /// <param name="httpRequestInterceptor">
+        /// The http Request Injector.
+        /// </param>
+        public FileUploader(
+            ILogger logger,
+            List<string> hosts,
+            IHttpClientFactory httpClientFactory,
+            string username,
+            string password,
+            IHttpRequestInterceptor httpRequestInterceptor)
         {
-            this.logger = logger;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.hosts = hosts;
             this.username = username;
             this.password = password;
+            this.httpRequestInterceptor = httpRequestInterceptor ?? throw new ArgumentNullException(nameof(logger));
 
             this.httpClient = httpClientFactory.Create();
             this.httpClient.DefaultRequestHeaders.Accept.Clear();
 
+            this.httpClientHelper = new HttpClientHelper(this.httpClient, this.httpRequestInterceptor);
+
             this.AddAuthorizationToken(this.httpClient);
-
-
         }
 
         /// <inheritdoc />
@@ -165,8 +188,8 @@ namespace Fabric.Databus.Http
                 var requestStartTimeMilliseconds = this.stopwatch.ElapsedMilliseconds;
 
                 var response = doCompress
-                                   ? await this.httpClient.PutAsyncStreamCompressed(baseUri, url, stream)
-                                   : await this.httpClient.PutAsyncStream(baseUri, url, stream);
+                                   ? await httpClientHelper.PutAsyncStreamCompressed(baseUri, url, stream)
+                                   : await httpClientHelper.PutAsyncStream(baseUri, url, stream);
 
                 if (response.IsSuccessStatusCode)
                 {

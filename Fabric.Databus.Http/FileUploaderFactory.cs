@@ -11,9 +11,12 @@ namespace Fabric.Databus.Http
 {
     using System;
     using System.Collections.Generic;
+
+    using Fabric.Databus.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
     using Serilog;
 
+    /// <inheritdoc />
     public class FileUploaderFactory : IFileUploaderFactory
     {
         /// <summary>
@@ -27,7 +30,7 @@ namespace Fabric.Databus.Http
         private readonly IHttpClientFactory httpClientFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ElasticSearchUploaderFactory"/> class.
+        /// Initializes a new instance of the <see cref="FileUploaderFactory"/> class. 
         /// </summary>
         /// <param name="logger">
         /// The logger.
@@ -42,9 +45,9 @@ namespace Fabric.Databus.Http
         }
 
         /// <inheritdoc />
-        public IFileUploader Create(string userName, string password, List<string> urls)
+        public IFileUploader Create(string userName, string password, List<string> urls, IHttpRequestInterceptor httpRequestInterceptor)
         {
-            return new FileUploader(this.logger, urls, this.httpClientFactory, userName, password);
+            return new FileUploader(this.logger, urls, this.httpClientFactory, userName, password, httpRequestInterceptor);
         }
     }
 }

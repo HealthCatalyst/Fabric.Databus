@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateBatchItemsQueueProcessorTests.cs" company="Health Catalyst">
+// <copyright file="CreateJsonBatchesPipelineStepUnitTests.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
@@ -31,7 +31,7 @@ namespace PipelineStep.Tests
     /// The create batch items queue processor tests.
     /// </summary>
     [TestClass]
-    public class CreateBatchItemsQueueProcessorTests
+    public class CreateJsonBatchesPipelineStepUnitTests
     {
         /// <summary>
         /// The test success.
@@ -100,7 +100,7 @@ namespace PipelineStep.Tests
 
                 Assert.AreEqual(2, queues.Count);
 
-                var meteredBlockingCollection = queues.First(queue => queue.Key == "SaveBatchQueueItem2").Value;
+                var meteredBlockingCollection = queues.First(queue => queue.Key == nameof(SaveBatchQueueItem) + "2").Value;
                 var outputQueue = meteredBlockingCollection as IQueue<SaveBatchQueueItem>;
 
                 Assert.IsNotNull(outputQueue);

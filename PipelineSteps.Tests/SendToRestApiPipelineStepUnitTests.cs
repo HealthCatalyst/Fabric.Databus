@@ -139,7 +139,7 @@ namespace PipelineStep.Tests
 
                 Assert.AreEqual(2, queues.Count);
 
-                var meteredBlockingCollection = queues.First(queue => queue.Key == "EndPointQueueItem2").Value;
+                var meteredBlockingCollection = queues.First(queue => queue.Key == nameof(EndPointQueueItem) + "2").Value;
                 var outputQueue = meteredBlockingCollection as IQueue<EndPointQueueItem>;
 
                 handlerMock.Protected()

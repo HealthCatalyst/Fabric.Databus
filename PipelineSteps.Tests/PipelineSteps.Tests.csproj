@@ -106,14 +106,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateBatchItemsQueueProcessorTests.cs" />
-    <Compile Include="JsonDocumentMergerQueueProcessorTester.cs" />
-    <Compile Include="MockDatabusSqlReader.cs" />
+    <Compile Include="CreateJsonBatchesPipelineStepUnitTests.cs" />
     <Compile Include="MockProgressMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlImporterUnitTests.cs" />
     <Compile Include="SendToRestApiPipelineStepUnitTests.cs" />
-    <Compile Include="CreateBatchesUnitTests.cs" />
+    <Compile Include="CreateBatchesPipelineStepUnitTests.cs" />
+    <Compile Include="QuerySqlPipelineStepUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Http\Fabric.Databus.Http.csproj">

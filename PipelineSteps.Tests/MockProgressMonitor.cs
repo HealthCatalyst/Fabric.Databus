@@ -12,37 +12,23 @@ namespace PipelineStep.Tests
     using System;
     using System.Collections.Generic;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Loggers;
 
+    /// <inheritdoc />
     /// <summary>
     /// The mock progress monitor.
     /// </summary>
     public class MockProgressMonitor : IProgressMonitor
     {
-        /// <summary>
-        /// Gets or sets the job history update action.
-        /// </summary>
+        /// <inheritdoc />
         public Action JobHistoryUpdateAction { get; set; }
 
-        /// <summary>
-        /// The set progress item.
-        /// </summary>
-        /// <param name="progressMonitorItem">
-        /// The progress monitor item.
-        /// </param>
+        /// <inheritdoc />
         public void SetProgressItem(ProgressMonitorItem progressMonitorItem)
         {
         }
 
-        /// <summary>
-        /// The get snapshot of progress items.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="IList"/>.
-        /// </returns>
-        /// <exception cref="NotImplementedException">exception thrown
-        /// </exception>
+        /// <inheritdoc />
         public IList<ProgressMonitorItem> GetSnapshotOfProgressItems()
         {
             throw new NotImplementedException();

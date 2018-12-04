@@ -109,7 +109,6 @@ namespace Fabric.Databus.Nuget.Console
 
             Console.WriteLine("(Type any key to exit)");
             Console.ReadKey();
-
         }
     }
 }

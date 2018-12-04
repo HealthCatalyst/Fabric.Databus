@@ -14,6 +14,7 @@ namespace Fabric.Databus.Config
 
     using Fabric.Databus.Interfaces.Config;
 
+    /// <inheritdoc />
     /// <summary>
     /// The query config.
     /// </summary>
@@ -36,11 +37,11 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public string ElasticSearchUserName { get; set; }
+        public string UrlUserName { get; set; }
 
         /// <inheritdoc />
         [DataMember]
-        public string ElasticSearchPassword { get; set; }
+        public string UrlPassword { get; set; }
 
         /// <inheritdoc />
         [DataMember]
@@ -100,7 +101,7 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public bool UploadToElasticSearch { get; set; }
+        public bool UploadToUrl { get; set; }
 
         /// <inheritdoc />
         [DataMember]

@@ -3,8 +3,8 @@
   <Config>
     <ConnectionString>Server=tcp:localhost,1433;Initial Catalog=Databus;Integrated Security=true;</ConnectionString>
     <Url>[elasticurl]</Url>
-    <ElasticSearchUserName>elastic</ElasticSearchUserName>
-    <ElasticSearchPassword>[password]</ElasticSearchPassword>
+    <UrlUserName>elastic</UrlUserName>
+    <UrlPassword>[password]</UrlPassword>
     <MaximumEntitiesToLoad>0</MaximumEntitiesToLoad>
     <EntitiesPerBatch>5000</EntitiesPerBatch>
     <EntitiesPerUploadFile>2000</EntitiesPerUploadFile>
@@ -13,7 +13,7 @@
     <WriteTemporaryFilesToDisk>false</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>false</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <UploadToElasticSearch>false</UploadToElasticSearch>
+    <UploadToUrl>false</UploadToUrl>
     <Index>patient_mvp20_0502</Index>
     <Alias>patients</Alias>
     <EntityType>Patient</EntityType>

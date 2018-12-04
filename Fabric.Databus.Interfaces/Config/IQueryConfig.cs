@@ -25,12 +25,12 @@ namespace Fabric.Databus.Interfaces.Config
         /// <summary>
         /// Gets or sets the elastic search user name.
         /// </summary>
-        string ElasticSearchUserName { get; set; }
+        string UrlUserName { get; set; }
 
         /// <summary>
         /// Gets or sets the elastic search password.
         /// </summary>
-        string ElasticSearchPassword { get; set; }
+        string UrlPassword { get; set; }
 
         /// <summary>
         /// Gets the urls.
@@ -60,7 +60,7 @@ namespace Fabric.Databus.Interfaces.Config
         /// <summary>
         /// Gets or sets a value indicating whether upload to elastic search.
         /// </summary>
-        bool UploadToElasticSearch { get; set; }
+        bool UploadToUrl { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether keep index online.

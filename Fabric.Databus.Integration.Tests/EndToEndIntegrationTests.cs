@@ -171,7 +171,7 @@ FROM Text
                                     Assert.AreEqual("Basic", request.Headers.Authorization.Scheme);
                                     var actualParameter = request.Headers.Authorization.Parameter;
 
-                                    var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.ElasticSearchUserName}:{config.Config.ElasticSearchPassword}");
+                                    var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.UrlUserName}:{config.Config.UrlPassword}");
                                     var expectedParameter = Convert.ToBase64String(expectedByteArray);
 
                                     Assert.AreEqual(expectedParameter, actualParameter);
@@ -191,8 +191,8 @@ FROM Text
                         container.RegisterInstance(mockHttpClientFactory.Object);
 
                         var basicAuthorizationRequestInterceptor = new BasicAuthorizationRequestInterceptor(
-                            config.Config.ElasticSearchUserName,
-                            config.Config.ElasticSearchPassword);
+                            config.Config.UrlUserName,
+                            config.Config.UrlPassword);
 
                         var mockHttpRequestInterceptor = mockRepository.Create<IHttpRequestInterceptor>();
                         mockHttpRequestInterceptor.Setup(
@@ -368,7 +368,7 @@ FROM Text
                                     Assert.AreEqual("Basic", request.Headers.Authorization.Scheme);
                                     var actualParameter = request.Headers.Authorization.Parameter;
 
-                                    var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.ElasticSearchUserName}:{config.Config.ElasticSearchPassword}");
+                                    var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.UrlUserName}:{config.Config.UrlPassword}");
                                     var expectedParameter = Convert.ToBase64String(expectedByteArray);
 
                                     Assert.AreEqual(expectedParameter, actualParameter);

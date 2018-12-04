@@ -157,7 +157,7 @@ namespace Fabric.Databus.Console
                 WriteTemporaryFilesToDisk = true,
                 WriteDetailedTemporaryFilesToDisk = true,
                 CompressFiles = false,
-                UploadToElasticSearch = false,
+                UploadToUrl = false,
                 Index = "Patients2",
                 Alias = "patients",
                 EntityType = "patient",

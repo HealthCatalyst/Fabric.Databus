@@ -32,13 +32,13 @@
               <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="WriteTemporaryFilesToDisk"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="WriteDetailedTemporaryFilesToDisk"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="CompressFiles"/>
-              <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UploadToElasticSearch"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UploadToUrl"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="KeepTemporaryLookupColumnsInOutput"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UseMultipleThreads"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="SqlCommandTimeoutInSeconds"/>
               <xs:element minOccurs="0" maxOccurs="1" type="pipelineName" name="Pipeline"/>
-              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="ElasticSearchUserName"/>
-              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="ElasticSearchPassword"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlUserName"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlPassword"/>
             </xs:all>
           </xs:complexType>
         </xs:element>

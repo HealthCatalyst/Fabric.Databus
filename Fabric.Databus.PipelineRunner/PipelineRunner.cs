@@ -236,7 +236,7 @@ namespace Fabric.Databus.PipelineRunner
                                 new PipelineStepInfo { Type = typeof(SaveSchemaPipelineStep), Count = 1 },
                                 new PipelineStepInfo
                                     {
-                                        Type = config.UploadToElasticSearch
+                                        Type = config.UploadToUrl
                                                    ? typeof(MappingUploadPipelineStep)
                                                    : typeof(DummyMappingUploadPipelineStep),
                                         Count = 1
@@ -438,9 +438,9 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IHttpRequestInterceptor>())
             {
-                if (!string.IsNullOrWhiteSpace(config.ElasticSearchUserName))
+                if (!string.IsNullOrWhiteSpace(config.UrlUserName))
                 {
-                    this.container.RegisterInstance<IHttpRequestInterceptor>(new BasicAuthorizationRequestInterceptor(config.ElasticSearchUserName, config.ElasticSearchPassword));
+                    this.container.RegisterInstance<IHttpRequestInterceptor>(new BasicAuthorizationRequestInterceptor(config.UrlUserName, config.UrlPassword));
                 }
                 else
                 {

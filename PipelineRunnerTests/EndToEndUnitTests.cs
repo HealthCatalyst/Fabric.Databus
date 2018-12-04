@@ -61,7 +61,7 @@ namespace PipelineRunnerTests
                     LocalSaveFolder = Path.GetTempPath(),
                     TopLevelKeyColumn = "AliasPatientID",
                     Url = "http://foo",
-                    UploadToElasticSearch = false,
+                    UploadToUrl = false,
                     EntitiesPerUploadFile = 1,
                     Pipeline = PipelineNames.ElasticSearch
                 },
@@ -193,7 +193,7 @@ namespace PipelineRunnerTests
                     LocalSaveFolder = Path.GetTempPath(),
                     TopLevelKeyColumn = "AliasPatientID",
                     Url = "http://foo",
-                    UploadToElasticSearch = false,
+                    UploadToUrl = false,
                     EntitiesPerUploadFile = 1,
                     Pipeline = PipelineNames.ElasticSearch
                 },

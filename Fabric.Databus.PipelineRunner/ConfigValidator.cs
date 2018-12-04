@@ -104,10 +104,10 @@ namespace Fabric.Databus.PipelineRunner
                     configValidationResult.Results.Add($"Query [{load.Path}]: {queryIsValid}");
                 }
 
-                if (job.Config.UploadToElasticSearch)
+                if (job.Config.UploadToUrl)
                 {
-                    // string x = await (new ElasticSearchUploader(job.Config.ElasticSearchUserName,
-                    //    job.Config.ElasticSearchPassword, job.Config.KeepIndexOnline).TestElasticSearchConnection(job.Config.Urls));
+                    // string x = await (new ElasticSearchUploader(job.Config.UrlUserName,
+                    //    job.Config.UrlPassword, job.Config.KeepIndexOnline).TestElasticSearchConnection(job.Config.Urls));
 
                     // configValidationResult.Results.Add($"ElasticSearch Connection: {x}");
                 }

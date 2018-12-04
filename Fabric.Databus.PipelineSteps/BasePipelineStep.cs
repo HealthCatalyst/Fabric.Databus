@@ -124,6 +124,11 @@ namespace Fabric.Databus.PipelineSteps
         private int totalItemsProcessedByThisProcessor;
 
         /// <summary>
+        /// The work item query id.
+        /// </summary>
+        private string workItemQueryId;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BasePipelineStep{TQueueInItem,TQueueOutItem}"/> class.
         /// </summary>
         /// <param name="jobConfig">
@@ -200,7 +205,7 @@ namespace Fabric.Databus.PipelineSteps
 
             this.LogToConsole(null, null);
 
-            string queryId = null;
+            this.workItemQueryId = null;
             var stopWatch = new Stopwatch();
 
             while (true)
@@ -220,7 +225,7 @@ namespace Fabric.Databus.PipelineSteps
 
                     blockedTime = blockedTime.Add(stopWatch.Elapsed);
 
-                    queryId = wt.QueryId;
+                    this.workItemQueryId = wt.QueryId;
 
                     this.LogItemToConsole(wt);
 
@@ -261,9 +266,9 @@ namespace Fabric.Databus.PipelineSteps
 
             currentProcessorCount = Interlocked.Decrement(ref processorCount);
             var isLastThreadForThisTask = currentProcessorCount < 1;
-            await this.CompleteAsync(queryId, isLastThreadForThisTask);
+            await this.CompleteAsync(this.workItemQueryId, isLastThreadForThisTask);
 
-            this.MyLogger.Verbose($"Completed {queryId}: queue: {this.InQueue.Count}");
+            this.MyLogger.Verbose($"Completed {this.workItemQueryId}: queue: {this.InQueue.Count}");
 
             this.LogToConsole(null, null);
         }
@@ -361,6 +366,12 @@ namespace Fabric.Databus.PipelineSteps
             // Logger.Verbose($"AddToOutputQueueAsync {item.ToJson()}");
             this.outQueue.Add(item);
             Interlocked.Increment(ref totalItemsAddedToOutputQueue);
+
+            if (this.workItemQueryId != null)
+            {
+                TotalItemsAddedToOutputQueueByQueryId.AddOrUpdate(this.workItemQueryId, 1, (key, currentValue) => currentValue + 1);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -432,6 +443,10 @@ namespace Fabric.Databus.PipelineSteps
                                             ? ProcessingTimeByQueryId[queryId]
                                             : processingTime;
 
+            var itemsAddedToOutputQueue = this.workItemQueryId != null && TotalItemsAddedToOutputQueueByQueryId.ContainsKey(this.workItemQueryId)
+                                              ? TotalItemsAddedToOutputQueueByQueryId[this.workItemQueryId]
+                                              : totalItemsAddedToOutputQueue;
+
             this.progressMonitor.SetProgressItem(new ProgressMonitorItem
             {
                 StepNumber = this.stepNumber,
@@ -444,7 +459,7 @@ namespace Fabric.Databus.PipelineSteps
                 TimeElapsedProcessing = timeElapsedProcessing,
                 TimeElapsedBlocked = blockedTime,
                 TotalItemsProcessed = totalItemsProcessed,
-                TotalItemsAddedToOutputQueue = totalItemsAddedToOutputQueue,
+                TotalItemsAddedToOutputQueue = itemsAddedToOutputQueue,
                 OutQueueName = this.outQueue.Name,
                 QueueProcessorCount = processorCount,
                 MaxQueueProcessorCount = maxProcessorCount,

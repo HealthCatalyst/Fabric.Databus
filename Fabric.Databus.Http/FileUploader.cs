@@ -15,7 +15,6 @@ namespace Fabric.Databus.Http
     using System.Diagnostics;
     using System.IO;
     using System.Net;
-    using System.Net.Http;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -54,6 +53,8 @@ namespace Fabric.Databus.Http
         /// </summary>
         protected List<string> hosts;
 
+        private readonly IHttpResponseInterceptor httpResponseInterceptor;
+
         /// <summary>
         /// The request failures.
         /// </summary>
@@ -84,14 +85,18 @@ namespace Fabric.Databus.Http
         /// <param name="httpRequestInterceptor">
         /// The http Request Injector.
         /// </param>
+        /// <param name="httpResponseInterceptor">
+        /// http response interceptor</param>
         public FileUploader(
             ILogger logger,
             List<string> hosts,
             IHttpClientFactory httpClientFactory,
-            IHttpRequestInterceptor httpRequestInterceptor)
+            IHttpRequestInterceptor httpRequestInterceptor,
+            IHttpResponseInterceptor httpResponseInterceptor)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.hosts = hosts;
+            this.httpResponseInterceptor = httpResponseInterceptor ?? throw new ArgumentNullException(nameof(httpResponseInterceptor));
 
             this.HttpClientHelper = new HttpClientHelper(httpClientFactory, httpRequestInterceptor);
         }
@@ -154,9 +159,11 @@ namespace Fabric.Databus.Http
                 Interlocked.Increment(ref this.currentRequests);
                 var requestStartTimeMilliseconds = this.Stopwatch.ElapsedMilliseconds;
 
+                var fullUri = new Uri(new Uri(baseUri), url);
+
                 var response = doCompress
-                                   ? await this.HttpClientHelper.PutAsyncStreamCompressed(baseUri, url, stream)
-                                   : await this.HttpClientHelper.PutAsyncStream(baseUri, url, stream);
+                                   ? await this.HttpClientHelper.PutAsyncStreamCompressed(fullUri, stream)
+                                   : await this.HttpClientHelper.PutAsyncStream(fullUri, stream);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -164,19 +171,18 @@ namespace Fabric.Databus.Http
 
                     var responseContent = await response.Content.ReadAsStringAsync();
 
-                    var stopwatchElapsed = this.Stopwatch.ElapsedMilliseconds;
-
-                    // var millisecsPerFile = 0; // Convert.ToInt32(stopwatchElapsed / (_totalFiles - _queuedFiles.Count));
-                    var millisecsForThisFile = stopwatchElapsed - requestStartTimeMilliseconds;
+                    this.httpResponseInterceptor.InterceptResponse(fullUri, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds);
                 }
                 else
                 {
                     // logger.Verbose("========= Error =================");
                     this.logger.Error(requestContent);
 
-                    var responseJson = await response.Content.ReadAsStringAsync();
+                    var responseContent = await response.Content.ReadAsStringAsync();
 
-                    this.logger.Error(responseJson);
+                    this.httpResponseInterceptor.InterceptResponse(fullUri, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds);
+
+                    this.logger.Error(responseContent);
 
                     // logger.Verbose("========= Error =================");
                 }

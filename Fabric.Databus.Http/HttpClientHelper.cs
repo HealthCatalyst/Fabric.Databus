@@ -121,11 +121,8 @@ namespace Fabric.Databus.Http
         /// <summary>
         /// The put async stream compressed.
         /// </summary>
-        /// <param name="baseUri">
-        /// The base uri.
-        /// </param>
-        /// <param name="relativeUrl">
-        /// The relative url.
+        /// <param name="url">
+        /// the url
         /// </param>
         /// <param name="stream">
         /// The stream.
@@ -134,8 +131,7 @@ namespace Fabric.Databus.Http
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
         public async Task<HttpResponseMessage> PutAsyncStreamCompressed(
-            string baseUri,
-            string relativeUrl,
+            Uri url,
             Stream stream)
         {
             stream.Position = 0;
@@ -152,18 +148,14 @@ namespace Fabric.Databus.Http
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            var url = new Uri(new Uri(baseUri), relativeUrl);
             return await this.PutAsync(url, content).ConfigureAwait(false);
         }
 
         /// <summary>
         /// The put async stream.
         /// </summary>
-        /// <param name="baseUri">
-        /// The base uri.
-        /// </param>
-        /// <param name="relativeUrl">
-        /// The relative url.
+        /// <param name="url">
+        /// The url.
         /// </param>
         /// <param name="stream">
         /// The stream.
@@ -172,8 +164,7 @@ namespace Fabric.Databus.Http
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
         public async Task<HttpResponseMessage> PutAsyncStream(
-            string baseUri,
-            string relativeUrl,
+            Uri url,
             Stream stream)
         {
             stream.Position = 0;
@@ -186,7 +177,6 @@ namespace Fabric.Databus.Http
             StreamContent content = new StreamContent(ms);
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
 
-            var url = new Uri(new Uri(baseUri), relativeUrl);
             return await this.PutAsync(url, content).ConfigureAwait(false);
         }
 

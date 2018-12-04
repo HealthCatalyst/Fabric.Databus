@@ -87,6 +87,7 @@ namespace Fabric.Databus.ElasticSearch
         /// The http Client Factory.
         /// </param>
         /// <param name="httpRequestInterceptor"></param>
+        /// <param name="httpResponseInterceptor"></param>
         public ElasticSearchUploader(
             bool keepIndexOnline,
             ILogger logger,
@@ -95,8 +96,9 @@ namespace Fabric.Databus.ElasticSearch
             string alias,
             string entityType,
             IHttpClientFactory httpClientFactory,
-            IHttpRequestInterceptor httpRequestInterceptor)
-        : base(logger, hosts, httpClientFactory, httpRequestInterceptor)
+            IHttpRequestInterceptor httpRequestInterceptor,
+            IHttpResponseInterceptor httpResponseInterceptor)
+        : base(logger, hosts, httpClientFactory, httpRequestInterceptor, httpResponseInterceptor)
         {
             if (httpClientFactory == null)
             {
@@ -459,9 +461,12 @@ namespace Fabric.Databus.ElasticSearch
                 Interlocked.Increment(ref this.currentRequests);
                 var requestStartTimeMillisecs = this.Stopwatch.ElapsedMilliseconds;
 
+
+                var fullUri = new Uri(new Uri(baseUri), url);
+
                 var response = doCompress
-                                   ? await this.HttpClientHelper.PutAsyncStreamCompressed(baseUri, url, stream)
-                                   : await this.HttpClientHelper.PutAsyncStream(baseUri, url, stream);
+                                   ? await this.HttpClientHelper.PutAsyncStreamCompressed(fullUri, stream)
+                                   : await this.HttpClientHelper.PutAsyncStream(fullUri, stream);
 
                 if (response.IsSuccessStatusCode)
                 {

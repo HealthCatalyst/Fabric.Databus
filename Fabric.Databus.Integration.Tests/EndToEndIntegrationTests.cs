@@ -21,6 +21,7 @@ namespace Fabric.Databus.Integration.Tests
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.Http;
     using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
@@ -189,6 +190,33 @@ FROM Text
 
                         container.RegisterInstance(mockHttpClientFactory.Object);
 
+                        var basicAuthorizationRequestInterceptor = new BasicAuthorizationRequestInterceptor(
+                            config.Config.ElasticSearchUserName,
+                            config.Config.ElasticSearchPassword);
+
+                        var mockHttpRequestInterceptor = mockRepository.Create<IHttpRequestInterceptor>();
+                        mockHttpRequestInterceptor.Setup(
+                            service => service.InterceptRequest(HttpMethod.Put, It.IsAny<HttpRequestMessage>()))
+                            .Callback<HttpMethod, HttpRequestMessage>(
+                                (method, message) =>
+                                    {
+                                        basicAuthorizationRequestInterceptor.InterceptRequest(method, message);
+                                    })
+                            .Verifiable();
+
+                        container.RegisterInstance(mockHttpRequestInterceptor.Object);
+
+                        var mockHttpResponseInterceptor = mockRepository.Create<IHttpResponseInterceptor>();
+                        mockHttpResponseInterceptor.Setup(
+                            service => service.InterceptResponse(
+                                expectedUri,
+                                HttpStatusCode.OK,
+                                string.Empty,
+                                It.IsAny<long>()))
+                            .Verifiable();
+
+                        container.RegisterInstance(mockHttpResponseInterceptor.Object);
+
                         // Act
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
@@ -217,6 +245,17 @@ FROM Text
                                            && req.RequestUri == expectedUri),
                                 ItExpr.IsAny<CancellationToken>());
 
+                        mockHttpRequestInterceptor.Verify(
+                            interceptor => interceptor.InterceptRequest(HttpMethod.Put, It.IsAny<HttpRequestMessage>()),
+                            Times.Once);
+
+                        mockHttpResponseInterceptor.Verify(
+                            service => service.InterceptResponse(
+                                expectedUri,
+                                HttpStatusCode.OK,
+                                string.Empty,
+                                It.IsAny<long>()),
+                            Times.Once);
                         stopwatch.Stop();
                     }
 

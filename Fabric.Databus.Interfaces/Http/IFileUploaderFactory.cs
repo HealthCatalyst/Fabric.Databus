@@ -24,12 +24,9 @@ namespace Fabric.Databus.Interfaces.Http
         /// <param name="urls">
         /// The config Urls.
         /// </param>
-        /// <param name="httpRequestInterceptor">
-        /// The http Request Injector.
-        /// </param>
         /// <returns>
         /// The <see cref="FileUploader"/>.
         /// </returns>
-        IFileUploader Create(List<string> urls, IHttpRequestInterceptor httpRequestInterceptor);
+        IFileUploader Create(List<string> urls);
     }
 }

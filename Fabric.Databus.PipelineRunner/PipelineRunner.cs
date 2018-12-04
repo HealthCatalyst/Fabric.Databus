@@ -173,7 +173,7 @@ namespace Fabric.Databus.PipelineRunner
 
             var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
             var httpRequestInjector = this.container.Resolve<IHttpRequestInterceptor>();
-            var fileUploader = fileUploaderFactory.Create(config.Urls, httpRequestInjector);
+            var fileUploader = fileUploaderFactory.Create(config.Urls);
             this.container.RegisterInstance(fileUploader);
 
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
@@ -446,6 +446,11 @@ namespace Fabric.Databus.PipelineRunner
                 {
                     this.container.RegisterType<IHttpRequestInterceptor, DummyHttpRequestInterceptor>();
                 }
+            }
+
+            if (!this.container.IsRegistered<IHttpResponseInterceptor>())
+            {
+                this.container.RegisterType<IHttpResponseInterceptor, DummyHttpResponseInterceptor>();
             }
 
             if (config.UseMultipleThreads)

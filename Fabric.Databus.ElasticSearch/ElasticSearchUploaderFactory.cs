@@ -37,6 +37,8 @@ namespace Fabric.Databus.ElasticSearch
         /// </summary>
         private readonly IHttpRequestInterceptor httpRequestInterceptor;
 
+        private readonly IHttpResponseInterceptor httpResponseInterceptor;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticSearchUploaderFactory"/> class.
         /// </summary>
@@ -49,11 +51,18 @@ namespace Fabric.Databus.ElasticSearch
         /// <param name="httpRequestInterceptor">
         /// The http Request Injector.
         /// </param>
-        public ElasticSearchUploaderFactory(ILogger logger, IHttpClientFactory httpClientFactory, IHttpRequestInterceptor httpRequestInterceptor)
+        /// <param name="httpResponseInterceptor">
+        /// The http response interceptor</param>
+        public ElasticSearchUploaderFactory(
+            ILogger logger,
+            IHttpClientFactory httpClientFactory,
+            IHttpRequestInterceptor httpRequestInterceptor,
+            IHttpResponseInterceptor httpResponseInterceptor)
         {
-            this.logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             this.httpRequestInterceptor = httpRequestInterceptor;
+            this.httpResponseInterceptor = httpResponseInterceptor;
         }
 
         /// <inheritdoc />
@@ -72,7 +81,8 @@ namespace Fabric.Databus.ElasticSearch
                 alias,
                 entityType,
                 this.httpClientFactory,
-                this.httpRequestInterceptor);
+                this.httpRequestInterceptor,
+                this.httpResponseInterceptor);
         }
     }
 }

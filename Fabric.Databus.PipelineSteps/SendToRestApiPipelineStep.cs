@@ -98,7 +98,7 @@ namespace Fabric.Databus.PipelineSteps
         /// The write diagnostics.
         /// </summary>
         /// <param name="workItem">
-        /// The work item.
+        /// The work item.  
         /// </param>
         private void WriteDiagnostics(IJsonObjectQueueItem workItem)
         {

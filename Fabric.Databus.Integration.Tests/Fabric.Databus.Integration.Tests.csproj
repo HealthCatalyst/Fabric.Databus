@@ -155,6 +155,10 @@
       <Project>{dc1c2dff-2458-4396-a872-e44fef249de1}</Project>
       <Name>Fabric.Databus.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.Http\Fabric.Databus.Http.csproj">
+      <Project>{bccdabf8-94f7-4d4e-812a-908e8a436b14}</Project>
+      <Name>Fabric.Databus.Http</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj">
       <Project>{a6c96bfb-24c4-482a-a3da-54c2bb5a2b4f}</Project>
       <Name>Fabric.Databus.Interfaces</Name>

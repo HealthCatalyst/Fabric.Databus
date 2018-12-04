@@ -7,23 +7,20 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueItems
+namespace Fabric.Databus.QueueItems
 {
     using System.Collections.Generic;
 
-    using Fabric.Databus.Config;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Queues;
 
+    /// <inheritdoc />
     /// <summary>
     /// The sql import queue item.
     /// </summary>
     public class SqlImportQueueItem : IQueueItem
     {
-        /// <summary>
-        /// Gets or sets the property name.
-        /// </summary>
+        /// <inheritdoc />
         public string PropertyName { get; set; }
 
         /// <inheritdoc />

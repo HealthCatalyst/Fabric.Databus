@@ -7,25 +7,21 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueItems
+namespace Fabric.Databus.QueueItems
 {
     using Fabric.Databus.Config;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
 
+    /// <inheritdoc />
     /// <summary>
     /// The sql job queue item.
     /// </summary>
     public class SqlJobQueueItem : IQueueItem
     {
-        /// <summary>
-        /// Gets or sets the query id.
-        /// </summary>
+        /// <inheritdoc />
         public string QueryId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the property name.
-        /// </summary>
+        /// <inheritdoc />
         public string PropertyName { get; set; }
 
         /// <summary>

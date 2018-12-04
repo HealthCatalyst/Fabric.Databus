@@ -9,7 +9,6 @@
 
 namespace Fabric.Databus.Shared
 {
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.ZipCodeToGeoCode;
 
@@ -18,8 +17,23 @@ namespace Fabric.Databus.Shared
     /// <inheritdoc />
     public class SqlJsonValueWriter : IJsonValueWriter
     {
+        /// <summary>
+        /// The geocode type.
+        /// </summary>
         private static readonly string GeocodeType = ElasticSearchTypes.geo_point.ToString();
 
+        /// <summary>
+        /// The write value.
+        /// </summary>
+        /// <param name="writer">
+        /// The writer.
+        /// </param>
+        /// <param name="elasticSearchType">
+        /// The elastic search type.
+        /// </param>
+        /// <param name="value">
+        /// The value.
+        /// </param>
         public void WriteValue(JsonTextWriter writer, string elasticSearchType, object value)
         {
             if (elasticSearchType == GeocodeType)

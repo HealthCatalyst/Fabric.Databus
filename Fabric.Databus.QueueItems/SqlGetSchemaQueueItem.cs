@@ -7,18 +7,28 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueItems
+namespace Fabric.Databus.QueueItems
 {
     using System.Collections.Generic;
 
     using Fabric.Databus.Config;
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
 
+    /// <inheritdoc />
+    /// <summary>
+    /// The sql get schema queue item.
+    /// </summary>
     public class SqlGetSchemaQueueItem : IQueueItem
     {
+        /// <inheritdoc />
         public string QueryId { get; set; }
+
+        /// <inheritdoc />
         public string PropertyName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the loads.
+        /// </summary>
         public List<DataSource> Loads { get; set; }
 
     }

@@ -13,6 +13,7 @@ namespace Fabric.Databus.PipelineRunner
 
     using Unity;
 
+    /// <inheritdoc />
     /// <summary>
     /// The single threaded pipeline executor factory.
     /// </summary>

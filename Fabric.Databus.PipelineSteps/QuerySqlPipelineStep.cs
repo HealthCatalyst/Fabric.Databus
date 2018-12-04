@@ -206,8 +206,6 @@ namespace Fabric.Databus.PipelineSteps
             int batchNumber,
             IDictionary<string, string> propertyTypes)
         {
-            var sqlJsonValueWriter = new SqlJsonValueWriter();
-
             var result = await this.databusSqlReader.ReadDataFromQueryAsync(
                 load,
                 start,
@@ -229,7 +227,6 @@ namespace Fabric.Databus.PipelineSteps
                             Columns = result.ColumnList,
                             PropertyName = load.Path,
                             PropertyType = load.PropertyType,
-                            JsonValueWriter = sqlJsonValueWriter,
                             PropertyTypes = propertyTypes
                         });
             }

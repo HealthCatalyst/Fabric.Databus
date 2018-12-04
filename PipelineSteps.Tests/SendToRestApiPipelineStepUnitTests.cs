@@ -25,6 +25,7 @@ namespace PipelineStep.Tests
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Json;
     using Fabric.Databus.PipelineSteps;
+    using Fabric.Databus.QueueItems;
     using Fabric.Databus.Shared.FileWriters;
     using Fabric.Databus.Shared.Queues;
 
@@ -34,8 +35,6 @@ namespace PipelineStep.Tests
     using Moq.Protected;
 
     using Newtonsoft.Json.Linq;
-
-    using QueueItems;
 
     using Serilog;
 

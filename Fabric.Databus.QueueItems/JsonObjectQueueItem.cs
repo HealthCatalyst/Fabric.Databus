@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueItems
+namespace Fabric.Databus.QueueItems
 {
     using Fabric.Databus.Interfaces.Queues;
 
@@ -17,7 +17,7 @@ namespace QueueItems
     /// <summary>
     /// The json object queue item.
     /// </summary>
-    public class JsonObjectQueueItem : IQueueItem, IJsonObjectQueueItem
+    public class JsonObjectQueueItem : IJsonObjectQueueItem
     {
         /// <inheritdoc />
         public string QueryId { get; set; }

@@ -21,6 +21,7 @@ namespace PipelineStep.Tests
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.PipelineSteps;
+    using Fabric.Databus.QueueItems;
     using Fabric.Databus.Shared.FileWriters;
     using Fabric.Databus.Shared.Queues;
     using Fabric.Shared;
@@ -29,8 +30,6 @@ namespace PipelineStep.Tests
 
     using Moq;
     using Moq.Protected;
-
-    using QueueItems;
 
     using Serilog;
 

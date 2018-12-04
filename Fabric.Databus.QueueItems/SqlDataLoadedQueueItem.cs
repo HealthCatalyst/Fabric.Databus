@@ -7,15 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueItems
+namespace Fabric.Databus.QueueItems
 {
     using System.Collections.Generic;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
-    using Fabric.Databus.Shared;
 
+    /// <inheritdoc />
     /// <summary>
     /// The convert database to json queue item.
     /// </summary>
@@ -33,11 +32,6 @@ namespace QueueItems
         /// Gets or sets the property name.
         /// </summary>
         public string PropertyName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the json value writer.
-        /// </summary>
-        public IJsonValueWriter JsonValueWriter { get; set; }
 
         /// <summary>
         /// Gets or sets the join column value.

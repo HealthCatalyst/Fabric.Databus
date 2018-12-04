@@ -17,13 +17,12 @@ namespace PipelineStep.Tests
     using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.PipelineSteps;
+    using Fabric.Databus.QueueItems;
     using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Newtonsoft.Json.Linq;
-
-    using QueueItems;
 
     using Serilog;
 

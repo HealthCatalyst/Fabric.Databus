@@ -7,10 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace QueueItems
+namespace Fabric.Databus.QueueItems
 {
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Shared;
+
+    using Newtonsoft.Json;
 
     /// <inheritdoc />
     /// <summary>
@@ -27,6 +29,7 @@ namespace QueueItems
         /// <summary>
         /// Gets or sets the source wrapper collection.
         /// </summary>
+        [JsonIgnore]
         public SourceWrapperCollection SourceWrapperCollection { get; set; }
 
         /// <summary>

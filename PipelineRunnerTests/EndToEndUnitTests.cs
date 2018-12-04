@@ -114,7 +114,7 @@ namespace PipelineRunnerTests
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
-                .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(service => service.Create(It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(mockFileUploader.Object);
 
             mockFileUploader.Setup(
@@ -246,7 +246,7 @@ namespace PipelineRunnerTests
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
-                .Setup(service => service.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(service => service.Create(It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(mockFileUploader.Object);
 
             mockFileUploader.Setup(

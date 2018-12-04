@@ -173,7 +173,7 @@ namespace Fabric.Databus.PipelineRunner
 
             var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
             var httpRequestInjector = this.container.Resolve<IHttpRequestInterceptor>();
-            var fileUploader = fileUploaderFactory.Create(config.ElasticSearchUserName, config.ElasticSearchPassword, config.Urls, httpRequestInjector);
+            var fileUploader = fileUploaderFactory.Create(config.Urls, httpRequestInjector);
             this.container.RegisterInstance(fileUploader);
 
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();
@@ -287,8 +287,6 @@ namespace Fabric.Databus.PipelineRunner
             {
                 var elasticSearchUploaderFactory = this.container.Resolve<IElasticSearchUploaderFactory>();
                 IElasticSearchUploader elasticSearchUploader = elasticSearchUploaderFactory.Create(
-                    config.ElasticSearchUserName,
-                    config.ElasticSearchPassword,
                     false,
                     config.Urls,
                     config.Index,
@@ -440,7 +438,14 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IHttpRequestInterceptor>())
             {
-                this.container.RegisterType<IHttpRequestInterceptor, DummyHttpRequestInterceptor>();
+                if (!string.IsNullOrWhiteSpace(config.ElasticSearchUserName))
+                {
+                    this.container.RegisterInstance<IHttpRequestInterceptor>(new BasicAuthorizationRequestInterceptor(config.ElasticSearchUserName, config.ElasticSearchPassword));
+                }
+                else
+                {
+                    this.container.RegisterType<IHttpRequestInterceptor, DummyHttpRequestInterceptor>();
+                }
             }
 
             if (config.UseMultipleThreads)

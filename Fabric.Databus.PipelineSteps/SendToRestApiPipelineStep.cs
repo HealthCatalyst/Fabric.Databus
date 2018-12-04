@@ -111,6 +111,5 @@ namespace Fabric.Databus.PipelineSteps
                 this.detailedTemporaryFileWriter.CreateDirectory(path);
             }
         }
-
     }
 }

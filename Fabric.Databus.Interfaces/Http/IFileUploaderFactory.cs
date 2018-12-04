@@ -21,12 +21,6 @@ namespace Fabric.Databus.Interfaces.Http
         /// <summary>
         /// The create.
         /// </summary>
-        /// <param name="userName">
-        /// The config elastic search user name.
-        /// </param>
-        /// <param name="password">
-        /// The config elastic search password.
-        /// </param>
         /// <param name="urls">
         /// The config Urls.
         /// </param>
@@ -36,6 +30,6 @@ namespace Fabric.Databus.Interfaces.Http
         /// <returns>
         /// The <see cref="FileUploader"/>.
         /// </returns>
-        IFileUploader Create(string userName, string password, List<string> urls, IHttpRequestInterceptor httpRequestInterceptor);
+        IFileUploader Create(List<string> urls, IHttpRequestInterceptor httpRequestInterceptor);
     }
 }

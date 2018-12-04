@@ -58,8 +58,6 @@ namespace Fabric.Databus.ElasticSearch
 
         /// <inheritdoc />
         public IElasticSearchUploader Create(
-            string userName,
-            string password,
             bool keepIndexOnline,
             List<string> urls,
             string index,
@@ -67,8 +65,6 @@ namespace Fabric.Databus.ElasticSearch
             string entityType)
         {
             return new ElasticSearchUploader(
-                userName,
-                password,
                 keepIndexOnline,
                 this.logger,
                 urls,

@@ -43,15 +43,22 @@ namespace Fabric.Databus.Http
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientHelper"/> class.
         /// </summary>
-        /// <param name="httpClient">
-        /// The http client.
+        /// <param name="httpClientFactory">
+        /// The http Client Factory.
         /// </param>
         /// <param name="httpRequestInterceptor">
         /// The http Request Injector.
         /// </param>
-        public HttpClientHelper(HttpClient httpClient, IHttpRequestInterceptor httpRequestInterceptor)
+        public HttpClientHelper(IHttpClientFactory httpClientFactory, IHttpRequestInterceptor httpRequestInterceptor)
         {
-            this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            if (httpClientFactory == null)
+            {
+                throw new ArgumentNullException(nameof(httpClientFactory));
+            }
+            
+            this.httpClient = httpClientFactory.Create();
+            this.httpClient.DefaultRequestHeaders.Accept.Clear();
+
             this.httpRequestInterceptor = httpRequestInterceptor ?? throw new ArgumentNullException(nameof(httpRequestInterceptor));
         }
 

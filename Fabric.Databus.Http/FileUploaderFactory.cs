@@ -40,14 +40,14 @@ namespace Fabric.Databus.Http
         /// </param>
         public FileUploaderFactory(ILogger logger, IHttpClientFactory httpClientFactory)
         {
-            this.logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         }
 
         /// <inheritdoc />
-        public IFileUploader Create(string userName, string password, List<string> urls, IHttpRequestInterceptor httpRequestInterceptor)
+        public IFileUploader Create(List<string> urls, IHttpRequestInterceptor httpRequestInterceptor)
         {
-            return new FileUploader(this.logger, urls, this.httpClientFactory, userName, password, httpRequestInterceptor);
+            return new FileUploader(this.logger, urls, this.httpClientFactory, httpRequestInterceptor);
         }
     }
 }

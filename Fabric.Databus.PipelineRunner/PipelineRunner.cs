@@ -246,7 +246,7 @@ namespace Fabric.Databus.PipelineRunner
             processors.AddRange(
                 new List<PipelineStepInfo>
                     {
-                        new PipelineStepInfo { Type = typeof(CreateBatchesPipelineJob), Count = 1 },
+                        new PipelineStepInfo { Type = typeof(CreateBatchesPipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(CreateBatchesForEachDataSourcePipelineStep), Count = 1 },
                         new PipelineStepInfo { Type = typeof(QuerySqlPipelineStep), Count = 5 },
                         new PipelineStepInfo { Type = typeof(CreateSourceWrappersPipelineStep), Count = 1 },

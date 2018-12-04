@@ -45,6 +45,9 @@ namespace Fabric.Databus.Shared
         /// </summary>
         private readonly ISqlConnectionFactory sqlConnectionFactory;
 
+        /// <summary>
+        /// The sql generator factory.
+        /// </summary>
         private readonly ISqlGeneratorFactory sqlGeneratorFactory;
 
         /// <summary>

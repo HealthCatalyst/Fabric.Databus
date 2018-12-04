@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CreateBatchesPipelineJob.cs" company="Health Catalyst">
+// <copyright file="CreateBatchesPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the CreateBatchesPipelineJob type.
+//   Defines the CreateBatchesPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ namespace Fabric.Databus.PipelineSteps
     /// <summary>
     /// Reads a SqlJobQueueItem and creates a set of SqlBatchQueueItems based on EntitiesPerBatch config
     /// </summary>
-    public class CreateBatchesPipelineJob : BasePipelineStep<SqlJobQueueItem, SqlBatchQueueItem>
+    public class CreateBatchesPipelineStep : BasePipelineStep<SqlJobQueueItem, SqlBatchQueueItem>
     {
         /// <summary>
         /// The databus sql reader.
@@ -49,7 +49,7 @@ namespace Fabric.Databus.PipelineSteps
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:CreateBatchesPipelineJob.CreateBatchesPipelineJob" /> class.
+        /// Initializes a new instance of the <see cref="T:CreateBatchesPipelineStep.CreateBatchesPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -66,10 +66,10 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="databusSqlReader"></param>
         /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="cancellationToken"></param>
-        public CreateBatchesPipelineJob(
-            IJobConfig jobConfig, 
-            ILogger logger, 
-            IQueueManager queueManager, 
+        public CreateBatchesPipelineStep(
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IDatabusSqlReader databusSqlReader,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
@@ -98,15 +98,25 @@ namespace Fabric.Databus.PipelineSteps
         /// </exception>
         protected override async Task HandleAsync(SqlJobQueueItem workItem)
         {
+            if (workItem.Job == null)
+            {
+                throw new Exception("workItem.Job is null");
+            }
+
+            if (workItem.Job.Data == null)
+            {
+                throw new Exception("workItem.Job.Data is null");
+            }
+
             if (this.Config.EntitiesPerBatch <= 0)
             {
                 await this.AddToOutputQueueAsync(new SqlBatchQueueItem
-                                          {
-                                              BatchNumber = 1,
-                                              Start = null,
-                                              End = null,
-                                              Loads = workItem.Job.Data.DataSources,
-                                          });
+                {
+                    BatchNumber = 1,
+                    Start = null,
+                    End = null,
+                    Loads = workItem.Job.Data.DataSources,
+                });
 
                 await this.WriteDiagnosticsWithNoBatches();
             }
@@ -116,21 +126,35 @@ namespace Fabric.Databus.PipelineSteps
 
                 int currentBatchNumber = 1;
 
-                foreach (var range in ranges)
+                var rangesList = ranges.ToList();
+                if (!rangesList.Any())
+                {
+                    await this.AddToOutputQueueAsync(new SqlBatchQueueItem
+                    {
+                        BatchNumber = 1,
+                        Start = null,
+                        End = null,
+                        Loads = workItem.Job.Data.DataSources,
+                    });
+
+                    await this.WriteDiagnosticsWithNoBatches();
+                }
+
+                foreach (var range in rangesList)
                 {
                     await this.AddToOutputQueueAsync(
                         new SqlBatchQueueItem
-                            {
-                                BatchNumber = currentBatchNumber++,
-                                Start = range.Item1,
-                                End = range.Item2,
-                                Loads = workItem.Job.Data.DataSources,
-                                PropertyTypes = workItem.Job.Data.DataSources
+                        {
+                            BatchNumber = currentBatchNumber++,
+                            Start = range.Item1,
+                            End = range.Item2,
+                            Loads = workItem.Job.Data.DataSources,
+                            PropertyTypes = workItem.Job.Data.DataSources
                                     .Where(a => a.Path != null)
                                     .GroupBy(a => a.Path)
                                     .Select(g => g.First())
                                     .ToDictionary(a => a.Path, a => a.PropertyType)
-                            });
+                        });
 
                     await this.WriteDiagnostics(currentBatchNumber, range);
                 }
@@ -164,6 +188,11 @@ namespace Fabric.Databus.PipelineSteps
         /// </returns>
         private async Task<IEnumerable<Tuple<string, string>>> CalculateRangesAsync(IJob job)
         {
+            if (!job.Data.DataSources.Any())
+            {
+                throw new Exception("job.Data.DataSources has no entity with path $");
+            }
+
             var list = await this.databusSqlReader.GetListOfEntityKeysAsync(
                 this.Config.TopLevelKeyColumn,
                 this.Config.MaximumEntitiesToLoad,

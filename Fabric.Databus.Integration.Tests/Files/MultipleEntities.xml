@@ -7,6 +7,8 @@
     <LocalSaveFolder>foo</LocalSaveFolder>
     <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
     <UseMultipleThreads>false</UseMultipleThreads>
+    <ElasticSearchUserName>myUser</ElasticSearchUserName>
+    <ElasticSearchPassword>myPassword</ElasticSearchPassword>
   </Config>
   <Data>
     <DataSource Path="$" Name="First" TableOrView="Text">

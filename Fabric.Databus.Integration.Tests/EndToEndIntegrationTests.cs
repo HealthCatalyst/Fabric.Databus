@@ -15,6 +15,7 @@ namespace Fabric.Databus.Integration.Tests
     using System.Diagnostics;
     using System.Net;
     using System.Net.Http;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -104,6 +105,9 @@ namespace Fabric.Databus.Integration.Tests
         [TestMethod]
         public void CanRunSingleEntityEndToEnd()
         {
+            var fileContents = TestFileLoader.GetFileContents("Files", "SingleEntity.xml");
+            var config = new ConfigReader().ReadXmlFromText(fileContents);
+
             string connectionString = "Data Source=:memory:";
 
             using (var connection = new SQLiteConnection(connectionString))
@@ -162,6 +166,14 @@ FROM Text
                                 {
                                     var content = request.Content.ReadAsStringAsync().Result;
                                     Assert.IsTrue(JToken.DeepEquals(expectedJson, JObject.Parse(content)), content);
+
+                                    Assert.AreEqual("Basic", request.Headers.Authorization.Scheme);
+                                    var actualParameter = request.Headers.Authorization.Parameter;
+
+                                    var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.ElasticSearchUserName}:{config.Config.ElasticSearchPassword}");
+                                    var expectedParameter = Convert.ToBase64String(expectedByteArray);
+
+                                    Assert.AreEqual(expectedParameter, actualParameter);
                                 })
                             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
                                               {
@@ -182,10 +194,6 @@ FROM Text
                         stopwatch.Start();
 
                         var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
-
-                        var fileContents = TestFileLoader.GetFileContents("Files", "SingleEntity.xml");
-
-                        var config = new ConfigReader().ReadXmlFromText(fileContents);
 
                         pipelineRunner.RunPipeline(config);
 
@@ -223,6 +231,10 @@ FROM Text
         [TestMethod]
         public void CanRunMultipleEntitiesEndToEnd()
         {
+            var fileContents = TestFileLoader.GetFileContents("Files", "MultipleEntities.xml");
+
+            var config = new ConfigReader().ReadXmlFromText(fileContents);
+
             string connectionString = "Data Source=:memory:";
 
             using (var connection = new SQLiteConnection(connectionString))
@@ -313,6 +325,14 @@ FROM Text
                                     var content = request.Content.ReadAsStringAsync().Result;
                                     var expectedJson = numHttpCall == 1 ? expectedJson1 : expectedJson2;
                                     Assert.IsTrue(JToken.DeepEquals(expectedJson, JObject.Parse(content)), content);
+
+                                    Assert.AreEqual("Basic", request.Headers.Authorization.Scheme);
+                                    var actualParameter = request.Headers.Authorization.Parameter;
+
+                                    var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.ElasticSearchUserName}:{config.Config.ElasticSearchPassword}");
+                                    var expectedParameter = Convert.ToBase64String(expectedByteArray);
+
+                                    Assert.AreEqual(expectedParameter, actualParameter);
                                 })
                             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
                                               {
@@ -333,10 +353,6 @@ FROM Text
                         stopwatch.Start();
 
                         var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
-
-                        var fileContents = TestFileLoader.GetFileContents("Files", "MultipleEntities.xml");
-
-                        var config = new ConfigReader().ReadXmlFromText(fileContents);
 
                         pipelineRunner.RunPipeline(config);
 

@@ -24,9 +24,9 @@ namespace Fabric.Databus.PipelineSteps
 
     /// <inheritdoc />
     /// <summary>
-    /// Reads a SqlBatchQueueItem with a number of queries and splits it into one SqlImportQueueItem for each query
+    /// Reads a SqlBatchQueueItem with a number of queries and splits it into one SqlQueryDataSourceQueueItem for each query
     /// </summary>
-    public class CreateBatchesForEachDataSourcePipelineStep : BasePipelineStep<SqlBatchQueueItem, SqlImportQueueItem>
+    public class CreateBatchesForEachDataSourcePipelineStep : BasePipelineStep<SqlBatchQueueItem, SqlQueryDataSourceQueueItem>
     {
         /// <summary>
         /// The file writer.
@@ -85,7 +85,7 @@ namespace Fabric.Databus.PipelineSteps
                 var queryId = $"{Convert.ToString(i)}-{queryName}";
 
                 await this.AddToOutputQueueAsync(
-                    new SqlImportQueueItem
+                    new SqlQueryDataSourceQueueItem
                     {
                         BatchNumber = workItem.BatchNumber,
                         QueryId = queryId,

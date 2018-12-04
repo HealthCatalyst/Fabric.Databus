@@ -30,9 +30,9 @@ namespace Fabric.Databus.PipelineSteps
 
     /// <inheritdoc />
     /// <summary>
-    /// Reads a SqlImportQueueItem and calls SqlServer to load the data for that query and put it in a SqlDataLoadedQueueItem
+    /// Reads a SqlQueryDataSourceQueueItem and calls SqlServer to load the data for that query and put it in a SqlDataLoadedQueueItem
     /// </summary>
-    public class QuerySqlPipelineStep : BasePipelineStep<SqlImportQueueItem, SqlDataLoadedQueueItem>
+    public class QuerySqlPipelineStep : BasePipelineStep<SqlQueryDataSourceQueueItem, SqlDataLoadedQueueItem>
     {
         /// <summary>
         /// The folder.
@@ -96,7 +96,7 @@ namespace Fabric.Databus.PipelineSteps
         protected override sealed string LoggerName => "QuerySql";
 
         /// <inheritdoc />
-        protected override async Task HandleAsync(SqlImportQueueItem workItem)
+        protected override async Task HandleAsync(SqlQueryDataSourceQueueItem workItem)
         {
             // throw new ArgumentNullException(nameof(workItem));
             await this.ReadOneQueryFromDatabaseAsync(
@@ -110,7 +110,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override string GetId(SqlImportQueueItem workItem)
+        protected override string GetId(SqlQueryDataSourceQueueItem workItem)
         {
             return workItem.QueryId;
         }

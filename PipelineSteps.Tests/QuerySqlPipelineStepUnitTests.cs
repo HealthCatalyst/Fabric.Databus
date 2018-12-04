@@ -107,14 +107,14 @@ namespace PipelineStep.Tests
                     new NullFileWriter(),
                     cancellationTokenSource.Token);
 
-                var sqlJobQueueItem = new SqlImportQueueItem
+                var sqlJobQueueItem = new SqlQueryDataSourceQueueItem
                                           {
                                               QueryId = "$",
                                               DataSource = new DataSource { Path = "$" }, Start = "2", End = "5"
                                           };
 
                 var stepNumber = 1;
-                queueManager.CreateInputQueue<SqlImportQueueItem>(stepNumber);
+                queueManager.CreateInputQueue<SqlQueryDataSourceQueueItem>(stepNumber);
 
                 querySqlPipelineStep.CreateOutQueue(stepNumber);
 

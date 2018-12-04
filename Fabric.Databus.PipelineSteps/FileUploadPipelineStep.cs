@@ -10,6 +10,7 @@
 namespace Fabric.Databus.PipelineSteps
 {
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
@@ -61,9 +62,7 @@ namespace Fabric.Databus.PipelineSteps
             this.elasticSearchUploader = elasticSearchUploader;
         }
 
-        /// <summary>
-        /// The logger name.
-        /// </summary>
+        /// <inheritdoc />
         protected override string LoggerName => "FileUpload";
 
         /// <inheritdoc />
@@ -90,15 +89,7 @@ namespace Fabric.Databus.PipelineSteps
             }
         }
 
-        /// <summary>
-        /// The get id.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
+        /// <inheritdoc />
         protected override string GetId(FileUploadQueueItem workItem)
         {
             return workItem.QueryId;
@@ -113,7 +104,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async System.Threading.Tasks.Task UploadFileAsync(FileUploadQueueItem wt)
+        private async Task UploadFileAsync(FileUploadQueueItem wt)
         {
             await this.elasticSearchUploader.SendDataToHostsAsync(
                     wt.BatchNumber,
@@ -122,7 +113,6 @@ namespace Fabric.Databus.PipelineSteps
                     doCompress: this.Config.CompressFiles);
 
             this.MyLogger.Verbose($"Uploaded batch: {wt.BatchNumber} ");
-
         }
     }
 }

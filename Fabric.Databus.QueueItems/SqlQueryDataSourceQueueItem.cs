@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlImportQueueItem.cs" company="Health Catalyst">
+// <copyright file="SqlQueryDataSourceQueueItem.cs" company="Health Catalyst">
 //   2018
 // </copyright>
 // <summary>
-//   Defines the SqlImportQueueItem type.
+//   Defines the SqlQueryDataSourceQueueItem type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ namespace Fabric.Databus.QueueItems
     /// <summary>
     /// The sql import queue item.
     /// </summary>
-    public class SqlImportQueueItem : IQueueItem
+    public class SqlQueryDataSourceQueueItem : IQueueItem
     {
         /// <inheritdoc />
         public string PropertyName { get; set; }

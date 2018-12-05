@@ -66,6 +66,8 @@ namespace Fabric.Databus.PipelineSteps
         /// <inheritdoc />
         protected override Task HandleAsync(SourceWrapperCollectionQueueItem workItem)
         {
+            workItem.SourceWrapperCollection.SortAll();
+
             using (var textWriter = new StringWriter())
             {
                 using (var writer = new JsonTextWriter(textWriter))

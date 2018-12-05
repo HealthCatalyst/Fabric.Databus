@@ -107,9 +107,19 @@ namespace Fabric.Databus.Shared
         public string PropertyNameLastPart { get; }
 
         /// <summary>
+        /// The depth.
+        /// </summary>
+        public int Depth => this.PropertyName.Count(c => c == '.');
+
+        /// <summary>
         /// Gets or sets the rows.
         /// </summary>
         public List<object[]> Rows { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent.
+        /// </summary>
+        internal SourceWrapper Parent { get; set; }
 
         /// <summary>
         /// Gets the children.
@@ -130,6 +140,7 @@ namespace Fabric.Databus.Shared
         public void AddChild(SourceWrapper childSourcesWrapper)
         {
             this.Children.Add(childSourcesWrapper);
+            childSourcesWrapper.Parent = this;
         }
 
         /// <summary>
@@ -141,8 +152,8 @@ namespace Fabric.Databus.Shared
         public void AddSibling(SourceWrapper sourceWrapper)
         {
             this.Siblings.Add(sourceWrapper);
+            sourceWrapper.Parent = this;
         }
-
 
         /// <summary>
         /// The write.

@@ -280,6 +280,8 @@ namespace PipelineRunnerTests
 ";
             var expectedJson = JArray.Parse(expectedJsonText);
 
+            sourceWrapperCollection.SortAll();
+
             using (var textWriter = new StringWriter())
             {
                 using (var writer = new JsonTextWriter(textWriter))

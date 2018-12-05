@@ -130,7 +130,7 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public bool UploadToUrl { get; set; }
+        public bool UploadToUrl { get; set; } = true;
 
         /// <inheritdoc />
         [DataMember]

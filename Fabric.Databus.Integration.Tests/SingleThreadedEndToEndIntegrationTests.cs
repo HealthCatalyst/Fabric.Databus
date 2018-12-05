@@ -310,7 +310,9 @@ FROM Text
                                     numHttpCall++;
                                     var content = request.Content.ReadAsStringAsync().Result;
                                     var expectedJson = numHttpCall == 1 ? expectedJson1 : expectedJson2;
-                                    Assert.IsTrue(JToken.DeepEquals(expectedJson, JObject.Parse(content)), content);
+                                    Assert.IsTrue(
+                                        JToken.DeepEquals(expectedJson, JObject.Parse(content)),
+                                        $"{numHttpCall}: {expectedJson} vs. {content}");
 
                                     Assert.AreEqual("Basic", request.Headers.Authorization.Scheme);
                                     var actualParameter = request.Headers.Authorization.Parameter;

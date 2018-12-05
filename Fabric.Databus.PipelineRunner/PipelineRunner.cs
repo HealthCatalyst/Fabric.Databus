@@ -266,7 +266,7 @@ namespace Fabric.Databus.PipelineRunner
                         });
             }
 
-            if (!string.IsNullOrWhiteSpace(config.Url))
+            if (!string.IsNullOrWhiteSpace(config.Url) && config.UploadToUrl)
             {
                 if (name == PipelineNames.ElasticSearch)
                 {

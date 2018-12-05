@@ -17,6 +17,16 @@
       <xs:enumeration value="Put" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="incrementalColumnOperator">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="GreaterThan" />
+      <xs:enumeration value="GreaterThanOrEqualTo" />
+      <xs:enumeration value="LessThan" />
+      <xs:enumeration value="LessThanOrEqualTo" />
+      <xs:enumeration value="EqualTo" />
+      <xs:enumeration value="NotEqualTo" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:element name="Job">
     <xs:complexType>
@@ -60,8 +70,8 @@
                         <xs:simpleContent>
                           <xs:extension base="xs:string">
                             <xs:attribute type="xs:string" name="Name" use="required"/>
-                            <xs:attribute type="xs:string" name="Operator" use="optional"/>
-                            <xs:attribute type="xs:string" name="Value" use="optional"/>
+                            <xs:attribute type="incrementalColumnOperator" name="Operator" use="required"/>
+                            <xs:attribute type="xs:string" name="Value" use="required"/>
                           </xs:extension>
                         </xs:simpleContent>
                       </xs:complexType>

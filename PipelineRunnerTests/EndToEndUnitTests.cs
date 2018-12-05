@@ -20,6 +20,7 @@ namespace PipelineRunnerTests
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ConfigValidators;
     using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.Http;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Loggers;
@@ -123,7 +124,7 @@ namespace PipelineRunnerTests
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),
                     It.IsAny<bool>(),
-                    It.IsAny<bool>())).Returns(Task.FromResult(HttpStatusCode.OK));
+                    It.IsAny<bool>())).ReturnsAsync(new FileUploadResult { StatusCode = HttpStatusCode.OK });
 
             mockFileUploader
                 .Setup(service => service.StartUploadAsync())
@@ -262,7 +263,8 @@ namespace PipelineRunnerTests
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),
                     It.IsAny<bool>(),
-                    It.IsAny<bool>())).Returns(Task.FromResult(HttpStatusCode.OK));
+                    It.IsAny<bool>()))
+                .ReturnsAsync(new FileUploadResult { StatusCode = HttpStatusCode.OK });
 
             mockFileUploader
                 .Setup(service => service.StartUploadAsync())

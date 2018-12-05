@@ -111,11 +111,16 @@ namespace Fabric.Databus.Http
         }
 
         /// <inheritdoc />
-        public async Task<HttpStatusCode> SendStreamToHostsAsync(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress)
+        public async Task<IFileUploadResult> SendStreamToHostsAsync(
+            string relativeUrl,
+            int batch,
+            Stream stream,
+            bool doLogContent,
+            bool doCompress)
         {
             var hostNumber = batch % this.hosts.Count;
 
-            var url = this.hosts[hostNumber] + relativeUrl;
+            var url = new Uri(new Uri(this.hosts[hostNumber]), relativeUrl);
 
             return await this.SendStreamToUrlAsync(url, batch, stream, doLogContent, doCompress);
         }
@@ -124,31 +129,35 @@ namespace Fabric.Databus.Http
         /// The send stream to url.
         /// </summary>
         /// <param name="url">
-        /// The url.
+        ///     The url.
         /// </param>
         /// <param name="batch">
-        /// The batch.
+        ///     The batch.
         /// </param>
         /// <param name="stream">
-        /// The stream.
+        ///     The stream.
         /// </param>
         /// <param name="doLogContent">
-        /// The do log content.
+        ///     The do log content.
         /// </param>
         /// <param name="doCompress">
-        /// The do compress.
+        ///     The do compress.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected virtual async Task<HttpStatusCode> SendStreamToUrlAsync(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        protected virtual async Task<IFileUploadResult> SendStreamToUrlAsync(
+            Uri url,
+            int batch,
+            Stream stream,
+            bool doLogContent,
+            bool doCompress)
         {
             try
             {
                 this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
-                var baseUri = url;
                 string requestContent;
 
                 using (var newMemoryStream = new MemoryStream())
@@ -168,42 +177,39 @@ namespace Fabric.Databus.Http
                 Interlocked.Increment(ref this.currentRequests);
                 this.Stopwatch.Reset();
 
-                var fullUri = new Uri(new Uri(baseUri), url);
-
                 var response = doCompress
-                                   ? await this.HttpClientHelper.SendAsyncStreamCompressed(fullUri, this.httpMethod, stream)
-                                   : await this.HttpClientHelper.SendAsyncStream(fullUri, this.httpMethod, stream);
+                                   ? await this.HttpClientHelper.SendAsyncStreamCompressed(url, this.httpMethod, stream)
+                                   : await this.HttpClientHelper.SendAsyncStream(url, this.httpMethod, stream);
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                this.httpResponseInterceptor.InterceptResponse(url, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds, this.httpMethod);
 
                 if (response.IsSuccessStatusCode)
                 {
                     Interlocked.Decrement(ref this.currentRequests);
 
-                    var responseContent = await response.Content.ReadAsStringAsync();
 
-                    this.httpResponseInterceptor.InterceptResponse(fullUri, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds, this.httpMethod);
                 }
                 else
                 {
-                    // logger.Verbose("========= Error =================");
                     this.logger.Error(requestContent);
-
-                    var responseContent = await response.Content.ReadAsStringAsync();
-
-                    this.httpResponseInterceptor.InterceptResponse(fullUri, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds, this.httpMethod);
-
-                    this.logger.Error(responseContent);
-
-                    // logger.Verbose("========= Error =================");
                 }
 
-                return response.StatusCode;
+                return new FileUploadResult
+                           {
+                               Uri = url,
+                               HttpMethod = this.httpMethod,
+                               RequestContent = requestContent,
+                               StatusCode = response.StatusCode,
+                               ResponseContent = responseContent
+                           };
             }
             catch (Exception ex)
             {
-                this.logger.Error(ex, url);
+                this.logger.Error(ex, url.ToString());
                 throw;
             }
         }
-
     }
 }

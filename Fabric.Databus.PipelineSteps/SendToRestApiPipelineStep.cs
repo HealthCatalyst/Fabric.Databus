@@ -82,10 +82,10 @@ namespace Fabric.Databus.PipelineSteps
 
             await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
-            this.WriteDiagnostics(workItem);
-
             // now send to Rest Api
-            await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, false);
+            var fileUploadResult = await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, false);
+
+            this.WriteDiagnostics(workItem, fileUploadResult);
         }
 
         /// <inheritdoc />
@@ -98,17 +98,30 @@ namespace Fabric.Databus.PipelineSteps
         /// The write diagnostics.
         /// </summary>
         /// <param name="workItem">
-        /// The work item.  
+        ///     The work item.  
         /// </param>
-        private void WriteDiagnostics(IJsonObjectQueueItem workItem)
+        /// <param name="fileUploadResult">
+        /// file upload result
+        /// </param>
+        private void WriteDiagnostics(IJsonObjectQueueItem workItem, IFileUploadResult fileUploadResult)
         {
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {
-                var path = this.detailedTemporaryFileWriter.CombinePath(
-                    this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.BatchNumber}.txt"),
-                    Convert.ToString(workItem.BatchNumber));
+                var path = this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.BatchNumber}");
 
                 this.detailedTemporaryFileWriter.CreateDirectory(path);
+
+                this.detailedTemporaryFileWriter.WriteToFileAsync(
+                    this.detailedTemporaryFileWriter.CombinePath(path, "url.txt"),
+                    $"{fileUploadResult.HttpMethod} {fileUploadResult.Uri}");
+
+                this.detailedTemporaryFileWriter.WriteToFileAsync(
+                    this.detailedTemporaryFileWriter.CombinePath(path, "request.txt"),
+                    fileUploadResult.RequestContent);
+
+                this.detailedTemporaryFileWriter.WriteToFileAsync(
+                    this.detailedTemporaryFileWriter.CombinePath(path, $"response-{fileUploadResult.StatusCode}.txt"),
+                    fileUploadResult.ResponseContent);
             }
         }
     }

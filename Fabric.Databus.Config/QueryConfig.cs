@@ -51,11 +51,12 @@ namespace Fabric.Databus.Config
         public HttpMethod UrlMethod { get; set; } = HttpMethod.Put;
 
         /// <summary>
-        /// Sets the my url method.
+        /// Gets or sets the my url method.
         /// </summary>
-        [XmlAttribute(nameof(UrlMethod))]
-        public string MyUrlMethod
+        [XmlElement("UrlMethod")]
+        public string UrlMethodProxy
         {
+            get => this.UrlMethod.ToString();
             set
             {
                 switch (value)

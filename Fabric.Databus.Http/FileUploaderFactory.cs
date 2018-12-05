@@ -52,7 +52,7 @@ namespace Fabric.Databus.Http
         /// The http Request Interceptor.
         /// </param>
         /// <param name="httpResponseInterceptor">
-        /// The http Response Interceptor.
+        /// The http ResponseContent Interceptor.
         /// </param>
         public FileUploaderFactory(
             ILogger logger,

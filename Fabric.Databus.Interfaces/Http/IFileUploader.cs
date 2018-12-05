@@ -22,23 +22,28 @@ namespace Fabric.Databus.Interfaces.Http
         /// The send stream to hosts.
         /// </summary>
         /// <param name="relativeUrl">
-        /// The relative url.
+        ///     The relative url.
         /// </param>
         /// <param name="batch">
-        /// The batch.
+        ///     The batch.
         /// </param>
         /// <param name="stream">
-        /// The stream.
+        ///     The stream.
         /// </param>
         /// <param name="doLogContent">
-        /// The do log content.
+        ///     The do log content.
         /// </param>
         /// <param name="doCompress">
-        /// The do compress.
+        ///     The do compress.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task<HttpStatusCode> SendStreamToHostsAsync(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress);
+        Task<IFileUploadResult> SendStreamToHostsAsync(
+            string relativeUrl,
+            int batch,
+            Stream stream,
+            bool doLogContent,
+            bool doCompress);
     }
 }

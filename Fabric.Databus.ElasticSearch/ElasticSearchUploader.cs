@@ -420,31 +420,35 @@ namespace Fabric.Databus.ElasticSearch
         /// The send stream to url.
         /// </summary>
         /// <param name="url">
-        /// The url.
+        ///     The url.
         /// </param>
         /// <param name="batch">
-        /// The batch.
+        ///     The batch.
         /// </param>
         /// <param name="stream">
-        /// The stream.
+        ///     The stream.
         /// </param>
         /// <param name="doLogContent">
-        /// The do log content.
+        ///     The do log content.
         /// </param>
         /// <param name="doCompress">
-        /// The do compress.
+        ///     The do compress.
         /// </param>
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        protected override async Task<HttpStatusCode> SendStreamToUrlAsync(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        protected override async Task<IFileUploadResult> SendStreamToUrlAsync(
+            Uri url,
+            int batch,
+            Stream stream,
+            bool doLogContent,
+            bool doCompress)
         {
             try
             {
                 this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
-                var baseUri = url;
                 string requestContent;
 
                 using (var newMemoryStream = new MemoryStream())
@@ -465,17 +469,17 @@ namespace Fabric.Databus.ElasticSearch
                 var requestStartTimeMillisecs = this.Stopwatch.ElapsedMilliseconds;
 
 
-                var fullUri = new Uri(new Uri(baseUri), url);
 
                 var response = doCompress
-                                   ? await this.HttpClientHelper.SendAsyncStreamCompressed(fullUri, this.httpMethod, stream)
-                                   : await this.HttpClientHelper.SendAsyncStream(fullUri, this.httpMethod, stream);
+                                   ? await this.HttpClientHelper.SendAsyncStreamCompressed(url, this.httpMethod, stream)
+                                   : await this.HttpClientHelper.SendAsyncStream(url, this.httpMethod, stream);
+
+                var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
                     Interlocked.Decrement(ref this.currentRequests);
 
-                    var responseContent = await response.Content.ReadAsStringAsync();
                     var result = JsonConvert.DeserializeObject<ElasticSearchJsonResponse>(responseContent);
 
                     var stopwatchElapsed = this.Stopwatch.ElapsedMilliseconds;
@@ -503,21 +507,21 @@ namespace Fabric.Databus.ElasticSearch
                 }
                 else
                 {
-                    // logger.Verbose("========= Error =================");
                     this.logger.Error(requestContent);
-
-                    var responseJson = await response.Content.ReadAsStringAsync();
-
-                    this.logger.Error(responseJson);
-
-                    // logger.Verbose("========= Error =================");
                 }
 
-                return response.StatusCode;
+                return new FileUploadResult
+                           {
+                               Uri = url,
+                               HttpMethod = this.httpMethod,
+                               RequestContent = requestContent,
+                               StatusCode = response.StatusCode,
+                               ResponseContent = responseContent
+                           };
             }
             catch (Exception ex)
             {
-                this.logger.Error(ex, url);
+                this.logger.Error(ex, url.ToString());
                 throw;
             }
         }

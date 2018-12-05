@@ -37,9 +37,9 @@ namespace Fabric.Databus.API.Middleware
                 await next(env);
 
                 //contextSpecificLogger.Information("Outgoing response: {@StatusCode}, {@Headers}, {@Body}",
-                //    owinContext.Response.StatusCode,
-                //    owinContext.Response.Headers,
-                //    owinContext.Response.Body);
+                //    owinContext.ResponseContent.StatusCode,
+                //    owinContext.ResponseContent.Headers,
+                //    owinContext.ResponseContent.Body);
             };
         }
     }

@@ -11,6 +11,8 @@ namespace Fabric.Databus.TestApi.Controllers
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
 
     using Microsoft.AspNetCore.Mvc;
 
@@ -53,12 +55,19 @@ namespace Fabric.Databus.TestApi.Controllers
         /// <summary>
         /// POST api/values
         /// </summary>
-        /// <param name="value">
-        /// The value.
-        /// </param>
+        /// <returns>
+        /// The <see cref="JsonResult"/>.
+        /// </returns>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public JsonResult Post()
         {
+            Console.WriteLine("POST");
+            using (var reader = new StreamReader(this.Request.Body, Encoding.UTF8))
+            {
+                Console.WriteLine(reader.ReadToEnd());
+            }
+
+            return new JsonResult(new { Message = "Received" });
         }
 
         /// <summary>
@@ -70,9 +79,19 @@ namespace Fabric.Databus.TestApi.Controllers
         /// <param name="value">
         /// The value.
         /// </param>
+        /// <returns>
+        /// The <see cref="JsonResult"/>.
+        /// </returns>
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public JsonResult Put(int id, [FromBody] string value)
         {
+            Console.WriteLine("PUT");
+            using (var reader = new StreamReader(this.Request.Body, Encoding.UTF8))
+            {
+                Console.WriteLine(reader.ReadToEnd());
+            }
+
+            return new JsonResult(new { Message = "Received" });
         }
 
         /// <summary>

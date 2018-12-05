@@ -1958,7 +1958,7 @@ namespace LibOwin
 
         #endregion
 
-        #region OWIN v1.0.0 - 3.2.2. Response Data
+        #region OWIN v1.0.0 - 3.2.2. ResponseContent Data
 
         // http://owin.org/spec/owin-1.0.0.html
 
@@ -2094,7 +2094,7 @@ namespace LibOwin
 
             public const string Authenticate = "security.Authenticate";
 
-            // 3.3. Response
+            // 3.3. ResponseContent
 
             public const string SignIn = "security.SignIn";
 

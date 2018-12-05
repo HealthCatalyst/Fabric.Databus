@@ -264,6 +264,10 @@
       <Project>{3BBF6CF0-197F-4980-BDAF-1418E473C014}</Project>
       <Name>Fabric.Databus.ElasticSearch</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.Http\Fabric.Databus.Http.csproj">
+      <Project>{BCCDABF8-94F7-4D4E-812A-908E8A436B14}</Project>
+      <Name>Fabric.Databus.Http</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj">
       <Project>{A6C96BFB-24C4-482A-A3DA-54C2BB5A2B4F}</Project>
       <Name>Fabric.Databus.Interfaces</Name>

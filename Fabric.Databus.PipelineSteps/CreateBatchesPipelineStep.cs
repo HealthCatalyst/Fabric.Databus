@@ -134,6 +134,7 @@ namespace Fabric.Databus.PipelineSteps
                         Start = null,
                         End = null,
                         Loads = workItem.Job.Data.DataSources,
+                        TopLevelDataSource = workItem.Job.Data.TopLevelDataSource
                     });
 
                     await this.WriteDiagnosticsWithNoBatches();
@@ -152,7 +153,8 @@ namespace Fabric.Databus.PipelineSteps
                                     .Where(a => a.Path != null)
                                     .GroupBy(a => a.Path)
                                     .Select(g => g.First())
-                                    .ToDictionary(a => a.Path, a => a.PropertyType)
+                                    .ToDictionary(a => a.Path, a => a.PropertyType),
+                            TopLevelDataSource = workItem.Job.Data.TopLevelDataSource
                         });
 
                     await this.WriteDiagnostics(currentBatchNumber, range);

@@ -4,7 +4,7 @@
   <Config>
     <ConnectionString>server=HCS-DEV0002;initial catalog=Shared;Trusted_Connection=True;</ConnectionString>
     <Url>http://localhost:5000/api/values</Url>
-    <UploadToUrl>true</UploadToUrl>
+    <UploadToUrl>false</UploadToUrl>
     <UrlMethod>Post</UrlMethod>
     <MaximumEntitiesToLoad>20</MaximumEntitiesToLoad>
     <EntitiesPerBatch>10</EntitiesPerBatch>

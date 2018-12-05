@@ -27,6 +27,11 @@ namespace Fabric.Databus.Config
         /// <summary>
         /// Gets the data sources.
         /// </summary>
-        IList<IDataSource> DataSources { get; }
+        IEnumerable<IDataSource> DataSources { get; }
+
+        /// <summary>
+        /// Gets or sets the top level data source.
+        /// </summary>
+        ITopLevelDataSource TopLevelDataSource { get; set; }
     }
 }

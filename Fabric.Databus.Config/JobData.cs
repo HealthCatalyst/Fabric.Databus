@@ -36,7 +36,7 @@ namespace Fabric.Databus.Config
         /// Gets or sets the data sources.
         /// </summary>
         [XmlIgnore]
-        public IList<IDataSource> DataSources => this.MyDataSources.Cast<IDataSource>().ToList();
+        public IEnumerable<IDataSource> DataSources => this.MyDataSources;
 
         /// <summary>
         /// Gets or sets the data sources.
@@ -44,5 +44,23 @@ namespace Fabric.Databus.Config
         [DataMember(Name = "DataSources")]
         [XmlElement("DataSource")]
         public List<DataSource> MyDataSources { get; set; }
+
+        /// <inheritdoc />
+        [XmlIgnore]
+        public ITopLevelDataSource TopLevelDataSource { get; set; }
+
+        /// <summary>
+        /// Gets or sets the top level data source.
+        /// </summary>
+        [XmlElement(nameof(TopLevelDataSource))]
+        public TopLevelDataSource MyTopLevelDataSource
+        {
+            get => (TopLevelDataSource)this.TopLevelDataSource;
+            set
+            {
+                this.TopLevelDataSource = value;
+                this.MyDataSources.Add(value);
+            }
+        }
     }
 }

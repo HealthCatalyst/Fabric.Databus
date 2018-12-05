@@ -28,6 +28,6 @@ namespace Fabric.Databus.Interfaces.Sql
         /// The <see cref="List"/>.
         /// </returns>
         IList<MappingItem> GetSchemasForLoads(
-            IList<IDataSource> workItemLoads);
+            IEnumerable<IDataSource> workItemLoads);
     }
 }

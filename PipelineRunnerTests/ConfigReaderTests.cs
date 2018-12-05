@@ -35,7 +35,7 @@ namespace PipelineRunnerTests
 
             var job = new ConfigReader().ReadXmlFromText(fileContents);
 
-            Assert.AreEqual(4, job.Data.DataSources.Count);
+            Assert.AreEqual(4, job.Data.DataSources.Count());
         }
 
         /// <summary>
@@ -51,8 +51,8 @@ namespace PipelineRunnerTests
 
             var job = new ConfigReader().ReadXmlFromText(fileContents);
 
-            Assert.AreEqual(2, job.Data.DataSources.Count);
-            Assert.AreEqual("$", job.Data.DataSources[0].Path);
+            Assert.AreEqual(2, job.Data.DataSources.Count());
+            Assert.AreEqual("$", job.Data.DataSources.First().Path);
         }
 
         /// <summary>
@@ -68,8 +68,8 @@ namespace PipelineRunnerTests
 
             var job = new ConfigReader().ReadXmlFromText(fileContents);
 
-            Assert.AreEqual(2, job.Data.DataSources.Count);
-            Assert.AreEqual("$", job.Data.DataSources[0].Path);
+            Assert.AreEqual(2, job.Data.DataSources.Count());
+            Assert.AreEqual("$", job.Data.DataSources.First().Path);
         }
 
         /// <summary>
@@ -87,10 +87,10 @@ namespace PipelineRunnerTests
 
             new ConfigReader().MergeDataSourcesFromDataModel(job, fileContents);
 
-            Assert.AreEqual(2, job.Data.DataSources.Count);
-            Assert.AreEqual("$", job.Data.DataSources[0].Path);
-            Assert.AreEqual("SELECT * FROM Text", job.Data.DataSources[0].Sql);
-            Assert.AreEqual("SELECT * FROM TextDate", job.Data.DataSources[1].Sql);
+            Assert.AreEqual(2, job.Data.DataSources.Count());
+            Assert.AreEqual("$", job.Data.DataSources.First().Path);
+            Assert.AreEqual("SELECT * FROM Text", job.Data.DataSources.First().Sql);
+            Assert.AreEqual("SELECT * FROM TextDate", job.Data.DataSources.Skip(1).First().Sql);
         }
 
         /// <summary>
@@ -106,17 +106,44 @@ namespace PipelineRunnerTests
 
             var job = new ConfigReader().ReadXmlFromText(fileContents);
 
-            Assert.AreEqual(2, job.Data.DataSources.Count);
-            Assert.AreEqual("$", job.Data.DataSources[0].Path);
-            Assert.AreEqual("Text.Text", job.Data.DataSources[0].TableOrView);
-            Assert.AreEqual(0, job.Data.DataSources[0].Relationships.Count());
-            Assert.AreEqual(2, job.Data.DataSources[0].SqlEntityColumnMappings.Count());
-            Assert.AreEqual("TextID", job.Data.DataSources[0].SqlEntityColumnMappings.First().Name);
+            Assert.AreEqual(2, job.Data.DataSources.Count());
+            Assert.AreEqual("$", job.Data.DataSources.First().Path);
+            Assert.AreEqual("Text.Text", job.Data.DataSources.First().TableOrView);
+            Assert.AreEqual(0, job.Data.DataSources.First().Relationships.Count());
+            Assert.AreEqual(2, job.Data.DataSources.First().SqlEntityColumnMappings.Count());
+            Assert.AreEqual("TextID", job.Data.DataSources.First().SqlEntityColumnMappings.First().Name);
 
-            Assert.AreEqual("$.patient", job.Data.DataSources[1].Path);
-            Assert.AreEqual("Person.Patient", job.Data.DataSources[1].TableOrView);
-            Assert.AreEqual(1, job.Data.DataSources[1].Relationships.Count());
-            Assert.AreEqual("Text.Text", job.Data.DataSources[1].Relationships.First().Source.Entity);
+            Assert.AreEqual("$.patient", job.Data.DataSources.Skip(1).First().Path);
+            Assert.AreEqual("Person.Patient", job.Data.DataSources.Skip(1).First().TableOrView);
+            Assert.AreEqual(1, job.Data.DataSources.Skip(1).First().Relationships.Count());
+            Assert.AreEqual("Text.Text", job.Data.DataSources.Skip(1).First().Relationships.First().Source.Entity);
+        }
+
+        /// <summary>
+        /// The read config with tables.
+        /// </summary>
+        [TestMethod]
+        public void ReadConfigWithIncrementalColumns()
+        {
+            var fileContents = TestFileLoader.GetFileContents("Files", "ConfigWithIncrementalColumns.xml");
+
+            Assert.IsNotNull(fileContents);
+            Assert.AreNotEqual(0, fileContents.Length, "Could not read file from assembly.  Did you mark it as Embedded Resource?");
+
+            var job = new ConfigReader().ReadXmlFromText(fileContents);
+
+            Assert.AreEqual(2, job.Data.DataSources.Count());
+            Assert.AreEqual("$", job.Data.DataSources.First().Path);
+            Assert.AreEqual("Text.Text", job.Data.DataSources.First().TableOrView);
+            Assert.AreEqual(0, job.Data.DataSources.First().Relationships.Count());
+            Assert.AreEqual(0, job.Data.DataSources.First().SqlEntityColumnMappings.Count());
+
+            Assert.AreEqual("$.patients", job.Data.DataSources.Skip(1).First().Path);
+            Assert.AreEqual("Person.Patient", job.Data.DataSources.Skip(1).First().TableOrView);
+            Assert.AreEqual(1, job.Data.DataSources.Skip(1).First().Relationships.Count());
+            Assert.AreEqual("Text.Text", job.Data.DataSources.Skip(1).First().Relationships.First().Source.Entity);
+
+            Assert.AreEqual(2, job.Data.TopLevelDataSource.IncrementalColumns.Count());
         }
     }
 }

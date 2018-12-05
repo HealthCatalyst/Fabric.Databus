@@ -53,6 +53,66 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="DataModel" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="TopLevelDataSource" maxOccurs="1" minOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="IncrementalColumn" maxOccurs="unbounded" minOccurs="0">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="Name" use="required"/>
+                            <xs:attribute type="xs:string" name="Operator" use="optional"/>
+                            <xs:attribute type="xs:string" name="Value" use="optional"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Relationship" maxOccurs="unbounded" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Source" minOccurs="1">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute type="xs:string" name="Entity" use="required"/>
+                                  <xs:attribute type="xs:string" name="Key" use="required"/>
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="Destination" minOccurs="1">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute type="xs:string" name="Entity" use="required"/>
+                                  <xs:attribute type="xs:string" name="Key" use="required"/>
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Column" maxOccurs="unbounded" minOccurs="0">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:string">
+                            <xs:attribute type="xs:string" name="Name" use="required"/>
+                            <xs:attribute type="xs:string" name="Alias" use="optional"/>
+                            <xs:attribute type="xs:string" name="Entity" use="optional"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element type="xs:string" name="Sql" minOccurs="0" maxOccurs="1"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:string" name="Name" use="optional"/>
+                  <xs:attribute type="xs:string" name="Path" use="optional"/>
+                  <xs:attribute type="xs:string" name="TableOrView" use="optional"/>
+                  <xs:attribute type="propertyType" name="PropertyType" use="optional"/>
+                  <xs:attribute type="xs:string" name="Key" use="required"/>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="DataSource" maxOccurs="unbounded" minOccurs="1">
                 <xs:complexType>
                   <xs:sequence>

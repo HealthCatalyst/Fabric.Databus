@@ -66,7 +66,7 @@ namespace Fabric.Databus.Schema
 
         /// <inheritdoc />
         public IList<MappingItem> GetSchemasForLoads(
-            IList<IDataSource> workItemLoads)
+            IEnumerable<IDataSource> workItemLoads)
         {
             var dictionary = new List<MappingItem>();
 

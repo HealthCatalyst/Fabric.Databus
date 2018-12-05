@@ -39,7 +39,7 @@ namespace Fabric.Databus.QueueItems
         /// <summary>
         /// Gets or sets the loads.
         /// </summary>
-        public IList<IDataSource> Loads { get; set; }
+        public IEnumerable<IDataSource> Loads { get; set; }
 
         /// <summary>
         /// Gets or sets the batch number.

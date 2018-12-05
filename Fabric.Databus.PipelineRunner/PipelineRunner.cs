@@ -313,9 +313,14 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
             }
 
+            if (!this.container.IsRegistered<IQueueFactory>())
+            {
+                this.container.RegisterType<IQueueFactory, SimpleQueueFactory>();
+            }
+
             if (!this.container.IsRegistered<IQueueManager>())
             {
-                var queueManager = new QueueManager();
+                var queueManager = new QueueManager(this.container.Resolve<IQueueFactory>());
                 this.container.RegisterInstance<IQueueManager>(queueManager);
             }
 

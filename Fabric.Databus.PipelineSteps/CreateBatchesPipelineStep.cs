@@ -94,8 +94,6 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="workItem">
         /// The work item.
         /// </param>
-        /// <exception cref="T:System.NotImplementedException">exception thrown
-        /// </exception>
         protected override async Task HandleAsync(SqlJobQueueItem workItem)
         {
             if (workItem.Job == null)
@@ -157,21 +155,15 @@ namespace Fabric.Databus.PipelineSteps
                         });
 
                     await this.WriteDiagnostics(currentBatchNumber, range);
+
+                    // wait until the other queues are cleared up
+
+                    // QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
                 }
             }
         }
 
-        /// <summary>
-        /// The get id.
-        /// </summary>
-        /// <param name="workItem">
-        /// The work item.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        /// <exception cref="NotImplementedException">exception thrown
-        /// </exception>
+        /// <inheritdoc />
         protected override string GetId(SqlJobQueueItem workItem)
         {
             return "1";

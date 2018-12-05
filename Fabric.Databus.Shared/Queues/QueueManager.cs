@@ -15,15 +15,20 @@ namespace Fabric.Databus.Shared.Queues
     using System.Linq;
     using System.Threading;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Shared;
 
+    /// <inheritdoc />
     /// <summary>
     /// The queue manager.
     /// </summary>
     public class QueueManager : IQueueManager
     {
+        /// <summary>
+        /// The queue factory.
+        /// </summary>
+        private readonly IQueueFactory queueFactory;
+
         /// <summary>
         /// The queues.
         /// </summary>
@@ -36,80 +41,46 @@ namespace Fabric.Databus.Shared.Queues
         private int nextId;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="QueueManager"/> class.
+        /// </summary>
+        /// <param name="queueFactory">
+        /// The queue factory.
+        /// </param>
+        public QueueManager(IQueueFactory queueFactory)
+        {
+            this.queueFactory = queueFactory ?? throw new ArgumentNullException(nameof(queueFactory));
+        }
+
+        /// <summary>
         /// The queues.
         /// </summary>
         public IDictionary<string, IQueue> Queues => this.queues;
 
-        /// <summary>
-        /// The create input queue.
-        /// </summary>
-        /// <param name="stepNumber">
-        /// The step number.
-        /// </param>
-        /// <typeparam name="T">type of queue
-        /// </typeparam>
-        /// <returns>
-        /// The <see cref="IQueue"/>.
-        /// </returns>
+        /// <inheritdoc />
         public IQueue<T> CreateInputQueue<T>(int stepNumber)
         {
             return this.CreateQueue<T>(stepNumber);
         }
 
-        /// <summary>
-        /// The get input queue.
-        /// </summary>
-        /// <param name="stepNumber">
-        /// The step number.
-        /// </param>
-        /// <typeparam name="T">type of queue
-        /// </typeparam>
-        /// <returns>
-        /// The <see cref="IQueue"/>.
-        /// </returns>
+        /// <inheritdoc />
         public IQueue<T> GetInputQueue<T>(int stepNumber)
         {
             return this.GetQueue<T>(stepNumber);
         }
 
-        /// <summary>
-        /// The get output queue.
-        /// </summary>
-        /// <param name="stepNumber">
-        /// The step number.
-        /// </param>
-        /// <typeparam name="T">type of queue
-        /// </typeparam>
-        /// <returns>
-        /// The <see cref="IQueue"/>.
-        /// </returns>
+        /// <inheritdoc />
         public IQueue<T> GetOutputQueue<T>(int stepNumber)
         {
             return this.GetQueue<T>(stepNumber + 1);
         }
 
-        /// <summary>
-        /// The create output queue.
-        /// </summary>
-        /// <param name="stepNumber">
-        /// The step number.
-        /// </param>
-        /// <typeparam name="T">type of queue
-        /// </typeparam>
-        /// <returns>
-        /// The <see cref="IQueue"/>.
-        /// </returns>
+        /// <inheritdoc />
         public IQueue<T> CreateOutputQueue<T>(int stepNumber)
         {
             return this.CreateQueue<T>(stepNumber + 1);
         }
 
-        /// <summary>
-        /// The get unique id.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="int"/>.
-        /// </returns>
+        /// <inheritdoc />
         public int GetUniqueId()
         {
             return Interlocked.Increment(ref this.nextId);
@@ -196,10 +167,7 @@ namespace Fabric.Databus.Shared.Queues
         /// </returns>
         private IQueue InternalCreateQueue<T>(int id)
         {
-            return new SimpleQueue<T>(
-                new ConcurrentQueue<T>(),
-                this.GetQueueName<T>(id),
-                1000);
+            return this.queueFactory.Create<T>(this.GetQueueName<T>(id));
         }
     }
 }

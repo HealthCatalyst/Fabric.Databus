@@ -99,10 +99,6 @@ namespace Fabric.Databus.PipelineSteps
             }
 
             await this.WriteDiagnostics(workItem);
-
-            // wait until the other queues are cleared up
-
-            // QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
         }
 
         /// <inheritdoc />
@@ -143,6 +139,5 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
         }
-
     }
 }

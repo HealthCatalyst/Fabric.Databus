@@ -14,7 +14,6 @@ namespace Fabric.Databus.Shared.Queues
     using System.Linq;
     using System.Threading;
 
-    using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
 
     /// <inheritdoc />
@@ -51,31 +50,9 @@ namespace Fabric.Databus.Shared.Queues
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:Fabric.Databus.Shared.Queues.SimpleQueue`1" /> class.
-        /// </summary>
-        /// <param name="concurrentQueue">
-        /// The concurrent queue.
-        /// </param>
-        /// <param name="name">
-        /// The name.
-        /// </param>
-        /// <param name="maxItems">
-        /// The max items.
-        /// </param>
-        public SimpleQueue(IProducerConsumerCollection<T> concurrentQueue, string name, int maxItems)
-            : this(concurrentQueue, name)
-        {
-        }
-
-        /// <summary>
-        /// The count.
-        /// </summary>
         public int Count => this.blockingCollection.Count;
 
-        /// <summary>
-        /// The is completed.
-        /// </summary>
+        /// <inheritdoc />
         public bool IsCompleted => this.blockingCollection.IsCompleted;
 
         /// <summary>

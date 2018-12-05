@@ -22,7 +22,6 @@ namespace Fabric.Databus.PipelineSteps
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
-    using Fabric.Databus.Shared;
 
     using QueueItems;
 

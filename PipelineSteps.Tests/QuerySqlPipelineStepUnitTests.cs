@@ -57,7 +57,7 @@ namespace PipelineStep.Tests
                 }
             };
 
-            var queueManager = new QueueManager();
+            var queueManager = new QueueManager(new SimpleQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()

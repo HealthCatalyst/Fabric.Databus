@@ -15,7 +15,9 @@ namespace Fabric.Databus.Interfaces.Queues
     public interface IQueueManager
     {
         //void CompleteAdding<T>();
+
         //void WaitTillAllQueuesAreCompleted<T>();
+
         /// <summary>
         /// The get unique id.
         /// </summary>

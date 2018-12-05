@@ -63,6 +63,18 @@ namespace Fabric.Databus.Shared.Queues
             this._maxItems = maxItems;
         }
 
+        /// <inheritdoc />
+        public int Count => this.blockingCollection.Count;
+
+        /// <inheritdoc />
+        public bool IsCompleted => this.blockingCollection.IsCompleted;
+
+        /// <summary>
+        /// The name.
+        /// </summary>
+        // ReSharper disable once ConvertToAutoProperty
+        public string Name => this._name;
+
         /// <param name="cancellationToken"></param>
         /// <inheritdoc />
         public T Take(CancellationToken cancellationToken)
@@ -73,31 +85,33 @@ namespace Fabric.Databus.Shared.Queues
             return item;
         }
 
-        /// <summary>
-        /// The release lock if needed.
-        /// </summary>
-        private void ReleaseLockIfNeeded()
-        {
-            if (this._maxItems > 0)
-            {
-                lock (this._locker) // Let's now wake up the thread by
-                {
-                    if (this.Count <= this._maxItems)
-                    {
-                        Logger.Verbose($"MeteredQueue.ReleaseAll {this._name}");
-
-                        Monitor.PulseAll(this._locker);
-                    }
-                }
-            }
-        }
-
         /// <inheritdoc />
         public void Add(T item)
         {
             this.BlockIfNeeded();
 
             this.blockingCollection.Add(item);
+        }
+
+        /// <inheritdoc />
+        public bool Any()
+        {
+            return this.blockingCollection.Any();
+        }
+
+        /// <inheritdoc />
+        public bool TryTake(out T cacheItem)
+        {
+            var result = this.blockingCollection.TryTake(out cacheItem);
+            this.ReleaseLockIfNeeded();
+
+            return result;
+        }
+
+        /// <inheritdoc />
+        public void CompleteAdding()
+        {
+            this.blockingCollection.CompleteAdding();
         }
 
         /// <summary>
@@ -126,31 +140,24 @@ namespace Fabric.Databus.Shared.Queues
             }
         }
 
-        /// <inheritdoc />
-        public bool Any()
+        /// <summary>
+        /// The release lock if needed.
+        /// </summary>
+        private void ReleaseLockIfNeeded()
         {
-            return this.blockingCollection.Any();
+            if (this._maxItems > 0)
+            {
+                lock (this._locker)
+                {
+                    // Let's now wake up the thread by
+                    if (this.Count <= this._maxItems)
+                    {
+                        Logger.Verbose($"MeteredQueue.ReleaseAll {this._name}");
+
+                        Monitor.PulseAll(this._locker);
+                    }
+                }
+            }
         }
-
-        /// <inheritdoc />
-        public bool TryTake(out T cacheItem)
-        {
-            var result = this.blockingCollection.TryTake(out cacheItem);
-            this.ReleaseLockIfNeeded();
-
-            return result;
-        }
-
-        public int Count => this.blockingCollection.Count;
-        public bool IsCompleted => this.blockingCollection.IsCompleted;
-
-        /// <inheritdoc />
-        public void CompleteAdding()
-        {
-            this.blockingCollection.CompleteAdding();
-        }
-
-        // ReSharper disable once ConvertToAutoProperty
-        public string Name => this._name;
     }
 }

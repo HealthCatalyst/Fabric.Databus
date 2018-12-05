@@ -1,16 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EndToEndIntegrationTests.cs" company="">
+// <copyright file="SingleThreadedEndToEndIntegrationTests.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the EndToEndIntegrationTests type.
+//   Defines the SingleThreadedEndToEndIntegrationTests type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.Integration.Tests
 {
     using System;
-    using System.Data.Common;
     using System.Data.SQLite;
     using System.Diagnostics;
     using System.Net;
@@ -25,9 +24,11 @@ namespace Fabric.Databus.Integration.Tests
     using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared.Loggers;
+    using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -42,64 +43,8 @@ namespace Fabric.Databus.Integration.Tests
     /// The end to end integration tests.
     /// </summary>
     [TestClass]
-    public class EndToEndIntegrationTests
+    public class MultiThreadedEndToEndIntegrationTests
     {
-        /// <summary>
-        /// The test creating database.
-        /// </summary>
-        [TestMethod]
-        public void TestCreatingDatabase()
-        {
-            string connectionString = "Data Source=:memory:";
-
-            var connection = new SQLiteConnection(connectionString);
-            connection.Open();
-
-            string sql = "create table highscores (name varchar(20), score int)";
-
-            SQLiteCommand command = connection.CreateCommand();
-            command.CommandText = sql;
-            command.ExecuteNonQuery();
-
-            sql = "insert into highscores (name, score) values ('Me', 9001)";
-
-            command.CommandText = sql;
-            command.ExecuteNonQuery();
-
-            sql = "select * from highscores";
-
-            command.CommandText = sql;
-            var reader = command.ExecuteReader();
-
-            var values = new object[2];
-
-            while (reader.Read())
-            {
-                var read = reader.GetValues(values);
-            }
-
-            connection.Close();
-
-            Assert.AreEqual("Me", values[0]);
-            Assert.AreEqual(9001, values[1]);
-        }
-
-        /// <summary>
-        /// The can connect to sql lite via sql connection.
-        /// </summary>
-        [TestMethod]
-        public void CanConnectToSqlLiteViaSqlConnection()
-        {
-            string connectionString = "Data Source=:memory:";
-
-            using (DbConnection conn = new SQLiteConnection(connectionString))
-            {
-                conn.Open();
-
-                conn.Close();
-            }
-        }
-
         /// <summary>
         /// The can run successfully end to end.
         /// </summary>
@@ -108,6 +53,8 @@ namespace Fabric.Databus.Integration.Tests
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "SingleEntity.xml");
             var config = new ConfigReader().ReadXmlFromText(fileContents);
+
+            config.Config.UseMultipleThreads = true;
 
             string connectionString = "Data Source=:memory:";
 
@@ -148,6 +95,8 @@ FROM Text
                         container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
 
                         container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
+
+                        container.RegisterType<IQueueFactory, AdvancedQueueFactory>();
 
                         // set up a mock web service
                         var mockRepository = new MockRepository(MockBehavior.Strict);

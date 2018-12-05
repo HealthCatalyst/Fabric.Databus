@@ -44,6 +44,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The total items added to output queue by query id.
         /// </summary>
+        // ReSharper disable once StaticMemberInGenericType
         private static readonly ConcurrentDictionary<string, int> TotalItemsAddedToOutputQueueByQueryId = new ConcurrentDictionary<string, int>();
 
         /// <summary>

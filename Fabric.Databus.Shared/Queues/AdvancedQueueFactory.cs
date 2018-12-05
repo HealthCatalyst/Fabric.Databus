@@ -1,28 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimpleQueueFactory.cs" company="">
+// <copyright file="AdvancedQueueFactory.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SimpleQueueFactory type.
+//   Defines the AdvancedQueueFactory type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.Shared.Queues
 {
-    using System.Collections.Concurrent;
-
     using Fabric.Databus.Interfaces.Queues;
 
     /// <inheritdoc />
     /// <summary>
-    /// The queue factory.
+    /// The advanced queue factory.
     /// </summary>
-    public class SimpleQueueFactory : IQueueFactory
+    public class AdvancedQueueFactory : IQueueFactory
     {
         /// <inheritdoc />
         public IQueue Create<T>(string name)
         {
-            return new SimpleQueue<T>(name);
+            return new AdvancedQueue<T>(name);
         }
     }
 }

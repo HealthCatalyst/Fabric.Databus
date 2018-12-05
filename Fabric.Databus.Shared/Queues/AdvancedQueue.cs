@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimpleQueue.cs" company="">
+// <copyright file="AdvancedQueue.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SimpleQueue type.
+//   Defines the AdvancedQueue type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,11 +18,12 @@ namespace Fabric.Databus.Shared.Queues
 
     /// <inheritdoc />
     /// <summary>
-    /// The simple blocking collection.
+    /// The advanced queue.
     /// </summary>
-    /// <typeparam name="T">type of item
+    /// <typeparam name="T">
+    /// type of queue
     /// </typeparam>
-    public class SimpleQueue<T> : IQueue<T>
+    public class AdvancedQueue<T> : IQueue<T>
     {
         /// <summary>
         /// The blocking collection.
@@ -35,12 +36,12 @@ namespace Fabric.Databus.Shared.Queues
         private readonly string name;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleQueue{T}"/> class.
+        /// Initializes a new instance of the <see cref="AdvancedQueue{T}"/> class.
         /// </summary>
         /// <param name="name">
         /// The name.
         /// </param>
-        public SimpleQueue(string name)
+        public AdvancedQueue(string name)
         {
             var concurrentQueue = new ConcurrentQueue<T>();
             this.blockingCollection = new BlockingCollection<T>(concurrentQueue);

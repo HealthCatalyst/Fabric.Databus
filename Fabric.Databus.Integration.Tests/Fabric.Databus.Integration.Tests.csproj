@@ -124,7 +124,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EndToEndIntegrationTests.cs" />
+    <Compile Include="MultiThreadedEndToEndIntegrationTests.cs" />
+    <Compile Include="SingleThreadedEndToEndIntegrationTests.cs" />
     <Compile Include="IntegrationTestFileStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlLiteConnectionFactory.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="SqlLiteGenerator.cs" />
     <Compile Include="SqlLiteGeneratorFactory.cs" />
     <Compile Include="TestFileLoader.cs" />
+    <Compile Include="SqlLiteIntegrationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

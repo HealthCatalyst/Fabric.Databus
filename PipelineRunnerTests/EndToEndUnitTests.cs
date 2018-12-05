@@ -114,11 +114,11 @@ namespace PipelineRunnerTests
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
-                .Setup(service => service.Create(It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(service => service.Create(It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<HttpMethod>()))
                 .Returns(mockFileUploader.Object);
 
             mockFileUploader.Setup(
-                service => service.SendStreamToHosts(
+                service => service.SendStreamToHostsAsync(
                     It.IsAny<string>(),
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),
@@ -246,11 +246,18 @@ namespace PipelineRunnerTests
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
 
             mockFileUploaderFactory
-                .Setup(service => service.Create(It.IsAny<bool>(), It.IsAny<List<string>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(
+                    service => service.Create(
+                        It.IsAny<bool>(),
+                        It.IsAny<List<string>>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<HttpMethod>()))
                 .Returns(mockFileUploader.Object);
 
             mockFileUploader.Setup(
-                service => service.SendStreamToHosts(
+                service => service.SendStreamToHostsAsync(
                     It.IsAny<string>(),
                     It.IsAny<int>(),
                     It.IsAny<Stream>(),

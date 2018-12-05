@@ -14,6 +14,7 @@ namespace Fabric.Databus.ElasticSearch
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Net.Http;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -88,6 +89,7 @@ namespace Fabric.Databus.ElasticSearch
         /// </param>
         /// <param name="httpRequestInterceptor"></param>
         /// <param name="httpResponseInterceptor"></param>
+        /// <param name="method"></param>
         public ElasticSearchUploader(
             bool keepIndexOnline,
             ILogger logger,
@@ -97,8 +99,9 @@ namespace Fabric.Databus.ElasticSearch
             string entityType,
             IHttpClientFactory httpClientFactory,
             IHttpRequestInterceptor httpRequestInterceptor,
-            IHttpResponseInterceptor httpResponseInterceptor)
-        : base(logger, hosts, httpClientFactory, httpRequestInterceptor, httpResponseInterceptor)
+            IHttpResponseInterceptor httpResponseInterceptor,
+            HttpMethod method)
+        : base(logger, hosts, httpClientFactory, httpRequestInterceptor, httpResponseInterceptor, method)
         {
             if (httpClientFactory == null)
             {
@@ -132,15 +135,15 @@ namespace Fabric.Databus.ElasticSearch
                 $"{{\"actions\" : [{{ \"remove\" : {{ \"index\" : \"{this.index}\", \"alias\" : \"{this.alias}\" }} }}]}}";
 
             await this.HttpClientHelper.PostAsyncString(
-                host + "/_aliases?pretty",
+                new Uri(new Uri(host), "/_aliases?pretty"),
                 text);
 
-            var requestUri = host + $"/{this.index}";
+            var requestUri = new Uri(new Uri(host), $"/{this.index}");
 
             await this.HttpClientHelper.DeleteAsync(requestUri);
 
             // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
-            await this.HttpClientHelper.PostAsync(host + "/_forcemerge?only_expunge_deletes=true", null);
+            await this.HttpClientHelper.PostAsync(new Uri(new Uri(host), "/_forcemerge?only_expunge_deletes=true"), null);
 
             await this.HttpClientHelper.PutAsyncFile(requestUri, folder + @"\mainmapping.json");
 
@@ -154,11 +157,11 @@ namespace Fabric.Databus.ElasticSearch
             if (!this.keepIndexOnline)
             {
                 await this.HttpClientHelper.PutAsyncString(
-                    host + "/" + this.index + "/_settings",
+                    new Uri(new Uri(host), "/" + this.index + "/_settings"),
                     "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
 
                 await this.HttpClientHelper.PutAsyncString(
-                    host + "/" + this.index + "/_settings",
+                    new Uri(new Uri(host), "/" + this.index + "/_settings"),
                     "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
             }
         }
@@ -180,17 +183,17 @@ namespace Fabric.Databus.ElasticSearch
                        + "\" } }]}";
 
             await this.HttpClientHelper.PostAsyncString(
-                host + "/_aliases?pretty",
+                new Uri(new Uri(host), "/_aliases?pretty"),
                 text);
 
-            var requestUri = host + relativeUrl;
+            var requestUri = new Uri(new Uri(host), relativeUrl);
 
             await this.HttpClientHelper.DeleteAsync(requestUri);
 
             // now also delete the alias in case it was pointing to some other index
 
             // DELETE /logs_20162801/_alias/current_day
-            await this.HttpClientHelper.DeleteAsync(host + "/_all/_alias/" + this.alias);
+            await this.HttpClientHelper.DeleteAsync(new Uri(new Uri(host), "/_all/_alias/" + this.alias));
         }
 
         /// <inheritdoc />
@@ -207,15 +210,15 @@ namespace Fabric.Databus.ElasticSearch
                 var host = this.hosts.First() ?? throw new ArgumentNullException("hosts.First()");
 
                 // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
-                await this.HttpClientHelper.PostAsync(host + "/_forcemerge?only_expunge_deletes=true", null);
+                await this.HttpClientHelper.PostAsync(new Uri(new Uri(host), "/_forcemerge?only_expunge_deletes=true"), null);
 
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-codec
                 await this.HttpClientHelper.PutAsyncString(
-                    host + "/" + this.index + "/_settings",
+                    new Uri(new Uri(host), "/" + this.index + "/_settings"),
                     "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
 
                 await this.HttpClientHelper.PutAsyncString(
-                    host + "/" + this.index + "/_settings",
+                    new Uri(new Uri(host), "/" + this.index + "/_settings"),
                     "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
             }
         }
@@ -235,15 +238,15 @@ namespace Fabric.Databus.ElasticSearch
             if (!this.keepIndexOnline)
             {
                 await this.HttpClientHelper.PutAsyncString(
-                    host + "/" + this.index + "/_settings",
+                    new Uri(new Uri(host), "/" + this.index + "/_settings"),
                     "{ \"index\" : {\"number_of_replicas\" : \"1\" } }");
 
                 await this.HttpClientHelper.PutAsyncString(
-                    host + "/" + this.index + "/_settings",
+                    new Uri(new Uri(host), "/" + this.index + "/_settings"),
                     "{ \"index\" : {\"refresh_interval\" : \"1s\" } }");
 
                 // curl -XPOST %ESURL%/patients2/_forcemerge?max_num_segments=5
-                await this.HttpClientHelper.PostAsync(host + "/" + this.index + "/_forcemerge?max_num_segments=5", null);
+                await this.HttpClientHelper.PostAsync(new Uri(new Uri(host), "/" + this.index + "/_forcemerge?max_num_segments=5"), null);
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 // await
@@ -256,7 +259,7 @@ namespace Fabric.Databus.ElasticSearch
                        + "\" } }]}";
 
             await this.HttpClientHelper.PostAsyncString(
-                host + "/_aliases?pretty",
+                new Uri(new Uri(host), "/_aliases?pretty"),
                 text);
         }
 
@@ -273,7 +276,7 @@ namespace Fabric.Databus.ElasticSearch
             var text = "{\"actions\" : [{ \"add\" : { \"index\" : \"" + this.index + "\", \"alias\" : \"" + this.alias
                        + "\" } }]}";
             await this.HttpClientHelper.PostAsyncString(
-                host + "/_aliases?pretty",
+                new Uri(new Uri(host), "/_aliases?pretty"),
                 text);
         }
 
@@ -324,7 +327,7 @@ namespace Fabric.Databus.ElasticSearch
             bool doCompress)
         {
             var relativeUrl = $"/{this.index}/{this.entityType}/_bulk?pretty";
-            await this.SendStreamToHosts(relativeUrl, batch, stream, doLogContent, doCompress);
+            await this.SendStreamToHostsAsync(relativeUrl, batch, stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
@@ -353,7 +356,7 @@ namespace Fabric.Databus.ElasticSearch
             bool doCompress)
         {
             var relativeUrl = $"/{this.index}";
-            await this.SendStreamToHosts(relativeUrl, batch, stream, doLogContent, doCompress);
+            await this.SendStreamToHostsAsync(relativeUrl, batch, stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
@@ -382,7 +385,7 @@ namespace Fabric.Databus.ElasticSearch
             bool doCompress)
         {
             var relativeUrl = $"/{this.index}/_mapping/{this.entityType}";
-            await this.SendStreamToHosts(relativeUrl, batch, stream, doLogContent, doCompress);
+            await this.SendStreamToHostsAsync(relativeUrl, batch, stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
@@ -408,7 +411,7 @@ namespace Fabric.Databus.ElasticSearch
 
             if (!this.keepIndexOnline)
             {
-                await this.HttpClientHelper.PostAsyncString(host + "/" + this.index + "/_refresh", null);
+                await this.HttpClientHelper.PostAsyncString(new Uri(new Uri(host), "/" + this.index + "/_refresh"), null);
             }
         }
 
@@ -434,7 +437,7 @@ namespace Fabric.Databus.ElasticSearch
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        protected override async Task<HttpStatusCode> SendStreamToUrl(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
+        protected override async Task<HttpStatusCode> SendStreamToUrlAsync(string url, int batch, Stream stream, bool doLogContent, bool doCompress)
         {
             try
             {
@@ -465,8 +468,8 @@ namespace Fabric.Databus.ElasticSearch
                 var fullUri = new Uri(new Uri(baseUri), url);
 
                 var response = doCompress
-                                   ? await this.HttpClientHelper.PutAsyncStreamCompressed(fullUri, stream)
-                                   : await this.HttpClientHelper.PutAsyncStream(fullUri, stream);
+                                   ? await this.HttpClientHelper.SendAsyncStreamCompressed(fullUri, this.httpMethod, stream)
+                                   : await this.HttpClientHelper.SendAsyncStream(fullUri, this.httpMethod, stream);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -545,7 +548,7 @@ namespace Fabric.Databus.ElasticSearch
                 Interlocked.Increment(ref this.currentRequests);
                 var requestStartTimeMillisecs = this.Stopwatch.ElapsedMilliseconds;
 
-                var response = await this.HttpClientHelper.PutAsyncFileCompressed(baseUri, url, filepath);
+                var response = await this.HttpClientHelper.PutAsyncFileCompressed(new Uri(new Uri(baseUri), url), filepath);
 
                 if (response.IsSuccessStatusCode)
                 {

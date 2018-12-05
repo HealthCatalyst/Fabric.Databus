@@ -39,6 +39,6 @@ namespace Fabric.Databus.Interfaces.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task<HttpStatusCode> SendStreamToHosts(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress);
+        Task<HttpStatusCode> SendStreamToHostsAsync(string relativeUrl, int batch, Stream stream, bool doLogContent, bool doCompress);
     }
 }

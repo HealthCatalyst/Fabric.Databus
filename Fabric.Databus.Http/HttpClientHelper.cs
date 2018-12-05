@@ -65,8 +65,8 @@ namespace Fabric.Databus.Http
         /// <summary>
         /// The put async file.
         /// </summary>
-        /// <param name="url">
-        /// The url.
+        /// <param name="uri">
+        /// The uri.
         /// </param>
         /// <param name="filename">
         /// The filename.
@@ -74,22 +74,19 @@ namespace Fabric.Databus.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> PutAsyncFile(string url, string filename)
+        public async Task<HttpResponseMessage> PutAsyncFile(Uri uri, string filename)
         {
             var allText = File.ReadAllText(filename);
             var stringContent = new StringContent(allText, Encoding.UTF8, ContentTypeHeader);
 
-            return await this.PutAsync(new Uri(url), stringContent);
+            return await this.PutAsync(uri, stringContent);
         }
 
         /// <summary>
         /// The put async file compressed.
         /// </summary>
-        /// <param name="baseUri">
-        /// The base uri.
-        /// </param>
-        /// <param name="relativeUrl">
-        /// The relative url.
+        /// <param name="uri">
+        /// The uri.
         /// </param>
         /// <param name="filename">
         /// The filename.
@@ -98,8 +95,7 @@ namespace Fabric.Databus.Http
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
         public async Task<HttpResponseMessage> PutAsyncFileCompressed(
-            string baseUri,
-            string relativeUrl,
+            Uri uri,
             string filename)
         {
             var allText = File.ReadAllText(filename);
@@ -114,25 +110,23 @@ namespace Fabric.Databus.Http
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            var url = new Uri(new Uri(baseUri), relativeUrl);
-            return await this.PutAsync(url, content).ConfigureAwait(false);
+            return await this.PutAsync(uri, content).ConfigureAwait(false);
         }
 
         /// <summary>
         /// The put async stream compressed.
         /// </summary>
         /// <param name="url">
-        /// the url
+        ///     the url
         /// </param>
+        /// <param name="httpMethod">http method</param>
         /// <param name="stream">
-        /// The stream.
+        ///     The stream.
         /// </param>
         /// <returns>
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> PutAsyncStreamCompressed(
-            Uri url,
-            Stream stream)
+        public async Task<HttpResponseMessage> SendAsyncStreamCompressed(Uri url, HttpMethod httpMethod, Stream stream)
         {
             stream.Position = 0;
             var ms = new MemoryStream();
@@ -148,24 +142,24 @@ namespace Fabric.Databus.Http
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            return await this.PutAsync(url, content).ConfigureAwait(false);
+            return await this.SendAsync(url, httpMethod, content).ConfigureAwait(false);
         }
 
         /// <summary>
         /// The put async stream.
         /// </summary>
         /// <param name="url">
-        /// The url.
+        ///     The url.
         /// </param>
+        /// <param name="httpMethod">
+        ///     http method</param>
         /// <param name="stream">
-        /// The stream.
+        ///     The stream.
         /// </param>
         /// <returns>
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> PutAsyncStream(
-            Uri url,
-            Stream stream)
+        public async Task<HttpResponseMessage> SendAsyncStream(Uri url, HttpMethod httpMethod, Stream stream)
         {
             stream.Position = 0;
             MemoryStream ms = new MemoryStream();
@@ -177,7 +171,7 @@ namespace Fabric.Databus.Http
             StreamContent content = new StreamContent(ms);
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
 
-            return await this.PutAsync(url, content).ConfigureAwait(false);
+            return await this.SendAsync(url, httpMethod, content).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -192,11 +186,11 @@ namespace Fabric.Databus.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> PutAsyncString(string url, string text)
+        public async Task<HttpResponseMessage> PutAsyncString(Uri url, string text)
         {
             var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
 
-            return await this.PutAsync(new Uri(url), stringContent);
+            return await this.PutAsync(url, stringContent);
         }
 
         /// <summary>
@@ -211,7 +205,7 @@ namespace Fabric.Databus.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> PostAsyncString(string url, string text)
+        public async Task<HttpResponseMessage> PostAsyncString(Uri url, string text)
         {
             var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
 
@@ -230,17 +224,9 @@ namespace Fabric.Databus.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> PostAsync(string url, HttpContent stringContent)
+        public async Task<HttpResponseMessage> PostAsync(Uri url, HttpContent stringContent)
         {
-            var httpMethod = HttpMethod.Post;
-            using (var request = new HttpRequestMessage(httpMethod, url))
-            {
-                request.Content = stringContent;
-
-                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
-
-                return await this.httpClient.SendAsync(request);
-            }
+            return await this.SendAsync(url, HttpMethod.Post, stringContent);
         }
 
         /// <summary>
@@ -252,7 +238,7 @@ namespace Fabric.Databus.Http
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> DeleteAsync(string requestUri)
+        public async Task<HttpResponseMessage> DeleteAsync(Uri requestUri)
         {
             var httpMethod = HttpMethod.Delete;
             using (var request = new HttpRequestMessage(httpMethod, requestUri))
@@ -299,10 +285,29 @@ namespace Fabric.Databus.Http
         /// </returns>
         private async Task<HttpResponseMessage> PutAsync(Uri url, HttpContent content)
         {
-            var httpMethod = HttpMethod.Put;
-            using (var request = new HttpRequestMessage(httpMethod, url))
+            return await this.SendAsync(url, HttpMethod.Put, content);
+        }
+
+        /// <summary>
+        /// The send async.
+        /// </summary>
+        /// <param name="uri">
+        /// The uri.
+        /// </param>
+        /// <param name="httpMethod">
+        /// The http Method.
+        /// </param>
+        /// <param name="stringContent">
+        /// The string content.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task<HttpResponseMessage> SendAsync(Uri uri, HttpMethod httpMethod, HttpContent stringContent)
+        {
+            using (var request = new HttpRequestMessage(httpMethod, uri))
             {
-                request.Content = content;
+                request.Content = stringContent;
 
                 this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
 

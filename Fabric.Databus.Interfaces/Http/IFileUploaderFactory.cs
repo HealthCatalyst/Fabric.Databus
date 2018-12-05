@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Interfaces.Http
 {
     using System.Collections.Generic;
+    using System.Net.Http;
 
     using Fabric.Databus.Http;
 
@@ -24,9 +25,12 @@ namespace Fabric.Databus.Interfaces.Http
         /// <param name="urls">
         /// The config Urls.
         /// </param>
+        /// <param name="method">
+        /// The method.
+        /// </param>
         /// <returns>
         /// The <see cref="FileUploader"/>.
         /// </returns>
-        IFileUploader Create(List<string> urls);
+        IFileUploader Create(List<string> urls, HttpMethod method);
     }
 }

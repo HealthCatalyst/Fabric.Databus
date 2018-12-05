@@ -11,6 +11,7 @@ namespace Fabric.Databus.Http
 {
     using System;
     using System.Collections.Generic;
+    using System.Net.Http;
 
     using Fabric.Databus.Interfaces.Http;
     using Serilog;
@@ -66,9 +67,9 @@ namespace Fabric.Databus.Http
         }
 
         /// <inheritdoc />
-        public IFileUploader Create(List<string> urls)
+        public IFileUploader Create(List<string> urls, HttpMethod method)
         {
-            return new FileUploader(this.logger, urls, this.httpClientFactory, this.httpRequestInterceptor, this.httpResponseInterceptor);
+            return new FileUploader(this.logger, urls, this.httpClientFactory, this.httpRequestInterceptor, this.httpResponseInterceptor, method);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Fabric.Databus.Interfaces.Http
 {
     using System;
     using System.Net;
+    using System.Net.Http;
 
     /// <summary>
     /// The HttpResponseInterceptor interface.
@@ -32,6 +33,9 @@ namespace Fabric.Databus.Interfaces.Http
         /// <param name="stopwatchElapsedMilliseconds">
         /// The stopwatch elapsed milliseconds.
         /// </param>
-        void InterceptResponse(Uri fullUri, HttpStatusCode responseStatusCode, string responseContent, long stopwatchElapsedMilliseconds);
+        /// <param name="httpMethod">
+        /// The http Method.
+        /// </param>
+        void InterceptResponse(Uri fullUri, HttpStatusCode responseStatusCode, string responseContent, long stopwatchElapsedMilliseconds, HttpMethod httpMethod);
     }
 }

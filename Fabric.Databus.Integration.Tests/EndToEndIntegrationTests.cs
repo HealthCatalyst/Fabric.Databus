@@ -212,7 +212,8 @@ FROM Text
                                 expectedUri,
                                 HttpStatusCode.OK,
                                 string.Empty,
-                                It.IsAny<long>()))
+                                It.IsAny<long>(),
+                                HttpMethod.Put))
                             .Verifiable();
 
                         container.RegisterInstance(mockHttpResponseInterceptor.Object);
@@ -254,7 +255,8 @@ FROM Text
                                 expectedUri,
                                 HttpStatusCode.OK,
                                 string.Empty,
-                                It.IsAny<long>()),
+                                It.IsAny<long>(),
+                                HttpMethod.Put),
                             Times.Once);
                         stopwatch.Stop();
                     }

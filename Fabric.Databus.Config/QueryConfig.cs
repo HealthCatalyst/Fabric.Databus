@@ -10,7 +10,9 @@
 namespace Fabric.Databus.Config
 {
     using System.Collections.Generic;
+    using System.Net.Http;
     using System.Runtime.Serialization;
+    using System.Xml.Serialization;
 
     using Fabric.Databus.Interfaces.Config;
 
@@ -42,6 +44,32 @@ namespace Fabric.Databus.Config
         /// <inheritdoc />
         [DataMember]
         public string UrlPassword { get; set; }
+
+        /// <inheritdoc />
+        [DataMember]
+        [XmlIgnore]
+        public HttpMethod UrlMethod { get; set; } = HttpMethod.Put;
+
+        /// <summary>
+        /// Sets the my url method.
+        /// </summary>
+        [XmlAttribute(nameof(UrlMethod))]
+        public string MyUrlMethod
+        {
+            set
+            {
+                switch (value)
+                {
+                    case nameof(HttpMethod.Put):
+                        this.UrlMethod = HttpMethod.Put;
+                        break;
+
+                    default:
+                        this.UrlMethod = HttpMethod.Post;
+                        break;
+                }
+            }
+        }
 
         /// <inheritdoc />
         [DataMember]

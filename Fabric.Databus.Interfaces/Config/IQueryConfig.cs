@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Interfaces.Config
 {
     using System.Collections.Generic;
+    using System.Net.Http;
 
     /// <inheritdoc />
     /// <summary>
@@ -76,5 +77,10 @@ namespace Fabric.Databus.Interfaces.Config
         /// Gets or sets the pipeline.
         /// </summary>
         PipelineNames Pipeline { get; set; }
+
+        /// <summary>
+        /// Gets or sets the url method.
+        /// </summary>
+        HttpMethod UrlMethod { get; set; }
     }
 }

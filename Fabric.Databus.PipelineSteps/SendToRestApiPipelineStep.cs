@@ -85,7 +85,7 @@ namespace Fabric.Databus.PipelineSteps
             this.WriteDiagnostics(workItem);
 
             // now send to Rest Api
-            await this.fileUploader.SendStreamToHosts(string.Empty, 1, stream, false, false);
+            await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, false);
         }
 
         /// <inheritdoc />

@@ -11,6 +11,12 @@
       <xs:enumeration value="RestApi" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="httpMethod">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Post" />
+      <xs:enumeration value="Put" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:element name="Job">
     <xs:complexType>
@@ -21,6 +27,9 @@
               <xs:element minOccurs="1" maxOccurs="1" type="xs:string" name="ConnectionString"/>
               <xs:element minOccurs="1" maxOccurs="1" type="xs:string" name="TopLevelKeyColumn"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Url"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlUserName"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlPassword"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="httpMethod" name="UrlMethod"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Index"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Alias"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="EntityType"/>
@@ -37,8 +46,6 @@
               <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UseMultipleThreads"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="SqlCommandTimeoutInSeconds"/>
               <xs:element minOccurs="0" maxOccurs="1" type="pipelineName" name="Pipeline"/>
-              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlUserName"/>
-              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlPassword"/>
             </xs:all>
           </xs:complexType>
         </xs:element>

@@ -116,14 +116,15 @@ namespace PipelineStep.Tests
 
                 var mockHttpResponseInjector = mockRepository.Create<IHttpResponseInterceptor>();
                 mockHttpResponseInjector.Setup(
-                    service => service.InterceptResponse(It.IsAny<Uri>(), It.IsAny<HttpStatusCode>(), It.IsAny<string>(), It.IsAny<long>()));
+                    service => service.InterceptResponse(It.IsAny<Uri>(), It.IsAny<HttpStatusCode>(), It.IsAny<string>(), It.IsAny<long>(), HttpMethod.Put));
 
                 var fileUploader = new FileUploader(
                     logger,
                     hosts,
                     mockHttpClientFactory.Object,
                     mockHttpRequestInjector.Object,
-                    mockHttpResponseInjector.Object);
+                    mockHttpResponseInjector.Object,
+                    HttpMethod.Put);
 
                 IEntityJsonWriter entityJsonWriter = new EntityJsonWriter();
 

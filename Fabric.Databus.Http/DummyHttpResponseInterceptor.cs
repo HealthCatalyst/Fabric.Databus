@@ -11,6 +11,7 @@ namespace Fabric.Databus.Http
 {
     using System;
     using System.Net;
+    using System.Net.Http;
 
     using Fabric.Databus.Interfaces.Http;
 
@@ -22,7 +23,8 @@ namespace Fabric.Databus.Http
             Uri fullUri,
             HttpStatusCode responseStatusCode,
             string responseContent,
-            long stopwatchElapsedMilliseconds)
+            long stopwatchElapsedMilliseconds,
+            HttpMethod httpMethod)
         {
         }
     }

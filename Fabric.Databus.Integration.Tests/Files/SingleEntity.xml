@@ -9,6 +9,7 @@
     <UseMultipleThreads>false</UseMultipleThreads>
     <UrlUserName>myUser</UrlUserName>
     <UrlPassword>myPassword</UrlPassword>
+    <UrlMethod>Put</UrlMethod>
   </Config>
   <Data>
     <DataSource Path="$" Name="First" TableOrView="Text">

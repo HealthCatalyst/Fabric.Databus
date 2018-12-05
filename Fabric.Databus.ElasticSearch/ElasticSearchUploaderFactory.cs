@@ -11,6 +11,9 @@ namespace Fabric.Databus.ElasticSearch
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
+    using System.Net.Http;
+
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
 
@@ -37,6 +40,9 @@ namespace Fabric.Databus.ElasticSearch
         /// </summary>
         private readonly IHttpRequestInterceptor httpRequestInterceptor;
 
+        /// <summary>
+        /// The http response interceptor.
+        /// </summary>
         private readonly IHttpResponseInterceptor httpResponseInterceptor;
 
         /// <summary>
@@ -71,7 +77,8 @@ namespace Fabric.Databus.ElasticSearch
             List<string> urls,
             string index,
             string alias,
-            string entityType)
+            string entityType,
+            HttpMethod method)
         {
             return new ElasticSearchUploader(
                 keepIndexOnline,
@@ -82,7 +89,8 @@ namespace Fabric.Databus.ElasticSearch
                 entityType,
                 this.httpClientFactory,
                 this.httpRequestInterceptor,
-                this.httpResponseInterceptor);
+                this.httpResponseInterceptor,
+                method);
         }
     }
 }

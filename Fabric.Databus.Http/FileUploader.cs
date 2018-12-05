@@ -183,7 +183,7 @@ namespace Fabric.Databus.Http
 
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                this.httpResponseInterceptor.InterceptResponse(url, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds, this.httpMethod);
+                this.httpResponseInterceptor.InterceptResponse(this.httpMethod, url, requestContent, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds);
 
                 if (response.IsSuccessStatusCode)
                 {

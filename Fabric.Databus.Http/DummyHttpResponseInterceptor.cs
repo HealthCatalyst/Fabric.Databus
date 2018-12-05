@@ -20,11 +20,12 @@ namespace Fabric.Databus.Http
     {
         /// <inheritdoc />
         public void InterceptResponse(
+            HttpMethod httpMethod,
             Uri fullUri,
+            string requestContent,
             HttpStatusCode responseStatusCode,
             string responseContent,
-            long stopwatchElapsedMilliseconds,
-            HttpMethod httpMethod)
+            long stopwatchElapsedMilliseconds)
         {
         }
     }

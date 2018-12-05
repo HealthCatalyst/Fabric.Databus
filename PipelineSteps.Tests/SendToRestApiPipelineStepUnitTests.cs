@@ -116,7 +116,7 @@ namespace PipelineStep.Tests
 
                 var mockHttpResponseInjector = mockRepository.Create<IHttpResponseInterceptor>();
                 mockHttpResponseInjector.Setup(
-                    service => service.InterceptResponse(It.IsAny<Uri>(), It.IsAny<HttpStatusCode>(), It.IsAny<string>(), It.IsAny<long>(), HttpMethod.Put));
+                    service => service.InterceptResponse(HttpMethod.Put, It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<HttpStatusCode>(), It.IsAny<string>(), It.IsAny<long>()));
 
                 var fileUploader = new FileUploader(
                     logger,

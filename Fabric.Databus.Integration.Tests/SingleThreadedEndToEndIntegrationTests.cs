@@ -152,11 +152,12 @@ FROM Text
                         var mockHttpResponseInterceptor = mockRepository.Create<IHttpResponseInterceptor>();
                         mockHttpResponseInterceptor.Setup(
                             service => service.InterceptResponse(
+                                HttpMethod.Put,
                                 expectedUri,
+                                It.IsAny<string>(),
                                 HttpStatusCode.OK,
                                 string.Empty,
-                                It.IsAny<long>(),
-                                HttpMethod.Put))
+                                It.IsAny<long>()))
                             .Verifiable();
 
                         container.RegisterInstance(mockHttpResponseInterceptor.Object);
@@ -195,11 +196,12 @@ FROM Text
 
                         mockHttpResponseInterceptor.Verify(
                             service => service.InterceptResponse(
+                                HttpMethod.Put,
                                 expectedUri,
+                                It.IsAny<string>(),
                                 HttpStatusCode.OK,
                                 string.Empty,
-                                It.IsAny<long>(),
-                                HttpMethod.Put),
+                                It.IsAny<long>()),
                             Times.Once);
                         stopwatch.Stop();
                     }

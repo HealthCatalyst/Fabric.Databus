@@ -21,21 +21,30 @@ namespace Fabric.Databus.Interfaces.Http
         /// <summary>
         /// The intercept.
         /// </summary>
+        /// <param name="httpMethod">
+        ///     The http Method.
+        /// </param>
         /// <param name="fullUri">
-        /// The full uri.
+        ///     The full uri.
+        /// </param>
+        /// <param name="requestContent">
+        ///     request content
         /// </param>
         /// <param name="responseStatusCode">
-        /// The response status code.
+        ///     The response status code.
         /// </param>
         /// <param name="responseContent">
-        /// The response content.
+        ///     The response content.
         /// </param>
         /// <param name="stopwatchElapsedMilliseconds">
-        /// The stopwatch elapsed milliseconds.
+        ///     The stopwatch elapsed milliseconds.
         /// </param>
-        /// <param name="httpMethod">
-        /// The http Method.
-        /// </param>
-        void InterceptResponse(Uri fullUri, HttpStatusCode responseStatusCode, string responseContent, long stopwatchElapsedMilliseconds, HttpMethod httpMethod);
+        void InterceptResponse(
+            HttpMethod httpMethod,
+            Uri fullUri,
+            string requestContent,
+            HttpStatusCode responseStatusCode,
+            string responseContent,
+            long stopwatchElapsedMilliseconds);
     }
 }

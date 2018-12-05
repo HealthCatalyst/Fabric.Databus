@@ -6,6 +6,8 @@
     <Url>http://localhost:5000/api/values</Url>
     <UploadToUrl>true</UploadToUrl>
     <UrlMethod>Post</UrlMethod>
+    <UrlUserName>MyUser</UrlUserName>
+    <UrlPassword>MyPassword</UrlPassword>
     <MaximumEntitiesToLoad>10</MaximumEntitiesToLoad>
     <EntitiesPerBatch>10</EntitiesPerBatch>
     <EntitiesPerUploadFile>10</EntitiesPerUploadFile>

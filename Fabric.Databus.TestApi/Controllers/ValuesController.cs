@@ -61,12 +61,26 @@ namespace Fabric.Databus.TestApi.Controllers
         [HttpPost]
         public JsonResult Post()
         {
-            Console.WriteLine("POST");
-            using (var reader = new StreamReader(this.Request.Body, Encoding.UTF8))
+            Console.WriteLine("--------------- POST ------------------------");
+            var headerDictionary = this.Request.Headers;
+            if (headerDictionary != null)
             {
-                Console.WriteLine(reader.ReadToEnd());
+                foreach (var requestHeader in headerDictionary)
+                {
+                    Console.WriteLine($"{requestHeader.Key}: {requestHeader.Value}");
+                }
             }
 
+            var requestBody = this.Request.Body;
+            if (requestBody != null)
+            {
+                using (var reader = new StreamReader(requestBody, Encoding.UTF8))
+                {
+                    Console.WriteLine(reader.ReadToEnd());
+                }
+            }
+
+            Console.WriteLine("--------------- END POST ------------------------");
             return new JsonResult(new { Message = "Received" });
         }
 
@@ -85,12 +99,26 @@ namespace Fabric.Databus.TestApi.Controllers
         [HttpPut("{id}")]
         public JsonResult Put(int id, [FromBody] string value)
         {
-            Console.WriteLine("PUT");
-            using (var reader = new StreamReader(this.Request.Body, Encoding.UTF8))
+            Console.WriteLine("------------------ PUT -------------");
+            var headerDictionary = this.Request.Headers;
+            if (headerDictionary != null)
             {
-                Console.WriteLine(reader.ReadToEnd());
+                foreach (var requestHeader in headerDictionary)
+                {
+                    Console.WriteLine($"{requestHeader.Key}: {requestHeader.Value}");
+                }
             }
 
+            var requestBody = this.Request.Body;
+            if (requestBody != null)
+            {
+                using (var reader = new StreamReader(requestBody, Encoding.UTF8))
+                {
+                    Console.WriteLine(reader.ReadToEnd());
+                }
+            }
+
+            Console.WriteLine("------------------ END PUT -------------");
             return new JsonResult(new { Message = "Received" });
         }
 

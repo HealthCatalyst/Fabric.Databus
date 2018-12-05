@@ -121,7 +121,7 @@ namespace Fabric.Databus.PipelineRunner
             }
 
             var config = job.Config;
-            this.InitContainerWithDefaults(config);
+            this.InitContainerWithDefaults(job);
 
             this.container.Resolve<IConfigValidator>().ValidateJob(job);
 
@@ -152,7 +152,7 @@ namespace Fabric.Databus.PipelineRunner
 
                 if (string.IsNullOrEmpty(dataSource.Sql))
                 {
-                    dataSource.Sql = this.GenerateSqlForDataSource(dataSource, config.TopLevelKeyColumn);
+                    dataSource.Sql = this.GenerateSqlForDataSource(dataSource, job.Data.TopLevelDataSource.Key);
                 }
             }
 
@@ -306,7 +306,7 @@ namespace Fabric.Databus.PipelineRunner
         /// <param name="config">
         /// The config.
         /// </param>
-        private void InitContainerWithDefaults(IQueryConfig config)
+        private void InitContainerWithDefaults(IJob job)
         {
             if (!this.container.IsRegistered<ISqlGeneratorFactory>())
             {
@@ -332,7 +332,7 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IJobConfig>())
             {
-                this.container.RegisterInstance<IJobConfig>(config);
+                this.container.RegisterInstance<IJobConfig>(job.Config);
             }
 
             if (!this.container.IsRegistered<IConfigValidator>())
@@ -347,7 +347,7 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IDetailedTemporaryFileWriter>())
             {
-                if (config.WriteDetailedTemporaryFilesToDisk)
+                if (job.Config.WriteDetailedTemporaryFilesToDisk)
                 {
                     this.container.RegisterType<IDetailedTemporaryFileWriter, FileWriter>();
                 }
@@ -359,7 +359,7 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<ITemporaryFileWriter>())
             {
-                if (config.WriteTemporaryFilesToDisk)
+                if (job.Config.WriteTemporaryFilesToDisk)
                 {
                     this.container.RegisterType<ITemporaryFileWriter, FileWriter>();
                 }
@@ -390,8 +390,8 @@ namespace Fabric.Databus.PipelineRunner
                 var sqlConnectionFactory = this.container.Resolve<ISqlConnectionFactory>();
                 var sqlGeneratorFactory = this.container.Resolve<ISqlGeneratorFactory>();
                 var databusSqlReader = new DatabusSqlReader(
-                    config.ConnectionString,
-                    config.SqlCommandTimeoutInSeconds,
+                    job.Config.ConnectionString,
+                    job.Config.SqlCommandTimeoutInSeconds,
                     sqlConnectionFactory,
                     sqlGeneratorFactory);
                 this.container.RegisterInstance<IDatabusSqlReader>(databusSqlReader);
@@ -401,7 +401,11 @@ namespace Fabric.Databus.PipelineRunner
             {
                 var sqlConnectionFactory = this.container.Resolve<ISqlConnectionFactory>();
                 var sqlGeneratorFactory = this.container.Resolve<ISqlGeneratorFactory>();
-                var schemaLoader = new SchemaLoader(config.ConnectionString, config.TopLevelKeyColumn, sqlConnectionFactory, sqlGeneratorFactory);
+                var schemaLoader = new SchemaLoader(
+                    job.Config.ConnectionString,
+                    job.Data.TopLevelDataSource.Key,
+                    sqlConnectionFactory,
+                    sqlGeneratorFactory);
                 this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
             }
 
@@ -444,9 +448,10 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IHttpRequestInterceptor>())
             {
-                if (!string.IsNullOrWhiteSpace(config.UrlUserName))
+                if (!string.IsNullOrWhiteSpace(job.Config.UrlUserName))
                 {
-                    this.container.RegisterInstance<IHttpRequestInterceptor>(new BasicAuthorizationRequestInterceptor(config.UrlUserName, config.UrlPassword));
+                    this.container.RegisterInstance<IHttpRequestInterceptor>(
+                        new BasicAuthorizationRequestInterceptor(job.Config.UrlUserName, job.Config.UrlPassword));
                 }
                 else
                 {
@@ -459,7 +464,7 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterType<IHttpResponseInterceptor, DummyHttpResponseInterceptor>();
             }
 
-            if (config.UseMultipleThreads)
+            if (job.Config.UseMultipleThreads)
             {
                 if (!this.container.IsRegistered<IPipelineExecutorFactory>())
                 {

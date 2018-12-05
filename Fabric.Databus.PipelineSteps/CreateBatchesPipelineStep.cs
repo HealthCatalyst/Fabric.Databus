@@ -114,6 +114,7 @@ namespace Fabric.Databus.PipelineSteps
                     Start = null,
                     End = null,
                     Loads = workItem.Job.Data.DataSources,
+                    TopLevelDataSource = workItem.Job.Data.TopLevelDataSource
                 });
 
                 await this.WriteDiagnosticsWithNoBatches();
@@ -186,9 +187,9 @@ namespace Fabric.Databus.PipelineSteps
             }
 
             var list = await this.databusSqlReader.GetListOfEntityKeysAsync(
-                this.Config.TopLevelKeyColumn,
-                this.Config.MaximumEntitiesToLoad,
-                job.Data.DataSources.First(d => (d.Path == null || d.Path == "$")));
+                           job.Data.TopLevelDataSource.Key,
+                           this.Config.MaximumEntitiesToLoad,
+                           job.Data.DataSources.First(d => (d.Path == null || d.Path == "$")));
 
             var itemsLeft = list.Count;
 

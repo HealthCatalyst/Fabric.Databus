@@ -12,11 +12,10 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>false</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <UploadToElasticSearch>false</UploadToElasticSearch>
+    <UploadToUrl>false</UploadToUrl>
     <Index>patients2</Index>
     <Alias>patients</Alias>
     <EntityType>patient</EntityType>
-    <TopLevelKeyColumn>EDWPatientID</TopLevelKeyColumn>
     <UseMultipleThreads>true</UseMultipleThreads>
   </Config>
 
@@ -40,7 +39,7 @@
 	      ]
       }
     </DataModel>
-    <DataSource>
+    <TopLevelDataSource Key="EDWPatientID">
       <Sql>
         SELECT PatientID AS EDWPatientID
         , CASE GenderCD
@@ -51,7 +50,7 @@
         ,BirthDTS as birthDate
         FROM [Person].[SourcePatientBASE]
       </Sql>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="identifier">
       <Sql>
         SELECT PatientID AS EDWPatientID, CONCAT(PatientID,'-','MR') as KeyLevel1, 'usual' as [use], 'http://www.healthcatalyst.com' as system, MRN as value, 'MR' as type FROM [Person].[SourcePatientBASE]

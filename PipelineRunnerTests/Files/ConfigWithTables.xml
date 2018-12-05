@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Job>
+<Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
     <ConnectionString>server=HCS-DEV0002;initial catalog=Shared;Trusted_Connection=True;</ConnectionString>
     <MaximumEntitiesToLoad>100</MaximumEntitiesToLoad>
@@ -10,15 +11,14 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
   </Config>
 
   <Data>
-    <DataSource Path="$" TableOrView="Text.Text">
+    <TopLevelDataSource Key="TextID" Path="$" TableOrView="Text.Text">
       <Column Name="TextID" Alias="extension"></Column>
       <Column Name="TextSourceDSC" Alias="root"></Column>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="$.patient" PropertyType="object" TableOrView="Person.Patient">
       <Relationship>
         <Source Entity="Text.Text" Key="EdwPatientID"></Source>

@@ -126,10 +126,6 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public string TopLevelKeyColumn { get; set; }
-
-        /// <inheritdoc />
-        [DataMember]
         public bool UploadToUrl { get; set; } = true;
 
         /// <inheritdoc />

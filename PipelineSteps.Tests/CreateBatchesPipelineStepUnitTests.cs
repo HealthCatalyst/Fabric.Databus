@@ -130,16 +130,16 @@ namespace PipelineStep.Tests
         {
             // Arrange
             var job = new Job
-            {
-                Config = new QueryConfig
-                {
-                    LocalSaveFolder = Path.GetTempPath(),
-                    EntitiesPerUploadFile = 1,
-                    EntitiesPerBatch = 2,
-                    TopLevelKeyColumn = "TextID",
-                    MaximumEntitiesToLoad = 4
-                }
-            };
+                          {
+                              Config = new QueryConfig
+                                           {
+                                               LocalSaveFolder = Path.GetTempPath(),
+                                               EntitiesPerUploadFile = 1,
+                                               EntitiesPerBatch = 2,
+                                               MaximumEntitiesToLoad = 4
+                                           },
+                              Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
+                          };
 
             var queueManager = new QueueManager(new SimpleQueueFactory());
 
@@ -166,21 +166,20 @@ namespace PipelineStep.Tests
                     cancellationTokenSource.Token);
 
                 var sqlJobQueueItem = new SqlJobQueueItem
-                {
-                    Job = new Job
-                    {
-                        Data = new JobData
-                        {
-                            MyDataSources = new List<DataSource>
-                                                {
-                                                    new DataSource
+                                          {
+                                              Job = new Job
                                                         {
-                                                            Path = "$"
+                                                            Data = new JobData
+                                                                       {
+                                                                           MyTopLevelDataSource = new TopLevelDataSource
+                                                                                                      {
+                                                                                                          Key =
+                                                                                                              "TextID",
+                                                                                                          Path = "$"
+                                                                                                      }
+                                                                       }
                                                         }
-                                                }
-                        }
-                    }
-                };
+                                          };
 
                 var stepNumber = 1;
                 queueManager.CreateInputQueue<SqlJobQueueItem>(stepNumber);
@@ -222,16 +221,16 @@ namespace PipelineStep.Tests
         {
             // Arrange
             var job = new Job
-            {
-                Config = new QueryConfig
-                {
-                    LocalSaveFolder = Path.GetTempPath(),
-                    EntitiesPerUploadFile = 1,
-                    EntitiesPerBatch = 2,
-                    TopLevelKeyColumn = "TextID",
-                    MaximumEntitiesToLoad = 4
-                }
-            };
+                          {
+                              Config = new QueryConfig
+                                           {
+                                               LocalSaveFolder = Path.GetTempPath(),
+                                               EntitiesPerUploadFile = 1,
+                                               EntitiesPerBatch = 2,
+                                               MaximumEntitiesToLoad = 4
+                                           },
+                              Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
+                          };
 
             var queueManager = new QueueManager(new SimpleQueueFactory());
 
@@ -258,21 +257,25 @@ namespace PipelineStep.Tests
                     cancellationTokenSource.Token);
 
                 var sqlJobQueueItem = new SqlJobQueueItem
-                {
-                    Job = new Job
-                    {
-                        Data = new JobData
-                        {
-                            MyDataSources = new List<DataSource>
-                                                {
-                                                    new DataSource
+                                          {
+                                              Job = new Job
                                                         {
-                                                            Path = "$"
+                                                            Data = new JobData
+                                                                       {
+                                                                           MyDataSources =
+                                                                               new List<DataSource>
+                                                                                   {
+                                                                                       new DataSource { Path = "$" }
+                                                                                   },
+                                                                           MyTopLevelDataSource = new TopLevelDataSource
+                                                                                                      {
+                                                                                                          Key =
+                                                                                                              "TextID",
+                                                                                                          Path = "$"
+                                                                                                      }
+                                                                       }
                                                         }
-                                                }
-                        }
-                    }
-                };
+                                          };
 
                 var stepNumber = 1;
                 queueManager.CreateInputQueue<SqlJobQueueItem>(stepNumber);

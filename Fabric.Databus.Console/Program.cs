@@ -161,22 +161,19 @@ namespace Fabric.Databus.Console
                 Index = "Patients2",
                 Alias = "patients",
                 EntityType = "patient",
-                TopLevelKeyColumn = "EDWPatientID",
                 UseMultipleThreads = false,
                 KeepTemporaryLookupColumnsInOutput = true
             };
             var jobData = new JobData
-            {
-                DataModel = "{}",
-                MyDataSources = new List<DataSource>
-                                                      {
-                                                          new DataSource
-                                                              {
-                                                                  Sql =
-                                                                      "SELECT 3 [EDWPatientID], 2 [BatchDefinitionId], 'Queued' [Status], 'Batch' [PipelineType]"
-                                                              }
-                                                      }
-            };
+                              {
+                                  DataModel = "{}",
+                                  MyTopLevelDataSource = new TopLevelDataSource
+                                                             {
+                                                                 Key = "EDWPatientID",
+                                                                 Sql =
+                                                                     "SELECT 3 [EDWPatientID], 2 [BatchDefinitionId], 'Queued' [Status], 'Batch' [PipelineType]"
+                                                             }
+                              };
             var job = new Job { Config = config, Data = jobData };
             var runner = new DatabusRunner();
             runner.RunRestApiPipeline(new UnityContainer(), job, new CancellationToken());

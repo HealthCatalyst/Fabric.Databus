@@ -13,14 +13,13 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
     <SqlCommandTimeoutInSeconds>300</SqlCommandTimeoutInSeconds>
     <Pipeline>RestApi</Pipeline>
   </Config>
 
   <Data>
-    <DataSource Path="$" TableOrView="Text.Text">
+    <TopLevelDataSource Key="TextID" Path="$" TableOrView="Text.Text">
       <Column Name="TextID"/>
       <Column Name="TextSourceDSC" Alias="root"/>
       <Column Name="TextID" Alias="extension"/>
@@ -28,7 +27,7 @@
       <Column Name="TextTXT" Alias="data"/>
       <Column Name="TextTXT" Alias="base64_data"/>
       <Column Name="MimeTypeNM" Alias="data_format"/>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="$" TableOrView="Text.Date">
       <Column Name="TextID"/>
       <Column Name="DateDTS" Alias="source_last_modified_at"/>

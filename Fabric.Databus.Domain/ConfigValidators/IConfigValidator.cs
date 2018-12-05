@@ -38,6 +38,12 @@ namespace Fabric.Databus.Domain.ConfigValidators
         /// </param>
         void ValidateJob(IJob job);
 
+        /// <summary>
+        /// The validate data sources.
+        /// </summary>
+        /// <param name="job">
+        /// The job.
+        /// </param>
         void ValidateDataSources(IJob job);
     }
 }

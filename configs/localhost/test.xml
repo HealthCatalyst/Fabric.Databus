@@ -12,15 +12,14 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <UploadToElasticSearch>false</UploadToElasticSearch>
+    <UploadToUrl>false</UploadToUrl>
     <Index>patients2</Index>
     <Alias>patients</Alias>
     <EntityType>patient</EntityType>
-    <TopLevelKeyColumn>PatientID</TopLevelKeyColumn>
   </Config>
 
   <Data>
-    <DataSource>
+    <TopLevelDataSource Key="PatientID">
       <Sql>
         SELECT [PatientID]
         ,[PatientLastNM]
@@ -29,7 +28,7 @@
         FROM [Patients]
       </Sql>
 
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="diagnoses">
       <Sql>
         SELECT [DiagnosisID] as KeyLevel1

@@ -110,7 +110,9 @@ namespace PipelineStep.Tests
                 var sqlJobQueueItem = new SqlQueryDataSourceQueueItem
                                           {
                                               QueryId = "$",
-                                              DataSource = new DataSource { Path = "$" }, Start = "2", End = "5"
+                                              DataSource = new DataSource { Path = "$" },
+                                              Start = "2", End = "5",
+                                              TopLevelDataSource = new TopLevelDataSource { Key = "Id" }
                                           };
 
                 var stepNumber = 1;

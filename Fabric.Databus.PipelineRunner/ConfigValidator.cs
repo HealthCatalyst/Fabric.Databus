@@ -230,14 +230,19 @@ namespace Fabric.Databus.PipelineRunner
                 throw new Exception($"Unable to connect to connection string: [{job.Config.ConnectionString}]");
             }
 
-            if (string.IsNullOrWhiteSpace(job.Config.TopLevelKeyColumn))
-            {
-                throw new Exception("No TopLevelKeyColumn was specified");
-            }
-
             if (job.Data == null)
             {
                 throw new Exception("job.Data cannot be null");
+            }
+
+            if (job.Data.TopLevelDataSource == null)
+            {
+                throw new Exception("No TopLevelDataSource was specified");
+            }
+
+            if (string.IsNullOrWhiteSpace(job.Data.TopLevelDataSource.Key))
+            {
+                throw new Exception("No Key was specified in TopLevelDataSource");
             }
 
             if (!job.Data.DataSources.Any())

@@ -9,11 +9,10 @@
     <LocalSaveFolder>c:\Catalyst\databus</LocalSaveFolder>
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
-    <TopLevelKeyColumn>TextKEY</TopLevelKeyColumn>
   </Config>
 
   <Data>
-    <DataSource Path="$" TableOrView="HCOSText.Data">
+    <TopLevelDataSource Key="TextKEY" Path="$" TableOrView="HCOSText.Data">
       <Column Name="TextKEY"/>
       <Column Name="root" Alias="root"/>
       <Column Name="extension" Alias="extension"/>
@@ -23,7 +22,7 @@
       <Column Name="data_format" Alias="data_format"/>
       <Column Name="source_last_modified_at" Alias="source_last_modified_at"/>
       <Column Name="source_versioned_at" Alias="source_versioned_at"/>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="$.patient" PropertyType="object" TableOrView="HCOSText.Patient">
       <Relationship>
         <Source Entity="HCOSText.Data" Key="TextKEY"/>

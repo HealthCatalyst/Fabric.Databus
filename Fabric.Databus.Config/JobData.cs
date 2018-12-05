@@ -43,7 +43,7 @@ namespace Fabric.Databus.Config
         /// </summary>
         [DataMember(Name = "DataSources")]
         [XmlElement("DataSource")]
-        public List<DataSource> MyDataSources { get; set; }
+        public List<DataSource> MyDataSources { get; set; } = new List<DataSource>();
 
         /// <inheritdoc />
         [XmlIgnore]

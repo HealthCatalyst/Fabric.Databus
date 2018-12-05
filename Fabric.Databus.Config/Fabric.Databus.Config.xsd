@@ -25,7 +25,6 @@
           <xs:complexType>
             <xs:all minOccurs="0" maxOccurs="1">
               <xs:element minOccurs="1" maxOccurs="1" type="xs:string" name="ConnectionString"/>
-              <xs:element minOccurs="1" maxOccurs="1" type="xs:string" name="TopLevelKeyColumn"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="Url"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlUserName"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="UrlPassword"/>
@@ -113,7 +112,7 @@
                   <xs:attribute type="xs:string" name="Key" use="required"/>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="DataSource" maxOccurs="unbounded" minOccurs="1">
+              <xs:element name="DataSource" maxOccurs="unbounded" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="Relationship" maxOccurs="unbounded" minOccurs="0">

@@ -15,7 +15,6 @@
     <Index>facilityaccount_2017_08_15_1</Index>
     <Alias>facilityaccounts_test</Alias>
     <EntityType>FacilityAccount</EntityType>
-    <TopLevelKeyColumn>FacilityAccountID</TopLevelKeyColumn>
   </Config>
 
   <Data>
@@ -23,7 +22,7 @@
       {
       }
     </DataModel>
-      <DataSource>
+      <TopLevelDataSource Key="FacilityAccountID">
         <Sql>
           SELECT
           CustomerID
@@ -54,6 +53,6 @@
           ,	ExpectedLengthOfStay
           FROM dbo.Elasticsearchtest
         </Sql>
-      </DataSource>
+      </TopLevelDataSource>
   </Data>
 </Job>

@@ -55,28 +55,22 @@ namespace PipelineRunnerTests
             var sql = @"fake sql";
 
             var job = new Job
-            {
-                Config = new QueryConfig
-                {
-                    ConnectionString = "foo",
-                    LocalSaveFolder = Path.GetTempPath(),
-                    TopLevelKeyColumn = "AliasPatientID",
-                    Url = "http://foo",
-                    UploadToUrl = false,
-                    EntitiesPerUploadFile = 1,
-                    Pipeline = PipelineNames.ElasticSearch
-                },
-                Data = new JobData
-                {
-                    MyDataSources = new List<DataSource>
-                                    {
-                                       new DataSource
+                          {
+                              Config = new QueryConfig
                                            {
-                                               Sql = sql
-                                           }
-                                    }
-                }
-            };
+                                               ConnectionString = "foo",
+                                               LocalSaveFolder = Path.GetTempPath(),
+                                               Url = "http://foo",
+                                               UploadToUrl = false,
+                                               EntitiesPerUploadFile = 1,
+                                               Pipeline = PipelineNames.ElasticSearch
+                                           },
+                              Data = new JobData
+                                         {
+                                             MyTopLevelDataSource =
+                                                 new TopLevelDataSource { Key = "AliasPatientID", Sql = sql }
+                                         }
+                          };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
             var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
@@ -187,28 +181,24 @@ namespace PipelineRunnerTests
             var sql = @"fake sql";
 
             var job = new Job
-            {
-                Config = new QueryConfig
-                {
-                    ConnectionString = "foo",
-                    LocalSaveFolder = Path.GetTempPath(),
-                    TopLevelKeyColumn = "AliasPatientID",
-                    Url = "http://foo",
-                    UploadToUrl = false,
-                    EntitiesPerUploadFile = 1,
-                    Pipeline = PipelineNames.ElasticSearch
-                },
-                Data = new JobData
-                {
-                    MyDataSources = new List<DataSource>
-                                    {
-                                       new DataSource
+                          {
+                              Config = new QueryConfig
                                            {
-                                               Sql = sql
-                                           }
-                                    }
-                }
-            };
+                                               ConnectionString = "foo",
+                                               LocalSaveFolder = Path.GetTempPath(),
+                                               Url = "http://foo",
+                                               UploadToUrl = false,
+                                               EntitiesPerUploadFile = 1,
+                                               Pipeline = PipelineNames.ElasticSearch
+                                           },
+                              Data = new JobData
+                                         {
+                                             MyTopLevelDataSource = new TopLevelDataSource
+                                                                        {
+                                                                            Key = "AliasPatientID", Sql = sql
+                                                                        }
+                                         }
+                          };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
             var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();

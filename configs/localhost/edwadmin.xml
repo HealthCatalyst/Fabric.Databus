@@ -11,12 +11,11 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <TopLevelKeyColumn>DataMartID</TopLevelKeyColumn>
     <UseMultipleThreads>false</UseMultipleThreads>
   </Config>
 
   <Data>
-    <DataSource>
+    <TopLevelDataSource Key="DataMartID">
       <Sql>
         SELECT
         DataMartID,
@@ -24,7 +23,7 @@
         ContentID
         from CatalystAdmin.DataMartBASE
       </Sql>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="Entities">
       <Sql>
         /****** Script for SelectTopNRows command from SSMS  ******/

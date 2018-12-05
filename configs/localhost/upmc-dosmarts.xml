@@ -11,12 +11,11 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <TopLevelKeyColumn>KeyLevel1</TopLevelKeyColumn>
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
   </Config>
 
   <Data>
-    <DataSource Path="$">
+    <TopLevelDataSource Key="KeyLevel1" Path="$">
       <Sql>
         SELECT
         Text.TextID            AS [KeyLevel1],
@@ -28,7 +27,7 @@
         Text.MimeTypeNM        AS [data_format]
         FROM   Text.Text
       </Sql>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="$">
       <Sql>
         SELECT DISTINCT

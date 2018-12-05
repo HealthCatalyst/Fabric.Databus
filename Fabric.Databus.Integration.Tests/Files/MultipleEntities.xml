@@ -5,14 +5,13 @@
     <ConnectionString>Data Source=:memory:</ConnectionString>
     <Url>http://foo</Url>
     <LocalSaveFolder>foo</LocalSaveFolder>
-    <TopLevelKeyColumn>TextID</TopLevelKeyColumn>
     <UseMultipleThreads>false</UseMultipleThreads>
     <UrlUserName>myUser</UrlUserName>
     <UrlPassword>myPassword</UrlPassword>
   </Config>
   <Data>
-    <DataSource Path="$" Name="First" TableOrView="Text">
-    </DataSource>
+    <TopLevelDataSource Key="TextID" Path="$" Name="First" TableOrView="Text">
+    </TopLevelDataSource>
     <DataSource Path="$.patients" Name="Patients" TableOrView="Patients" PropertyType="object">
       <Relationship>
         <Source Entity="Text" Key="TextID"/>

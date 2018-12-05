@@ -12,17 +12,15 @@
     <WriteTemporaryFilesToDisk>true</WriteTemporaryFilesToDisk>
     <WriteDetailedTemporaryFilesToDisk>true</WriteDetailedTemporaryFilesToDisk>
     <CompressFiles>false</CompressFiles>
-    <UploadToElasticSearch>true</UploadToElasticSearch>
     <Index>metadata1</Index>
     <Alias>metadata</Alias>
     <EntityType>datamart</EntityType>
-    <TopLevelKeyColumn>DataMartID</TopLevelKeyColumn>
     <UseMultipleThreads>false</UseMultipleThreads>
   </Config>
 
   <Data>
 
-    <DataSource>
+    <TopLevelDataSource Key="DataMartID">
       <Sql>
         SELECT
         DataMartID,
@@ -31,7 +29,7 @@
         from CatalystAdmin.DataMartBASE
         WHERE LastModifiedDate > '1/1/2018'
       </Sql>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="Entities">
       <Sql>
         /****** Script for SelectTopNRows command from SSMS  ******/

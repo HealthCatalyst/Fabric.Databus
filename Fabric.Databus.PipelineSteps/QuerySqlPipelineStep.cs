@@ -105,7 +105,8 @@ namespace Fabric.Databus.PipelineSteps
                 workItem.Start,
                 workItem.End,
                 workItem.BatchNumber,
-                workItem.PropertyTypes);
+                workItem.PropertyTypes,
+                workItem.TopLevelDataSource);
         }
 
         /// <inheritdoc />
@@ -118,25 +119,28 @@ namespace Fabric.Databus.PipelineSteps
         /// The read one query from database.
         /// </summary>
         /// <param name="queryId">
-        /// The query id.
+        ///     The query id.
         /// </param>
         /// <param name="load">
-        /// The load.
+        ///     The load.
         /// </param>
         /// <param name="seed">
-        /// The seed.
+        ///     The seed.
         /// </param>
         /// <param name="start">
-        /// The start.
+        ///     The start.
         /// </param>
         /// <param name="end">
-        /// The end.
+        ///     The end.
         /// </param>
         /// <param name="workItemBatchNumber">
-        /// The workItem batch number.
+        ///     The workItem batch number.
         /// </param>
         /// <param name="propertyTypes">
-        /// The property Types.
+        ///     The property Types.
+        /// </param>
+        /// <param name="topLevelDataSource">
+        /// top level data source
         /// </param>
         /// <exception cref="Exception">
         /// exception thrown
@@ -151,11 +155,19 @@ namespace Fabric.Databus.PipelineSteps
             string start,
             string end,
             int workItemBatchNumber,
-            IDictionary<string, string> propertyTypes)
+            IDictionary<string, string> propertyTypes,
+            ITopLevelDataSource topLevelDataSource)
         {
             try
             {
-                await this.InternalReadOneQueryFromDatabase(queryId, load, start, end, workItemBatchNumber, propertyTypes);
+                await this.InternalReadOneQueryFromDatabase(
+                    queryId,
+                    load,
+                    start,
+                    end,
+                    workItemBatchNumber,
+                    propertyTypes,
+                    topLevelDataSource);
             }
             catch (Exception e)
             {
@@ -177,23 +189,25 @@ namespace Fabric.Databus.PipelineSteps
         /// The internal read one query from database.
         /// </summary>
         /// <param name="queryId">
-        /// The query id.
+        ///     The query id.
         /// </param>
         /// <param name="load">
-        /// The load.
+        ///     The load.
         /// </param>
         /// <param name="start">
-        /// The start.
+        ///     The start.
         /// </param>
         /// <param name="end">
-        /// The end.
+        ///     The end.
         /// </param>
         /// <param name="batchNumber">
-        /// The batch number.
+        ///     The batch number.
         /// </param>
         /// <param name="propertyTypes">
-        /// The property Types.
+        ///     The property Types.
         /// </param>
+        /// <param name="topLevelDataSource">
+        /// top level data source</param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
@@ -203,14 +217,15 @@ namespace Fabric.Databus.PipelineSteps
             string start,
             string end,
             int batchNumber,
-            IDictionary<string, string> propertyTypes)
+            IDictionary<string, string> propertyTypes,
+            ITopLevelDataSource topLevelDataSource)
         {
             var result = await this.databusSqlReader.ReadDataFromQueryAsync(
                 load,
                 start,
                 end,
                 this.MyLogger,
-                this.Config.TopLevelKeyColumn);
+                topLevelDataSource.Key);
 
             await this.WriteDiagnostics(queryId, batchNumber, result);
 

@@ -144,6 +144,8 @@ namespace PipelineRunnerTests
             Assert.AreEqual("Text.Text", job.Data.DataSources.Skip(1).First().Relationships.First().Source.Entity);
 
             Assert.AreEqual(2, job.Data.TopLevelDataSource.IncrementalColumns.Count());
+
+            Assert.AreEqual("TextID", job.Data.TopLevelDataSource.Key);
         }
     }
 }

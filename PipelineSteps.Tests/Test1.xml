@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0"?>
-<Job>
+<Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
     <ConnectionString>Server=tcp:localhost,1433;Initial Catalog=Databus;Integrated Security=true;</ConnectionString>
     <Url>[elasticurl]</Url>
@@ -17,12 +18,11 @@
     <Index>patient_mvp20_0502</Index>
     <Alias>patients</Alias>
     <EntityType>Patient</EntityType>
-    <TopLevelKeyColumn>PatientID</TopLevelKeyColumn>
   </Config>
   <Data>
     <DataModel>
     </DataModel>
-    <DataSource>
+    <TopLevelDataSource Key="PatientID">
       <Sql>
         SELECT
         [PatientID]
@@ -31,7 +31,7 @@
         ,[DateOfBirth]
         FROM [PatientBASE]
       </Sql>
-    </DataSource>
+    </TopLevelDataSource>
     <DataSource Path="FacilityAccount">
       <Sql>
         SELECT

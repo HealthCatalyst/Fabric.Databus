@@ -94,7 +94,8 @@ namespace Fabric.Databus.PipelineSteps
                         DataSource = dataSource,
                         Start = workItem.Start,
                         End = workItem.End,
-                        PropertyTypes = workItem.PropertyTypes
+                        PropertyTypes = workItem.PropertyTypes,
+                        TopLevelDataSource = workItem.TopLevelDataSource
                     });
             }
 

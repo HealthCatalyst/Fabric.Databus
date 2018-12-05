@@ -71,18 +71,17 @@ namespace Fabric.Databus.PipelineSteps
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task FlushDocumentsToBatchFile(List<IJsonObjectQueueItem> documentCacheItems)
+        private async Task FlushDocumentsToBatchFile(IEnumerable<IJsonObjectQueueItem> documentCacheItems)
         {
-            var docs = documentCacheItems.Select(c => c.Document).ToList();
-
             var stream = new MemoryStream(); // do not use using since we'll pass it to next queue
 
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             using (var writer = new JsonTextWriter(textWriter))
             {
-                foreach (var doc in docs)
+                foreach (var documentCacheItem in documentCacheItems)
                 {
-                    var entityId = doc[this.Config.TopLevelKeyColumn].Value<string>();
+                    var doc = documentCacheItem.Document;
+                    var entityId = documentCacheItem.Id;
 
                     await writer.WriteStartObjectAsync();
                     using (new JsonPropertyWrapper(writer, "update"))

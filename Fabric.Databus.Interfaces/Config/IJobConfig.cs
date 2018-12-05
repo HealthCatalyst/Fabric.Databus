@@ -55,11 +55,6 @@ namespace Fabric.Databus.Interfaces.Config
         int EntitiesPerUploadFile { get; set; }
 
         /// <summary>
-        /// Gets or sets the top level key column.
-        /// </summary>
-        string TopLevelKeyColumn { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether compress files.
         /// </summary>
         bool CompressFiles { get; set; }

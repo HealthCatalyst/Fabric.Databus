@@ -118,6 +118,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Integration.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.PipelineSteps", "Fabric.Databus.PipelineSteps\Fabric.Databus.PipelineSteps.csproj", "{D38A68BD-CA60-4774-9E4D-CFFC36E70D4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.TestApi", "Fabric.Databus.TestApi\Fabric.Databus.TestApi.csproj", "{72165061-6027-42EC-993A-90117B1B3ECA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -228,6 +230,10 @@ Global
 		{D38A68BD-CA60-4774-9E4D-CFFC36E70D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D38A68BD-CA60-4774-9E4D-CFFC36E70D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D38A68BD-CA60-4774-9E4D-CFFC36E70D4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72165061-6027-42EC-993A-90117B1B3ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72165061-6027-42EC-993A-90117B1B3ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72165061-6027-42EC-993A-90117B1B3ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72165061-6027-42EC-993A-90117B1B3ECA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -266,6 +272,7 @@ Global
 		{104C7335-D0B6-4587-A1A9-843C69042AE2} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{E225637C-63A6-4740-9A02-9643C2C9852A} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 		{D38A68BD-CA60-4774-9E4D-CFFC36E70D4E} = {E05C9DF2-FD60-496E-AE8E-EE2B7D488DC6}
+		{72165061-6027-42EC-993A-90117B1B3ECA} = {08C7F77C-30FE-40AC-AD28-1076D3EF24CC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

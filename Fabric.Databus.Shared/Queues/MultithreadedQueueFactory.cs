@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AdvancedQueueFactory.cs" company="">
+// <copyright file="MultiThreadedQueueFactory.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the AdvancedQueueFactory type.
+//   Defines the MultiThreadedQueueFactory type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,13 +15,13 @@ namespace Fabric.Databus.Shared.Queues
     /// <summary>
     /// The advanced queue factory.
     /// </summary>
-    public class AdvancedQueueFactory : IQueueFactory
+    public class MultiThreadedQueueFactory : IQueueFactory
     {
         /// <inheritdoc />
         public IQueue Create<T>(string name)
             where T : class, IQueueItem
         {
-            return new AdvancedQueue<T>(name);
+            return new MultiThreadedQueue<T>(name);
         }
     }
 }

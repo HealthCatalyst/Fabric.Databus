@@ -60,7 +60,8 @@ namespace PipelineRunnerTests
                                                Url = "http://foo",
                                                UploadToUrl = false,
                                                EntitiesPerUploadFile = 1,
-                                               Pipeline = PipelineNames.ElasticSearch
+                                               Pipeline = PipelineNames.ElasticSearch,
+                                               UseMultipleThreads = false
                                            },
                               Data = new JobData
                                          {
@@ -186,7 +187,8 @@ namespace PipelineRunnerTests
                                                Url = "http://foo",
                                                UploadToUrl = false,
                                                EntitiesPerUploadFile = 1,
-                                               Pipeline = PipelineNames.ElasticSearch
+                                               Pipeline = PipelineNames.ElasticSearch,
+                                               UseMultipleThreads = true
                                            },
                               Data = new JobData
                                          {

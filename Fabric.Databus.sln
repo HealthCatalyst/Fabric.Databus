@@ -53,6 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "localhost", "localhost", "{
 		configs\localhost\hcos.xml = configs\localhost\hcos.xml
 		configs\localhost\job.xml = configs\localhost\job.xml
 		configs\localhost\test.xml = configs\localhost\test.xml
+		configs\localhost\upmc-dosmarts-tables-singlethreaded.xml = configs\localhost\upmc-dosmarts-tables-singlethreaded.xml
 		configs\localhost\upmc-dosmarts-tables.xml = configs\localhost\upmc-dosmarts-tables.xml
 		configs\localhost\upmc-dosmarts-withmodel.xml = configs\localhost\upmc-dosmarts-withmodel.xml
 		configs\localhost\upmc-dosmarts.xml = configs\localhost\upmc-dosmarts.xml
@@ -120,7 +121,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Integration.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.PipelineSteps", "Fabric.Databus.PipelineSteps\Fabric.Databus.PipelineSteps.csproj", "{D38A68BD-CA60-4774-9E4D-CFFC36E70D4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.TestApi", "Fabric.Databus.TestApi\Fabric.Databus.TestApi.csproj", "{72165061-6027-42EC-993A-90117B1B3ECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.TestApi", "Fabric.Databus.TestApi\Fabric.Databus.TestApi.csproj", "{72165061-6027-42EC-993A-90117B1B3ECA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

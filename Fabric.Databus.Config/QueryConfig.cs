@@ -142,7 +142,7 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [DataMember]
-        public bool UseMultipleThreads { get; set; }
+        public bool UseMultipleThreads { get; set; } = true;
 
         /// <inheritdoc />
         public PipelineNames Pipeline { get; set; } = PipelineNames.RestApi;

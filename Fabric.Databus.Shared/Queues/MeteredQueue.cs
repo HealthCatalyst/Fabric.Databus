@@ -13,6 +13,7 @@ namespace Fabric.Databus.Shared.Queues
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Queues;
@@ -113,6 +114,13 @@ namespace Fabric.Databus.Shared.Queues
             }
 
             return default(T);
+        }
+
+        /// <inheritdoc />
+        public Task WaitTillEmptyAsync(CancellationToken cancellationToken)
+        {
+            // do nothing since we don't wait for simple queue
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />

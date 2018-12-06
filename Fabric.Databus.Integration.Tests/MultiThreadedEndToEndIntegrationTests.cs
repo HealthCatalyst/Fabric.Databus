@@ -96,7 +96,7 @@ FROM Text
 
                         container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
 
-                        container.RegisterType<IQueueFactory, AdvancedQueueFactory>();
+                        container.RegisterType<IQueueFactory, MultiThreadedQueueFactory>();
 
                         // set up a mock web service
                         var mockRepository = new MockRepository(MockBehavior.Strict);

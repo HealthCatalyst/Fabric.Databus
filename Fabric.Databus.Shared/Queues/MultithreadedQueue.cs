@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AdvancedQueue.cs" company="">
+// <copyright file="MultiThreadedQueue.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the AdvancedQueue type.
+//   Defines the MultiThreadedQueue type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ namespace Fabric.Databus.Shared.Queues
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Queues;
 
@@ -23,7 +24,7 @@ namespace Fabric.Databus.Shared.Queues
     /// <typeparam name="T">
     /// type of queue
     /// </typeparam>
-    public class AdvancedQueue<T> : IQueue<T>
+    public class MultiThreadedQueue<T> : IQueue<T>
         where T : class, IQueueItem
     {
         /// <summary>
@@ -37,12 +38,12 @@ namespace Fabric.Databus.Shared.Queues
         private readonly string name;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AdvancedQueue{T}"/> class.
+        /// Initializes a new instance of the <see cref="MultiThreadedQueue{T}"/> class.
         /// </summary>
         /// <param name="name">
         /// The name.
         /// </param>
-        public AdvancedQueue(string name)
+        public MultiThreadedQueue(string name)
         {
             var concurrentQueue = new ConcurrentQueue<IQueueItem>();
             this.blockingCollection = new BlockingCollection<IQueueItem>(concurrentQueue);
@@ -104,6 +105,15 @@ namespace Fabric.Databus.Shared.Queues
             }
 
             return default(T);
+        }
+
+        /// <inheritdoc />
+        public async Task WaitTillEmptyAsync(CancellationToken cancellationToken)
+        {
+            while (this.Any())
+            {
+                await Task.Delay(1000, cancellationToken);
+            }
         }
 
         /// <inheritdoc />

@@ -491,10 +491,8 @@ namespace Fabric.Databus.PipelineSteps
         protected async Task WaitTillOutputQueueIsEmptyAsync(int batchNumber)
         {
             this.LogToConsole(null, null, PipelineStepState.Waiting, batchNumber);
-            while (this.outQueue.Any())
-            {
-                await Task.Delay(1000, this.cancellationToken);
-            }
+
+            await this.outQueue.WaitTillEmptyAsync(this.cancellationToken);
         }
 
         /// <summary>

@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimpleQueue.cs" company="">
+// <copyright file="SingleThreadedQueue.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SimpleQueue type.
+//   Defines the SingleThreadedQueue type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,6 +13,7 @@ namespace Fabric.Databus.Shared.Queues
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Queues;
 
@@ -22,7 +23,7 @@ namespace Fabric.Databus.Shared.Queues
     /// </summary>
     /// <typeparam name="T">type of item
     /// </typeparam>
-    public class SimpleQueue<T> : IQueue<T>
+    public class SingleThreadedQueue<T> : IQueue<T>
         where T : class, IQueueItem
     {
         /// <summary>
@@ -36,12 +37,12 @@ namespace Fabric.Databus.Shared.Queues
         private readonly string name;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleQueue{T}"/> class.
+        /// Initializes a new instance of the <see cref="SingleThreadedQueue{T}"/> class.
         /// </summary>
         /// <param name="name">
         /// The name.
         /// </param>
-        public SimpleQueue(string name)
+        public SingleThreadedQueue(string name)
         {
             var concurrentQueue = new ConcurrentQueue<T>();
             this.blockingCollection = new BlockingCollection<T>(concurrentQueue);
@@ -103,6 +104,13 @@ namespace Fabric.Databus.Shared.Queues
             }
 
             return default(T);
+        }
+
+        /// <inheritdoc />
+        public Task WaitTillEmptyAsync(CancellationToken cancellationToken)
+        {
+            // do nothing since we don't wait for simple queue
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />

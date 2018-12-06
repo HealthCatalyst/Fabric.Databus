@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Interfaces.Queues
 {
     using System.Threading;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The MeteredBlockingCollection interface.
@@ -109,5 +110,16 @@ namespace Fabric.Databus.Interfaces.Queues
         /// The <see cref="!:T" />.
         /// </returns>
         IQueueItem TakeGeneric(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// The wait till empty async.
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// The cancellation token.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task WaitTillEmptyAsync(CancellationToken cancellationToken);
     }
 }

@@ -58,7 +58,7 @@ namespace PipelineStep.Tests
                 }
             };
 
-            var queueManager = new QueueManager(new SimpleQueueFactory());
+            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -141,7 +141,7 @@ namespace PipelineStep.Tests
                               Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
                           };
 
-            var queueManager = new QueueManager(new SimpleQueueFactory());
+            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -232,7 +232,7 @@ namespace PipelineStep.Tests
                               Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
                           };
 
-            var queueManager = new QueueManager(new SimpleQueueFactory());
+            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()

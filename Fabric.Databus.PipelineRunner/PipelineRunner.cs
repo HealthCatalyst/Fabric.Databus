@@ -316,7 +316,14 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IQueueFactory>())
             {
-                this.container.RegisterType<IQueueFactory, AdvancedQueueFactory>();
+                if (job.Config.UseMultipleThreads)
+                {
+                    this.container.RegisterType<IQueueFactory, MultiThreadedQueueFactory>();
+                }
+                else
+                {
+                    this.container.RegisterType<IQueueFactory, SingleThreadedQueueFactory>();
+                }
             }
 
             if (!this.container.IsRegistered<IQueueManager>())

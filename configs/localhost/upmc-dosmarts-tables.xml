@@ -16,6 +16,7 @@
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
     <SqlCommandTimeoutInSeconds>300</SqlCommandTimeoutInSeconds>
     <Pipeline>RestApi</Pipeline>
+    <UseMultipleThreads>false</UseMultipleThreads>
   </Config>
 
   <Data>

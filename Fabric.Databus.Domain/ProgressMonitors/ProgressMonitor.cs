@@ -17,6 +17,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Pipeline;
 
     /// <summary>
     /// The progress monitor.
@@ -115,7 +116,6 @@ namespace Fabric.Databus.Domain.ProgressMonitors
                 this.progressMonitorItems.AddOrUpdate(key, progressMonitorItem, (a, b) => progressMonitorItem);
                 this.JobHistoryUpdateAction?.Invoke();
             }
-
         }
 
         /// <inheritdoc />
@@ -138,6 +138,14 @@ namespace Fabric.Databus.Domain.ProgressMonitors
         public IList<ProgressMonitorItem> GetSnapshotOfProgressItems()
         {
             return this.progressMonitorItems.ToArray().Select(a => a.Value).ToList();
+        }
+
+        /// <inheritdoc />
+        public void CompleteProgressItemsWithUniqueId(int uniqueId)
+        {
+            this.progressMonitorItems.Where(a => a.Value.UniqueStepId == uniqueId)
+                .ToList()
+                .ForEach(a => a.Value.State = PipelineStepState.Completed);
         }
 
         /// <summary>

@@ -57,7 +57,7 @@ namespace Fabric.Databus.Interfaces.Queues
         /// The take.
         /// </summary>
         /// <param name="cancellationToken">
-        /// The cancellation token
+        ///     The cancellation token
         /// </param>
         /// <returns>
         /// The <see cref="T"/>.
@@ -73,6 +73,22 @@ namespace Fabric.Databus.Interfaces.Queues
         void Add(T item);
 
         /// <summary>
+        /// The add batch completed.
+        /// </summary>
+        /// <param name="item">
+        /// The item.
+        /// </param>
+        void AddBatchCompleted(IQueueItem item);
+
+        /// <summary>
+        /// The add job completed.
+        /// </summary>
+        /// <param name="item">
+        /// The job completed queue item.
+        /// </param>
+        void AddJobCompleted(IQueueItem item);
+
+        /// <summary>
         /// The try take.
         /// </summary>
         /// <param name="cacheItem">
@@ -82,5 +98,16 @@ namespace Fabric.Databus.Interfaces.Queues
         /// The <see cref="bool"/>.
         /// </returns>
         bool TryTake(out T cacheItem);
+
+        /// <summary>
+        /// The take.
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// cancellation token
+        /// </param>
+        /// <returns>
+        /// The <see cref="!:T" />.
+        /// </returns>
+        IQueueItem TakeGeneric(CancellationToken cancellationToken);
     }
 }

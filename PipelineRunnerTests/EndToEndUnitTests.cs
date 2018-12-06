@@ -32,9 +32,6 @@ namespace PipelineRunnerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Moq.Protected;
-
-    using Newtonsoft.Json.Linq;
 
     using Serilog;
 

@@ -33,5 +33,10 @@ namespace PipelineStep.Tests
         {
             throw new NotImplementedException();
         }
+
+        /// <inheritdoc />
+        public void CompleteProgressItemsWithUniqueId(int uniqueId)
+        {
+        }
     }
 }

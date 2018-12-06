@@ -63,7 +63,7 @@ namespace Fabric.Databus.Interfaces.Queues
         /// <returns>
         /// The <see cref="IQueue"/>.
         /// </returns>
-        IQueue<T> CreateOutputQueue<T>(int stepNumber);
+        IQueue<T> CreateOutputQueue<T>(int stepNumber) where T : class, IQueueItem;
 
         /// <summary>
         /// The create input queue.
@@ -76,6 +76,6 @@ namespace Fabric.Databus.Interfaces.Queues
         /// <returns>
         /// The <see cref="IQueue"/>.
         /// </returns>
-        IQueue<T> CreateInputQueue<T>(int stepNumber);
+        IQueue<T> CreateInputQueue<T>(int stepNumber) where T : class, IQueueItem;
     }
 }

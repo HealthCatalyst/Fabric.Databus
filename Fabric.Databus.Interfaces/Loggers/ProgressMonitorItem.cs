@@ -12,6 +12,8 @@ namespace Fabric.Databus.Interfaces.Loggers
     using System;
     using System.Collections.Generic;
 
+    using Fabric.Databus.Interfaces.Pipeline;
+
     /// <summary>
     /// The progress monitor item.
     /// </summary>
@@ -95,7 +97,7 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// <summary>
         /// Gets or sets a value indicating whether is in queue completed.
         /// </summary>
-        public bool IsInQueueCompleted { get; set; }
+        public PipelineStepState State { get; set; }
 
         /// <summary>
         /// Gets or sets the in queue name.

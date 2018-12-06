@@ -157,13 +157,15 @@ namespace Fabric.Databus.PipelineSteps
                             TopLevelDataSource = workItem.Job.Data.TopLevelDataSource
                         });
 
-                    await this.WriteDiagnostics(currentBatchNumber, range);
+                    await this.WriteDiagnosticsAsync(currentBatchNumber, range);
 
-                    // wait until the other queues are cleared up
+                    await this.AddBatchCompletionMessageToOutputQueueAsync(currentBatchNumber);
 
-                    // QueueContext.QueueManager.WaitTillAllQueuesAreCompleted<SqlBatchQueueItem>();
+                    await this.WaitTillOutputQueueIsEmptyAsync();
                 }
             }
+
+            await this.AddJobCompletionMessageToOutputQueueAsync();
         }
 
         /// <inheritdoc />
@@ -240,7 +242,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task WriteDiagnostics(int currentBatchNumber, Tuple<string, string> range)
+        private async Task WriteDiagnosticsAsync(int currentBatchNumber, Tuple<string, string> range)
         {
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {

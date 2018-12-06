@@ -19,6 +19,7 @@ namespace Fabric.Databus.Shared.Queues
     {
         /// <inheritdoc />
         public IQueue Create<T>(string name)
+            where T : class, IQueueItem
         {
             return new AdvancedQueue<T>(name);
         }

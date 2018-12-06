@@ -26,6 +26,6 @@ namespace Fabric.Databus.Interfaces.Queues
         /// <returns>
         /// The <see cref="IQueue"/>.
         /// </returns>
-        IQueue Create<T>(string name);
+        IQueue Create<T>(string name) where T : class, IQueueItem;
     }
 }

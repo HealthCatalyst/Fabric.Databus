@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.Shared.Queues
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Threading;
@@ -25,6 +26,7 @@ namespace Fabric.Databus.Shared.Queues
     /// <typeparam name="T">item type
     /// </typeparam>
     public class MeteredQueue<T> : IQueue<T>
+        where T : class, IQueueItem
     {
         /// <summary>
         /// The logger.
@@ -37,8 +39,13 @@ namespace Fabric.Databus.Shared.Queues
         /// </summary>
         private readonly BlockingCollection<T> blockingCollection;
 
+        /// <summary>
+        /// The _max items.
+        /// </summary>
         private readonly int _maxItems;
+
         private readonly object _locker = new object();
+
         private readonly string _name;
 
         /// <summary>
@@ -86,11 +93,46 @@ namespace Fabric.Databus.Shared.Queues
         }
 
         /// <inheritdoc />
+        /// <summary>
+        /// The take.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>
+        /// The <see cref="!:T" />.
+        /// </returns>
+        [System.Diagnostics.DebuggerNonUserCode]
+        [System.Diagnostics.DebuggerHidden]
+        public IQueueItem TakeGeneric(CancellationToken cancellationToken)
+        {
+            try
+            {
+                return this.blockingCollection.Take(cancellationToken);
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            return default(T);
+        }
+
+        /// <inheritdoc />
         public void Add(T item)
         {
             this.BlockIfNeeded();
 
             this.blockingCollection.Add(item);
+        }
+
+        /// <inheritdoc />
+        public void AddBatchCompleted(IQueueItem item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public void AddJobCompleted(IQueueItem item)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc />

@@ -37,5 +37,13 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// The <see cref="IList"/>.
         /// </returns>
         IList<ProgressMonitorItem> GetSnapshotOfProgressItems();
+
+        /// <summary>
+        /// The complete progress items with unique id.
+        /// </summary>
+        /// <param name="uniqueId">
+        /// The unique id.
+        /// </param>
+        void CompleteProgressItemsWithUniqueId(int uniqueId);
     }
 }

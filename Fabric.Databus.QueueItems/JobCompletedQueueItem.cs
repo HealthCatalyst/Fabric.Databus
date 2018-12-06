@@ -1,29 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SimpleQueueFactory.cs" company="">
+// <copyright file="JobCompletedQueueItem.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SimpleQueueFactory type.
+//   Defines the JobCompletedQueueItem type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Shared.Queues
+namespace Fabric.Databus.QueueItems
 {
-    using System.Collections.Concurrent;
-
     using Fabric.Databus.Interfaces.Queues;
 
     /// <inheritdoc />
     /// <summary>
-    /// The queue factory.
+    /// The job completed queue item.
     /// </summary>
-    public class SimpleQueueFactory : IQueueFactory
+    public class JobCompletedQueueItem : IQueueItem
     {
         /// <inheritdoc />
-        public IQueue Create<T>(string name)
-            where T : class, IQueueItem
-        {
-            return new SimpleQueue<T>(name);
-        }
+        public string QueryId { get; set; }
+
+        /// <inheritdoc />
+        public string PropertyName { get; set; }
     }
 }

@@ -24,11 +24,12 @@ namespace Fabric.Databus.Shared.Queues
     /// type of queue
     /// </typeparam>
     public class AdvancedQueue<T> : IQueue<T>
+        where T : class, IQueueItem
     {
         /// <summary>
         /// The blocking collection.
         /// </summary>
-        private readonly BlockingCollection<T> blockingCollection;
+        private readonly BlockingCollection<IQueueItem> blockingCollection;
 
         /// <summary>
         /// The name.
@@ -43,8 +44,8 @@ namespace Fabric.Databus.Shared.Queues
         /// </param>
         public AdvancedQueue(string name)
         {
-            var concurrentQueue = new ConcurrentQueue<T>();
-            this.blockingCollection = new BlockingCollection<T>(concurrentQueue);
+            var concurrentQueue = new ConcurrentQueue<IQueueItem>();
+            this.blockingCollection = new BlockingCollection<IQueueItem>(concurrentQueue);
             this.name = name;
         }
 
@@ -73,6 +74,29 @@ namespace Fabric.Databus.Shared.Queues
         {
             try
             {
+                return this.blockingCollection.Take(cancellationToken) as T;
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            return default(T);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// The take.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns>
+        /// The <see cref="!:T" />.
+        /// </returns>
+        [System.Diagnostics.DebuggerNonUserCode]
+        [System.Diagnostics.DebuggerHidden]
+        public IQueueItem TakeGeneric(CancellationToken cancellationToken)
+        {
+            try
+            {
                 return this.blockingCollection.Take(cancellationToken);
             }
             catch (InvalidOperationException)
@@ -89,6 +113,18 @@ namespace Fabric.Databus.Shared.Queues
         }
 
         /// <inheritdoc />
+        public void AddBatchCompleted(IQueueItem item)
+        {
+            this.blockingCollection.Add(item);
+        }
+
+        /// <inheritdoc />
+        public void AddJobCompleted(IQueueItem item)
+        {
+            this.blockingCollection.Add(item);
+        }
+
+        /// <inheritdoc />
         public bool Any()
         {
             return this.blockingCollection.Any();
@@ -97,15 +133,16 @@ namespace Fabric.Databus.Shared.Queues
         /// <inheritdoc />
         public bool TryTake(out T cacheItem)
         {
-            var result = this.blockingCollection.TryTake(out cacheItem);
+            var result = this.blockingCollection.TryTake(out var cacheItem1);
 
+            cacheItem = cacheItem1 as T;
             return result;
         }
 
         /// <inheritdoc />
         public void CompleteAdding()
         {
-            this.blockingCollection.CompleteAdding();
+            // this.blockingCollection.CompleteAdding();
         }
     }
 }

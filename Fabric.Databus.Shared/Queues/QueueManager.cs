@@ -58,6 +58,7 @@ namespace Fabric.Databus.Shared.Queues
 
         /// <inheritdoc />
         public IQueue<T> CreateInputQueue<T>(int stepNumber)
+            where T : class, IQueueItem
         {
             return this.CreateQueue<T>(stepNumber);
         }
@@ -76,6 +77,7 @@ namespace Fabric.Databus.Shared.Queues
 
         /// <inheritdoc />
         public IQueue<T> CreateOutputQueue<T>(int stepNumber)
+            where T : class, IQueueItem
         {
             return this.CreateQueue<T>(stepNumber + 1);
         }
@@ -100,6 +102,7 @@ namespace Fabric.Databus.Shared.Queues
         /// <exception cref="ArgumentException">exception thrown
         /// </exception>
         private IQueue<T> CreateQueue<T>(int id)
+            where T : class, IQueueItem
         {
             var queueName = this.GetQueueName<T>(id);
             if (this.queues.ContainsKey(queueName))
@@ -166,6 +169,7 @@ namespace Fabric.Databus.Shared.Queues
         /// The <see cref="IQueue"/>.
         /// </returns>
         private IQueue InternalCreateQueue<T>(int id)
+            where T : class, IQueueItem
         {
             return this.queueFactory.Create<T>(this.GetQueueName<T>(id));
         }

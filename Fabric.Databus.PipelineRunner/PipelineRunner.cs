@@ -167,12 +167,13 @@ namespace Fabric.Databus.PipelineRunner
                 Job = job
             });
 
+            sqlJobQueue.AddBatchCompleted(new JobCompletedQueueItem());
+
             sqlJobQueue.CompleteAdding();
 
             var processors = this.GetPipelineByName(config.Pipeline, config);
 
             var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
-            var httpRequestInjector = this.container.Resolve<IHttpRequestInterceptor>();
             var fileUploader = fileUploaderFactory.Create(config.Urls, config.UrlMethod);
             this.container.RegisterInstance(fileUploader);
 
@@ -275,7 +276,7 @@ namespace Fabric.Databus.PipelineRunner
                         processors.Add(new PipelineStepInfo { Type = typeof(FileSavePipelineStep), Count = 1 });
                     }
 
-                    processors.Add(new PipelineStepInfo { Type = typeof(FileUploadPipelineStep), Count = 1 });
+                    processors.Add(new PipelineStepInfo { Type = typeof(ElasticSearchFileUploadPipelineStep), Count = 1 });
                 }
                 else
                 {
@@ -303,8 +304,8 @@ namespace Fabric.Databus.PipelineRunner
         /// <summary>
         /// The init container with defaults.
         /// </summary>
-        /// <param name="config">
-        /// The config.
+        /// <param name="job">
+        /// The job.
         /// </param>
         private void InitContainerWithDefaults(IJob job)
         {
@@ -315,7 +316,7 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IQueueFactory>())
             {
-                this.container.RegisterType<IQueueFactory, SimpleQueueFactory>();
+                this.container.RegisterType<IQueueFactory, AdvancedQueueFactory>();
             }
 
             if (!this.container.IsRegistered<IQueueManager>())

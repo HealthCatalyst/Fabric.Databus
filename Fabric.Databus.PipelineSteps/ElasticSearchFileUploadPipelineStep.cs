@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FileUploadPipelineStep.cs" company="Health Catalyst">
+// <copyright file="ElasticSearchFileUploadPipelineStep.cs" company="Health Catalyst">
 //   
 // </copyright>
 // <summary>
-//   Defines the FileUploadPipelineStep type.
+//   Defines the ElasticSearchFileUploadPipelineStep type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ namespace Fabric.Databus.PipelineSteps
     /// <summary>
     /// The file upload queue processor.
     /// </summary>
-    public class FileUploadPipelineStep : BasePipelineStep<FileUploadQueueItem, EndPointQueueItem>
+    public class ElasticSearchFileUploadPipelineStep : BasePipelineStep<FileUploadQueueItem, EndPointQueueItem>
     {
         /// <summary>
         /// The file uploader.
@@ -34,7 +34,7 @@ namespace Fabric.Databus.PipelineSteps
 
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Fabric.Databus.PipelineSteps.FileUploadPipelineStep" /> class.
+        /// Initializes a new instance of the <see cref="T:Fabric.Databus.PipelineSteps.ElasticSearchFileUploadPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
         /// The queue context.
@@ -50,7 +50,7 @@ namespace Fabric.Databus.PipelineSteps
         /// </param>
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
-        public FileUploadPipelineStep(
+        public ElasticSearchFileUploadPipelineStep(
             IJobConfig jobConfig, 
             IElasticSearchUploader elasticSearchUploader, 
             ILogger logger, 

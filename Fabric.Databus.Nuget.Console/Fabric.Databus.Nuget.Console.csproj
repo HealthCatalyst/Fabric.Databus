@@ -36,53 +36,53 @@
     <Reference Include="CommonServiceLocator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.5.8.12\lib\net46\CommonServiceLocator.dll</HintPath>
     </Reference>
-    <Reference Include="Fabric.Databus.Client, Version=1.1.18339.6, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Client.dll</HintPath>
+    <Reference Include="Fabric.Databus.Client, Version=1.1.18339.9, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Client.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.Config, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Config.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Config.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Domain.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Domain.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.ElasticSearch, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.ElasticSearch.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.ElasticSearch.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.Http, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Http.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Http.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Interfaces.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.Json, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Json.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Json.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.PipelineRunner, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.PipelineRunner.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.PipelineRunner.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.PipelineSteps, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.PipelineSteps.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.PipelineSteps.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.ProgressMonitors, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.ProgressMonitors.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.ProgressMonitors.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.QueueItems, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.QueueItems.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.QueueItems.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.Schema, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Schema.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Schema.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Shared.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.SqlGenerator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.SqlGenerator.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.SqlGenerator.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Databus.ZipCodeToGeoCode, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.ZipCodeToGeoCode.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.ZipCodeToGeoCode.dll</HintPath>
     </Reference>
     <Reference Include="Fabric.Shared, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.6\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Shared.dll</HintPath>
+      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18339.9\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Shared.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>

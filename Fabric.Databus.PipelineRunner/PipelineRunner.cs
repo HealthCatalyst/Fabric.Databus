@@ -43,6 +43,7 @@ namespace Fabric.Databus.PipelineRunner
     using QueueItems;
 
     using Serilog;
+    using Serilog.Core;
 
     using Unity;
 
@@ -319,24 +320,7 @@ namespace Fabric.Databus.PipelineRunner
         {
             if (!this.container.IsRegistered<ILogger>())
             {
-                var loggerConfiguration = new LoggerConfiguration().Enrich.With(new ThreadIdEnricher());
-
-                loggerConfiguration = job.Config.LogVerbose
-                                          ? loggerConfiguration.MinimumLevel.Verbose()
-                                          : loggerConfiguration.MinimumLevel.Information();
-
-                if (!string.IsNullOrWhiteSpace(job.Config.LogFile))
-                {
-                    loggerConfiguration =
-                        loggerConfiguration.WriteTo.File(job.Config.LogFile, rollingInterval: RollingInterval.Day);
-                }
-
-                if (job.Config.LogToSeq)
-                {
-                    loggerConfiguration = loggerConfiguration.WriteTo.Seq("http://localhost:5341");
-                }
-
-                ILogger logger = loggerConfiguration.CreateLogger();
+                ILogger logger = new LoggerConfiguration().CreateLogger();
                 this.container.RegisterInstance(logger);
             }
 

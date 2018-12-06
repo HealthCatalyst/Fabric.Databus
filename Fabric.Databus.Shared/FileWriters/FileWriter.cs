@@ -15,6 +15,7 @@ namespace Fabric.Databus.Shared.FileWriters
 
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Shared;
 
     /// <summary>
     /// The file writer.
@@ -104,7 +105,7 @@ namespace Fabric.Databus.Shared.FileWriters
         /// <inheritdoc />
         public string CombinePath(string folder, string file)
         {
-            return Path.Combine(folder, file);
+            return Path.Combine(folder, PathHelpers.GetSafeFilename(file));
         }
     }
 }

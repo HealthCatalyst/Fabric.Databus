@@ -100,9 +100,10 @@ namespace Fabric.Databus.PipelineRunner
 
                 configValidationResult.Results.Add($"First Query: {firstQueryIsValid}");
 
+                int i = 0;
                 foreach (var load in job.Data.DataSources)
                 {
-                    var queryIsValid = await this.CheckQueryIsValid(job, load, logger) ? "OK" : "No Rows";
+                    var queryIsValid = await this.CheckQueryIsValid(job, load, logger, ++i) ? "OK" : "No Rows";
 
                     configValidationResult.Results.Add($"Query [{load.Path}]: {queryIsValid}");
                 }
@@ -166,7 +167,7 @@ namespace Fabric.Databus.PipelineRunner
         {
             var load = job.Data.DataSources.First(c => c.Path == null);
 
-            return await this.CheckQueryIsValid(job, load, logger);
+            return await this.CheckQueryIsValid(job, load, logger, 1);
         }
 
         /// <summary>
@@ -179,16 +180,19 @@ namespace Fabric.Databus.PipelineRunner
         ///     The load.
         /// </param>
         /// <param name="logger">
-        /// the logger
+        ///     the logger
+        /// </param>
+        /// <param name="numberOfDataSource">
+        /// number of data source
         /// </param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
         /// <exception cref="Exception">exception thrown
         /// </exception>
-        public async Task<bool> CheckQueryIsValid(IJob job, IDataSource load, ILogger logger)
+        public async Task<bool> CheckQueryIsValid(IJob job, IDataSource load, ILogger logger, int numberOfDataSource)
         {
-            logger.Information("Validating data source {@load} {@StartTime}", load, DateTime.Now);
+            logger.Information("Validating data source {index} {path} {@load} {@StartTime}", numberOfDataSource, load.Path, load, DateTime.Now);
 
             using (var conn = this.sqlConnectionFactory.GetConnection(job.Config.ConnectionString))
             {
@@ -211,6 +215,8 @@ namespace Fabric.Databus.PipelineRunner
                     foundRow = true;
                 }
 
+                logger.Information("Validated data source {index} {path} {@load} {@StartTime}", numberOfDataSource, load.Path, load, DateTime.Now);
+
                 return foundRow;
             }
         }
@@ -219,7 +225,7 @@ namespace Fabric.Databus.PipelineRunner
         public void ValidateJob(IJob job, ILogger logger)
         {
             // logger.Information("Validating Job {@Job}", job);
-            logger.Information("Validating job {@job} {@StartTime}", job, DateTime.Now);
+             logger.Information("Validating job {@StartTime}", DateTime.Now);
             if (job == null)
             {
                 throw new Exception("job cannot be null");
@@ -280,23 +286,24 @@ namespace Fabric.Databus.PipelineRunner
                     throw new Exception("dataSource.SqlEntityColumnMappings cannot be null");
                 }
             }
+            logger.Information("Validated job {@StartTime}", DateTime.Now);
         }
 
         /// <inheritdoc />
         public void ValidateDataSources(IJob job, ILogger logger)
         {
-            int i = 0;
+            int numberOfDataSource = 0;
             foreach (var dataSource in job.Data.DataSources)
             {
-                i++;
+                numberOfDataSource++;
                 try
                 {
-                    this.CheckQueryIsValid(job, dataSource, logger).Wait();
+                    this.CheckQueryIsValid(job, dataSource, logger, numberOfDataSource).Wait();
                 }
                 catch (Exception e)
                 {
                     throw new Exception(
-                        $"Error in dataSource index {i} with name [{dataSource.Name}] and path [{dataSource.Path}] and Sql [{dataSource.Sql}]",
+                        $"Error in dataSource index {numberOfDataSource} with name [{dataSource.Name}] and path [{dataSource.Path}] and Sql [{dataSource.Sql}]",
                         e);
                 }
             }

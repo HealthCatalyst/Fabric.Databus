@@ -22,6 +22,7 @@ namespace Fabric.Databus.PipelineSteps
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
+    using Fabric.Shared;
 
     using QueueItems;
 
@@ -284,7 +285,7 @@ namespace Fabric.Databus.PipelineSteps
 
                     var filepath = this.detailedTemporaryFileWriter.CombinePath(
                         path,
-                        this.GetSafeFilename(Convert.ToString(key)) + ".csv");
+                        PathHelpers.GetSafeFilename(Convert.ToString(key)) + ".csv");
 
                     using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
                     {
@@ -304,20 +305,6 @@ namespace Fabric.Databus.PipelineSteps
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// The get safe filename.
-        /// </summary>
-        /// <param name="filename">
-        /// The filename.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        private string GetSafeFilename(string filename)
-        {
-            return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
         }
     }
 }

@@ -1,0 +1,24 @@
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Verbose"
+    },
+    "WriteTo": [
+      {
+        "Name": "RollingFile",
+        "Args": {
+          "pathFormat": "C:\\logs\\databus-logs\\databus-log-{Date}.txt"
+        }
+      },
+      {
+        "Name": "Seq",
+        "Args": { "serverUrl": "http://localhost:5341" }
+      }
+    ],
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ],
+    "Properties": {
+      "Application": "Sample",
+      "Environment": "Test"
+    }
+  }
+}

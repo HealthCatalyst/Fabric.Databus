@@ -30,12 +30,6 @@ namespace Fabric.Databus.Shared.Queues
         where T : class, IQueueItem
     {
         /// <summary>
-        /// The logger.
-        /// </summary>
-        // ReSharper disable once StaticMemberInGenericType
-        private static readonly ILogger Logger = new LoggerConfiguration().CreateLogger();
-
-        /// <summary>
         /// The blocking collection.
         /// </summary>
         private readonly BlockingCollection<T> blockingCollection;
@@ -43,11 +37,19 @@ namespace Fabric.Databus.Shared.Queues
         /// <summary>
         /// The _max items.
         /// </summary>
-        private readonly int _maxItems;
+        private readonly int maxItems;
 
-        private readonly object _locker = new object();
+        /// <summary>
+        /// The locker.
+        /// </summary>
+        private readonly object locker = new object();
 
-        private readonly string _name;
+        private readonly string name;
+
+        /// <summary>
+        /// The logger.
+        /// </summary>
+        private readonly ILogger logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeteredQueue{T}"/> class.
@@ -58,17 +60,21 @@ namespace Fabric.Databus.Shared.Queues
         /// <param name="name">
         /// The name.
         /// </param>
-        public MeteredQueue(IProducerConsumerCollection<T> concurrentQueue, string name)
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        public MeteredQueue(IProducerConsumerCollection<T> concurrentQueue, string name, ILogger logger)
         {
             this.blockingCollection = new BlockingCollection<T>(concurrentQueue);
-            this._name = name;
+            this.name = name;
+            this.logger = logger;
         }
 
         /// <inheritdoc />
-        public MeteredQueue(IProducerConsumerCollection<T> concurrentQueue, string name, int maxItems)
-            : this(concurrentQueue, name)
+        public MeteredQueue(IProducerConsumerCollection<T> concurrentQueue, string name, int maxItems, ILogger logger)
+            : this(concurrentQueue, name, logger)
         {
-            this._maxItems = maxItems;
+            this.maxItems = maxItems;
         }
 
         /// <inheritdoc />
@@ -81,7 +87,7 @@ namespace Fabric.Databus.Shared.Queues
         /// The name.
         /// </summary>
         // ReSharper disable once ConvertToAutoProperty
-        public string Name => this._name;
+        public string Name => this.name;
 
         /// <param name="cancellationToken"></param>
         /// <inheritdoc />
@@ -169,22 +175,22 @@ namespace Fabric.Databus.Shared.Queues
         /// </summary>
         private void BlockIfNeeded()
         {
-            if (this._maxItems > 0)
+            if (this.maxItems > 0)
             {
                 // if we have enough items in the queue then block
                 // http://www.albahari.com/threading/part4.aspx#_Signaling_with_Wait_and_Pulse
-                lock (this._locker)
+                lock (this.locker)
                 {
                     bool didLock = false;
-                    while (this.Count > this._maxItems)
+                    while (this.Count > this.maxItems)
                     {
                         didLock = true;
-                        Logger.Verbose($"MeteredQueue.Block {this._name}, Count={this.Count:N0}");
-                        Monitor.Wait(this._locker); // Lock is released while we’re waiting
+                        logger.Verbose($"MeteredQueue.Block {this.name}, Count={this.Count:N0}");
+                        Monitor.Wait(this.locker); // Lock is released while we’re waiting
                     }
                     if (didLock)
                     {
-                        Logger.Verbose($"MeteredQueue.Released {this._name}, Count={this.Count:N0}");
+                        logger.Verbose($"MeteredQueue.Released {this.name}, Count={this.Count:N0}");
                     }
                 }
             }
@@ -195,16 +201,16 @@ namespace Fabric.Databus.Shared.Queues
         /// </summary>
         private void ReleaseLockIfNeeded()
         {
-            if (this._maxItems > 0)
+            if (this.maxItems > 0)
             {
-                lock (this._locker)
+                lock (this.locker)
                 {
                     // Let's now wake up the thread by
-                    if (this.Count <= this._maxItems)
+                    if (this.Count <= this.maxItems)
                     {
-                        Logger.Verbose($"MeteredQueue.ReleaseAll {this._name}");
+                        logger.Verbose($"MeteredQueue.ReleaseAll {this.name}");
 
-                        Monitor.PulseAll(this._locker);
+                        Monitor.PulseAll(this.locker);
                     }
                 }
             }

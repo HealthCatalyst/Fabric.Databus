@@ -10,7 +10,6 @@
 namespace Fabric.Databus.Console
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
@@ -19,17 +18,12 @@ namespace Fabric.Databus.Console
     using Fabric.Databus.Client;
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
-    using Fabric.Databus.ElasticSearch;
-    using Fabric.Databus.Http;
-    using Fabric.Databus.Interfaces.ElasticSearch;
-    using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.JsonSchema;
-    using Fabric.Databus.Shared;
     using Fabric.Databus.Shared.Loggers;
     using Fabric.Shared;
 
-    using PipelineRunner;
+    using Microsoft.Extensions.Configuration;
 
     using Serilog;
 

@@ -16,9 +16,6 @@
     <KeepTemporaryLookupColumnsInOutput>false</KeepTemporaryLookupColumnsInOutput>
     <SqlCommandTimeoutInSeconds>300</SqlCommandTimeoutInSeconds>
     <Pipeline>RestApi</Pipeline>
-    <LogToSeq>true</LogToSeq>
-    <LogVerbose>true</LogVerbose>
-    <LogFile>C:\Catalyst\databus-logs\databus-out.txt</LogFile>
   </Config>
 
   <Data>

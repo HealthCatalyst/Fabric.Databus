@@ -12,8 +12,6 @@ namespace Fabric.Databus.Interfaces.ElasticSearch
     using System.Collections.Generic;
     using System.Net.Http;
 
-    using Fabric.Databus.Http;
-
     /// <summary>
     /// The FileUploaderFactory interface.
     /// </summary>
@@ -41,7 +39,7 @@ namespace Fabric.Databus.Interfaces.ElasticSearch
         /// The method.
         /// </param>
         /// <returns>
-        /// The <see cref="FileUploader"/>.
+        /// The <see cref="IElasticSearchUploader"/>.
         /// </returns>
         IElasticSearchUploader Create(bool keepIndexOnline, List<string> urls, string index, string alias, string entityType, HttpMethod method);
     }

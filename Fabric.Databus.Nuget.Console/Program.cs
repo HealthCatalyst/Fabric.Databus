@@ -51,50 +51,43 @@ namespace Fabric.Databus.Nuget.Console
 
             try
             {
-            string inputFile = args[0];
+                string inputFile = args[0];
 
-            var config = new ConfigReader().ReadXml(inputFile);
+                var config = new ConfigReader().ReadXml(inputFile);
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
 
-            ILogger logger = new LoggerConfiguration()
-                .MinimumLevel.Verbose()
-                .WriteTo.File(Path.Combine(Path.GetTempPath(), "Databus.out.txt"))
-                .CreateLogger();
+                ILogger logger = new LoggerConfiguration()
+                    .MinimumLevel.Verbose()
+                    .WriteTo.File(Path.Combine(Path.GetTempPath(), "Databus.out.txt"))
+                    .CreateLogger();
 
-            using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
-            {
-                using (var cancellationTokenSource = new CancellationTokenSource())
+                using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
                 {
-                    var container = new UnityContainer();
-                    container.RegisterInstance<IProgressMonitor>(progressMonitor);
-
-                    container.RegisterInstance(logger);
-
-                    var pipelineRunner = new DatabusRunner();
-
-                    if (config.Config.UploadToElasticSearch)
+                    using (var cancellationTokenSource = new CancellationTokenSource())
                     {
-                        pipelineRunner.RunElasticSearchPipeline(container, config, cancellationTokenSource.Token);
-                    }
-                    else
-                    {
+                        var container = new UnityContainer();
+                        container.RegisterInstance<IProgressMonitor>(progressMonitor);
+
+                        container.RegisterInstance(logger);
+
+                        var pipelineRunner = new DatabusRunner();
+
                         pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
                     }
                 }
-            }
 
-            stopwatch.Stop();
-            var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
-            var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
-            Console.WriteLine($"Finished in {timeElapsed} using {threadText}");
+                stopwatch.Stop();
+                var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+                var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
+                Console.WriteLine($"Finished in {timeElapsed} using {threadText}");
 
 #if TRUE
-            logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);
-            //logger.Error(new Exception("test"), "An error has occurred.");
+                logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);
+                //logger.Error(new Exception("test"), "An error has occurred.");
 
-            Log.CloseAndFlush();
+                Log.CloseAndFlush();
 
                 //file.Flush();
                 //file.Close();

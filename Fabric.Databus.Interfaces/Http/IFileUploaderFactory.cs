@@ -12,8 +12,6 @@ namespace Fabric.Databus.Interfaces.Http
     using System.Collections.Generic;
     using System.Net.Http;
 
-    using Fabric.Databus.Http;
-
     /// <summary>
     /// The FileUploaderFactory interface.
     /// </summary>
@@ -29,7 +27,7 @@ namespace Fabric.Databus.Interfaces.Http
         /// The method.
         /// </param>
         /// <returns>
-        /// The <see cref="FileUploader"/>.
+        /// The <see cref="IFileUploader"/>.
         /// </returns>
         IFileUploader Create(List<string> urls, HttpMethod method);
     }

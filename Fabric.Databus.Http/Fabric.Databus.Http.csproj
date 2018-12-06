@@ -12,10 +12,4 @@
     <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Fabric.Databus.ElasticSearch">
-      <HintPath>..\packages\Catalyst.Fabric.Databus.Client.1.1.18332.13\lib\netstandard2.0\bin\Release\netstandard2.0\Fabric.Databus.ElasticSearch.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

@@ -9,11 +9,15 @@
     <description>Client for Fabric.Databus</description>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Newtonsoft.Json" version="11.0.2" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration" version="2.2.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Configuration.Json" version="2.2.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="12.0.1" exclude="Build,Analyzers" />
         <dependency id="Serilog" version="2.7.1" exclude="Build,Analyzers" />
+        <dependency id="Serilog.Settings.Configuration" version="3.0.1" exclude="Build,Analyzers" />
         <dependency id="Serilog.Sinks.File" version="4.0.0" exclude="Build,Analyzers" />
-        <dependency id="Unity" version="5.8.11" exclude="Build,Analyzers" />
-        <dependency id="System.Data.SqlClient" version="4.5.1" exclude="Build,Analyzers" />
+        <dependency id="Serilog.Sinks.Seq" version="4.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.6.0" exclude="Build,Analyzers" />
+        <dependency id="Unity" version="5.8.12" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>

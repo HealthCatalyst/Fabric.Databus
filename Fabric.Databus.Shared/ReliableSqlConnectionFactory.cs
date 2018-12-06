@@ -10,17 +10,17 @@
 namespace Fabric.Databus.Shared
 {
     using System.Data.Common;
-    using System.Data.SqlClient;
 
     using Fabric.Databus.Interfaces.Sql;
+    using Fabric.Shared.ReliableSql;
 
     /// <inheritdoc />
-    public class SqlConnectionFactory : ISqlConnectionFactory
+    public class ReliableSqlConnectionFactory : ISqlConnectionFactory
     {
         /// <inheritdoc />
         public DbConnection GetConnection(string connectionString)
         {
-            return new SqlConnection(connectionString);
+            return new ReliableSqlDbConnection(connectionString);
         }
     }
 }

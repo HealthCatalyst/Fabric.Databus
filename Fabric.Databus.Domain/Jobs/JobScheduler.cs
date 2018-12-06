@@ -86,31 +86,13 @@ namespace Fabric.Databus.Domain.Jobs
             this.jobStatusTrackerFactory = jobStatusTrackerFactory ?? throw new ArgumentNullException(nameof(jobStatusTrackerFactory));
         }
 
-        /// <summary>
-        /// The schedule job.
-        /// </summary>
-        /// <param name="queryConfig">
-        /// The query config.
-        /// </param>
-        /// <param name="jobName">
-        /// The job name.
-        /// </param>
-        /// <exception cref="NotImplementedException">not implemented exception
-        /// </exception>
+        /// <inheritdoc />
         public void ScheduleJob(QueryConfig queryConfig, string jobName)
         {
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// The execute job immediately.
-        /// </summary>
-        /// <param name="query">
-        /// The query.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Guid"/>.
-        /// </returns>
+        /// <inheritdoc />
         public Guid ExecuteJobImmediately(Job query)
         {
             var jobHistoryItem = this.CreateJobHistoryItem(query);
@@ -123,76 +105,33 @@ namespace Fabric.Databus.Domain.Jobs
             return jobHistoryItem.Id;
         }
 
-        /// <summary>
-        /// The validate job.
-        /// </summary>
-        /// <param name="queryConfig">
-        /// The query config.
-        /// </param>
-        /// <param name="jobName">
-        /// The job name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        public async Task<ConfigValidationResult> ValidateJob(string queryConfig, string jobName)
+        /// <inheritdoc />
+        public async Task<ConfigValidationResult> ValidateJobAsync(string queryConfig, string jobName, ILogger logger1)
         {
-            var result = await this.configValidator.ValidateFromTextAsync(queryConfig);
+            var result = await this.configValidator.ValidateFromTextAsync(queryConfig, logger1);
 
             return result;
         }
 
-        /// <summary>
-        /// The get job status.
-        /// </summary>
-        /// <param name="jobGuid">
-        /// The job guid.
-        /// </param>
-        /// <returns>
-        /// The <see cref="JobHistoryItem"/>.
-        /// </returns>
+        /// <inheritdoc />
         public JobHistoryItem GetJobStatus(Guid jobGuid)
         {
             return this.jobHistoryStore.GetJobHistoryItem(jobGuid);
         }
 
-        /// <summary>
-        /// The get job status.
-        /// </summary>
-        /// <param name="jobName">
-        /// The job name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="JobHistoryItem"/>.
-        /// </returns>
+        /// <inheritdoc />
         public JobHistoryItem GetJobStatus(string jobName)
         {
             return this.jobHistoryStore.GetLatestJobHistoryItem(jobName);
         }
 
-        /// <summary>
-        /// The get job history.
-        /// </summary>
-        /// <param name="jobName">
-        /// The job name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="ICollection{T}"/>.
-        /// </returns>
+        /// <inheritdoc />
         public ICollection<JobHistoryItem> GetJobHistory(string jobName)
         {
             return this.jobHistoryStore.GetJobHistory(jobName);
         }
 
-        /// <summary>
-        /// The get most recent jobs.
-        /// </summary>
-        /// <param name="numberOfJobs">
-        /// The number of jobs.
-        /// </param>
-        /// <returns>
-        /// The <see cref="ICollection{T}"/>.
-        /// </returns>
+        /// <inheritdoc />
         public ICollection<JobHistoryItem> GetMostRecentJobs(int numberOfJobs)
         {
             return this.jobHistoryStore.GetMostRecentJobs(numberOfJobs);

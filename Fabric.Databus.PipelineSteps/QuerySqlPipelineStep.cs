@@ -251,8 +251,6 @@ namespace Fabric.Databus.PipelineSteps
             var untransformedFields = load.Fields.Where(f => f.Transform == QueryFieldTransform.None).ToList();
 
             untransformedFields.ForEach(f => { });
-
-            this.MyLogger.Verbose($"Finished reading rows for {queryId}");
         }
 
         /// <summary>

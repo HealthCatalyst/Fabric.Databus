@@ -14,6 +14,8 @@ namespace Fabric.Databus.Domain.ConfigValidators
     using Fabric.Databus.Config;
     using Fabric.Databus.Shared;
 
+    using Serilog;
+
     /// <summary>
     /// The ConfigValidator interface.
     /// </summary>
@@ -25,10 +27,13 @@ namespace Fabric.Databus.Domain.ConfigValidators
         /// <param name="fileContents">
         /// The file contents.
         /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents);
+        Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents, ILogger logger);
 
         /// <summary>
         /// The validate job.
@@ -36,7 +41,10 @@ namespace Fabric.Databus.Domain.ConfigValidators
         /// <param name="job">
         /// The job.
         /// </param>
-        void ValidateJob(IJob job);
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        void ValidateJob(IJob job, ILogger logger);
 
         /// <summary>
         /// The validate data sources.
@@ -44,6 +52,9 @@ namespace Fabric.Databus.Domain.ConfigValidators
         /// <param name="job">
         /// The job.
         /// </param>
-        void ValidateDataSources(IJob job);
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        void ValidateDataSources(IJob job, ILogger logger);
     }
 }

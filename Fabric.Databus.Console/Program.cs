@@ -92,17 +92,13 @@ namespace Fabric.Databus.Console
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                ILogger logger = new LoggerConfiguration().MinimumLevel.Verbose().WriteTo
-                    .File(Path.Combine(Path.GetTempPath(), "Databus.out.txt")).CreateLogger();
 
-                using (ProgressMonitor progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
+                using (var progressMonitor = new ProgressMonitor(new ConsoleProgressLogger()))
                 {
                     using (var cancellationTokenSource = new CancellationTokenSource())
                     {
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
-
-                        container.RegisterInstance(logger);
 
                         var pipelineRunner = new DatabusRunner();
 
@@ -118,18 +114,6 @@ namespace Fabric.Databus.Console
                 var threadText = config.Config.UseMultipleThreads ? "multiple threads" : "single thread";
                 var memoryInBytes = GC.GetTotalMemory(true);
                 Console.WriteLine($"Finished in {timeElapsed} using {threadText}, Memory Working set: {memoryInBytes.ToDisplayString()}");
-
-#if TRUE
-                logger.Verbose("Finished in {ElapsedMinutes} minutes on {Date}.", stopwatch.Elapsed.TotalMinutes, DateTime.Today);
-                //logger.Error(new Exception("test"), "An error has occurred.");
-
-                Log.CloseAndFlush();
-
-                //file.Flush();
-                //file.Close();
-                //file.Dispose();
-                //file = null;
-#endif
             }
             catch (Exception e)
             {

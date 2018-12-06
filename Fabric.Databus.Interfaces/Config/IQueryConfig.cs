@@ -82,5 +82,20 @@ namespace Fabric.Databus.Interfaces.Config
         /// Gets or sets the url method.
         /// </summary>
         HttpMethod UrlMethod { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether log to seq.
+        /// </summary>
+        bool LogToSeq { get; set; }
+
+        /// <summary>
+        /// Gets or sets the log to file.
+        /// </summary>
+        string LogFile { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether log verbose.
+        /// </summary>
+        bool LogVerbose { get; set; }
     }
 }

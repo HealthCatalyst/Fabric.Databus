@@ -113,7 +113,7 @@ namespace Fabric.Databus.Shared
                     cmd.AddParameterWithValue("@end", end);
                 }
 
-                logger.Verbose($"Start: {cmd.CommandText}");
+                logger.Verbose("Sql Begin [{Path}]: {@load} {@cmd}", load.Path, load, cmd);
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
                 /* var schema = reader.GetSchemaTable(); */
@@ -178,7 +178,7 @@ namespace Fabric.Databus.Shared
                     }
                 }
 
-                logger.Verbose($"Finish: {cmd.CommandText} rows={rows}");
+                logger.Verbose("Sql Finish [{Path}] ({rows}): {@load} {@cmd}", load.Path, rows, load, cmd);
 
                 return new ReadSqlDataResult { Data = data, ColumnList = columnList };
             }

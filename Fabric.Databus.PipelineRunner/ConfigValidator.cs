@@ -21,6 +21,8 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
 
+    using Serilog;
+
     /// <inheritdoc />
     public class ConfigValidator : IConfigValidator
     {
@@ -56,12 +58,13 @@ namespace Fabric.Databus.PipelineRunner
         /// <param name="fileContents">
         /// The file contents.
         /// </param>
+        /// <param name="logger"></param>
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">exception thrown
         /// </exception>
-        public async Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents)
+        public async Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(fileContents))
             {
@@ -93,13 +96,13 @@ namespace Fabric.Databus.PipelineRunner
 
                 configValidationResult.Results.Add($"Sql Connection String: OK");
 
-                var firstQueryIsValid = await this.CheckFirstQueryIsValid(job) ? "OK" : "No Rows";
+                var firstQueryIsValid = await this.CheckFirstQueryIsValid(job, logger) ? "OK" : "No Rows";
 
                 configValidationResult.Results.Add($"First Query: {firstQueryIsValid}");
 
                 foreach (var load in job.Data.DataSources)
                 {
-                    var queryIsValid = await this.CheckQueryIsValid(job, load) ? "OK" : "No Rows";
+                    var queryIsValid = await this.CheckQueryIsValid(job, load, logger) ? "OK" : "No Rows";
 
                     configValidationResult.Results.Add($"Query [{load.Path}]: {queryIsValid}");
                 }
@@ -151,36 +154,41 @@ namespace Fabric.Databus.PipelineRunner
         /// The check first query is valid.
         /// </summary>
         /// <param name="job">
-        /// The job.
+        ///     The job.
+        /// </param>
+        /// <param name="logger">
+        /// The logger
         /// </param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        public async Task<bool> CheckFirstQueryIsValid(IJob job)
+        public async Task<bool> CheckFirstQueryIsValid(IJob job, ILogger logger)
         {
             var load = job.Data.DataSources.First(c => c.Path == null);
 
-            return await this.CheckQueryIsValid(job, load);
+            return await this.CheckQueryIsValid(job, load, logger);
         }
 
         /// <summary>
         /// The check query is valid.
         /// </summary>
         /// <param name="job">
-        /// The job.
+        ///     The job.
         /// </param>
         /// <param name="load">
-        /// The load.
+        ///     The load.
+        /// </param>
+        /// <param name="logger">
+        /// the logger
         /// </param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
         /// <exception cref="Exception">exception thrown
         /// </exception>
-        public async Task<bool> CheckQueryIsValid(IJob job, IDataSource load)
+        public async Task<bool> CheckQueryIsValid(IJob job, IDataSource load, ILogger logger)
         {
-            var numberOfLevels =
-                (load.Path?.Count(a => a == '.') + 1) ?? 0;
+            logger.Information("Validating data source {@load} {@StartTime}", load, DateTime.Now);
 
             using (var conn = this.sqlConnectionFactory.GetConnection(job.Config.ConnectionString))
             {
@@ -192,7 +200,7 @@ namespace Fabric.Databus.PipelineRunner
                     cmd.CommandTimeout = job.Config.SqlCommandTimeoutInSeconds;
                 }
 
-                cmd.CommandText = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddTopFilter(1).ToSqlString();
+                cmd.CommandText = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddTopFilter(0).ToSqlString();
 
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
@@ -208,8 +216,10 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public void ValidateJob(IJob job)
+        public void ValidateJob(IJob job, ILogger logger)
         {
+            // logger.Information("Validating Job {@Job}", job);
+            logger.Information("Validating job {@job} {@StartTime}", job, DateTime.Now);
             if (job == null)
             {
                 throw new Exception("job cannot be null");
@@ -273,7 +283,7 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public void ValidateDataSources(IJob job)
+        public void ValidateDataSources(IJob job, ILogger logger)
         {
             int i = 0;
             foreach (var dataSource in job.Data.DataSources)
@@ -281,7 +291,7 @@ namespace Fabric.Databus.PipelineRunner
                 i++;
                 try
                 {
-                    this.CheckQueryIsValid(job, dataSource).Wait();
+                    this.CheckQueryIsValid(job, dataSource, logger).Wait();
                 }
                 catch (Exception e)
                 {

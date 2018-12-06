@@ -13,7 +13,6 @@ namespace Fabric.Databus.ElasticSearch
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
     using System.Text;
     using System.Threading;
@@ -446,7 +445,7 @@ namespace Fabric.Databus.ElasticSearch
         {
             try
             {
-                this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
+                this.logger.Verbose("Sending file {batch} of size {streamLength} to {url}", batch, stream.Length, url);
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
                 string requestContent;
@@ -461,7 +460,7 @@ namespace Fabric.Databus.ElasticSearch
                         requestContent = reader.ReadToEnd();
 
                         // TODO: Do something with the value
-                        this.logger.Verbose($"{requestContent}");
+                        this.logger.Verbose("Http Send {requestContent}", requestContent);
                     }
                 }
 
@@ -496,13 +495,27 @@ namespace Fabric.Databus.ElasticSearch
                             // _queuedFiles.Enqueue(filepath);
                             this.requestFailures++;
                             this.logger.Error(
-                                $"Failed: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.QueuedFiles.Count}/{this.totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}");
+                                "ElasticSearchUpload Failed: {batch} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}",
+                                batch,
+                                response.StatusCode,
+                                this.currentRequests,
+                                this.QueuedFiles.Count,
+                                this.totalFiles,
+                                milliSecondsPerFile,
+                                millisecsForThisFile);
                         }
                     }
                     else
                     {
                         this.logger.Verbose(
-                            $"Finished: {batch} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.QueuedFiles.Count}/{this.totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}");
+                            "ElasticSearchUpload Succeeded: {batch} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}",
+                            batch,
+                            response.StatusCode,
+                            this.currentRequests,
+                            this.QueuedFiles.Count,
+                            this.totalFiles,
+                            milliSecondsPerFile,
+                            millisecsForThisFile);
                     }
                 }
                 else
@@ -574,14 +587,27 @@ namespace Fabric.Databus.ElasticSearch
                             // add back to queue for sending
                             this.QueuedFiles.Enqueue(filepath);
                             this.requestFailures++;
-                            this.logger.Verbose(
-                                $"Failed: {filepath} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.QueuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+
+                            this.logger.Error(
+                                "ElasticSearchUpload Failed: {filepath} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, This file: {millisecsForThisFile}",
+                                filepath,
+                                response.StatusCode,
+                                this.currentRequests,
+                                this.QueuedFiles.Count,
+                                this.totalFiles,
+                                millisecsForThisFile);
                         }
                     }
                     else
                     {
                         this.logger.Verbose(
-                            $"Finished: {filepath} status: {response.StatusCode} requests:{this.currentRequests} Left:{this.QueuedFiles.Count}/{this.totalFiles}, Speed/file: {millisecsPerFile}, This file: {millisecsForThisFile}");
+                            "ElasticSearchUpload Succeeded: {file} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, This file: {millisecsForThisFile}",
+                            filepath,
+                            response.StatusCode,
+                            this.currentRequests,
+                            this.QueuedFiles.Count,
+                            this.totalFiles,
+                            millisecsForThisFile);
                     }
                 }
                 else
@@ -595,7 +621,7 @@ namespace Fabric.Databus.ElasticSearch
             }
             catch (Exception ex)
             {
-                this.logger.Verbose("{Exception}", ex);
+                this.logger.Error("{Exception}", ex);
                 throw;
             }
         }
@@ -613,7 +639,10 @@ namespace Fabric.Databus.ElasticSearch
         {
             if (!this.QueuedFiles.IsEmpty)
             {
+#pragma warning disable IDE0018 // Inline variable declaration
+                // ReSharper disable once InlineOutVariableDeclaration
                 string filename;
+#pragma warning restore IDE0018 // Inline variable declaration
                 while (this.QueuedFiles.TryDequeue(out filename))
                 {
                     try
@@ -691,7 +720,10 @@ namespace Fabric.Databus.ElasticSearch
             var stopwatchElapsed = this.Stopwatch.Elapsed;
             var milliSecsPerFile = stopwatchElapsed.TotalMilliseconds / fileList.Count;
 
-            this.logger.Verbose($"total: {stopwatchElapsed}, per file: {milliSecsPerFile}");
+            this.logger.Verbose(
+                "total: {stopwatchElapsed}, per file: {milliSecsPerFile}",
+                stopwatchElapsed,
+                milliSecsPerFile);
         }
     }
 }

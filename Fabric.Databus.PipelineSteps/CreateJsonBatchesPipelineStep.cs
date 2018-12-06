@@ -145,7 +145,13 @@ namespace Fabric.Databus.PipelineSteps
 
             if (docsToSave.Any())
             {
-                this.MyLogger.Verbose($"Saved Batch: count:{docsToSave.Count} from {docsToSave.First().Id} to {docsToSave.Last().Id}, inQueue:{this.InQueue.Count} ");
+                this.MyLogger.Verbose(
+                    "Saved Batch: count:{DocumentsToSave} from {FirstDocumentId} to {LastDocumentId}, inQueue:{InQueueCount} ",
+                    docsToSave.Count,
+                    docsToSave.First().Id,
+                    docsToSave.Last().Id,
+                    this.InQueue.Count);
+
                 await this.AddToOutputQueueAsync(new SaveBatchQueueItem { ItemsToSave = docsToSave });
             }
         }

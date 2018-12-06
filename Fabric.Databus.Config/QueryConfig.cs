@@ -146,5 +146,14 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         public PipelineNames Pipeline { get; set; } = PipelineNames.RestApi;
+
+        /// <inheritdoc />
+        public bool LogToSeq { get; set; }
+
+        /// <inheritdoc />
+        public string LogFile { get; set; }
+
+        /// <inheritdoc />
+        public bool LogVerbose { get; set; }
     }
 }

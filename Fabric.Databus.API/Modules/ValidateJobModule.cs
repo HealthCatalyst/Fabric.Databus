@@ -1,29 +1,47 @@
-﻿using System;
-using System.Linq;
-using Fabric.Databus.API.Configuration;
-using Fabric.Databus.Domain.Jobs;
-using Nancy;
-using Nancy.Extensions;
-using Nancy.IO;
-using Nancy.Security;
-using Serilog;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ValidateJobModule.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the ValidateJobModule type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.API.Modules
 {
+    using System;
+    using System.Linq;
+
+    using Fabric.Databus.API.Configuration;
+    using Fabric.Databus.Domain.Jobs;
+
+    using Nancy;
+    using Nancy.Extensions;
+    using Nancy.IO;
+
+    using Serilog;
+
+    /// <inheritdoc />
+    /// <summary>
+    /// The validate job module.
+    /// </summary>
     public class ValidateJobModule : NancyModule
     {
+        /// <inheritdoc />
         public ValidateJobModule(ILogger logger, IJobScheduler jobScheduler, IAppConfiguration configuration) : base("/validate")
         {
             this.RequiresClaimsIfAuthorizationEnabled(configuration, claim => claim.Value.Equals("fabric/databus.validate", StringComparison.OrdinalIgnoreCase));
 
-            Post("/", async parameters =>
-            {
-                var jobName = string.Empty; // parameters.jobName;
+            Post(
+                "/",
+                async parameters =>
+                    {
+                        var jobName = string.Empty; // parameters.jobName;
 
-                var httpFiles = Request.Files.ToList();
+                var httpFiles = this.Request.Files.ToList();
 
                 var body = RequestStream.FromStream(Request.Body).AsString();
-                return await jobScheduler.ValidateJob(body, jobName);
+                return await jobScheduler.ValidateJobAsync(body, jobName, logger);
             });
         }
     }

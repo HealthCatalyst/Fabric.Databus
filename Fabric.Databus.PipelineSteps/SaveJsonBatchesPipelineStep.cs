@@ -118,7 +118,7 @@ namespace Fabric.Databus.PipelineSteps
                                                      Stream = stream
                                                  });
 
-            this.MyLogger.Verbose($"Wrote batch: {batchNumber}");
+            this.MyLogger.Verbose("Wrote batch: {batchNumber}", batchNumber);
         }
     }
 }

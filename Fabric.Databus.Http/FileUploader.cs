@@ -155,7 +155,7 @@ namespace Fabric.Databus.Http
         {
             try
             {
-                this.logger.Verbose($"Sending file {batch} of size {stream.Length:N0} to {url}");
+                this.logger.Verbose("Sending file {batch} of size {Length} to {url}", batch, stream.Length, url);
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
                 string requestContent;
@@ -170,7 +170,7 @@ namespace Fabric.Databus.Http
                         requestContent = reader.ReadToEnd();
 
                         // TODO: Do something with the value
-                        this.logger.Verbose($"{requestContent}");
+                        this.logger.Verbose("Http Sending {@requestContent}", requestContent);
                     }
                 }
 

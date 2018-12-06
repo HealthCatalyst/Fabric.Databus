@@ -12,6 +12,7 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Threading;
 
     using Fabric.Databus.Config;
@@ -123,7 +124,9 @@ namespace Fabric.Databus.PipelineRunner
             var config = job.Config;
             this.InitContainerWithDefaults(job);
 
-            this.container.Resolve<IConfigValidator>().ValidateJob(job);
+            var logger = this.container.Resolve<ILogger>();
+
+            this.container.Resolve<IConfigValidator>().ValidateJob(job, logger);
 
             if (config.WriteTemporaryFilesToDisk)
             {
@@ -156,7 +159,7 @@ namespace Fabric.Databus.PipelineRunner
                 }
             }
 
-            this.container.Resolve<IConfigValidator>().ValidateDataSources(job);
+            this.container.Resolve<IConfigValidator>().ValidateDataSources(job, logger);
 
             // add job to the first queue
             var sqlJobQueue = this.container.Resolve<IQueueManager>()
@@ -181,11 +184,16 @@ namespace Fabric.Databus.PipelineRunner
 
             var pipelineExecutor = pipelineExecutorFactory.Create(this.container, this.cancellationTokenSource);
 
+            logger.Information("Starting pipeline {config} {processors} {TimeoutInMilliseconds}", config, processors, TimeoutInMilliseconds);
+
             pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
 
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();
             Console.WriteLine(stopwatchElapsed);
+
+            logger.Information("Finished pipeline");
+            Log.CloseAndFlush();
         }
 
         /// <summary>
@@ -309,6 +317,29 @@ namespace Fabric.Databus.PipelineRunner
         /// </param>
         private void InitContainerWithDefaults(IJob job)
         {
+            if (!this.container.IsRegistered<ILogger>())
+            {
+                var loggerConfiguration = new LoggerConfiguration().Enrich.With(new ThreadIdEnricher());
+
+                loggerConfiguration = job.Config.LogVerbose
+                                          ? loggerConfiguration.MinimumLevel.Verbose()
+                                          : loggerConfiguration.MinimumLevel.Information();
+
+                if (!string.IsNullOrWhiteSpace(job.Config.LogFile))
+                {
+                    loggerConfiguration =
+                        loggerConfiguration.WriteTo.File(job.Config.LogFile, rollingInterval: RollingInterval.Day);
+                }
+
+                if (job.Config.LogToSeq)
+                {
+                    loggerConfiguration = loggerConfiguration.WriteTo.Seq("http://localhost:5341");
+                }
+
+                ILogger logger = loggerConfiguration.CreateLogger();
+                this.container.RegisterInstance(logger);
+            }
+
             if (!this.container.IsRegistered<ISqlGeneratorFactory>())
             {
                 this.container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
@@ -415,13 +446,6 @@ namespace Fabric.Databus.PipelineRunner
                     sqlConnectionFactory,
                     sqlGeneratorFactory);
                 this.container.RegisterInstance<ISchemaLoader>(schemaLoader);
-            }
-
-            if (!this.container.IsRegistered<ILogger>())
-            {
-                ILogger logger = new LoggerConfiguration().MinimumLevel.Verbose().CreateLogger();
-
-                this.container.RegisterInstance(logger);
             }
 
             if (!this.container.IsRegistered<IElasticSearchUploaderFactory>())

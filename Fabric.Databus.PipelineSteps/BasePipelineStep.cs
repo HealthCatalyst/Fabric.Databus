@@ -229,12 +229,29 @@ namespace Fabric.Databus.PipelineSteps
 
                     if (wt1 is JobCompletedQueueItem)
                     {
+                        this.MyLogger.Verbose(
+                            "{Name} Job Completed. Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0} {@wt}",
+                            this.LoggerName,
+                            this.outQueue.Count,
+                            totalItemsProcessed,
+                            this.totalItemsProcessedByThisProcessor,
+                            wt1);
+
                         await this.AddJobCompletionMessageToOutputQueueAsync();
                         break;
                     }
 
                     if (wt1 is BatchCompletedQueueItem batchCompletedQueueItem)
                     {
+                        this.MyLogger.Verbose(
+                            "{Name} Batch Completed (batch). Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0} {@wt}",
+                            this.LoggerName,
+                            wt1.BatchNumber,
+                            this.outQueue.Count,
+                            totalItemsProcessed,
+                            this.totalItemsProcessedByThisProcessor,
+                            wt1);
+
                         await this.CompleteAsync(null, true);
                         await this.AddBatchCompletionMessageToOutputQueueAsync(batchCompletedQueueItem.BatchNumber);
                         continue;
@@ -273,7 +290,14 @@ namespace Fabric.Databus.PipelineSteps
                     this.LogItemToConsole(wt, PipelineStepState.Processed);
 
                     this.MyLogger.Verbose(
-                        $"Processing: {wt.QueryId} {this.GetId(wt)}, Queue Length: {this.outQueue.Count:N0}, Processed: {totalItemsProcessed:N0}, ByThisProcessor: {this.totalItemsProcessedByThisProcessor:N0}");
+                        "{Name}({queryId}) Processed: {id} Queue Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0} {@wt}",
+                        this.LoggerName,
+                        this.workItemQueryId,
+                        this.GetId(wt),
+                        this.outQueue.Count,
+                        totalItemsProcessed,
+                        this.totalItemsProcessedByThisProcessor,
+                        wt);
                 }
                 catch (Exception e)
                 {
@@ -287,7 +311,7 @@ namespace Fabric.Databus.PipelineSteps
             var isLastThreadForThisTask = currentProcessorCount < 1;
             await this.CompleteAsync(this.workItemQueryId, isLastThreadForThisTask);
 
-            this.MyLogger.Verbose($"Completed {this.workItemQueryId}: queue: {this.InQueue.Count}");
+            this.MyLogger.Verbose("Completed {QueryId}: queue: {InQueueCount}", this.workItemQueryId, this.InQueue.Count);
 
             this.LogToConsole(null, null, PipelineStepState.Completed, 0);
         }
@@ -505,9 +529,10 @@ namespace Fabric.Databus.PipelineSteps
         ///     The query Id.
         /// </param>
         /// <param name="pipelineStepState">
-        ///     The pipo Step State.
+        ///     The pipeline Step State.
         /// </param>
-        /// <param name="batchNumber"></param>
+        /// <param name="batchNumber">
+        /// batch number</param>
         private void LogToConsole(string id1, string queryId, PipelineStepState pipelineStepState, int batchNumber)
         {
             var timeElapsedProcessing = queryId != null && ProcessingTimeByQueryId.ContainsKey(queryId)
@@ -518,26 +543,37 @@ namespace Fabric.Databus.PipelineSteps
                                               ? TotalItemsAddedToOutputQueueByQueryId[this.workItemQueryId]
                                               : totalItemsAddedToOutputQueue;
 
-            this.progressMonitor.SetProgressItem(new ProgressMonitorItem
+            var progressMonitorItem = new ProgressMonitorItem
+                                          {
+                                              StepNumber = this.stepNumber,
+                                              BatchNumber = batchNumber,
+                                              QueryId = queryId,
+                                              LoggerName = this.LoggerName,
+                                              Id = id1,
+                                              UniqueStepId = this.UniqueId,
+                                              InQueueCount = this.InQueue.Count,
+                                              InQueueName = this.InQueue.Name,
+                                              State = pipelineStepState,
+                                              TimeElapsedProcessing = timeElapsedProcessing,
+                                              TimeElapsedBlocked = blockedTime,
+                                              TotalItemsProcessed = totalItemsProcessed,
+                                              TotalItemsAddedToOutputQueue = itemsAddedToOutputQueue,
+                                              OutQueueName = this.outQueue.Name,
+                                              QueueProcessorCount = processorCount,
+                                              MaxQueueProcessorCount = maxProcessorCount,
+                                              ErrorText = errorText,
+                                          };
+
+            this.progressMonitor.SetProgressItem(progressMonitorItem);
+
+            if (pipelineStepState != PipelineStepState.Starting && pipelineStepState != PipelineStepState.Completed)
             {
-                StepNumber = this.stepNumber,
-                BatchNumber = batchNumber,
-                QueryId = queryId,
-                LoggerName = this.LoggerName,
-                Id = id1,
-                UniqueStepId = this.UniqueId,
-                InQueueCount = this.InQueue.Count,
-                InQueueName = this.InQueue.Name,
-                State = pipelineStepState,
-                TimeElapsedProcessing = timeElapsedProcessing,
-                TimeElapsedBlocked = blockedTime,
-                TotalItemsProcessed = totalItemsProcessed,
-                TotalItemsAddedToOutputQueue = itemsAddedToOutputQueue,
-                OutQueueName = this.outQueue.Name,
-                QueueProcessorCount = processorCount,
-                MaxQueueProcessorCount = maxProcessorCount,
-                ErrorText = errorText,
-            });
+                this.MyLogger.Verbose("{PipelineStep} [{BatchNumber}] ({State}): {@ProgressMonitorItem}", this.LoggerName, batchNumber, pipelineStepState, progressMonitorItem);
+            }
+            else
+            {
+                this.MyLogger.Information("{PipelineStep} [{BatchNumber}] ({State}): {@ProgressMonitorItem}", this.LoggerName, batchNumber, pipelineStepState, progressMonitorItem);
+            }
 
             if (pipelineStepState == PipelineStepState.Completed)
             {

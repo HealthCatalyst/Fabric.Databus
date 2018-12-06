@@ -37,7 +37,7 @@ namespace Fabric.Databus.SqlGenerator
         /// <summary>
         /// Gets the top filter count.
         /// </summary>
-        protected int TopFilterCount { get; private set; }
+        protected int TopFilterCount { get; private set; } = -1;
 
         /// <summary>
         /// Gets the query for cte.
@@ -152,7 +152,7 @@ namespace Fabric.Databus.SqlGenerator
         protected virtual void AppendSelectStatement(StringBuilder sb, string destinationEntity)
         {
             sb.AppendLine("SELECT");
-            if (this.TopFilterCount > 0)
+            if (this.TopFilterCount >= 0)
             {
                 sb.AppendLine($"TOP {this.TopFilterCount}");
             }

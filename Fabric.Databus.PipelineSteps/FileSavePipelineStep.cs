@@ -120,7 +120,7 @@ namespace Fabric.Databus.PipelineSteps
                 await semaphoreSlim.WaitAsync();
                 try
                 {
-                    this.MyLogger.Verbose($"Saving file: {path} ");
+                    this.MyLogger.Verbose("Saving file: {path}", path);
 
                     if (this.Config.CompressFiles)
                     {
@@ -146,7 +146,7 @@ namespace Fabric.Databus.PipelineSteps
                         }
                     }
 
-                    this.MyLogger.Verbose($"Saved file: {path} ");
+                    this.MyLogger.Verbose("Saved file: {path}", path);
                 }
                 finally
                 {

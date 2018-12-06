@@ -112,7 +112,7 @@ namespace Fabric.Databus.PipelineSteps
                     doLogContent: false,
                     doCompress: this.Config.CompressFiles);
 
-            this.MyLogger.Verbose($"Uploaded batch: {wt.BatchNumber} ");
+            this.MyLogger.Verbose("Uploaded batch: {BatchNumber}", wt.BatchNumber);
         }
     }
 }

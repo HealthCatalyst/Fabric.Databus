@@ -127,7 +127,7 @@ namespace Fabric.Databus.PipelineSteps
                 await this.elasticSearchUploader.SendNestedMappingFileToHostsAsync(1, wt.Stream, doLogContent: true, doCompress: false);
             }
 
-            this.MyLogger.Verbose($"Uploaded mapping file: {wt.PropertyName} ");
+            this.MyLogger.Verbose("Uploaded mapping file: {PropertyName} {@wt}", wt.PropertyName, wt);
         }
     }
 }

@@ -55,6 +55,9 @@
               <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="UseMultipleThreads"/>
               <xs:element minOccurs="0" maxOccurs="1" type="xs:positiveInteger" name="SqlCommandTimeoutInSeconds"/>
               <xs:element minOccurs="0" maxOccurs="1" type="pipelineName" name="Pipeline"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="LogToSeq"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:boolean" name="LogVerbose"/>
+              <xs:element minOccurs="0" maxOccurs="1" type="xs:string" name="LogFile"/>
             </xs:all>
           </xs:complexType>
         </xs:element>

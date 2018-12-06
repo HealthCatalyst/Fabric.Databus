@@ -161,7 +161,7 @@ namespace Fabric.Databus.PipelineSteps
 
                     await this.AddBatchCompletionMessageToOutputQueueAsync(currentBatchNumber);
 
-                    await this.WaitTillOutputQueueIsEmptyAsync();
+                    await this.WaitTillOutputQueueIsEmptyAsync(currentBatchNumber);
                 }
             }
 

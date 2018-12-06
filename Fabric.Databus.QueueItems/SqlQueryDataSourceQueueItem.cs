@@ -46,9 +46,7 @@ namespace Fabric.Databus.QueueItems
         /// </summary>
         public string End { get; set; }
 
-        /// <summary>
-        /// Gets or sets the batch number.
-        /// </summary>
+        /// <inheritdoc />
         public int BatchNumber { get; set; }
 
         /// <summary>

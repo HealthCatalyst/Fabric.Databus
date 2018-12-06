@@ -123,5 +123,10 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// Gets or sets the unique step id.
         /// </summary>
         public int UniqueStepId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the batch number.
+        /// </summary>
+        public int BatchNumber { get; set; }
     }
 }

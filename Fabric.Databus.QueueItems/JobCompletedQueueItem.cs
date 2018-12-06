@@ -22,5 +22,7 @@ namespace Fabric.Databus.QueueItems
 
         /// <inheritdoc />
         public string PropertyName { get; set; }
+
+        public int BatchNumber { get; set; }
     }
 }

@@ -23,5 +23,10 @@ namespace Fabric.Databus.Interfaces.Queues
         /// Gets or sets the property name.
         /// </summary>
         string PropertyName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the batch number.
+        /// </summary>
+        int BatchNumber { get; set; }
     }
 }

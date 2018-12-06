@@ -207,7 +207,7 @@ namespace Fabric.Databus.PipelineSteps
             var isFirstThreadForThisTask = currentProcessorCount < 2;
             await this.BeginAsync(isFirstThreadForThisTask);
 
-            this.LogToConsole(null, null, PipelineStepState.Starting);
+            this.LogToConsole(null, null, PipelineStepState.Starting, 0);
 
             this.workItemQueryId = null;
             var stopWatch = new Stopwatch();
@@ -289,7 +289,7 @@ namespace Fabric.Databus.PipelineSteps
 
             this.MyLogger.Verbose($"Completed {this.workItemQueryId}: queue: {this.InQueue.Count}");
 
-            this.LogToConsole(null, null, PipelineStepState.Completed);
+            this.LogToConsole(null, null, PipelineStepState.Completed, 0);
         }
 
         /// <inheritdoc />
@@ -371,7 +371,7 @@ namespace Fabric.Databus.PipelineSteps
         {
             var myId = this.GetId(wt);
 
-            this.LogToConsole(myId, wt.QueryId, pipelineStepState);
+            this.LogToConsole(myId, wt.QueryId, pipelineStepState, wt.BatchNumber);
         }
 
         /// <summary>
@@ -482,12 +482,15 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The wait till output queue is empty async.
         /// </summary>
+        /// <param name="batchNumber">
+        /// The batch Number.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected async Task WaitTillOutputQueueIsEmptyAsync()
+        protected async Task WaitTillOutputQueueIsEmptyAsync(int batchNumber)
         {
-            this.LogToConsole(null, null, PipelineStepState.Waiting);
+            this.LogToConsole(null, null, PipelineStepState.Waiting, batchNumber);
             while (this.outQueue.Any())
             {
                 await Task.Delay(1000, this.cancellationToken);
@@ -498,15 +501,16 @@ namespace Fabric.Databus.PipelineSteps
         /// The log to console.
         /// </summary>
         /// <param name="id1">
-        /// The id.
+        ///     The id.
         /// </param>
         /// <param name="queryId">
-        /// The query Id.
+        ///     The query Id.
         /// </param>
         /// <param name="pipelineStepState">
-        /// The pipo Step State.
+        ///     The pipo Step State.
         /// </param>
-        private void LogToConsole(string id1, string queryId, PipelineStepState pipelineStepState)
+        /// <param name="batchNumber"></param>
+        private void LogToConsole(string id1, string queryId, PipelineStepState pipelineStepState, int batchNumber)
         {
             var timeElapsedProcessing = queryId != null && ProcessingTimeByQueryId.ContainsKey(queryId)
                                             ? ProcessingTimeByQueryId[queryId]
@@ -519,6 +523,7 @@ namespace Fabric.Databus.PipelineSteps
             this.progressMonitor.SetProgressItem(new ProgressMonitorItem
             {
                 StepNumber = this.stepNumber,
+                BatchNumber = batchNumber,
                 QueryId = queryId,
                 LoggerName = this.LoggerName,
                 Id = id1,

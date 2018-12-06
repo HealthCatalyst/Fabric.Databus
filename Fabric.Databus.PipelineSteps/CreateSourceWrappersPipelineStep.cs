@@ -40,7 +40,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The source wrapper collection.
         /// </summary>
-        private readonly SourceWrapperCollection sourceWrapperCollection = new SourceWrapperCollection();
+        private SourceWrapperCollection sourceWrapperCollection = new SourceWrapperCollection();
 
         /// <summary>
         /// The folder.
@@ -126,6 +126,9 @@ namespace Fabric.Databus.PipelineSteps
                     SourceWrapperCollection = this.sourceWrapperCollection
                 });
             }
+
+            // start a new collection for next batch
+            this.sourceWrapperCollection = new SourceWrapperCollection();
 
             return base.CompleteAsync(queryId, isLastThreadForThisTask);
         }

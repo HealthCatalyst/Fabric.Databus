@@ -26,10 +26,5 @@ namespace Fabric.Databus.Interfaces.Queues
         /// Gets or sets the document.
         /// </summary>
         JObject Document { get; set; }
-
-        /// <summary>
-        /// Gets or sets the batch number.
-        /// </summary>
-        int BatchNumber { get; set; }
     }
 }

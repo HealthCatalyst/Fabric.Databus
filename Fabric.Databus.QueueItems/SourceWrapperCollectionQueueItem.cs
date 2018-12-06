@@ -32,9 +32,7 @@ namespace Fabric.Databus.QueueItems
         [JsonIgnore]
         public SourceWrapperCollection SourceWrapperCollection { get; set; }
 
-        /// <summary>
-        /// Gets or sets the batch number.
-        /// </summary>
+        /// <inheritdoc />
         public int BatchNumber { get; set; }
     }
 }

@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Client
 {
     using System.Diagnostics;
+    using System.IO;
     using System.Threading;
 
     using Fabric.Databus.Config;
@@ -76,19 +77,22 @@ namespace Fabric.Databus.Client
                 }
                 else
                 {
-                    var configuration = new ConfigurationBuilder()
-                        .SetBasePath(System.AppContext.BaseDirectory)
-                        // ReSharper disable once StringLiteralTypo
-                        .AddJsonFile("serilog-config.json")
-                        .Build();
+                    if (File.Exists(Path.Combine(System.AppContext.BaseDirectory, "serilog-config.json")))
+                    {
+                        var configuration = new ConfigurationBuilder()
+                            .SetBasePath(System.AppContext.BaseDirectory)
+                            // ReSharper disable once StringLiteralTypo
+                            .AddJsonFile("serilog-config.json")
+                            .Build();
 
-                    ILogger logger = new LoggerConfiguration()
-                        .ReadFrom.Configuration(configuration)
-                        .CreateLogger();
-                    container.RegisterInstance(logger);
+                        ILogger logger = new LoggerConfiguration()
+                            .ReadFrom.Configuration(configuration)
+                            .CreateLogger();
+                        container.RegisterInstance(logger);
 
 
-                    logger.Information("DatabusRunner start from serilog-config.json");
+                        logger.Information("DatabusRunner start from serilog-config.json");
+                    }
                 }
             }
 

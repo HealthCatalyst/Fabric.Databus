@@ -17,7 +17,7 @@
         <dependency id="Serilog.Sinks.File" version="4.0.0" exclude="Build,Analyzers" />
         <dependency id="Serilog.Sinks.Seq" version="4.0.0" exclude="Build,Analyzers" />
         <dependency id="System.Data.SqlClient" version="4.6.0" exclude="Build,Analyzers" />
-        <dependency id="Unity" version="5.8.12" exclude="Build,Analyzers" />
+        <dependency id="Unity" version="5.8.13" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>

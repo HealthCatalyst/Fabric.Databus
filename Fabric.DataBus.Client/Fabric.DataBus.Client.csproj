@@ -43,7 +43,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
-    <PackageReference Include="Unity" Version="5.8.12" />
+    <PackageReference Include="Unity" Version="5.8.13" />
   </ItemGroup>
 
   <ItemGroup>

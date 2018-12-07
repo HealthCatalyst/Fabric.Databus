@@ -10,10 +10,10 @@
 namespace Fabric.Databus.Integration.Tests
 {
     using System.Data.Common;
-    using System.Data.SQLite;
 
     using Fabric.Databus.Interfaces.Sql;
 
+    /// <inheritdoc />
     /// <summary>
     /// The sql lite connection factory.
     /// </summary>

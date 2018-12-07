@@ -405,7 +405,7 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<ISqlConnectionFactory>())
             {
-                this.container.RegisterType<ISqlConnectionFactory, SqlConnectionFactory>();
+                this.container.RegisterType<ISqlConnectionFactory, ReliableSqlConnectionFactory>();
             }
 
             if (!this.container.IsRegistered<IDatabusSqlReader>())

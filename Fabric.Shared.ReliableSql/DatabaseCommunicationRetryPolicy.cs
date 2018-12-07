@@ -38,7 +38,20 @@ namespace Fabric.Shared.ReliableSql
         /// <summary>
         /// The _sql exceptions.
         /// </summary>
-        private readonly int[] sqlExceptions = new[] { 53, -2 };
+        private readonly int[] sqlExceptions =
+            {
+                -2, /* timeout */ 53, // connection failure
+                701, // Out of Memory
+                1204, // Lock Issue
+                1205, // Deadlock Victim
+                1222, // Lock request time out period exceeded.
+                7214, // Remote procedure time out of %d seconds exceeded. Remote procedure '%.*ls' is canceled.
+                7604, // Full-text operation failed due to a time out.
+                7618, // %d is not a valid value for a full-text connection time out.
+                8628, // A time out occurred while waiting to optimize the query. Rerun the query.
+                8645, // A time out occurred while waiting for memory resources to execute the query. Rerun the query.
+                8651 // Low memory condition
+            };
 
         /// <summary>
         /// The _retry policy async.

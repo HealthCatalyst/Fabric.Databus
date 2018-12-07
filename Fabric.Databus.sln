@@ -111,8 +111,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.Client", "Fabric.Databus.Client\Fabric.Databus.Client.csproj", "{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.ElasticSearchConsole", "Fabric.Databus.ElasticSearchConsole\Fabric.Databus.ElasticSearchConsole.csproj", "{DBA64266-AF85-4627-81F6-6183D62858FF}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Nuget.Console", "Fabric.Databus.Nuget.Console\Fabric.Databus.Nuget.Console.csproj", "{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.SqlGenerator", "Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj", "{104C7335-D0B6-4587-A1A9-843C69042AE2}"
@@ -123,7 +121,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.PipelineStep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.TestApi", "Fabric.Databus.TestApi\Fabric.Databus.TestApi.csproj", "{72165061-6027-42EC-993A-90117B1B3ECA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.ReliableSql", "Fabric.Shared.ReliableSql\Fabric.Shared.ReliableSql.csproj", "{1094F52A-6684-4ACB-A875-E76D205DE0D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared.ReliableSql", "Fabric.Shared.ReliableSql\Fabric.Shared.ReliableSql.csproj", "{1094F52A-6684-4ACB-A875-E76D205DE0D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -215,10 +213,6 @@ Global
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DBA64266-AF85-4627-81F6-6183D62858FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DBA64266-AF85-4627-81F6-6183D62858FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DBA64266-AF85-4627-81F6-6183D62858FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DBA64266-AF85-4627-81F6-6183D62858FF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -276,7 +270,6 @@ Global
 		{653263D1-A870-4A19-919D-0F56BA7870B9} = {8E854DC5-EBE7-4581-81F6-EAA4AA10A871}
 		{BCCDABF8-94F7-4D4E-812A-908E8A436B14} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{0B223EE6-7D5E-4D45-AA4D-3417F691BBA4} = {653263D1-A870-4A19-919D-0F56BA7870B9}
-		{DBA64266-AF85-4627-81F6-6183D62858FF} = {E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}
 		{861B3FD1-2DCA-494E-A442-5DDF2F3CE8EB} = {E4FEF435-44CC-4F2A-8AEF-8317C410EB4C}
 		{104C7335-D0B6-4587-A1A9-843C69042AE2} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{E225637C-63A6-4740-9A02-9643C2C9852A} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}

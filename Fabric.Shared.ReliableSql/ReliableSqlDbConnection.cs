@@ -9,7 +9,6 @@
 
 namespace Fabric.Shared.ReliableSql
 {
-    using System;
     using System.Data;
     using System.Data.Common;
     using System.Data.SqlClient;
@@ -27,20 +26,23 @@ namespace Fabric.Shared.ReliableSql
         /// </summary>
         private readonly IReliableRetryPolicy retryPolicy;
 
-        /// <summary>
-        /// The connection string.
-        /// </summary>
-        private string connectionString;
+        /// <inheritdoc />
+        public ReliableSqlDbConnection(
+            SqlConnection connection,
+            IReliableRetryPolicy retryPolicy)
+        {
+            this.retryPolicy = retryPolicy;
+            this.underlyingConnection = connection;
+        }
 
         /// <inheritdoc />
         public ReliableSqlDbConnection(
             string connectionString,
             IReliableRetryPolicy retryPolicy)
+        : this(new SqlConnection(connectionString), retryPolicy)
         {
-            this.connectionString = connectionString;
-            this.retryPolicy = retryPolicy;
-            this.underlyingConnection = new SqlConnection(connectionString);
         }
+
 
         /// <inheritdoc />
         public ReliableSqlDbConnection(
@@ -52,16 +54,9 @@ namespace Fabric.Shared.ReliableSql
         /// <inheritdoc />
         public override string ConnectionString
         {
-            get
-            {
-                return this.connectionString;
-            }
+            get => this.underlyingConnection.ConnectionString;
 
-            set
-            {
-                this.connectionString = value;
-                this.underlyingConnection.ConnectionString = value;
-            }
+            set => this.underlyingConnection.ConnectionString = value;
         }
 
         /// <inheritdoc />
@@ -124,8 +119,6 @@ namespace Fabric.Shared.ReliableSql
 
                 this.underlyingConnection.Dispose();
             }
-
-            GC.SuppressFinalize(this);
         }
     }
 }

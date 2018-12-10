@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Interfaces.Http
+namespace Fabric.Shared.ReliableHttp.Interfaces
 {
     using System.Net.Http;
 

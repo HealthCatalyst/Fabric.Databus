@@ -31,7 +31,7 @@ namespace Fabric.Databus.Http
         public HttpStatusCode StatusCode { get; set; }
 
         /// <inheritdoc />
-        public string ResponseContent { get; set; }
+        public HttpContent ResponseContent { get; set; }
 
         /// <inheritdoc />
         public string RequestContent { get; set; }

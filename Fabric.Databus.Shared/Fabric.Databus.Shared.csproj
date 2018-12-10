@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj" />
     <ProjectReference Include="..\Fabric.Databus.ProgressMonitors\Fabric.Databus.ProgressMonitors.csproj" />
     <ProjectReference Include="..\Fabric.Databus.ZipCodeToGeoCode\Fabric.Databus.ZipCodeToGeoCode.csproj" />
+    <ProjectReference Include="..\Fabric.Shared.ReliableHttp\Fabric.Shared.ReliableHttp.csproj" />
     <ProjectReference Include="..\Fabric.Shared.ReliableSql\Fabric.Shared.ReliableSql.csproj" />
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj" />
   </ItemGroup>

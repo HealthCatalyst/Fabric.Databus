@@ -58,6 +58,9 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Polly, Version=6.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Polly.6.1.2\lib\netstandard2.0\Polly.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.2.7.1\lib\net46\Serilog.dll</HintPath>
     </Reference>
@@ -183,6 +186,10 @@
     <ProjectReference Include="..\Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj">
       <Project>{104c7335-d0b6-4587-a1a9-843c69042ae2}</Project>
       <Name>Fabric.Databus.SqlGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Fabric.Shared.ReliableHttp\Fabric.Shared.ReliableHttp.csproj">
+      <Project>{58da6e99-8dd9-4778-975e-c549e035b1cd}</Project>
+      <Name>Fabric.Shared.ReliableHttp</Name>
     </ProjectReference>
     <ProjectReference Include="..\Fabric.Shared.Tests\Fabric.Shared.Tests.csproj">
       <Project>{95cd492e-6d4a-4d9f-a307-1ccadd7bb0ed}</Project>

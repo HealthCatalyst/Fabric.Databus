@@ -11,6 +11,7 @@ namespace Fabric.Databus.Interfaces.Http
 {
     using System.Collections.Generic;
     using System.Net.Http;
+    using System.Threading;
 
     /// <summary>
     /// The FileUploaderFactory interface.
@@ -26,9 +27,10 @@ namespace Fabric.Databus.Interfaces.Http
         /// <param name="method">
         /// The method.
         /// </param>
+        /// <param name="cancellationToken"></param>
         /// <returns>
         /// The <see cref="IFileUploader"/>.
         /// </returns>
-        IFileUploader Create(List<string> urls, HttpMethod method);
+        IFileUploader Create(List<string> urls, HttpMethod method, CancellationToken cancellationToken);
     }
 }

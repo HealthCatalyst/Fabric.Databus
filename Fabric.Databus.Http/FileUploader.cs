@@ -14,12 +14,13 @@ namespace Fabric.Databus.Http
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Net;
     using System.Net.Http;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Fabric.Databus.Interfaces.Http;
+    using Fabric.Shared.ReliableHttp;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     using Serilog;
 
@@ -42,7 +43,7 @@ namespace Fabric.Databus.Http
         /// <summary>
         /// The http client helper.
         /// </summary>
-        protected readonly HttpClientHelper HttpClientHelper;
+        protected readonly ReliableHttpClient reliableHttpClient;
 
         /// <summary>
         /// The logger.
@@ -53,11 +54,6 @@ namespace Fabric.Databus.Http
         /// The hosts.
         /// </summary>
         protected List<string> hosts;
-
-        /// <summary>
-        /// The http response interceptor.
-        /// </summary>
-        private readonly IHttpResponseInterceptor httpResponseInterceptor;
 
         protected readonly HttpMethod httpMethod;
 
@@ -94,20 +90,25 @@ namespace Fabric.Databus.Http
         /// <param name="httpResponseInterceptor">
         ///     http response interceptor</param>
         /// <param name="httpMethod">http method</param>
+        /// <param name="cancellationToken">cancellation token</param>
         public FileUploader(
             ILogger logger,
             List<string> hosts,
             IHttpClientFactory httpClientFactory,
             IHttpRequestInterceptor httpRequestInterceptor,
             IHttpResponseInterceptor httpResponseInterceptor,
-            HttpMethod httpMethod)
+            HttpMethod httpMethod,
+            CancellationToken cancellationToken)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.hosts = hosts;
-            this.httpResponseInterceptor = httpResponseInterceptor ?? throw new ArgumentNullException(nameof(httpResponseInterceptor));
             this.httpMethod = httpMethod ?? throw new ArgumentNullException(nameof(httpMethod));
 
-            this.HttpClientHelper = new HttpClientHelper(httpClientFactory, httpRequestInterceptor);
+            this.reliableHttpClient = new ReliableHttpClient(
+                cancellationToken,
+                httpClientFactory,
+                httpRequestInterceptor,
+                httpResponseInterceptor);
         }
 
         /// <inheritdoc />
@@ -178,18 +179,14 @@ namespace Fabric.Databus.Http
                 this.Stopwatch.Reset();
 
                 var response = doCompress
-                                   ? await this.HttpClientHelper.SendAsyncStreamCompressed(url, this.httpMethod, stream)
-                                   : await this.HttpClientHelper.SendAsyncStream(url, this.httpMethod, stream);
+                                   ? await this.reliableHttpClient.SendAsyncStreamCompressed(url, this.httpMethod, stream)
+                                   : await this.reliableHttpClient.SendAsyncStream(url, this.httpMethod, stream);
 
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                this.httpResponseInterceptor.InterceptResponse(this.httpMethod, url, requestContent, response.StatusCode, responseContent, this.Stopwatch.ElapsedMilliseconds);
+                var responseContent = response.ResponseContent;
 
                 if (response.IsSuccessStatusCode)
                 {
                     Interlocked.Decrement(ref this.currentRequests);
-
-
                 }
                 else
                 {

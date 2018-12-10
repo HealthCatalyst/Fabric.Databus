@@ -7,9 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Interfaces.Http
+namespace Fabric.Shared.ReliableHttp.Interfaces
 {
     using System;
+    using System.IO;
     using System.Net;
     using System.Net.Http;
 
@@ -42,9 +43,9 @@ namespace Fabric.Databus.Interfaces.Http
         void InterceptResponse(
             HttpMethod httpMethod,
             Uri fullUri,
-            string requestContent,
+            Stream requestContent,
             HttpStatusCode responseStatusCode,
-            string responseContent,
+            HttpContent responseContent,
             long stopwatchElapsedMilliseconds);
     }
 }

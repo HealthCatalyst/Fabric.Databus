@@ -28,6 +28,7 @@ namespace PipelineStep.Tests
     using Fabric.Databus.QueueItems;
     using Fabric.Databus.Shared.FileWriters;
     using Fabric.Databus.Shared.Queues;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -116,7 +117,13 @@ namespace PipelineStep.Tests
 
                 var mockHttpResponseInjector = mockRepository.Create<IHttpResponseInterceptor>();
                 mockHttpResponseInjector.Setup(
-                    service => service.InterceptResponse(HttpMethod.Put, It.IsAny<Uri>(), It.IsAny<string>(), It.IsAny<HttpStatusCode>(), It.IsAny<string>(), It.IsAny<long>()));
+                    service => service.InterceptResponse(
+                        HttpMethod.Put,
+                        It.IsAny<Uri>(),
+                        It.IsAny<Stream>(),
+                        It.IsAny<HttpStatusCode>(),
+                        It.IsAny<HttpContent>(),
+                        It.IsAny<long>()));
 
                 var fileUploader = new FileUploader(
                     logger,
@@ -124,7 +131,8 @@ namespace PipelineStep.Tests
                     mockHttpClientFactory.Object,
                     mockHttpRequestInjector.Object,
                     mockHttpResponseInjector.Object,
-                    HttpMethod.Put);
+                    HttpMethod.Put,
+                    CancellationToken.None);
 
                 IEntityJsonWriter entityJsonWriter = new EntityJsonWriter();
 

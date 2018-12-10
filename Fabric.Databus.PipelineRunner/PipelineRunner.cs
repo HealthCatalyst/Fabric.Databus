@@ -39,6 +39,8 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
     using Fabric.Databus.SqlGenerator;
+    using Fabric.Shared.ReliableHttp.Interceptors;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     using QueueItems;
 
@@ -178,7 +180,7 @@ namespace Fabric.Databus.PipelineRunner
             var processors = this.GetPipelineByName(config.Pipeline, config);
 
             var fileUploaderFactory = this.container.Resolve<IFileUploaderFactory>();
-            var fileUploader = fileUploaderFactory.Create(config.Urls, config.UrlMethod);
+            var fileUploader = fileUploaderFactory.Create(config.Urls, config.UrlMethod, this.cancellationTokenSource.Token);
             this.container.RegisterInstance(fileUploader);
 
             var pipelineExecutorFactory = this.container.Resolve<IPipelineExecutorFactory>();

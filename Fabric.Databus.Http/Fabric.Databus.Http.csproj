@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Interfaces\Fabric.Databus.Interfaces.csproj" />
+    <ProjectReference Include="..\Fabric.Shared.ReliableHttp\Fabric.Shared.ReliableHttp.csproj" />
   </ItemGroup>
 
 </Project>

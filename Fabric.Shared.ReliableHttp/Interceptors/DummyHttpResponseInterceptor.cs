@@ -7,13 +7,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Http
+namespace Fabric.Shared.ReliableHttp.Interceptors
 {
     using System;
+    using System.IO;
     using System.Net;
     using System.Net.Http;
 
-    using Fabric.Databus.Interfaces.Http;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     /// <inheritdoc />
     public class DummyHttpResponseInterceptor : IHttpResponseInterceptor
@@ -22,9 +23,9 @@ namespace Fabric.Databus.Http
         public void InterceptResponse(
             HttpMethod httpMethod,
             Uri fullUri,
-            string requestContent,
+            Stream requestContent,
             HttpStatusCode responseStatusCode,
-            string responseContent,
+            HttpContent responseContent,
             long stopwatchElapsedMilliseconds)
         {
         }

@@ -10,6 +10,7 @@
 namespace Fabric.Shared.ReliableHttp.Events
 {
     using System;
+    using System.Net.Http;
 
     /// <summary>
     /// The navigated event args.
@@ -35,7 +36,7 @@ namespace Fabric.Shared.ReliableHttp.Events
         /// <param name="response">
         /// The response.
         /// </param>
-        public NavigatedEventArgs(string resourceId, string method, Uri fullUri, string statusCode, string response)
+        public NavigatedEventArgs(string resourceId, string method, Uri fullUri, string statusCode, HttpContent response)
         {
             this.Method = method;
             this.FullUri = fullUri;
@@ -57,7 +58,7 @@ namespace Fabric.Shared.ReliableHttp.Events
         /// <summary>
         /// Gets the response.
         /// </summary>
-        public string Response { get; }
+        public HttpContent Response { get; }
 
         /// <summary>
         /// Gets the resource id.

@@ -10,15 +10,20 @@
 namespace Fabric.Shared.ReliableHttp
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
+    using System.IO.Compression;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Runtime.CompilerServices;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Fabric.Shared.ReliableHttp.Events;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     using Polly;
     using Polly.Retry;
@@ -28,6 +33,10 @@ namespace Fabric.Shared.ReliableHttp
     /// </summary>
     public class ReliableHttpClient
     {
+        /// <summary>
+        /// The content type header.
+        /// </summary>
+        private const string ContentTypeHeader = "application/json";
 
         /// <summary>
         /// The seconds between retries.
@@ -40,20 +49,19 @@ namespace Fabric.Shared.ReliableHttp
         private const int MaxRetryCount = 5;
 
         /// <summary>
-        /// The application json media type.
+        /// The http request injector.
         /// </summary>
-        private const string ApplicationJsonMediaType = "application/json";
+        private readonly IHttpRequestInterceptor httpRequestInterceptor;
 
         /// <summary>
-        /// The http timeout.
+        /// The http response interceptor.
         /// </summary>
-        private static readonly TimeSpan HttpTimeout = TimeSpan.FromMinutes(5);
+        private readonly IHttpResponseInterceptor httpResponseInterceptor;
 
         /// <summary>
-        /// The _http client.
-        /// make HttpClient static per https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
+        /// The http client factory.
         /// </summary>
-        private static HttpClient httpClient;
+        private readonly IHttpClientFactory httpClientFactory;
 
         /// <summary>
         /// The http status codes worth retrying.
@@ -74,23 +82,31 @@ namespace Fabric.Shared.ReliableHttp
         /// </summary>
         private readonly CancellationToken cancellationToken;
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ReliableHttpClient"/> class.
         /// </summary>
-        /// <param name="httpClientHandler">
-        /// The http Client Handler.
-        /// </param>
         /// <param name="cancellationToken">
         /// The cancellation token.
         /// </param>
-        public ReliableHttpClient(HttpMessageHandler httpClientHandler, CancellationToken cancellationToken)
+        /// <param name="httpClientFactory">
+        /// The http Client Factory.
+        /// </param>
+        /// <param name="httpRequestInterceptor">
+        /// The http Request Interceptor.
+        /// </param>
+        /// <param name="httpResponseInterceptor">
+        /// The http Response Interceptor.
+        /// </param>
+        public ReliableHttpClient(
+            CancellationToken cancellationToken,
+            IHttpClientFactory httpClientFactory,
+            IHttpRequestInterceptor httpRequestInterceptor,
+            IHttpResponseInterceptor httpResponseInterceptor)
         {
             this.cancellationToken = cancellationToken;
-            if (httpClient == null)
-            {
-                httpClient = CreateHttpClient(httpClientHandler);
-            }
+            this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            this.httpRequestInterceptor = httpRequestInterceptor ?? throw new ArgumentNullException(nameof(httpRequestInterceptor));
+            this.httpResponseInterceptor = httpResponseInterceptor ?? throw new ArgumentNullException(nameof(httpResponseInterceptor));
         }
 
         /// <summary>
@@ -109,14 +125,6 @@ namespace Fabric.Shared.ReliableHttp
         public event TransientErrorEventHandler TransientError;
 
         /// <summary>
-        /// The clear http client.
-        /// </summary>
-        public static void ClearHttpClient()
-        {
-            httpClient = null;
-        }
-
-        /// <summary>
         /// The Send Async
         /// </summary>
         /// <param name="httpMethod">
@@ -133,7 +141,7 @@ namespace Fabric.Shared.ReliableHttp
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task SendAsync(HttpMethod httpMethod, string resourceId, Uri fullUri, Stream stream)
+        public async Task<SendAsyncResult> SendAsync(HttpMethod httpMethod, string resourceId, Uri fullUri, Stream stream)
         {
             var method = Convert.ToString(httpMethod);
 
@@ -141,56 +149,291 @@ namespace Fabric.Shared.ReliableHttp
 
             var policy = this.GetRetryPolicy(resourceId, method, fullUri);
 
+            var stopwatch = new Stopwatch();
+
             var httpResponse = await policy.ExecuteAsync(
                                    async () =>
                                        {
                                            using (var httpRequestMessage = new HttpRequestMessage(httpMethod, fullUri))
                                            {
-                                               using (var requestContent = new MultipartFormDataContent())
+                                               // StreamContent disposes the stream when it is done so we need to keep a copy for retries
+                                               var memoryStream = new MemoryStream();
+                                               // ReSharper disable once AccessToDisposedClosure
+                                               stream.Seek(0, SeekOrigin.Begin);
+                                               // ReSharper disable once AccessToDisposedClosure
+                                               await stream.CopyToAsync(memoryStream);
+
+                                               memoryStream.Seek(0, SeekOrigin.Begin);
+
+                                               using (var requestContent = new StreamContent(memoryStream))
                                                {
-                                                   // StreamContent disposes the stream when it is done so we need to keep a copy for retries
-                                                   var memoryStream = new MemoryStream();
-                                                   // ReSharper disable once AccessToDisposedClosure
-                                                   stream.Seek(0, SeekOrigin.Begin);
-                                                   // ReSharper disable once AccessToDisposedClosure
-                                                   await stream.CopyToAsync(memoryStream);
-
-                                                   memoryStream.Seek(0, SeekOrigin.Begin);
-
-                                                   var fileContent = new StreamContent(memoryStream);
-
-                                                   requestContent.Add(fileContent);
-
                                                    httpRequestMessage.Content = requestContent;
 
-                                                   return await httpClient.SendAsync(
+                                                   this.httpRequestInterceptor.InterceptRequest(
+                                                       httpMethod,
+                                                       httpRequestMessage);
+
+                                                   return await this.httpClientFactory.Create().SendAsync(
                                                               httpRequestMessage,
                                                               this.cancellationToken);
                                                }
                                            }
                                        });
 
-            var content = await httpResponse.Content.ReadAsStringAsync();
-            this.OnNavigated(new NavigatedEventArgs(resourceId, method, fullUri, httpResponse.StatusCode.ToString(), content));
+            this.OnNavigated(
+                new NavigatedEventArgs(resourceId, method, fullUri, httpResponse.StatusCode.ToString(), httpResponse.Content));
+
+            this.httpResponseInterceptor.InterceptResponse(
+                httpMethod,
+                fullUri,
+                stream,
+                httpResponse.StatusCode,
+                httpResponse.Content,
+                stopwatch.ElapsedMilliseconds);
+
+            return new SendAsyncResult
+                       {
+                           ResourceId = resourceId,
+                           Method = method,
+                           Uri = fullUri,
+                           StatusCode = httpResponse.StatusCode,
+                           IsSuccessStatusCode = httpResponse.IsSuccessStatusCode,
+                           ResponseContent = httpResponse.Content
+            };
         }
 
         /// <summary>
-        /// The create http client.
+        /// The send async.
         /// </summary>
-        /// <param name="httpClientHandler">
-        /// The http client handler.
+        /// <param name="uri">
+        /// The uri.
+        /// </param>
+        /// <param name="httpMethod">
+        /// The http Method.
+        /// </param>
+        /// <param name="stringContent">
+        /// The string content.
         /// </param>
         /// <returns>
-        /// The <see cref="HttpClient"/>.
+        /// The <see cref="Task"/>.
         /// </returns>
-        private static HttpClient CreateHttpClient(HttpMessageHandler httpClientHandler)
+        public async Task<SendAsyncResult> SendAsync(Uri uri, HttpMethod httpMethod, HttpContent stringContent)
         {
-            var client = new HttpClient(httpClientHandler, false);
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ApplicationJsonMediaType));
-            client.DefaultRequestHeaders.Connection.Clear();
-            client.DefaultRequestHeaders.ConnectionClose = true;
-            client.Timeout = HttpTimeout;
-            return client;
+            var ms = new MemoryStream();
+            await stringContent.CopyToAsync(ms);
+            ms.Seek(0, SeekOrigin.Begin);
+
+            return await this.SendAsync(httpMethod, string.Empty, uri, ms);
+        }
+
+        /// <summary>
+        /// The put async file.
+        /// </summary>
+        /// <param name="uri">
+        /// The uri.
+        /// </param>
+        /// <param name="filename">
+        /// The filename.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task<SendAsyncResult> PutAsyncFile(Uri uri, string filename)
+        {
+            var allText = File.ReadAllText(filename);
+            var stringContent = new StringContent(allText, Encoding.UTF8, ContentTypeHeader);
+
+            return await this.PutAsync(uri, stringContent);
+        }
+
+        /// <summary>
+        /// The put async file compressed.
+        /// </summary>
+        /// <param name="uri">
+        /// The uri.
+        /// </param>
+        /// <param name="filename">
+        /// The filename.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ConfiguredTaskAwaitable"/>.
+        /// </returns>
+        public async Task<SendAsyncResult> PutAsyncFileCompressed(
+            Uri uri,
+            string filename)
+        {
+            var allText = File.ReadAllText(filename);
+            byte[] jsonBytes = Encoding.UTF8.GetBytes(allText);
+            var ms = new MemoryStream();
+            using (var gzip = new GZipStream(ms, CompressionMode.Compress, true))
+            {
+                gzip.Write(jsonBytes, 0, jsonBytes.Length);
+            }
+
+            ms.Position = 0;
+            var content = new StreamContent(ms);
+            content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
+            content.Headers.ContentEncoding.Add("gzip");
+
+            return await this.PutAsync(uri, content).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// The put async stream compressed.
+        /// </summary>
+        /// <param name="url">
+        ///     the url
+        /// </param>
+        /// <param name="httpMethod">http method</param>
+        /// <param name="stream">
+        ///     The stream.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ConfiguredTaskAwaitable"/>.
+        /// </returns>
+        public async Task<SendAsyncResult> SendAsyncStreamCompressed(Uri url, HttpMethod httpMethod, Stream stream)
+        {
+            stream.Position = 0;
+            var ms = new MemoryStream();
+            using (var gzip = new GZipStream(ms, CompressionMode.Compress, true))
+            {
+                stream.CopyTo(gzip);
+            }
+
+            stream.Dispose();
+
+            ms.Position = 0;
+            var content = new StreamContent(ms);
+            content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
+            content.Headers.ContentEncoding.Add("gzip");
+
+            return await this.SendAsync(url, httpMethod, content).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// The put async stream.
+        /// </summary>
+        /// <param name="url">
+        ///     The url.
+        /// </param>
+        /// <param name="httpMethod">
+        ///     http method</param>
+        /// <param name="stream">
+        ///     The stream.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ConfiguredTaskAwaitable"/>.
+        /// </returns>
+        public async Task<SendAsyncResult> SendAsyncStream(Uri url, HttpMethod httpMethod, Stream stream)
+        {
+            stream.Position = 0;
+            MemoryStream ms = new MemoryStream();
+            stream.CopyTo(ms);
+
+            stream.Dispose();
+
+            ms.Position = 0;
+            StreamContent content = new StreamContent(ms);
+            content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
+
+            return await this.SendAsync(url, httpMethod, content).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// The put async string.
+        /// </summary>
+        /// <param name="url">
+        /// The url.
+        /// </param>
+        /// <param name="text">
+        /// The text.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task<SendAsyncResult> PutAsyncString(Uri url, string text)
+        {
+            var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
+
+            return await this.PutAsync(url, stringContent);
+        }
+
+        /// <summary>
+        /// The post async string.
+        /// </summary>
+        /// <param name="url">
+        /// The url.
+        /// </param>
+        /// <param name="text">
+        /// The text.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task<SendAsyncResult> PostAsyncString(Uri url, string text)
+        {
+            var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
+
+            return await this.PostAsync(url, stringContent);
+        }
+
+        /// <summary>
+        /// The post async.
+        /// </summary>
+        /// <param name="url">
+        /// The url.
+        /// </param>
+        /// <param name="stringContent">
+        /// The string content.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task<SendAsyncResult> PostAsync(Uri url, HttpContent stringContent)
+        {
+            return await this.SendAsync(url, HttpMethod.Post, stringContent);
+        }
+
+        /// <summary>
+        /// The delete async.
+        /// </summary>
+        /// <param name="requestUri">
+        /// The request uri.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task<HttpResponseMessage> DeleteAsync(Uri requestUri)
+        {
+            var httpMethod = HttpMethod.Delete;
+            using (var request = new HttpRequestMessage(httpMethod, requestUri))
+            {
+                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
+
+                return await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
+            }
+        }
+
+        /// <summary>
+        /// The get string async.
+        /// </summary>
+        /// <param name="host">
+        /// The host.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task<string> GetStringAsync(string host)
+        {
+            var httpMethod = HttpMethod.Get;
+            using (var request = new HttpRequestMessage(httpMethod, host))
+            {
+                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
+
+                var result = await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
+
+                return await result.Content.ReadAsStringAsync();
+            }
         }
 
         /// <summary>
@@ -226,6 +469,22 @@ namespace Fabric.Shared.ReliableHttp
             this.TransientError?.Invoke(this, e);
         }
 
+        /// <summary>
+        /// The put async.
+        /// </summary>
+        /// <param name="url">
+        /// The url.
+        /// </param>
+        /// <param name="content">
+        /// The content.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task<SendAsyncResult> PutAsync(Uri url, HttpContent content)
+        {
+            return await this.SendAsync(url, HttpMethod.Put, content);
+        }
 
         /// <summary>
         /// The get retry policy.

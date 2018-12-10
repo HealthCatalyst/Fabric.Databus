@@ -19,6 +19,7 @@
     <ProjectReference Include="..\Fabric.Databus.PipelineSteps\Fabric.Databus.PipelineSteps.csproj" />
     <ProjectReference Include="..\Fabric.Databus.Schema\Fabric.Databus.Schema.csproj" />
     <ProjectReference Include="..\Fabric.Databus.SqlGenerator\Fabric.Databus.SqlGenerator.csproj" />
+    <ProjectReference Include="..\Fabric.Shared.ReliableHttp\Fabric.Shared.ReliableHttp.csproj" />
   </ItemGroup>
 
 </Project>

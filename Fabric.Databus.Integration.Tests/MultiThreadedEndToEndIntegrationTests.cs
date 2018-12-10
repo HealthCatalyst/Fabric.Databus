@@ -12,6 +12,7 @@ namespace Fabric.Databus.Integration.Tests
     using System;
     using System.Data.SQLite;
     using System.Diagnostics;
+    using System.IO;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -29,6 +30,8 @@ namespace Fabric.Databus.Integration.Tests
     using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
+    using Fabric.Shared.ReliableHttp.Interceptors;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -160,9 +163,9 @@ FROM Text
                             service => service.InterceptResponse(
                                 HttpMethod.Put,
                                 expectedUri,
-                                It.IsAny<string>(),
+                                It.IsAny<Stream>(),
                                 HttpStatusCode.OK,
-                                string.Empty,
+                                It.IsAny<HttpContent>(),
                                 It.IsAny<long>()))
                             .Verifiable();
 
@@ -204,9 +207,9 @@ FROM Text
                             service => service.InterceptResponse(
                                 HttpMethod.Put,
                                 expectedUri,
-                                It.IsAny<string>(),
+                                It.IsAny<Stream>(),
                                 HttpStatusCode.OK,
-                                string.Empty,
+                                It.IsAny<HttpContent>(),
                                 It.IsAny<long>()),
                             Times.Once);
                         stopwatch.Stop();

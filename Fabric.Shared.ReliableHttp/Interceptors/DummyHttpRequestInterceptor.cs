@@ -7,11 +7,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Http
+namespace Fabric.Shared.ReliableHttp.Interceptors
 {
     using System.Net.Http;
 
-    using Fabric.Databus.Interfaces.Http;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     /// <inheritdoc />
     /// <summary>

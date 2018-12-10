@@ -1,46 +1,51 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IFileUploadResult.cs" company="">
+// <copyright file="SendAsyncResult.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   The FileUploadResult interface.
+//   Defines the SendAsyncResult type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Interfaces.Http
+namespace Fabric.Shared.ReliableHttp
 {
     using System;
     using System.Net;
     using System.Net.Http;
 
     /// <summary>
-    /// The FileUploadResult interface.
+    /// The send async result.
     /// </summary>
-    public interface IFileUploadResult
+    public class SendAsyncResult
     {
+        /// <summary>
+        /// Gets or sets the resource id.
+        /// </summary>
+        public string ResourceId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the method.
+        /// </summary>
+        public string Method { get; set; }
+
         /// <summary>
         /// Gets or sets the uri.
         /// </summary>
-        Uri Uri { get; set; }
-
-        /// <summary>
-        /// Gets or sets the http method.
-        /// </summary>
-        HttpMethod HttpMethod { get; set; }
+        public Uri Uri { get; set; }
 
         /// <summary>
         /// Gets or sets the status code.
         /// </summary>
-        HttpStatusCode StatusCode { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
 
         /// <summary>
         /// Gets or sets the response content.
         /// </summary>
-        HttpContent ResponseContent { get; set; }
+        public HttpContent ResponseContent { get; set; }
 
         /// <summary>
-        /// Gets or sets the request content.
+        /// Gets or sets a value indicating whether is success status code.
         /// </summary>
-        string RequestContent { get; set; }
+        public bool IsSuccessStatusCode { get; set; }
     }
 }

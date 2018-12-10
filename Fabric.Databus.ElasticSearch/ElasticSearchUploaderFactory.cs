@@ -13,9 +13,11 @@ namespace Fabric.Databus.ElasticSearch
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
+    using System.Threading;
 
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Http;
+    using Fabric.Shared.ReliableHttp.Interfaces;
 
     using Serilog;
 
@@ -90,7 +92,8 @@ namespace Fabric.Databus.ElasticSearch
                 this.httpClientFactory,
                 this.httpRequestInterceptor,
                 this.httpResponseInterceptor,
-                method);
+                method,
+                CancellationToken.None);
         }
     }
 }

@@ -98,12 +98,15 @@ namespace Fabric.Databus.PipelineSteps
         /// The write diagnostics.
         /// </summary>
         /// <param name="workItem">
-        ///     The work item.  
+        /// The work item.  
         /// </param>
         /// <param name="fileUploadResult">
         /// file upload result
         /// </param>
-        private void WriteDiagnostics(IJsonObjectQueueItem workItem, IFileUploadResult fileUploadResult)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        private async Task WriteDiagnostics(IQueueItem workItem, IFileUploadResult fileUploadResult)
         {
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {
@@ -111,17 +114,17 @@ namespace Fabric.Databus.PipelineSteps
 
                 this.detailedTemporaryFileWriter.CreateDirectory(path);
 
-                this.detailedTemporaryFileWriter.WriteToFileAsync(
+                await this.detailedTemporaryFileWriter.WriteToFileAsync(
                     this.detailedTemporaryFileWriter.CombinePath(path, "url.txt"),
                     $"{fileUploadResult.HttpMethod} {fileUploadResult.Uri}");
 
-                this.detailedTemporaryFileWriter.WriteToFileAsync(
+                await this.detailedTemporaryFileWriter.WriteToFileAsync(
                     this.detailedTemporaryFileWriter.CombinePath(path, "request.txt"),
                     fileUploadResult.RequestContent);
 
-                this.detailedTemporaryFileWriter.WriteToFileAsync(
+                await this.detailedTemporaryFileWriter.WriteToFileAsync(
                     this.detailedTemporaryFileWriter.CombinePath(path, $"response-{fileUploadResult.StatusCode}.txt"),
-                    fileUploadResult.ResponseContent);
+                    await fileUploadResult.ResponseContent.ReadAsStringAsync());
             }
         }
     }

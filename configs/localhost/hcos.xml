@@ -2,7 +2,7 @@
 <Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
-    <ConnectionString>server=HCS-DEV0002;initial catalog=SAM;Trusted_Connection=True;</ConnectionString>
+    <ConnectionString>server=(local);initial catalog=SAMHCOS;Trusted_Connection=True;</ConnectionString>
     <MaximumEntitiesToLoad>10</MaximumEntitiesToLoad>
     <EntitiesPerBatch>10</EntitiesPerBatch>
     <EntitiesPerUploadFile>10</EntitiesPerUploadFile>

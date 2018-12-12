@@ -193,7 +193,7 @@ namespace Fabric.Databus.PipelineSteps
             var list = await this.databusSqlReader.GetListOfEntityKeysAsync(
                            job.Data.TopLevelDataSource.Key,
                            this.Config.MaximumEntitiesToLoad,
-                           job.Data.DataSources.First(d => (d.Path == null || d.Path == "$")));
+                           job.Data.TopLevelDataSource);
 
             var itemsLeft = list.Count;
 

@@ -241,7 +241,10 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public async Task<IList<string>> GetListOfEntityKeysAsync(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource)
+        public async Task<IList<string>> GetListOfEntityKeysAsync(
+            string topLevelKeyColumn,
+            int maximumEntitiesToLoad,
+            ITopLevelDataSource dataSource)
         {
             var load = dataSource;
 

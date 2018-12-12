@@ -23,6 +23,7 @@ namespace Fabric.Shared.ReliableHttp
     using System.Threading.Tasks;
 
     using Fabric.Shared.ReliableHttp.Events;
+    using Fabric.Shared.ReliableHttp.Exceptions;
     using Fabric.Shared.ReliableHttp.Interfaces;
 
     using Polly;
@@ -151,55 +152,63 @@ namespace Fabric.Shared.ReliableHttp
 
             var stopwatch = new Stopwatch();
 
-            var httpResponse = await policy.ExecuteAsync(
-                                   async () =>
-                                       {
-                                           using (var httpRequestMessage = new HttpRequestMessage(httpMethod, fullUri))
+            try
+            {
+                var httpResponse = await policy.ExecuteAsync(
+                                       async () =>
                                            {
-                                               // StreamContent disposes the stream when it is done so we need to keep a copy for retries
-                                               var memoryStream = new MemoryStream();
-                                               // ReSharper disable once AccessToDisposedClosure
-                                               stream.Seek(0, SeekOrigin.Begin);
-                                               // ReSharper disable once AccessToDisposedClosure
-                                               await stream.CopyToAsync(memoryStream);
-
-                                               memoryStream.Seek(0, SeekOrigin.Begin);
-
-                                               using (var requestContent = new StreamContent(memoryStream))
+                                               using (var httpRequestMessage = new HttpRequestMessage(httpMethod, fullUri))
                                                {
-                                                   httpRequestMessage.Content = requestContent;
+                                                   // StreamContent disposes the stream when it is done so we need to keep a copy for retries
+                                                   var memoryStream = new MemoryStream();
+                                                   // ReSharper disable once AccessToDisposedClosure
+                                                   stream.Seek(0, SeekOrigin.Begin);
+                                                   // ReSharper disable once AccessToDisposedClosure
+                                                   await stream.CopyToAsync(memoryStream);
 
-                                                   this.httpRequestInterceptor.InterceptRequest(
-                                                       httpMethod,
-                                                       httpRequestMessage);
+                                                   memoryStream.Seek(0, SeekOrigin.Begin);
 
-                                                   return await this.httpClientFactory.Create().SendAsync(
-                                                              httpRequestMessage,
-                                                              this.cancellationToken);
+                                                   using (var requestContent = new StreamContent(memoryStream))
+                                                   {
+                                                       httpRequestMessage.Content = requestContent;
+
+                                                       this.httpRequestInterceptor.InterceptRequest(
+                                                           httpMethod,
+                                                           httpRequestMessage);
+
+                                                       return await this.httpClientFactory.Create().SendAsync(
+                                                                  httpRequestMessage,
+                                                                  this.cancellationToken);
+                                                   }
                                                }
-                                           }
-                                       });
+                                           });
 
-            this.OnNavigated(
-                new NavigatedEventArgs(resourceId, method, fullUri, httpResponse.StatusCode.ToString(), httpResponse.Content));
 
-            this.httpResponseInterceptor.InterceptResponse(
-                httpMethod,
-                fullUri,
-                stream,
-                httpResponse.StatusCode,
-                httpResponse.Content,
-                stopwatch.ElapsedMilliseconds);
+                this.OnNavigated(
+                    new NavigatedEventArgs(resourceId, method, fullUri, httpResponse.StatusCode.ToString(), httpResponse.Content));
 
-            return new SendAsyncResult
-                       {
-                           ResourceId = resourceId,
-                           Method = method,
-                           Uri = fullUri,
-                           StatusCode = httpResponse.StatusCode,
-                           IsSuccessStatusCode = httpResponse.IsSuccessStatusCode,
-                           ResponseContent = httpResponse.Content
-            };
+                this.httpResponseInterceptor.InterceptResponse(
+                    httpMethod,
+                    fullUri,
+                    stream,
+                    httpResponse.StatusCode,
+                    httpResponse.Content,
+                    stopwatch.ElapsedMilliseconds);
+
+                return new SendAsyncResult
+                {
+                    ResourceId = resourceId,
+                    Method = method,
+                    Uri = fullUri,
+                    StatusCode = httpResponse.StatusCode,
+                    IsSuccessStatusCode = httpResponse.IsSuccessStatusCode,
+                    ResponseContent = httpResponse.Content
+                };
+            }
+            catch (Exception e)
+            {
+                throw new ReliableHttpException(fullUri, method, e);
+            }
         }
 
         /// <summary>

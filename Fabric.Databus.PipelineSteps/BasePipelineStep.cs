@@ -16,6 +16,7 @@ namespace Fabric.Databus.PipelineSteps
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Exceptions;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Pipeline;
     using Fabric.Databus.Interfaces.Queues;
@@ -267,8 +268,16 @@ namespace Fabric.Databus.PipelineSteps
 
                     stopWatch.Restart();
 
-                    // if we use await here then we go through all the items and nothing gets processed
-                    this.InternalHandleAsync(wt).Wait(this.cancellationToken);
+                    try
+                    {
+                        // if we use await here then we go through all the items and nothing gets processed
+                        this.InternalHandleAsync(wt).Wait(this.cancellationToken);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new DatabusPipelineStepWorkItemException(wt1, e);
+                    }
+
 
                     processingTime = processingTime.Add(stopWatch.Elapsed);
 
@@ -303,7 +312,7 @@ namespace Fabric.Databus.PipelineSteps
                 {
                     this.MyLogger.Verbose("{@Exception}", e);
                     errorText = e.ToString();
-                    throw;
+                    throw new DatabusPipelineStepException(this.LoggerName, e);
                 }
             }
 

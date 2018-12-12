@@ -153,7 +153,7 @@ namespace PipelineStep.Tests
                 var mockRepository = new MockRepository(MockBehavior.Strict);
                 var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
                 mockDatabusSqlReader
-                    .Setup(service => service.GetListOfEntityKeysAsync("TextID", 4, It.IsAny<IDataSource>()))
+                    .Setup(service => service.GetListOfEntityKeysAsync("TextID", 4, It.IsAny<ITopLevelDataSource>()))
                     .ReturnsAsync(new List<string>());
 
                 var createBatchesPipelineStep = new CreateBatchesPipelineStep(
@@ -244,7 +244,7 @@ namespace PipelineStep.Tests
                 var mockRepository = new MockRepository(MockBehavior.Strict);
                 var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
                 mockDatabusSqlReader
-                    .Setup(service => service.GetListOfEntityKeysAsync("TextID", 4, It.IsAny<IDataSource>()))
+                    .Setup(service => service.GetListOfEntityKeysAsync("TextID", 4, It.IsAny<ITopLevelDataSource>()))
                     .ReturnsAsync(new List<string> { "1", "3", "5", "6" });
 
                 var createBatchesPipelineStep = new CreateBatchesPipelineStep(

@@ -18,6 +18,7 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ConfigValidators;
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Exceptions;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
 
@@ -62,8 +63,8 @@ namespace Fabric.Databus.PipelineRunner
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        /// <exception cref="T:System.ArgumentNullException">exception thrown
-        /// </exception>
+        /// <DatabusValidationException cref="T:System.ArgumentNullDatabusValidationException">DatabusValidationException thrown
+        /// </DatabusValidationException>
         public async Task<ConfigValidationResult> ValidateFromTextAsync(string fileContents, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(fileContents))
@@ -139,7 +140,7 @@ namespace Fabric.Databus.PipelineRunner
         {
             if (string.IsNullOrWhiteSpace(job.Config.ConnectionString))
             {
-                throw new Exception("Connection String is empty or null");
+                throw new DatabusValidationException("Connection String is empty or null");
             }
 
             using (var conn = this.sqlConnectionFactory.GetConnection(job.Config.ConnectionString))
@@ -188,8 +189,8 @@ namespace Fabric.Databus.PipelineRunner
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        /// <exception cref="Exception">exception thrown
-        /// </exception>
+        /// <DatabusValidationException cref="DatabusValidationException">DatabusValidationException thrown
+        /// </DatabusValidationException>
         public async Task<bool> CheckQueryIsValid(IJob job, IDataSource load, ILogger logger, int numberOfDataSource)
         {
             logger.Information("Validating data source {index} {path} {@load} {@StartTime}", numberOfDataSource, load.Path, load, DateTime.Now);
@@ -228,42 +229,42 @@ namespace Fabric.Databus.PipelineRunner
              logger.Information("Validating job {@StartTime}", DateTime.Now);
             if (job == null)
             {
-                throw new Exception("job cannot be null");
+                throw new DatabusValidationException("job cannot be null");
             }
 
             if (job.Config == null)
             {
-                throw new Exception("job.Config cannot be null");
+                throw new DatabusValidationException("job.Config cannot be null");
             }
 
             if (string.IsNullOrWhiteSpace(job.Config.ConnectionString))
             {
-                throw new Exception("No connection string was passed");
+                throw new DatabusValidationException("No connection string was passed");
             }
 
             if (!this.CheckDatabaseConnectionStringIsValid(job).Result)
             {
-                throw new Exception($"Unable to connect to connection string: [{job.Config.ConnectionString}]");
+                throw new DatabusValidationException($"Unable to connect to connection string: [{job.Config.ConnectionString}]");
             }
 
             if (job.Data == null)
             {
-                throw new Exception("job.Data cannot be null");
+                throw new DatabusValidationException("job.Data cannot be null");
             }
 
             if (job.Data.TopLevelDataSource == null)
             {
-                throw new Exception("No TopLevelDataSource was specified");
+                throw new DatabusValidationException("No TopLevelDataSource was specified");
             }
 
             if (string.IsNullOrWhiteSpace(job.Data.TopLevelDataSource.Key))
             {
-                throw new Exception("No Key was specified in TopLevelDataSource");
+                throw new DatabusValidationException("No Key was specified in TopLevelDataSource");
             }
 
             if (!job.Data.DataSources.Any())
             {
-                throw new Exception("No data sources were specified");
+                throw new DatabusValidationException("No data sources were specified");
             }
 
             int i = 0;
@@ -272,20 +273,27 @@ namespace Fabric.Databus.PipelineRunner
                 i++;
                 if (string.IsNullOrWhiteSpace(dataSource.Sql) && string.IsNullOrWhiteSpace(dataSource.TableOrView))
                 {
-                    throw new Exception(
-                        $"Both Sql and TableOrView is empty for dataSource index {i} with name {dataSource.Name} and path {dataSource.Path}");
+                    throw new DatabusDataSourceException(
+                        dataSource,
+                        new Exception(
+                            $"Both Sql and TableOrView is empty for dataSource index {i} with name {dataSource.Name} and path {dataSource.Path}"));
                 }
 
                 if (dataSource.Relationships == null)
                 {
-                    throw new Exception("dataSource.Relationships cannot be null");
+                    throw new DatabusDataSourceException(
+                        dataSource,
+                        new Exception("dataSource.Relationships cannot be null"));
                 }
 
                 if (dataSource.SqlEntityColumnMappings == null)
                 {
-                    throw new Exception("dataSource.SqlEntityColumnMappings cannot be null");
+                    throw new DatabusDataSourceException(
+                        dataSource,
+                        new Exception("dataSource.SqlEntityColumnMappings cannot be null"));
                 }
             }
+
             logger.Information("Validated job {@StartTime}", DateTime.Now);
         }
 
@@ -302,9 +310,11 @@ namespace Fabric.Databus.PipelineRunner
                 }
                 catch (Exception e)
                 {
-                    throw new Exception(
-                        $"Error in dataSource index {numberOfDataSource} with name [{dataSource.Name}] and path [{dataSource.Path}] and Sql [{dataSource.Sql}]",
-                        e);
+                    throw new DatabusDataSourceException(
+                        dataSource,
+                        new Exception(
+                            $"Error in dataSource index {numberOfDataSource} with name [{dataSource.Name}] and path [{dataSource.Path}] and Sql [{dataSource.Sql}]",
+                            e));
                 }
             }
         }

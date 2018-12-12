@@ -52,18 +52,21 @@ namespace Fabric.Databus.Interfaces.Sql
         /// The get list of entity keys.
         /// </summary>
         /// <param name="topLevelKeyColumn">
-        /// The top level key column.
+        ///     The top level key column.
         /// </param>
         /// <param name="maximumEntitiesToLoad">
-        /// The maximum entities to load.
+        ///     The maximum entities to load.
         /// </param>
         /// <param name="dataSource">
-        /// The data source.
+        ///     The data source.
         /// </param>
         /// <returns>
-        /// The <see cref="IList"/>.
+        /// The <see cref="IList{T}"/>.
         /// </returns>
-        Task<IList<string>> GetListOfEntityKeysAsync(string topLevelKeyColumn, int maximumEntitiesToLoad, IDataSource dataSource);
+        Task<IList<string>> GetListOfEntityKeysAsync(
+            string topLevelKeyColumn,
+            int maximumEntitiesToLoad,
+            ITopLevelDataSource dataSource);
 
         /// <summary>
         /// The calculate fields.

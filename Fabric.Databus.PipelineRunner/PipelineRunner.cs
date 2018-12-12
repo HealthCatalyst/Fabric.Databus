@@ -25,6 +25,7 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.ElasticSearch;
+    using Fabric.Databus.Interfaces.Exceptions;
     using Fabric.Databus.Interfaces.FileWriters;
     using Fabric.Databus.Interfaces.Http;
     using Fabric.Databus.Interfaces.Loggers;
@@ -125,6 +126,12 @@ namespace Fabric.Databus.PipelineRunner
             }
 
             var config = job.Config;
+
+            if (job.Data.TopLevelDataSource == null)
+            {
+                throw new DatabusValidationException("job.Data.TopLevelDataSource cannot be null");
+            }
+
             this.InitContainerWithDefaults(job);
 
             var logger = this.container.Resolve<ILogger>();

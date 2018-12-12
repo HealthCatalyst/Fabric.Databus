@@ -108,7 +108,7 @@ namespace Fabric.Databus.Config
                 throw new ArgumentNullException(nameof(job));
             }
 
-            return job.ToXml<Job>();
+            return (job as XmlJob).ToXml<XmlJob>();
         }
     }
 }

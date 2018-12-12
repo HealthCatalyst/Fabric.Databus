@@ -148,7 +148,8 @@ namespace Fabric.Databus.PipelineRunner
             var temporaryFileWriter = this.container.Resolve<ITemporaryFileWriter>();
             if (!string.IsNullOrWhiteSpace(job.Config.LocalSaveFolder) && temporaryFileWriter.IsWritingEnabled)
             {
-                temporaryFileWriter.WriteToFileAsync(temporaryFileWriter.CombinePath(job.Config.LocalSaveFolder, "job.json"), job.ToJsonPretty());
+                // temporaryFileWriter.WriteToFileAsync(temporaryFileWriter.CombinePath(job.Config.LocalSaveFolder, "job.json"), job.ToJsonPretty());
+                temporaryFileWriter.WriteToFileAsync(temporaryFileWriter.CombinePath(job.Config.LocalSaveFolder, "job.xml"), new ConfigReader().WriteXml(job));
             }
 
             this.container.Resolve<IConfigValidator>().ValidateJob(job, logger);

@@ -9,6 +9,8 @@
 
 namespace Fabric.Databus.Config
 {
+    using System.Xml.Serialization;
+
     using Fabric.Databus.Interfaces.Config;
 
     /// <summary>
@@ -19,11 +21,13 @@ namespace Fabric.Databus.Config
         /// <summary>
         /// Gets or sets the config.
         /// </summary>
+        [XmlIgnore]
         IQueryConfig Config { get; set; }
 
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
+        [XmlIgnore]
         IJobData Data { get; set; }
     }
 }

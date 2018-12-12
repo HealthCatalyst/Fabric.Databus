@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ThreadIdEnricher.cs" company="">
+// <copyright file="MyThreadIdEnricher.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the ThreadIdEnricher type.
+//   Defines the MyThreadIdEnricher type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ namespace Fabric.Databus.Shared.Loggers
     /// <summary>
     /// The thread id enricher.
     /// </summary>
-    public class ThreadIdEnricher : ILogEventEnricher
+    public class MyThreadIdEnricher : ILogEventEnricher
     {
         /// <inheritdoc />
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)

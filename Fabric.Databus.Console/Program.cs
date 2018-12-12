@@ -94,6 +94,27 @@ namespace Fabric.Databus.Console
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
 
+                        var loggerConfiguration = new LoggerConfiguration().Enrich.With(new MyThreadIdEnricher());
+
+                        loggerConfiguration = config.Config.LogVerbose
+                                                  ? loggerConfiguration.MinimumLevel.Verbose()
+                                                  : loggerConfiguration.MinimumLevel.Information();
+
+                        if (!string.IsNullOrWhiteSpace(config.Config.LogFile))
+                        {
+                            loggerConfiguration =
+                                loggerConfiguration.WriteTo.File(config.Config.LogFile, rollingInterval: RollingInterval.Day);
+                        }
+
+                        if (config.Config.LogToSeq)
+                        {
+                            loggerConfiguration = loggerConfiguration.WriteTo
+                                .Seq("http://localhost:5341");
+                        }
+
+                        ILogger logger = loggerConfiguration.CreateLogger();
+                        container.RegisterInstance(logger);
+
                         var pipelineRunner = new DatabusRunner();
 
                         pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);

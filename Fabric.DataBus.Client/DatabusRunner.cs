@@ -51,7 +51,7 @@ namespace Fabric.Databus.Client
             {
                 if (job.Config.LogToSeq || !string.IsNullOrWhiteSpace(job.Config.LogFile))
                 {
-                    var loggerConfiguration = new LoggerConfiguration().Enrich.With(new ThreadIdEnricher());
+                    var loggerConfiguration = new LoggerConfiguration().Enrich.With(new MyThreadIdEnricher());
 
                     loggerConfiguration = job.Config.LogVerbose
                                               ? loggerConfiguration.MinimumLevel.Verbose()
@@ -61,12 +61,6 @@ namespace Fabric.Databus.Client
                     {
                         loggerConfiguration =
                             loggerConfiguration.WriteTo.File(job.Config.LogFile, rollingInterval: RollingInterval.Day);
-                    }
-
-                    if (job.Config.LogToSeq)
-                    {
-                        loggerConfiguration = loggerConfiguration.WriteTo
-                            .Seq("http://localhost:5341");
                     }
 
                     ILogger logger = loggerConfiguration.CreateLogger();

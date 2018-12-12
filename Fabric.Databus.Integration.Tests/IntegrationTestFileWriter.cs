@@ -54,15 +54,7 @@ namespace Fabric.Databus.Integration.Tests
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// The open stream for writing.
-        /// </summary>
-        /// <param name="filepath">
-        /// The filepath.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Stream"/>.
-        /// </returns>
+        /// <inheritdoc />
         public Stream OpenStreamForWriting(string filepath)
         {
             return new IntegrationTestFileStream(this, filepath);

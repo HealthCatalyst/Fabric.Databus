@@ -85,7 +85,7 @@ namespace Fabric.Databus.PipelineSteps
             // now send to Rest Api
             var fileUploadResult = await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, false);
 
-            this.WriteDiagnostics(workItem, fileUploadResult);
+            await this.WriteDiagnosticsAsync(workItem, fileUploadResult);
         }
 
         /// <inheritdoc />
@@ -106,7 +106,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task WriteDiagnostics(IQueueItem workItem, IFileUploadResult fileUploadResult)
+        private async Task WriteDiagnosticsAsync(IQueueItem workItem, IFileUploadResult fileUploadResult)
         {
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {

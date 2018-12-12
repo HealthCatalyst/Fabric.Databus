@@ -57,9 +57,11 @@ namespace Fabric.Shared
         /// The txt.
         /// </param>
         /// <typeparam name="T">
+        /// type of object
         /// </typeparam>
         /// <returns>
-        /// The <see cref="T"/>.
+        /// The <see cref="T"/>
+        /// type of object
         /// </returns>
         public static T FromJson<T>(this string txt)
         {
@@ -86,6 +88,30 @@ namespace Fabric.Shared
             var jobConfig = xmlSerializer.Deserialize(reader) as T;
 
             return jobConfig;
+        }
+
+        /// <summary>
+        /// The to xml.
+        /// </summary>
+        /// <param name="obj">
+        /// The obj.
+        /// </param>
+        /// <typeparam name="T">
+        /// type of object
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public static string ToXml<T>(this object obj) where T : class
+        {
+            var xmlSerializer = new XmlSerializer(typeof(T));
+
+            var memoryStream = new MemoryStream();
+            xmlSerializer.Serialize(memoryStream, obj);
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            return new StreamReader(memoryStream).ReadToEnd();
         }
 
         /// <summary>

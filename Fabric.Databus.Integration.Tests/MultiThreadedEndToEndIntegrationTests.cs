@@ -180,7 +180,7 @@ FROM Text
                         pipelineRunner.RunPipeline(config);
 
                         // Assert
-                        Assert.AreEqual(1, integrationTestFileWriter.Count);
+                        Assert.AreEqual(1 + 1, integrationTestFileWriter.Count); // first file is job.json
 
                        var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath));
@@ -351,8 +351,10 @@ FROM Text
 
                         pipelineRunner.RunPipeline(config);
 
-                        Assert.AreEqual(2, integrationTestFileWriter.Count);
-                        var expectedPath1 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
+                        Assert.AreEqual(2 + 1, integrationTestFileWriter.Count); // first file is job.json
+                        var expectedPath1 = integrationTestFileWriter.CombinePath(
+                            config.Config.LocalSaveFolder,
+                            "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath1));
 
                         var contents = integrationTestFileWriter.GetContents(expectedPath1);

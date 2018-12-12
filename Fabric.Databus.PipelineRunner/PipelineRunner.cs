@@ -40,8 +40,11 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
     using Fabric.Databus.SqlGenerator;
+    using Fabric.Shared;
     using Fabric.Shared.ReliableHttp.Interceptors;
     using Fabric.Shared.ReliableHttp.Interfaces;
+
+    using Newtonsoft.Json;
 
     using QueueItems;
 
@@ -136,12 +139,19 @@ namespace Fabric.Databus.PipelineRunner
 
             var logger = this.container.Resolve<ILogger>();
 
-            this.container.Resolve<IConfigValidator>().ValidateJob(job, logger);
 
             if (config.WriteTemporaryFilesToDisk)
             {
                 this.container.Resolve<IFileWriter>().DeleteDirectory(config.LocalSaveFolder);
             }
+
+            var temporaryFileWriter = this.container.Resolve<ITemporaryFileWriter>();
+            if (!string.IsNullOrWhiteSpace(job.Config.LocalSaveFolder) && temporaryFileWriter.IsWritingEnabled)
+            {
+                temporaryFileWriter.WriteToFileAsync(temporaryFileWriter.CombinePath(job.Config.LocalSaveFolder, "job.json"), job.ToJsonPretty());
+            }
+
+            this.container.Resolve<IConfigValidator>().ValidateJob(job, logger);
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();

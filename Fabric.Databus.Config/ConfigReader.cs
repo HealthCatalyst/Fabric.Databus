@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.Config
 {
+    using System;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Linq;
@@ -89,6 +90,25 @@ namespace Fabric.Databus.Config
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// The to xml.
+        /// </summary>
+        /// <param name="job">
+        /// The job.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public string WriteXml(IJob job)
+        {
+            if (job == null)
+            {
+                throw new ArgumentNullException(nameof(job));
+            }
+
+            return job.ToXml<Job>();
         }
     }
 }

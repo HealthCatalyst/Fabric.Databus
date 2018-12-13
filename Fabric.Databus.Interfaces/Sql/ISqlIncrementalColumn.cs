@@ -38,5 +38,10 @@ namespace Fabric.Databus.Interfaces.Sql
         /// Gets or sets the sql type.
         /// </summary>
         string Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table or view.
+        /// </summary>
+        string TableOrView { get; set; }
     }
 }

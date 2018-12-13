@@ -17,7 +17,7 @@ namespace Fabric.Databus.Integration.Tests
     /// <summary>
     /// The sql lite generator.
     /// </summary>
-    public class SqlLiteGenerator : AbstractBaseSqlGenerator
+    public class SqlLiteGenerator : BaseSqlGenerator
     {
         /// <inheritdoc />
         protected override void InsertTopStatementAtBeginning(StringBuilder sb)

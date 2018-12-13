@@ -27,6 +27,9 @@ namespace Fabric.Databus.SqlGenerator
         public string Type { get; set; }
 
         /// <inheritdoc />
+        public string TableOrView { get; set; }
+
+        /// <inheritdoc />
         public string SqlOperator => this.ConvertOperatorToSqlOperator();
 
         /// <inheritdoc />

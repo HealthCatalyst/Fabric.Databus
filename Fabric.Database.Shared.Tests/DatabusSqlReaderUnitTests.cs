@@ -143,7 +143,7 @@ ORDER BY Text.[TextID] ASC
 Text.*,Text.[TextID] AS [KeyLevel1]
 FROM Text
 WHERE Text.[TextID] BETWEEN @start AND @end
-AND [TextID] > @incrementColumnValue1
+AND Text.[TextID] > @incrementColumnValue1
 ORDER BY Text.[TextID] ASC
 ";
 
@@ -209,7 +209,7 @@ Text.*,Text.[TextKEY] AS [KeyLevel2],Patient.[TextID] AS [KeyLevel1]
 FROM Text
 INNER JOIN Patient ON Patient.[TextKEY] = Text.[TextKEY]
 WHERE Text.[TextID] BETWEEN @start AND @end
-AND [TextID] > @incrementColumnValue1
+AND Patient.[TextID] > @incrementColumnValue1
 ORDER BY Text.[TextID] ASC
 ";
 

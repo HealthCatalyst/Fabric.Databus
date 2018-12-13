@@ -13,7 +13,7 @@ namespace Fabric.Databus.SqlGenerator
     /// <summary>
     /// The sql generator.
     /// </summary>
-    public class SqlGenerator : AbstractBaseSqlGenerator
+    public class SqlGenerator : BaseSqlGenerator
     {
     }
 }

@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AbstractBaseSqlGenerator.cs" company="">
+// <copyright file="BaseSqlGenerator.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the AbstractBaseSqlGenerator type.
+//   Defines the BaseSqlGenerator type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ namespace Fabric.Databus.SqlGenerator
     using Fabric.Shared;
 
     /// <inheritdoc />
-    public abstract class AbstractBaseSqlGenerator : ISqlGenerator
+    public abstract class BaseSqlGenerator : ISqlGenerator
     {
         /// <summary>
         /// Gets or sets the select columns.
@@ -178,11 +178,17 @@ namespace Fabric.Databus.SqlGenerator
 
         /// <inheritdoc />
         public ISqlGenerator AddIncrementalColumn(
+            string tableName,
             string incrementalColumnName,
             string incrementalColumnOperator,
             string incrementalColumnValue,
             string incrementalColumnType)
         {
+            if (string.IsNullOrEmpty(tableName))
+            {
+                throw new ArgumentNullException(nameof(tableName));
+            }
+
             if (string.IsNullOrWhiteSpace(incrementalColumnName))
             {
                 throw new ArgumentNullException(nameof(incrementalColumnName));
@@ -195,6 +201,7 @@ namespace Fabric.Databus.SqlGenerator
 
             this.IncrementalColumns.Add(new SqlIncrementalColumn
             {
+                TableOrView = tableName,
                 Name = incrementalColumnName,
                 Operator = incrementalColumnOperator,
                 Type = incrementalColumnType,
@@ -205,11 +212,12 @@ namespace Fabric.Databus.SqlGenerator
         }
 
         /// <inheritdoc />
-        public ISqlGenerator AddIncrementalColumns(IEnumerable<IIncrementalColumn> incrementalColumns)
+        public ISqlGenerator AddIncrementalColumns(string tableName, IEnumerable<IIncrementalColumn> incrementalColumns)
         {
             foreach (var incrementalColumn in incrementalColumns)
             {
                 this.AddIncrementalColumn(
+                    tableName,
                     incrementalColumn.Name,
                     incrementalColumn.Operator,
                     incrementalColumn.Value,
@@ -293,15 +301,7 @@ namespace Fabric.Databus.SqlGenerator
 
                 this.AddColumn(entityName, topLevelKey, "KeyLevel1");
 
-                // ReSharper disable once PossibleMultipleEnumeration
-                foreach (var incrementalColumn in incrementalColumns)
-                {
-                    this.AddIncrementalColumn(
-                        incrementalColumn.Name,
-                        incrementalColumn.Operator,
-                        incrementalColumn.Value,
-                        incrementalColumn.Type);
-                }
+                this.AddIncrementalColumns(entityName, incrementalColumns);
 
                 return this;
             }
@@ -345,16 +345,11 @@ namespace Fabric.Databus.SqlGenerator
                     });
             }
 
-            this.AddColumn(sqlRelationships1.Last().Source.Entity, topLevelKey, "KeyLevel1");
-            // ReSharper disable once PossibleMultipleEnumeration
-            foreach (var incrementalColumn in incrementalColumns)
-            {
-                this.AddIncrementalColumn(
-                    incrementalColumn.Name,
-                    incrementalColumn.Operator,
-                    incrementalColumn.Value,
-                    incrementalColumn.Type);
-            }
+            var topLevelEntity = sqlRelationships1.Last().Source.Entity;
+
+            this.AddColumn(topLevelEntity, topLevelKey, "KeyLevel1");
+
+            this.AddIncrementalColumns(topLevelEntity, incrementalColumns);
 
             return this;
         }
@@ -413,7 +408,7 @@ namespace Fabric.Databus.SqlGenerator
             foreach (var incrementalColumn in this.IncrementalColumns)
             {
                 sb.AppendLine(
-                    $"AND [{incrementalColumn.Name}] {incrementalColumn.SqlOperator} @incrementColumnValue{++i}");
+                    $"AND {incrementalColumn.TableOrView}.[{incrementalColumn.Name}] {incrementalColumn.SqlOperator} @incrementColumnValue{++i}");
             }
 
             if (this.OrderByColumnAscending != null)

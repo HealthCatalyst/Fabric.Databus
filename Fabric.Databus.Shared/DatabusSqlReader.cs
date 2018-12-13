@@ -200,7 +200,7 @@ namespace Fabric.Databus.Shared
             {
                 sqlGenerator.AddCTE(load.Sql)
                     // ReSharper disable once PossibleMultipleEnumeration
-                    .AddIncrementalColumns(incrementalColumns);
+                    .AddIncrementalColumns(topLevelTableName, incrementalColumns);
             }
             else
             {

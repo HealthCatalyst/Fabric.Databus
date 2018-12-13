@@ -126,6 +126,9 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <summary>
         /// The add incremental column.
         /// </summary>
+        /// <param name="tableOrViewName">
+        /// The table Or View Name.
+        /// </param>
         /// <param name="incrementalColumnName">
         /// The incremental column name.
         /// </param>
@@ -141,7 +144,7 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <returns>
         /// The <see cref="ISqlGenerator"/>.
         /// </returns>
-        ISqlGenerator AddIncrementalColumn(string incrementalColumnName, string incrementalColumnOperator, string incrementalColumnValue, string incrementalColumnType);
+        ISqlGenerator AddIncrementalColumn(string tableOrViewName, string incrementalColumnName, string incrementalColumnOperator, string incrementalColumnValue, string incrementalColumnType);
 
         /// <summary>
         /// The to string.
@@ -154,13 +157,14 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <summary>
         /// The add incremental columns.
         /// </summary>
+        /// <param name="tableName"></param>
         /// <param name="incrementalColumns">
-        /// The incremental columns.
+        ///     The incremental columns.
         /// </param>
         /// <returns>
         /// The <see cref="ISqlGenerator"/>.
         /// </returns>
-        ISqlGenerator AddIncrementalColumns(IEnumerable<IIncrementalColumn> incrementalColumns);
+        ISqlGenerator AddIncrementalColumns(string tableName, IEnumerable<IIncrementalColumn> incrementalColumns);
 
         /// <summary>
         /// The create sql statement.

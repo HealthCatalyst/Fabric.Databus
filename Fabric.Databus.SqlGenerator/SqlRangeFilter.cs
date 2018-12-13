@@ -28,5 +28,10 @@ namespace Fabric.Databus.SqlGenerator
         /// Gets or sets the end variable.
         /// </summary>
         public string EndVariable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name.
+        /// </summary>
+        public string TableName { get; set; }
     }
 }

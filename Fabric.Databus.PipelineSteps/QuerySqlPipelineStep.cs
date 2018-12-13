@@ -227,7 +227,8 @@ namespace Fabric.Databus.PipelineSteps
                              end,
                              this.MyLogger,
                              topLevelDataSource.Key,
-                             topLevelDataSource.IncrementalColumns);
+                             topLevelDataSource.IncrementalColumns,
+                             topLevelDataSource.TableOrView);
 
             await this.WriteDiagnostics(queryId, batchNumber, result);
 

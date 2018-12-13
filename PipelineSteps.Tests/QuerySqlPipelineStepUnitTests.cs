@@ -75,7 +75,8 @@ namespace PipelineStep.Tests
                             It.IsAny<string>(),
                             It.IsAny<ILogger>(),
                             It.IsAny<string>(),
-                            It.IsAny<IEnumerable<IIncrementalColumn>>())).ReturnsAsync(
+                            It.IsAny<IEnumerable<IIncrementalColumn>>(),
+                            It.IsAny<string>())).ReturnsAsync(
                         new ReadSqlDataResult
                         {
                             ColumnList = new List<ColumnInfo>
@@ -187,7 +188,8 @@ namespace PipelineStep.Tests
                             It.IsAny<string>(),
                             It.IsAny<ILogger>(),
                             It.IsAny<string>(),
-                            It.IsAny<IEnumerable<IIncrementalColumn>>())).ReturnsAsync(
+                            It.IsAny<IEnumerable<IIncrementalColumn>>(),
+                            It.IsAny<string>())).ReturnsAsync(
                         new ReadSqlDataResult
                         {
                             ColumnList = new List<ColumnInfo>

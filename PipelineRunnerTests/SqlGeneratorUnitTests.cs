@@ -68,12 +68,12 @@ TOP 5
 *
 FROM CTE
 WHERE 1=1
-ORDER BY [OrderID] ASC
+ORDER BY Clinical.Orders.[OrderID] ASC
 ;";
 
             var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders")
                 .AddTopFilter(5)
-                .AddOrderByAscending("OrderID")
+                .AddOrderByAscending("Clinical.Orders", "OrderID")
                 .ToSqlString();
 
             Assert.AreEqual(expected, actual);
@@ -90,10 +90,10 @@ SELECT
 *
 FROM CTE
 WHERE 1=1
-ORDER BY [BindingID] ASC
+ORDER BY Clinical.Orders.[BindingID] ASC
 ;";
 
-            var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").AddOrderByAscending("BindingID").ToSqlString();
+            var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").AddOrderByAscending("Clinical.Orders", "BindingID").ToSqlString();
 
             Assert.AreEqual(expected, actual);
         }
@@ -109,10 +109,10 @@ SELECT
 [OrderID]
 FROM CTE
 WHERE 1=1
-ORDER BY [BindingID] ASC
+ORDER BY Clinical.Orders.[BindingID] ASC
 ;";
 
-            var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").AddOrderByAscending("BindingID")
+            var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").AddOrderByAscending("Clinical.Orders", "BindingID")
                 .AddColumn("OrderID")
                 .ToSqlString();
 
@@ -129,13 +129,13 @@ ORDER BY [BindingID] ASC
 SELECT
 *
 FROM CTE
-WHERE [BindingID] BETWEEN @start AND @end
-ORDER BY [BindingID] ASC
+WHERE Binding.[BindingID] BETWEEN @start AND @end
+ORDER BY Binding.[BindingID] ASC
 ;";
 
             var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders")
-                .AddRangeFilter("BindingID", "@start", "@end")
-                .AddOrderByAscending("BindingID")
+                .AddRangeFilter("Binding", "BindingID", "@start", "@end")
+                .AddOrderByAscending("Binding", "BindingID")
                 .ToSqlString();
 
             Assert.AreEqual(expected, actual);
@@ -158,12 +158,12 @@ WHERE 1=1
 
             var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").AddTopFilter(1)
                 .AddJoin(new SqlGeneratorJoin
-                             {
-                                 SourceEntity = "Clinical.Patients",
-                                 SourceEntityKey = "OrderKEY",
-                                 DestinationEntity = "Clinical.Orders",
-                                 DestinationEntityKey = "OrderKEY"
-                             })
+                {
+                    SourceEntity = "Clinical.Patients",
+                    SourceEntityKey = "OrderKEY",
+                    DestinationEntity = "Clinical.Orders",
+                    DestinationEntityKey = "OrderKEY"
+                })
                 .ToSqlString();
 
             Assert.AreEqual(expected, actual);

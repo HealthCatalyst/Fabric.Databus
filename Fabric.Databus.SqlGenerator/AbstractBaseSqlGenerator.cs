@@ -55,7 +55,7 @@ namespace Fabric.Databus.SqlGenerator
         /// <summary>
         /// Gets the order by column ascending.
         /// </summary>
-        protected string OrderByColumnAscending { get; private set; }
+        protected Tuple<string, string> OrderByColumnAscending { get; private set; }
 
         /// <summary>
         /// Gets the range filter.
@@ -73,17 +73,22 @@ namespace Fabric.Databus.SqlGenerator
         public ISqlGenerator AddColumn(string entityName, string columnName, string alias)
         {
             this.SelectColumns.Add(new SqlGeneratorColumn
-                                       {
-                                           EntityName = entityName,
-                                           ColumnName = columnName,
-                                           Alias = alias
-                                       });
+            {
+                EntityName = entityName,
+                ColumnName = columnName,
+                Alias = alias
+            });
             return this;
         }
 
         /// <inheritdoc />
         public ISqlGenerator AddColumn(string columnName)
         {
+            if (string.IsNullOrWhiteSpace(columnName))
+            {
+                throw new ArgumentNullException(nameof(columnName));
+            }
+
             this.AddColumn(null, columnName, null);
             return this;
         }
@@ -91,6 +96,11 @@ namespace Fabric.Databus.SqlGenerator
         /// <inheritdoc />
         public ISqlGenerator AddJoin(ISqlGeneratorJoin join)
         {
+            if (join == null)
+            {
+                throw new ArgumentNullException(nameof(join));
+            }
+
             this.SelectJoins.Add(@join);
             return this;
         }
@@ -106,26 +116,63 @@ namespace Fabric.Databus.SqlGenerator
         /// <inheritdoc />
         public ISqlGenerator AddCTE(string loadSql)
         {
+            if (string.IsNullOrWhiteSpace(loadSql))
+            {
+                throw new ArgumentNullException(nameof(loadSql));
+            }
+
             this.QueryForCTE = loadSql;
             return this;
         }
 
         /// <inheritdoc />
-        public ISqlGenerator AddOrderByAscending(string columnName)
+        public ISqlGenerator AddOrderByAscending(string tableName, string columnName)
         {
-            this.OrderByColumnAscending = columnName;
+            if (string.IsNullOrEmpty(tableName))
+            {
+                throw new ArgumentNullException(nameof(tableName));
+            }
+
+            if (string.IsNullOrWhiteSpace(columnName))
+            {
+                throw new ArgumentNullException(nameof(columnName));
+            }
+
+            this.OrderByColumnAscending = new Tuple<string, string>(tableName, columnName);
+
             return this;
         }
 
         /// <inheritdoc />
-        public ISqlGenerator AddRangeFilter(string columnName, string startVariable, string endVariable)
+        public ISqlGenerator AddRangeFilter(string tableName, string columnName, string startVariable, string endVariable)
         {
+            if (string.IsNullOrWhiteSpace(tableName))
+            {
+                throw new ArgumentNullException(nameof(tableName));
+            }
+
+            if (string.IsNullOrWhiteSpace(columnName))
+            {
+                throw new ArgumentNullException(nameof(columnName));
+            }
+
+            if (string.IsNullOrWhiteSpace(startVariable))
+            {
+                throw new ArgumentNullException(nameof(startVariable));
+            }
+
+            if (string.IsNullOrWhiteSpace(endVariable))
+            {
+                throw new ArgumentNullException(nameof(endVariable));
+            }
+
             this.RangeFilter = new SqlRangeFilter
-                                   {
-                                       ColumnName = columnName,
-                                       StartVariable = startVariable,
-                                       EndVariable = endVariable
-                                   };
+            {
+                TableName = tableName,
+                ColumnName = columnName,
+                StartVariable = startVariable,
+                EndVariable = endVariable
+            };
             return this;
         }
 
@@ -133,16 +180,26 @@ namespace Fabric.Databus.SqlGenerator
         public ISqlGenerator AddIncrementalColumn(
             string incrementalColumnName,
             string incrementalColumnOperator,
-            string incrementalColumnValue, 
+            string incrementalColumnValue,
             string incrementalColumnType)
         {
+            if (string.IsNullOrWhiteSpace(incrementalColumnName))
+            {
+                throw new ArgumentNullException(nameof(incrementalColumnName));
+            }
+
+            if (string.IsNullOrWhiteSpace(incrementalColumnOperator))
+            {
+                throw new ArgumentNullException(nameof(incrementalColumnOperator));
+            }
+
             this.IncrementalColumns.Add(new SqlIncrementalColumn
-                                            {
-                                                Name = incrementalColumnName,
-                                                Operator = incrementalColumnOperator,
-                                                Type = incrementalColumnType,
-                                                Value = incrementalColumnValue
-                                            });
+            {
+                Name = incrementalColumnName,
+                Operator = incrementalColumnOperator,
+                Type = incrementalColumnType,
+                Value = incrementalColumnValue
+            });
 
             return this;
         }
@@ -184,6 +241,16 @@ namespace Fabric.Databus.SqlGenerator
             IEnumerable<ISqlEntityColumnMapping> entityColumnMappings,
             IEnumerable<IIncrementalColumn> incrementalColumns)
         {
+            if (string.IsNullOrWhiteSpace(entityName))
+            {
+                throw new ArgumentNullException(nameof(entityName));
+            }
+
+            if (string.IsNullOrWhiteSpace(topLevelKey))
+            {
+                throw new ArgumentNullException(nameof(topLevelKey));
+            }
+
             if (sqlRelationships == null)
             {
                 throw new ArgumentNullException(nameof(sqlRelationships));
@@ -193,6 +260,13 @@ namespace Fabric.Databus.SqlGenerator
             {
                 throw new ArgumentNullException(nameof(entityColumnMappings));
             }
+
+            if (incrementalColumns == null)
+            {
+                throw new ArgumentNullException(nameof(incrementalColumns));
+            }
+
+            this.SetEntity(entityName);
 
             var sqlRelationships1 = sqlRelationships.Reverse().ToList();
 
@@ -263,12 +337,12 @@ namespace Fabric.Databus.SqlGenerator
                     $"KeyLevel{relationshipIndex}");
                 this.AddJoin(
                     new SqlGeneratorJoin
-                        {
-                            SourceEntity = sqlRelationship.Source.Entity,
-                            SourceEntityKey = sqlRelationship.Source.Key,
-                            DestinationEntity = sqlRelationship.Destination.Entity,
-                            DestinationEntityKey = sqlRelationship.Destination.Key
-                        });
+                    {
+                        SourceEntity = sqlRelationship.Source.Entity,
+                        SourceEntityKey = sqlRelationship.Source.Key,
+                        DestinationEntity = sqlRelationship.Destination.Entity,
+                        DestinationEntityKey = sqlRelationship.Destination.Key
+                    });
             }
 
             this.AddColumn(sqlRelationships1.Last().Source.Entity, topLevelKey, "KeyLevel1");
@@ -327,7 +401,7 @@ namespace Fabric.Databus.SqlGenerator
             if (this.RangeFilter != null)
             {
                 sb.AppendLine(
-                    $"WHERE [{this.RangeFilter.ColumnName}] BETWEEN {this.RangeFilter.StartVariable} AND {this.RangeFilter.EndVariable}");
+                    $"WHERE {this.RangeFilter.TableName}.[{this.RangeFilter.ColumnName}] BETWEEN {this.RangeFilter.StartVariable} AND {this.RangeFilter.EndVariable}");
             }
             else
             {
@@ -344,7 +418,7 @@ namespace Fabric.Databus.SqlGenerator
 
             if (this.OrderByColumnAscending != null)
             {
-                sb.AppendLine($"ORDER BY [{this.OrderByColumnAscending}] ASC");
+                sb.AppendLine($"ORDER BY {this.OrderByColumnAscending.Item1}.[{this.OrderByColumnAscending.Item2}] ASC");
             }
 
             this.InsertTopStatementAtEnd(sb);
@@ -358,6 +432,11 @@ namespace Fabric.Databus.SqlGenerator
         /// </param>
         protected virtual void InsertTopStatementAtBeginning(StringBuilder sb)
         {
+            if (sb == null)
+            {
+                throw new ArgumentNullException(nameof(sb));
+            }
+
             if (this.TopFilterCount >= 0)
             {
                 sb.AppendLine($"TOP {this.TopFilterCount}");

@@ -94,17 +94,21 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <summary>
         /// The add order by ascending.
         /// </summary>
+        /// <param name="tableName"></param>
         /// <param name="columnName">
-        /// The column name.
+        ///     The column name.
         /// </param>
         /// <returns>
         /// The <see cref="ISqlGenerator"/>.
         /// </returns>
-        ISqlGenerator AddOrderByAscending(string columnName);
+        ISqlGenerator AddOrderByAscending(string tableName, string columnName);
 
         /// <summary>
         /// The add range filter.
         /// </summary>
+        /// <param name="tableName">
+        /// The table Name.
+        /// </param>
         /// <param name="columnName">
         /// The column name.
         /// </param>
@@ -117,7 +121,7 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <returns>
         /// The <see cref="ISqlGenerator"/>.
         /// </returns>
-        ISqlGenerator AddRangeFilter(string columnName, string startVariable, string endVariable);
+        ISqlGenerator AddRangeFilter(string tableName, string columnName, string startVariable, string endVariable);
 
         /// <summary>
         /// The add incremental column.

@@ -85,12 +85,13 @@ namespace Fabric.Databus.Shared
             string end,
             ILogger logger,
             string topLevelKeyColumn,
-            IEnumerable<IIncrementalColumn> incrementalColumns)
+            IEnumerable<IIncrementalColumn> incrementalColumns,
+            string topLevelTableName)
         {
             using (var conn = this.sqlConnectionFactory.GetConnection(this.connectionString))
             {
                 conn.Open();
-                var cmd = this.CreateSqlCommand(load, start, end, topLevelKeyColumn, incrementalColumns, conn);
+                var cmd = this.CreateSqlCommand(load, start, end, topLevelKeyColumn, incrementalColumns, conn, topLevelTableName);
 
                 try
                 {
@@ -177,7 +178,8 @@ namespace Fabric.Databus.Shared
             string end,
             string topLevelKeyColumn,
             IEnumerable<IIncrementalColumn> incrementalColumns,
-            IDbConnection conn)
+            IDbConnection conn,
+            string topLevelTableName)
         {
             var cmd = conn.CreateCommand();
 
@@ -186,7 +188,7 @@ namespace Fabric.Databus.Shared
                 cmd.CommandTimeout = this.sqlCommandTimeoutInSeconds;
             }
 
-            var sqlGenerator = this.sqlGeneratorFactory.Create().AddOrderByAscending("KeyLevel1");
+            var sqlGenerator = this.sqlGeneratorFactory.Create().AddOrderByAscending(topLevelTableName, topLevelKeyColumn);
 
             if (!string.IsNullOrWhiteSpace(load.Sql))
             {
@@ -207,7 +209,7 @@ namespace Fabric.Databus.Shared
 
             if (start != null)
             {
-                sqlGenerator.AddRangeFilter("KeyLevel1", "@start", "@end");
+                sqlGenerator.AddRangeFilter(topLevelTableName, topLevelKeyColumn, "@start", "@end");
 
                 cmd.AddParameterWithValue("@start", start);
                 cmd.AddParameterWithValue("@end", end);
@@ -277,15 +279,7 @@ namespace Fabric.Databus.Shared
                     cmd.CommandTimeout = this.sqlCommandTimeoutInSeconds;
                 }
 
-                var sqlGenerator = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddColumn(null, topLevelKeyColumn, null)
-                    .AddOrderByAscending(topLevelKeyColumn);
-
-                if (maximumEntitiesToLoad > 0)
-                {
-                    sqlGenerator.AddTopFilter(maximumEntitiesToLoad);
-                }
-
-                cmd.CommandText = sqlGenerator.ToSqlString();
+                cmd.CommandText = this.GetQueryForEntityKeys(topLevelKeyColumn, maximumEntitiesToLoad, load);
 
                 // Logger.Verbose($"Start: {cmd.CommandText}");
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
@@ -301,6 +295,53 @@ namespace Fabric.Databus.Shared
                 // Logger.Verbose($"Finish: {cmd.CommandText}");
                 return list;
             }
+        }
+
+        /// <summary>
+        /// The get query for entity keys.
+        /// </summary>
+        /// <param name="topLevelKeyColumn">
+        /// The top level key column.
+        /// </param>
+        /// <param name="maximumEntitiesToLoad">
+        /// The maximum entities to load.
+        /// </param>
+        /// <param name="load">
+        /// The load.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public string GetQueryForEntityKeys(
+            string topLevelKeyColumn,
+            int maximumEntitiesToLoad,
+            ITopLevelDataSource load)
+        {
+            var sqlGenerator = this.sqlGeneratorFactory.Create();
+
+            if (!string.IsNullOrWhiteSpace(load.Sql))
+            {
+                sqlGenerator.AddCTE(load.Sql)
+                    .AddColumn(null, topLevelKeyColumn, null);
+            }
+            else
+            {
+                sqlGenerator.CreateSqlStatement(
+                    load.TableOrView,
+                    topLevelKeyColumn,
+                    load.Relationships,
+                    load.SqlEntityColumnMappings,
+                    load.IncrementalColumns);
+            }
+
+            sqlGenerator.AddOrderByAscending(load.TableOrView, topLevelKeyColumn);
+
+            if (maximumEntitiesToLoad > 0)
+            {
+                sqlGenerator.AddTopFilter(maximumEntitiesToLoad);
+            }
+
+            return sqlGenerator.ToSqlString();
         }
     }
 }

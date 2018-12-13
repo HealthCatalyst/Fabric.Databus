@@ -77,7 +77,7 @@ namespace Fabric.Databus.Schema
                     conn.Open();
                     var cmd = conn.CreateCommand();
 
-                    cmd.CommandText = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddTopFilter(0).ToSqlString();
+                    cmd.CommandText = this.GetQueryForSchema(load);
 
                     try
                     {
@@ -142,5 +142,34 @@ namespace Fabric.Databus.Schema
             return dictionary;
         }
 
+        /// <summary>
+        /// The get query for schema.
+        /// </summary>
+        /// <param name="load">
+        /// The load.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        private string GetQueryForSchema(IDataSource load)
+        {
+            var sqlGenerator = this.sqlGeneratorFactory.Create();
+            if (!string.IsNullOrWhiteSpace(load.Sql))
+            {
+                sqlGenerator.AddCTE(load.Sql);
+            }
+            else
+            {
+                sqlGenerator.CreateSqlStatement(
+                    load.TableOrView,
+                    this.topLevelKeyColumn,
+                    load.Relationships,
+                    load.SqlEntityColumnMappings,
+                    new List<IIncrementalColumn>());
+            }
+
+            var cmdCommandText = sqlGenerator.AddTopFilter(0).ToSqlString();
+            return cmdCommandText;
+        }
     }
 }

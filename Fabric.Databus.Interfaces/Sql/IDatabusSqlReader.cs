@@ -45,6 +45,9 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <param name="incrementalColumns">
         /// incremental columns
         /// </param>
+        /// <param name="topLevelTableName">
+        /// top level table name
+        /// </param>
         /// <returns>
         /// The <see cref="ReadSqlDataResult"/>ReadSqlDataResult
         /// </returns>
@@ -57,7 +60,8 @@ namespace Fabric.Databus.Interfaces.Sql
             string end,
             ILogger logger,
             string topLevelKeyColumn,
-            IEnumerable<IIncrementalColumn> incrementalColumns);
+            IEnumerable<IIncrementalColumn> incrementalColumns,
+            string topLevelTableName);
 
         /// <summary>
         /// The get list of entity keys.
@@ -117,6 +121,9 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <param name="conn">
         /// The conn.
         /// </param>
+        /// <param name="topLevelTableName">
+        /// top level table name
+        /// </param>
         /// <returns>
         /// The <see cref="DbCommand"/>.
         /// </returns>
@@ -126,6 +133,7 @@ namespace Fabric.Databus.Interfaces.Sql
             string end,
             string topLevelKeyColumn,
             IEnumerable<IIncrementalColumn> incrementalColumns,
-            IDbConnection conn);
+            IDbConnection conn,
+            string topLevelTableName);
     }
 }

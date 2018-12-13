@@ -61,6 +61,7 @@
     <Compile Include="DatabusSqlReaderUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helpers\TestDataSource.cs" />
+    <Compile Include="TestTopLevelDataSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

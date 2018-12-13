@@ -1,18 +1,18 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IIncrementalColumn.cs" company="">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ISqlIncrementalColumn.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   The IncrementalColumn interface.
+//   The SqlIncrementalColumn interface.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Interfaces.Config
+namespace Fabric.Databus.Interfaces.Sql
 {
     /// <summary>
-    /// The IncrementalColumn interface.
+    /// The SqlIncrementalColumn interface.
     /// </summary>
-    public interface IIncrementalColumn
+    public interface ISqlIncrementalColumn
     {
         /// <summary>
         /// Gets or sets the name.
@@ -25,11 +25,18 @@ namespace Fabric.Databus.Interfaces.Config
         string Operator { get; set; }
 
         /// <summary>
+        /// Gets the sql operator.
+        /// </summary>
+        string SqlOperator { get; }
+
+        /// <summary>
         /// Gets or sets the value.
         /// </summary>
         string Value { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the sql type.
+        /// </summary>
         string Type { get; set; }
     }
 }

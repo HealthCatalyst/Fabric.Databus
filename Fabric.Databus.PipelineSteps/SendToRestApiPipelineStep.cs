@@ -83,7 +83,7 @@ namespace Fabric.Databus.PipelineSteps
             await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
             // now send to Rest Api
-            var fileUploadResult = await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, false);
+            var fileUploadResult = await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, this.Config.CompressFiles);
 
             await this.WriteDiagnosticsAsync(workItem, fileUploadResult);
         }

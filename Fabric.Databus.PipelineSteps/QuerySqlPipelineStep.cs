@@ -222,11 +222,12 @@ namespace Fabric.Databus.PipelineSteps
             ITopLevelDataSource topLevelDataSource)
         {
             var result = await this.databusSqlReader.ReadDataFromQueryAsync(
-                load,
-                start,
-                end,
-                this.MyLogger,
-                topLevelDataSource.Key);
+                             load,
+                             start,
+                             end,
+                             this.MyLogger,
+                             topLevelDataSource.Key,
+                             topLevelDataSource.IncrementalColumns);
 
             await this.WriteDiagnostics(queryId, batchNumber, result);
 

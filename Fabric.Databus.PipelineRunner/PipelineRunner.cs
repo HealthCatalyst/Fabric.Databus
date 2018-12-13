@@ -173,14 +173,9 @@ namespace Fabric.Databus.PipelineRunner
                 {
                     dataSource.Path = $"$.{dataSource.Path}";
                 }
-
-                if (string.IsNullOrEmpty(dataSource.Sql))
-                {
-                    dataSource.Sql = this.GenerateSqlForDataSource(dataSource, job.Data.TopLevelDataSource.Key);
-                }
             }
 
-            this.container.Resolve<IConfigValidator>().ValidateDataSources(job, logger);
+            this.container.Resolve<IConfigValidator>().ValidateDataSourcesAsync(job, logger);
 
             // add job to the first queue
             var sqlJobQueue = this.container.Resolve<IQueueManager>()
@@ -215,28 +210,6 @@ namespace Fabric.Databus.PipelineRunner
 
             logger.Information("Finished pipeline");
             Log.CloseAndFlush();
-        }
-
-        /// <summary>
-        /// The generate sql for data source.
-        /// </summary>
-        /// <param name="dataSource">
-        /// The data source.
-        /// </param>
-        /// <param name="topLevelKeyColumn">
-        /// The top Level Key Column.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        private string GenerateSqlForDataSource(IDataSource dataSource, string topLevelKeyColumn)
-        {
-            return SqlSelectStatementGenerator.GetSqlStatement(
-                dataSource.TableOrView,
-                topLevelKeyColumn,
-                dataSource.Relationships,
-                dataSource.SqlEntityColumnMappings,
-                this.container.Resolve<ISqlGeneratorFactory>());
         }
 
         /// <summary>

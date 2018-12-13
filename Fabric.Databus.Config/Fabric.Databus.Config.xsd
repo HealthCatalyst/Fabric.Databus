@@ -27,6 +27,33 @@
       <xs:enumeration value="NotEqualTo" />
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="incrementalColumnType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="bigint" />
+      <xs:enumeration value="numeric" />
+      <xs:enumeration value="bit" />
+      <xs:enumeration value="smallint" />
+      <xs:enumeration value="decimal" />
+      <xs:enumeration value="smallmoney" />
+      <xs:enumeration value="int" />
+      <xs:enumeration value="tinyint" />
+      <xs:enumeration value="money" />
+      <xs:enumeration value="float" />
+      <xs:enumeration value="real" />
+      <xs:enumeration value="date" />
+      <xs:enumeration value="datetimeoffset" />
+      <xs:enumeration value="datetime2" />
+      <xs:enumeration value="smalldatetime" />
+      <xs:enumeration value="datetime" />
+      <xs:enumeration value="time" />
+      <xs:enumeration value="char" />
+      <xs:enumeration value="varchar" />
+      <xs:enumeration value="text" />
+      <xs:enumeration value="nchar" />
+      <xs:enumeration value="nvarchar" />
+      <xs:enumeration value="ntext" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:element name="Job">
     <xs:complexType>
@@ -74,6 +101,7 @@
                           <xs:extension base="xs:string">
                             <xs:attribute type="xs:string" name="Name" use="required"/>
                             <xs:attribute type="incrementalColumnOperator" name="Operator" use="required"/>
+                            <xs:attribute type="incrementalColumnType" name="Type" use="required"/>
                             <xs:attribute type="xs:string" name="Value" use="required"/>
                           </xs:extension>
                         </xs:simpleContent>

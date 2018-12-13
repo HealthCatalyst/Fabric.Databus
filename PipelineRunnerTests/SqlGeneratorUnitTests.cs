@@ -29,6 +29,7 @@ namespace PipelineRunnerTests
 SELECT
 *
 FROM CTE
+WHERE 1=1
 ;";
 
             var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").ToSqlString();
@@ -47,6 +48,7 @@ SELECT
 TOP 1
 *
 FROM CTE
+WHERE 1=1
 ;";
 
             var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").AddTopFilter(1).ToSqlString();
@@ -65,6 +67,7 @@ SELECT
 TOP 5
 *
 FROM CTE
+WHERE 1=1
 ORDER BY [OrderID] ASC
 ;";
 
@@ -86,6 +89,7 @@ ORDER BY [OrderID] ASC
 SELECT
 *
 FROM CTE
+WHERE 1=1
 ORDER BY [BindingID] ASC
 ;";
 
@@ -104,6 +108,7 @@ ORDER BY [BindingID] ASC
 SELECT
 [OrderID]
 FROM CTE
+WHERE 1=1
 ORDER BY [BindingID] ASC
 ;";
 
@@ -131,6 +136,34 @@ ORDER BY [BindingID] ASC
             var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders")
                 .AddRangeFilter("BindingID", "@start", "@end")
                 .AddOrderByAscending("BindingID")
+                .ToSqlString();
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// The generates sql for top 1.
+        /// </summary>
+        [TestMethod]
+        public void GeneratesSqlForCTETop1WithJoin()
+        {
+            string expected = @";WITH CTE AS ( SELECT * FROM Clinical.Orders )
+SELECT
+TOP 1
+*
+FROM CTE
+INNER JOIN Clinical.Patients ON Clinical.Patients.[OrderKEY] = Clinical.Orders.[OrderKEY]
+WHERE 1=1
+;";
+
+            var actual = new SqlGenerator().AddCTE("SELECT * FROM Clinical.Orders").AddTopFilter(1)
+                .AddJoin(new SqlGeneratorJoin
+                             {
+                                 SourceEntity = "Clinical.Patients",
+                                 SourceEntityKey = "OrderKEY",
+                                 DestinationEntity = "Clinical.Orders",
+                                 DestinationEntityKey = "OrderKEY"
+                             })
                 .ToSqlString();
 
             Assert.AreEqual(expected, actual);

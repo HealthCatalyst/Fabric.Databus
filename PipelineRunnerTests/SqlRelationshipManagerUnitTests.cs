@@ -29,16 +29,18 @@ namespace PipelineRunnerTests
         [TestMethod]
         public void TestNoRelationships()
         {
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+            var sqlStatement = new SqlGenerator().CreateSqlStatement(
                 "Text.Text",
                 "TextID",
                 new List<ISqlRelationship>(),
                 new List<ISqlEntityColumnMapping>(),
-                new SqlGeneratorFactory());
+                new List<IIncrementalColumn>())
+                .ToSqlString();
 
             string expected = @"SELECT
 Text.Text.*,Text.Text.[TextID] AS [KeyLevel1]
 FROM Text.Text
+WHERE 1=1
 ";
             Assert.AreEqual(expected, sqlStatement);
         }
@@ -49,16 +51,18 @@ FROM Text.Text
         [TestMethod]
         public void TestNoRelationshipsWithSpecificColumnsWithoutEntity()
         {
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+            var sqlStatement = new SqlGenerator().CreateSqlStatement(
                 "Text.Text",
                 "TextID",
                 new List<ISqlRelationship>(),
                 new List<ISqlEntityColumnMapping> { new SqlEntityColumnMapping { Name = "TextSourceDSC" } },
-                new SqlGeneratorFactory());
+                new List<IIncrementalColumn>())
+                .ToSqlString();
 
             string expected = @"SELECT
 Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
 FROM Text.Text
+WHERE 1=1
 ";
             Assert.AreEqual(expected, sqlStatement);
         }
@@ -69,7 +73,7 @@ FROM Text.Text
         [TestMethod]
         public void TestNoRelationshipsWithSpecificColumns()
         {
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+            var sqlStatement = new SqlGenerator().CreateSqlStatement(
                 "Text.Text",
                 "TextID",
                 new List<ISqlRelationship>(),
@@ -77,11 +81,13 @@ FROM Text.Text
                     {
                         new SqlEntityColumnMapping { Entity = "Text.Text", Name = "TextSourceDSC" }
                     },
-                new SqlGeneratorFactory());
+                new List<IIncrementalColumn>())
+                .ToSqlString();
 
             string expected = @"SELECT
 Text.Text.[TextSourceDSC],Text.Text.[TextID] AS [KeyLevel1]
 FROM Text.Text
+WHERE 1=1
 ";
             Assert.AreEqual(expected, sqlStatement);
         }
@@ -92,7 +98,7 @@ FROM Text.Text
         [TestMethod]
         public void TestNoRelationshipsWithSpecificColumnsUsingAlias()
         {
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+            var sqlStatement = new SqlGenerator().CreateSqlStatement(
                 "Text.Text",
                 "TextID",
                 new List<ISqlRelationship>(),
@@ -100,11 +106,13 @@ FROM Text.Text
                     {
                         new SqlEntityColumnMapping { Name = "TextSourceDSC", Alias = "extension" }
                     },
-                new SqlGeneratorFactory());
+                new List<IIncrementalColumn>())
+                .ToSqlString();
 
             string expected = @"SELECT
 Text.Text.[TextSourceDSC] AS [extension],Text.Text.[TextID] AS [KeyLevel1]
 FROM Text.Text
+WHERE 1=1
 ";
             Assert.AreEqual(expected, sqlStatement);
         }
@@ -129,17 +137,19 @@ FROM Text.Text
                 }
             };
 
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+            var sqlStatement = new SqlGenerator().CreateSqlStatement(
                 "Person.Patient",
                 "TextID",
                 new List<ISqlRelationship> { sqlRelationship },
                 new List<ISqlEntityColumnMapping>(),
-                new SqlGeneratorFactory());
+                new List<IIncrementalColumn>())
+                .ToSqlString();
 
             string expected = @"SELECT
 Person.Patient.*,Person.Patient.[EdwPatientID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]
 FROM Person.Patient
 INNER JOIN Text.Text ON Text.Text.[EdwPatientID] = Person.Patient.[EdwPatientID]
+WHERE 1=1
 ";
 
             Assert.AreEqual(expected, sqlStatement);
@@ -179,18 +189,20 @@ INNER JOIN Text.Text ON Text.Text.[EdwPatientID] = Person.Patient.[EdwPatientID]
                 }
             };
 
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+            var sqlStatement = new SqlGenerator().CreateSqlStatement(
                 "Clinical.FacilityAccount",
                 "TextID",
                 new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2 },
                 new List<ISqlEntityColumnMapping>(),
-                new SqlGeneratorFactory());
+                new List<IIncrementalColumn>())
+                .ToSqlString();
 
             string expected = @"SELECT
 Clinical.FacilityAccount.*,Clinical.FacilityAccount.[FacilityAccountID] AS [KeyLevel3],Clinical.Encounter.[EncounterID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]
 FROM Clinical.FacilityAccount
 INNER JOIN Clinical.Encounter ON Clinical.Encounter.[FacilityAccountID] = Clinical.FacilityAccount.[FacilityAccountID]
 INNER JOIN Text.Text ON Text.Text.[EncounterID] = Clinical.Encounter.[EncounterID]
+WHERE 1=1
 ";
 
             Assert.AreEqual(expected, sqlStatement);
@@ -244,12 +256,13 @@ INNER JOIN Text.Text ON Text.Text.[EncounterID] = Clinical.Encounter.[EncounterI
                 }
             };
 
-            var sqlStatement = SqlSelectStatementGenerator.GetSqlStatement(
+            var sqlStatement = new SqlGenerator().CreateSqlStatement(
                 "Person.Provider",
                 "TextID",
                 new List<ISqlRelationship> { sqlRelationship1, sqlRelationship2, sqlRelationship3 },
                 new List<ISqlEntityColumnMapping>(),
-                new SqlGeneratorFactory());
+                new List<IIncrementalColumn>())
+                .ToSqlString();
 
             string expected = @"SELECT
 Person.Provider.*,Person.Provider.[EDWProviderID] AS [KeyLevel4],Clinical.FacilityAccount.[FacilityAccountID] AS [KeyLevel3],Clinical.Encounter.[EncounterID] AS [KeyLevel2],Text.Text.[TextID] AS [KeyLevel1]
@@ -257,8 +270,8 @@ FROM Person.Provider
 INNER JOIN Clinical.FacilityAccount ON Clinical.FacilityAccount.[EDWAttendingProviderID] = Person.Provider.[EDWProviderID]
 INNER JOIN Clinical.Encounter ON Clinical.Encounter.[FacilityAccountID] = Clinical.FacilityAccount.[FacilityAccountID]
 INNER JOIN Text.Text ON Text.Text.[EncounterID] = Clinical.Encounter.[EncounterID]
+WHERE 1=1
 ";
-
             Assert.AreEqual(expected, sqlStatement);
         }
     }

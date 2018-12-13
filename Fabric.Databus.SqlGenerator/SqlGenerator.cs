@@ -9,13 +9,6 @@
 
 namespace Fabric.Databus.SqlGenerator
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
-    using Fabric.Databus.Interfaces.Sql;
-    using Fabric.Shared;
-
     /// <inheritdoc />
     /// <summary>
     /// The sql generator.

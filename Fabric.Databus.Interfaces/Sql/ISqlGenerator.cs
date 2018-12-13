@@ -9,6 +9,12 @@
 
 namespace Fabric.Databus.Interfaces.Sql
 {
+    using System.Collections.Generic;
+    using System.Text;
+
+    using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces.Config;
+
     /// <summary>
     /// The SqlGenerator interface.
     /// </summary>
@@ -114,11 +120,70 @@ namespace Fabric.Databus.Interfaces.Sql
         ISqlGenerator AddRangeFilter(string columnName, string startVariable, string endVariable);
 
         /// <summary>
+        /// The add incremental column.
+        /// </summary>
+        /// <param name="incrementalColumnName">
+        /// The incremental column name.
+        /// </param>
+        /// <param name="incrementalColumnOperator">
+        /// The incremental column operator.
+        /// </param>
+        /// <param name="incrementalColumnValue">
+        /// The incremental column value.
+        /// </param>
+        /// <param name="incrementalColumnType">
+        /// The incremental Column Type.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ISqlGenerator"/>.
+        /// </returns>
+        ISqlGenerator AddIncrementalColumn(string incrementalColumnName, string incrementalColumnOperator, string incrementalColumnValue, string incrementalColumnType);
+
+        /// <summary>
         /// The to string.
         /// </summary>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
         string ToSqlString();
+
+        /// <summary>
+        /// The add incremental columns.
+        /// </summary>
+        /// <param name="incrementalColumns">
+        /// The incremental columns.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ISqlGenerator"/>.
+        /// </returns>
+        ISqlGenerator AddIncrementalColumns(IEnumerable<IIncrementalColumn> incrementalColumns);
+
+        /// <summary>
+        /// The create sql statement.
+        /// </summary>
+        /// <param name="entityName">
+        /// The entity name.
+        /// </param>
+        /// <param name="topLevelKey">
+        /// The top level key.
+        /// </param>
+        /// <param name="sqlRelationships">
+        /// The sql relationships.
+        /// </param>
+        /// <param name="entityColumnMappings">
+        /// The entity column mappings.
+        /// </param>
+        /// <param name="incrementalColumns">
+        /// The incremental columns.
+        /// </param>
+        /// <returns>
+        /// The <see cref="ISqlGenerator"/>.
+        /// </returns>
+        ISqlGenerator CreateSqlStatement(
+            string entityName,
+            string topLevelKey,
+            IEnumerable<ISqlRelationship> sqlRelationships,
+            IEnumerable<ISqlEntityColumnMapping> entityColumnMappings,
+            IEnumerable<IIncrementalColumn> incrementalColumns);
     }
 }

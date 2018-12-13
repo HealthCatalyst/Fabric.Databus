@@ -104,7 +104,15 @@ namespace Fabric.Databus.PipelineRunner
                 int i = 0;
                 foreach (var load in job.Data.DataSources)
                 {
-                    var queryIsValid = await this.CheckQueryIsValid(job, load, logger, ++i) ? "OK" : "No Rows";
+                    var queryIsValid = await this.CheckQueryIsValidAsync(
+                                           job,
+                                           load,
+                                           logger,
+                                           ++i,
+                                           job.Data.TopLevelDataSource.Key,
+                                           job.Data.TopLevelDataSource.IncrementalColumns)
+                                           ? "OK"
+                                           : "No Rows";
 
                     configValidationResult.Results.Add($"Query [{load.Path}]: {queryIsValid}");
                 }
@@ -168,7 +176,7 @@ namespace Fabric.Databus.PipelineRunner
         {
             var load = job.Data.DataSources.First(c => c.Path == null);
 
-            return await this.CheckQueryIsValid(job, load, logger, 1);
+            return await this.CheckQueryIsValidAsync(job, load, logger, 1, job.Data.TopLevelDataSource.Key, job.Data.TopLevelDataSource.IncrementalColumns);
         }
 
         /// <summary>
@@ -186,13 +194,35 @@ namespace Fabric.Databus.PipelineRunner
         /// <param name="numberOfDataSource">
         /// number of data source
         /// </param>
+        /// <param name="topLevelKey">
+        /// top level key
+        /// </param>
+        /// <param name="incrementalColumns">
+        /// incremental columns
+        /// </param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
         /// <DatabusValidationException cref="DatabusValidationException">DatabusValidationException thrown
         /// </DatabusValidationException>
-        public async Task<bool> CheckQueryIsValid(IJob job, IDataSource load, ILogger logger, int numberOfDataSource)
+        public async Task<bool> CheckQueryIsValidAsync(
+            IJob job,
+            IDataSource load,
+            ILogger logger,
+            int numberOfDataSource,
+            string topLevelKey, 
+            IEnumerable<IIncrementalColumn> incrementalColumns)
         {
+            if (string.IsNullOrWhiteSpace(topLevelKey))
+            {
+                throw new ArgumentNullException(nameof(topLevelKey));
+            }
+
+            if (incrementalColumns == null)
+            {
+                throw new ArgumentNullException(nameof(incrementalColumns));
+            }
+
             logger.Information("Validating data source {index} {path} {@load} {@StartTime}", numberOfDataSource, load.Path, load, DateTime.Now);
 
             using (var conn = this.sqlConnectionFactory.GetConnection(job.Config.ConnectionString))
@@ -205,7 +235,21 @@ namespace Fabric.Databus.PipelineRunner
                     cmd.CommandTimeout = job.Config.SqlCommandTimeoutInSeconds;
                 }
 
-                cmd.CommandText = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddTopFilter(0).ToSqlString();
+                if (!string.IsNullOrWhiteSpace(load.Sql))
+                {
+                    cmd.CommandText = this.sqlGeneratorFactory.Create().AddCTE(load.Sql).AddTopFilter(0).ToSqlString();
+                }
+                else
+                {
+                    cmd.CommandText = this.sqlGeneratorFactory.Create()
+                        .SetEntity(load.TableOrView)
+                        .CreateSqlStatement(
+                        load.TableOrView,
+                        topLevelKey,
+                        load.Relationships,
+                        load.SqlEntityColumnMappings,
+                        incrementalColumns).AddTopFilter(0).ToSqlString();
+                }
 
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
@@ -298,7 +342,7 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public void ValidateDataSources(IJob job, ILogger logger)
+        public async void ValidateDataSourcesAsync(IJob job, ILogger logger)
         {
             int numberOfDataSource = 0;
             foreach (var dataSource in job.Data.DataSources)
@@ -306,7 +350,7 @@ namespace Fabric.Databus.PipelineRunner
                 numberOfDataSource++;
                 try
                 {
-                    this.CheckQueryIsValid(job, dataSource, logger, numberOfDataSource).Wait();
+                    await this.CheckQueryIsValidAsync(job, dataSource, logger, numberOfDataSource, job.Data.TopLevelDataSource.Key, job.Data.TopLevelDataSource.IncrementalColumns);
                 }
                 catch (Exception e)
                 {

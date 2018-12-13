@@ -29,6 +29,10 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         [XmlAttribute]
+        public string Type { get; set; }
+
+        /// <inheritdoc />
+        [XmlAttribute]
         public string Value { get; set; }
     }
 }

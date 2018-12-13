@@ -11,6 +11,8 @@ namespace Fabric.Databus.Interfaces.Sql
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
+    using System.Data.Common;
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Config;
@@ -26,19 +28,22 @@ namespace Fabric.Databus.Interfaces.Sql
         /// The read data from query.
         /// </summary>
         /// <param name="load">
-        /// The load.
+        ///     The load.
         /// </param>
         /// <param name="start">
-        /// The start.
+        ///     The start.
         /// </param>
         /// <param name="end">
-        /// The end.
+        ///     The end.
         /// </param>
         /// <param name="logger">
-        /// The logger.
+        ///     The logger.
         /// </param>
         /// <param name="topLevelKeyColumn">
-        /// The top Level Key Column.
+        ///     The top Level Key Column.
+        /// </param>
+        /// <param name="incrementalColumns">
+        /// incremental columns
         /// </param>
         /// <returns>
         /// The <see cref="ReadSqlDataResult"/>ReadSqlDataResult
@@ -46,7 +51,13 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <exception cref="ArgumentNullException">
         /// exception thrown
         /// </exception>
-        Task<ReadSqlDataResult> ReadDataFromQueryAsync(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn);
+        Task<ReadSqlDataResult> ReadDataFromQueryAsync(
+            IDataSource load,
+            string start,
+            string end,
+            ILogger logger,
+            string topLevelKeyColumn,
+            IEnumerable<IIncrementalColumn> incrementalColumns);
 
         /// <summary>
         /// The get list of entity keys.
@@ -84,5 +95,37 @@ namespace Fabric.Databus.Interfaces.Sql
         /// The <see cref="Task"/>.
         /// </returns>
         Task<List<object[]>> CalculateFields(IDataSource load, List<ColumnInfo> columnList, List<object[]> rows);
+
+        /// <summary>
+        /// The create sql command.
+        /// </summary>
+        /// <param name="load">
+        /// The load.
+        /// </param>
+        /// <param name="start">
+        /// The start.
+        /// </param>
+        /// <param name="end">
+        /// The end.
+        /// </param>
+        /// <param name="topLevelKeyColumn">
+        /// The top level key column.
+        /// </param>
+        /// <param name="incrementalColumns">
+        /// The incremental columns.
+        /// </param>
+        /// <param name="conn">
+        /// The conn.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DbCommand"/>.
+        /// </returns>
+        DbCommand CreateSqlCommand(
+            IDataSource load,
+            string start,
+            string end,
+            string topLevelKeyColumn,
+            IEnumerable<IIncrementalColumn> incrementalColumns,
+            IDbConnection conn);
     }
 }

@@ -55,6 +55,6 @@ namespace Fabric.Databus.Domain.ConfigValidators
         /// <param name="logger">
         /// The logger.
         /// </param>
-        void ValidateDataSources(IJob job, ILogger logger);
+        void ValidateDataSourcesAsync(IJob job, ILogger logger);
     }
 }

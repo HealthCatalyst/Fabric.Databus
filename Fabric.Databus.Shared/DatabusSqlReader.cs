@@ -12,11 +12,13 @@ namespace Fabric.Databus.Shared
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Data.Common;
     using System.Linq;
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.Exceptions;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.ZipCodeToGeoCode;
 
@@ -77,128 +79,145 @@ namespace Fabric.Databus.Shared
         }
 
         /// <inheritdoc />
-        public async Task<ReadSqlDataResult> ReadDataFromQueryAsync(IDataSource load, string start, string end, ILogger logger, string topLevelKeyColumn)
+        public async Task<ReadSqlDataResult> ReadDataFromQueryAsync(
+            IDataSource load,
+            string start,
+            string end,
+            ILogger logger,
+            string topLevelKeyColumn,
+            IEnumerable<IIncrementalColumn> incrementalColumns)
         {
-            if (string.IsNullOrWhiteSpace(load.Sql))
-            {
-                throw new ArgumentNullException($"Sql property is null for load with path: {load.Path}");
-            }
-
             using (var conn = this.sqlConnectionFactory.GetConnection(this.connectionString))
             {
                 conn.Open();
-                var cmd = conn.CreateCommand();
+                var cmd = this.CreateSqlCommand(load, start, end, topLevelKeyColumn, incrementalColumns, conn);
 
-                if (this.sqlCommandTimeoutInSeconds != 0)
+                try
                 {
-                    cmd.CommandTimeout = this.sqlCommandTimeoutInSeconds;
-                }
+                    logger.Verbose("Sql Begin [{Path}]: {@load} {@cmd}", load.Path, load, cmd);
+                    var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
 
-                if (start == null)
-                {
-                    cmd.CommandText = this.sqlGeneratorFactory.Create()
-                        .AddCTE(load.Sql)
-                        .AddOrderByAscending("KeyLevel1")
-                        .ToSqlString();
-                }
-                else
-                {
-                    cmd.CommandText = this.sqlGeneratorFactory.Create()
-                        .AddCTE(load.Sql)
-                        .AddOrderByAscending("KeyLevel1")
-                        .AddRangeFilter("KeyLevel1", "@start", "@end")
-                        .ToSqlString();
+                    /* var schema = reader.GetSchemaTable(); */
 
-                    cmd.AddParameterWithValue("@start", start);
-                    cmd.AddParameterWithValue("@end", end);
-                }
+                    var numberOfColumns = reader.FieldCount;
 
-                logger.Verbose("Sql Begin [{Path}]: {@load} {@cmd}", load.Path, load, cmd);
-                var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
+                    var columnList = new List<ColumnInfo>(numberOfColumns);
 
-                /* var schema = reader.GetSchemaTable(); */
-
-                var numberOfColumns = reader.FieldCount;
-
-                var columnList = new List<ColumnInfo>(numberOfColumns);
-
-                for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++)
-                {
-                    var columnName = reader.GetName(columnNumber);
-
-                    var columnType = reader.GetFieldType(columnNumber);
-                    columnList.Add(new ColumnInfo
+                    for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++)
                     {
-                        index = columnNumber,
-                        Name = columnName,
-                        IsJoinColumn = columnName.Equals(topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
-                        ElasticSearchType = SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
-                        IsCalculated = false,
-                    });
-                }
+                        var columnName = reader.GetName(columnNumber);
 
-                var joinColumnIndex = 0;
-
-                // add any calculated fields
-                var calculatedFields = load.Fields.Where(f => f.Destination != null).Select(
-                    f => new ColumnInfo
-                             {
-                                 sourceIndex =
-                                     columnList.FirstOrDefault(
-                                         c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
-                                 index = numberOfColumns++,
-                                 Name = f.Destination,
-                                 ElasticSearchType = f.DestinationType.ToString(),
-                                 IsCalculated = true,
-                                 Transform = f.Transform.ToString()
-                             }).ToList();
-
-                calculatedFields.ForEach(c => columnList.Add(c));
-
-                // now write the data
-                var data = new Dictionary<string, List<object[]>>();
-
-                int rows = 0;
-
-                while (reader.Read())
-                {
-                    rows++;
-                    var values = new object[numberOfColumns];
-
-                    reader.GetValues(values);
-
-                    var key = Convert.ToString(values[joinColumnIndex]);
-                    if (!data.ContainsKey(key))
-                    {
-                        data.Add(key, new List<object[]> { values });
+                        var columnType = reader.GetFieldType(columnNumber);
+                        columnList.Add(new ColumnInfo
+                        {
+                            index = columnNumber,
+                            Name = columnName,
+                            IsJoinColumn = columnName.Equals(topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
+                            ElasticSearchType = SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
+                            IsCalculated = false,
+                        });
                     }
-                    else
+
+                    var joinColumnIndex = 0;
+
+                    // add any calculated fields
+                    var calculatedFields = load.Fields.Where(f => f.Destination != null).Select(
+                        f => new ColumnInfo
+                        {
+                            sourceIndex =
+                                         columnList.FirstOrDefault(
+                                             c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
+                            index = numberOfColumns++,
+                            Name = f.Destination,
+                            ElasticSearchType = f.DestinationType.ToString(),
+                            IsCalculated = true,
+                            Transform = f.Transform.ToString()
+                        }).ToList();
+
+                    calculatedFields.ForEach(c => columnList.Add(c));
+
+                    // now write the data
+                    var data = new Dictionary<string, List<object[]>>();
+
+                    int rows = 0;
+
+                    while (reader.Read())
                     {
-                        data[key].Add(values);
+                        rows++;
+                        var values = new object[numberOfColumns];
+
+                        reader.GetValues(values);
+
+                        var key = Convert.ToString(values[joinColumnIndex]);
+                        if (!data.ContainsKey(key))
+                        {
+                            data.Add(key, new List<object[]> { values });
+                        }
+                        else
+                        {
+                            data[key].Add(values);
+                        }
                     }
+
+                    logger.Verbose("Sql Finish [{Path}] ({rows}): {@load} {@cmd}", load.Path, rows, load, cmd);
+
+                    return new ReadSqlDataResult { Data = data, ColumnList = columnList };
                 }
-
-                logger.Verbose("Sql Finish [{Path}] ({rows}): {@load} {@cmd}", load.Path, rows, load, cmd);
-
-                return new ReadSqlDataResult { Data = data, ColumnList = columnList };
+                catch (Exception e)
+                {
+                    throw new DatabusSqlException(cmd.CommandText, e);
+                }
             }
         }
 
-        /// <summary>
-        /// The calculate fields.
-        /// </summary>
-        /// <param name="load">
-        ///     The load.
-        /// </param>
-        /// <param name="columnList">
-        ///     The column list.
-        /// </param>
-        /// <param name="rows">
-        ///     The rows.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
+        /// <inheritdoc />
+        public DbCommand CreateSqlCommand(
+            IDataSource load,
+            string start,
+            string end,
+            string topLevelKeyColumn,
+            IEnumerable<IIncrementalColumn> incrementalColumns,
+            IDbConnection conn)
+        {
+            var cmd = conn.CreateCommand();
+
+            if (this.sqlCommandTimeoutInSeconds != 0)
+            {
+                cmd.CommandTimeout = this.sqlCommandTimeoutInSeconds;
+            }
+
+            var sqlGenerator = this.sqlGeneratorFactory.Create().AddOrderByAscending("KeyLevel1");
+
+            if (!string.IsNullOrWhiteSpace(load.Sql))
+            {
+                sqlGenerator.AddCTE(load.Sql)
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    .AddIncrementalColumns(incrementalColumns);
+            }
+            else
+            {
+                sqlGenerator.SetEntity(load.TableOrView).CreateSqlStatement(
+                    load.TableOrView,
+                    topLevelKeyColumn,
+                    load.Relationships,
+                    load.SqlEntityColumnMappings,
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    incrementalColumns);
+            }
+
+            if (start != null)
+            {
+                sqlGenerator.AddRangeFilter("KeyLevel1", "@start", "@end");
+
+                cmd.AddParameterWithValue("@start", start);
+                cmd.AddParameterWithValue("@end", end);
+            }
+
+            cmd.CommandText = sqlGenerator.ToSqlString();
+            return cmd as DbCommand;
+        }
+
+        /// <inheritdoc />
         public async Task<List<object[]>> CalculateFields(
             IDataSource load,
             List<ColumnInfo> columnList,

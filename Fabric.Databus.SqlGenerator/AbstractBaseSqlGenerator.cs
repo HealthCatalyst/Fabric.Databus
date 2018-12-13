@@ -9,10 +9,13 @@
 
 namespace Fabric.Databus.SqlGenerator
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
 
+    using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Shared;
 
@@ -28,6 +31,11 @@ namespace Fabric.Databus.SqlGenerator
         /// The select joins.
         /// </summary>
         protected readonly IList<ISqlGeneratorJoin> SelectJoins = new List<ISqlGeneratorJoin>();
+
+        /// <summary>
+        /// The incremental columns.
+        /// </summary>
+        protected readonly IList<ISqlIncrementalColumn> IncrementalColumns = new List<ISqlIncrementalColumn>();
 
         /// <summary>
         /// Gets the destination entity.
@@ -122,6 +130,39 @@ namespace Fabric.Databus.SqlGenerator
         }
 
         /// <inheritdoc />
+        public ISqlGenerator AddIncrementalColumn(
+            string incrementalColumnName,
+            string incrementalColumnOperator,
+            string incrementalColumnValue, 
+            string incrementalColumnType)
+        {
+            this.IncrementalColumns.Add(new SqlIncrementalColumn
+                                            {
+                                                Name = incrementalColumnName,
+                                                Operator = incrementalColumnOperator,
+                                                Type = incrementalColumnType,
+                                                Value = incrementalColumnValue
+                                            });
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ISqlGenerator AddIncrementalColumns(IEnumerable<IIncrementalColumn> incrementalColumns)
+        {
+            foreach (var incrementalColumn in incrementalColumns)
+            {
+                this.AddIncrementalColumn(
+                    incrementalColumn.Name,
+                    incrementalColumn.Operator,
+                    incrementalColumn.Value,
+                    incrementalColumn.Type);
+            }
+
+            return this;
+        }
+
+        /// <inheritdoc />
         public virtual string ToSqlString()
         {
             if (this.QueryForCTE != null)
@@ -132,13 +173,116 @@ namespace Fabric.Databus.SqlGenerator
             var sb = new StringBuilder();
             this.AppendSelectStatement(sb, this.DestinationEntity);
 
-            foreach (var selectJoin in this.SelectJoins)
+            return sb.ToString();
+        }
+
+        /// <inheritdoc />
+        public ISqlGenerator CreateSqlStatement(
+            string entityName,
+            string topLevelKey,
+            IEnumerable<ISqlRelationship> sqlRelationships,
+            IEnumerable<ISqlEntityColumnMapping> entityColumnMappings,
+            IEnumerable<IIncrementalColumn> incrementalColumns)
+        {
+            if (sqlRelationships == null)
             {
-                sb.AppendLine(
-                    $"INNER JOIN {selectJoin.SourceEntity} ON {selectJoin.SourceEntity}.[{selectJoin.SourceEntityKey}] = {selectJoin.DestinationEntity}.[{selectJoin.DestinationEntityKey}]");
+                throw new ArgumentNullException(nameof(sqlRelationships));
             }
 
-            return sb.ToString();
+            if (entityColumnMappings == null)
+            {
+                throw new ArgumentNullException(nameof(entityColumnMappings));
+            }
+
+            var sqlRelationships1 = sqlRelationships.Reverse().ToList();
+
+            var sqlEntityColumnMappings = entityColumnMappings.ToList();
+
+            if (!sqlRelationships1.Any())
+            {
+                this.SetEntity(entityName);
+
+                if (sqlEntityColumnMappings.Any())
+                {
+                    foreach (var sqlEntityColumnMapping in sqlEntityColumnMappings)
+                    {
+                        this.AddColumn(
+                            sqlEntityColumnMapping.Entity ?? entityName,
+                            sqlEntityColumnMapping.Name,
+                            sqlEntityColumnMapping.Alias);
+                    }
+                }
+                else
+                {
+                    this.AddColumn(entityName, "*", null);
+                }
+
+                this.AddColumn(entityName, topLevelKey, "KeyLevel1");
+
+                // ReSharper disable once PossibleMultipleEnumeration
+                foreach (var incrementalColumn in incrementalColumns)
+                {
+                    this.AddIncrementalColumn(
+                        incrementalColumn.Name,
+                        incrementalColumn.Operator,
+                        incrementalColumn.Value,
+                        incrementalColumn.Type);
+                }
+
+                return this;
+            }
+
+            var sqlRelationshipsCount = sqlRelationships1.Count();
+
+            var destinationEntity = sqlRelationships1.First().Destination.Entity;
+
+            this.SetEntity(destinationEntity);
+
+            if (sqlEntityColumnMappings.Any())
+            {
+                foreach (var sqlEntityColumnMapping in sqlEntityColumnMappings)
+                {
+                    this.AddColumn(
+                        sqlEntityColumnMapping.Entity ?? entityName,
+                        sqlEntityColumnMapping.Name,
+                        sqlEntityColumnMapping.Alias);
+                }
+            }
+            else
+            {
+                this.AddColumn(destinationEntity, "*", null);
+            }
+
+            int relationshipIndex = sqlRelationshipsCount + 2;
+            foreach (var sqlRelationship in sqlRelationships1)
+            {
+                relationshipIndex--;
+                this.AddColumn(
+                    sqlRelationship.Destination.Entity,
+                    sqlRelationship.Destination.Key,
+                    $"KeyLevel{relationshipIndex}");
+                this.AddJoin(
+                    new SqlGeneratorJoin
+                        {
+                            SourceEntity = sqlRelationship.Source.Entity,
+                            SourceEntityKey = sqlRelationship.Source.Key,
+                            DestinationEntity = sqlRelationship.Destination.Entity,
+                            DestinationEntityKey = sqlRelationship.Destination.Key
+                        });
+            }
+
+            this.AddColumn(sqlRelationships1.Last().Source.Entity, topLevelKey, "KeyLevel1");
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (var incrementalColumn in incrementalColumns)
+            {
+                this.AddIncrementalColumn(
+                    incrementalColumn.Name,
+                    incrementalColumn.Operator,
+                    incrementalColumn.Value,
+                    incrementalColumn.Type);
+            }
+
+            return this;
         }
 
         /// <summary>
@@ -151,11 +295,18 @@ namespace Fabric.Databus.SqlGenerator
         /// destination entity</param>
         protected virtual void AppendSelectStatement(StringBuilder sb, string destinationEntity)
         {
-            sb.AppendLine("SELECT");
-            if (this.TopFilterCount >= 0)
+            if (sb == null)
             {
-                sb.AppendLine($"TOP {this.TopFilterCount}");
+                throw new ArgumentNullException(nameof(sb));
             }
+
+            if (string.IsNullOrWhiteSpace(destinationEntity))
+            {
+                throw new ArgumentNullException(nameof(destinationEntity));
+            }
+
+            sb.AppendLine("SELECT");
+            this.InsertTopStatementAtBeginning(sb);
 
             if (!this.SelectColumns.Any())
             {
@@ -167,16 +318,60 @@ namespace Fabric.Databus.SqlGenerator
             sb.AppendLine(columnList);
             sb.AppendLine($"FROM {destinationEntity}");
 
+            foreach (var selectJoin in this.SelectJoins)
+            {
+                sb.AppendLine(
+                    $"INNER JOIN {selectJoin.SourceEntity} ON {selectJoin.SourceEntity}.[{selectJoin.SourceEntityKey}] = {selectJoin.DestinationEntity}.[{selectJoin.DestinationEntityKey}]");
+            }
+
             if (this.RangeFilter != null)
             {
                 sb.AppendLine(
                     $"WHERE [{this.RangeFilter.ColumnName}] BETWEEN {this.RangeFilter.StartVariable} AND {this.RangeFilter.EndVariable}");
+            }
+            else
+            {
+                sb.AppendLine(
+                    $"WHERE 1=1");
+            }
+
+            int i = 0;
+            foreach (var incrementalColumn in this.IncrementalColumns)
+            {
+                sb.AppendLine(
+                    $"AND [{incrementalColumn.Name}] {incrementalColumn.SqlOperator} @incrementColumnValue{++i}");
             }
 
             if (this.OrderByColumnAscending != null)
             {
                 sb.AppendLine($"ORDER BY [{this.OrderByColumnAscending}] ASC");
             }
+
+            this.InsertTopStatementAtEnd(sb);
+        }
+
+        /// <summary>
+        /// The insert top statement at beginning.
+        /// </summary>
+        /// <param name="sb">
+        /// The sb.
+        /// </param>
+        protected virtual void InsertTopStatementAtBeginning(StringBuilder sb)
+        {
+            if (this.TopFilterCount >= 0)
+            {
+                sb.AppendLine($"TOP {this.TopFilterCount}");
+            }
+        }
+
+        /// <summary>
+        /// The insert top statement at end.
+        /// </summary>
+        /// <param name="sb">
+        /// The sb.
+        /// </param>
+        protected virtual void InsertTopStatementAtEnd(StringBuilder sb)
+        {
         }
 
         /// <summary>

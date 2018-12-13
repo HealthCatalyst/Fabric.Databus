@@ -162,7 +162,13 @@ namespace Fabric.Databus.Shared
 
                     logger.Verbose("Sql Finish [{Path}] ({rows}): {@load} {@cmd}", load.Path, rows, load, cmd);
 
-                    return new ReadSqlDataResult { Data = data, ColumnList = columnList };
+                    var parameters = new Dictionary<string, object>();
+                    foreach (DbParameter parameter in cmd.Parameters)
+                    {
+                        parameters.Add(parameter.ParameterName, parameter.Value);
+                    }
+
+                    return new ReadSqlDataResult { Data = data, ColumnList = columnList, SqlCommandText = cmd.CommandText, SqlCommandParameters = parameters };
                 }
                 catch (Exception e)
                 {

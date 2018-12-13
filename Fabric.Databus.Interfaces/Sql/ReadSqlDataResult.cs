@@ -25,5 +25,15 @@ namespace Fabric.Databus.Interfaces.Sql
         /// Gets or sets the column list.
         /// </summary>
         public List<ColumnInfo> ColumnList { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sql command text.
+        /// </summary>
+        public string SqlCommandText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sql command parameters.
+        /// </summary>
+        public Dictionary<string, object> SqlCommandParameters { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace Fabric.Databus.PipelineSteps
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -230,7 +231,7 @@ namespace Fabric.Databus.PipelineSteps
                              topLevelDataSource.IncrementalColumns,
                              topLevelDataSource.TableOrView);
 
-            await this.WriteDiagnostics(queryId, batchNumber, result);
+            await this.WriteDiagnosticsAsync(queryId, batchNumber, result);
 
             foreach (var frame in result.Data)
             {
@@ -271,7 +272,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task WriteDiagnostics(string queryId, int batchNumber, ReadSqlDataResult result)
+        private async Task WriteDiagnosticsAsync(string queryId, int batchNumber, ReadSqlDataResult result)
         {
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {
@@ -280,6 +281,25 @@ namespace Fabric.Databus.PipelineSteps
                     Convert.ToString(batchNumber));
 
                 this.detailedTemporaryFileWriter.CreateDirectory(path);
+
+                if (result.SqlCommandText != null)
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine(result.SqlCommandText);
+                    sb.AppendLine();
+
+                    if (result.SqlCommandParameters != null)
+                    {
+                        foreach (var parameter in result.SqlCommandParameters)
+                        {
+                            sb.AppendLine($"{parameter.Key} = {parameter.Value}");
+                        }
+                    }
+
+                    await this.detailedTemporaryFileWriter.WriteToFileAsync(
+                        this.detailedTemporaryFileWriter.CombinePath(path, "query.sql"),
+                        sb.ToString());
+                }
 
                 foreach (var frame in result.Data)
                 {

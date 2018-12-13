@@ -11,6 +11,7 @@ namespace Fabric.Databus.SqlGenerator
 {
     using System;
     using System.Collections.Generic;
+    using System.Data.Common;
     using System.Linq;
     using System.Text;
 
@@ -228,7 +229,7 @@ namespace Fabric.Databus.SqlGenerator
         }
 
         /// <inheritdoc />
-        public virtual string ToSqlString()
+        public string ToSqlString()
         {
             if (this.QueryForCTE != null)
             {

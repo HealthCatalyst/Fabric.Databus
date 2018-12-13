@@ -221,6 +221,13 @@ namespace Fabric.Databus.Shared
                 cmd.AddParameterWithValue("@end", end);
             }
 
+            int i = 0;
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (var incrementalColumn in incrementalColumns)
+            {
+                cmd.AddParameterWithValue($"@incrementColumnValue{++i}", incrementalColumn.Value);
+            }
+
             cmd.CommandText = sqlGenerator.ToSqlString();
             return cmd as DbCommand;
         }

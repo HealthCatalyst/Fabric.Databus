@@ -214,6 +214,70 @@ ORDER BY Text.[TextID] ASC
 ";
 
             Assert.AreEqual(expected, sqlCommand.CommandText);
+
+            Assert.AreEqual(3, sqlCommand.Parameters.Count);
+
+            Assert.AreEqual("@start", sqlCommand.Parameters[0].ParameterName);
+            Assert.AreEqual("5", sqlCommand.Parameters[0].Value);
+
+            Assert.AreEqual("@end", sqlCommand.Parameters[1].ParameterName);
+            Assert.AreEqual("10", sqlCommand.Parameters[1].Value);
+
+            Assert.AreEqual("@incrementColumnValue1", sqlCommand.Parameters[2].ParameterName);
+            Assert.AreEqual("6", sqlCommand.Parameters[2].Value);
+        }
+
+        /// <summary>
+        /// The create sql command succeeds.
+        /// </summary>
+        [TestMethod]
+        public void CreateSqlCommandWithSimpleEntityWithIncrementalSucceeds()
+        {
+            var connectionString = string.Empty;
+            var sqlCommandTimeoutInSeconds = 1;
+
+            var databusSqlReader = new DatabusSqlReader(
+                connectionString,
+                sqlCommandTimeoutInSeconds,
+                new SqlConnectionFactory(),
+                new SqlGeneratorFactory());
+
+            var topLevelKeyColumn = "TextID";
+            string start = null;
+            string end = null;
+
+            var sqlCommand = databusSqlReader.CreateSqlCommand(
+                new TestDataSource { TableOrView = "Text" },
+                // ReSharper disable once ExpressionIsAlwaysNull
+                start,
+                // ReSharper disable once ExpressionIsAlwaysNull
+                end,
+                topLevelKeyColumn,
+                new List<IIncrementalColumn>
+                    {
+                        new IncrementalColumn
+                            {
+                                Name = "TextID",
+                                Operator = "GreaterThan",
+                                Value = "6"
+                            }
+                    },
+                new SqlConnection(),
+                "Text");
+
+            string expected = @"SELECT
+Text.*,Text.[TextID] AS [KeyLevel1]
+FROM Text
+WHERE 1=1
+AND Text.[TextID] > @incrementColumnValue1
+ORDER BY Text.[TextID] ASC
+";
+
+            Assert.AreEqual(expected, sqlCommand.CommandText);
+
+            Assert.AreEqual(1, sqlCommand.Parameters.Count);
+            Assert.AreEqual("@incrementColumnValue1", sqlCommand.Parameters[0].ParameterName);
+            Assert.AreEqual("6", sqlCommand.Parameters[0].Value);
         }
 
         /// <summary>

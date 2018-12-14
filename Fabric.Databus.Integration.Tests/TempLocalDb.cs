@@ -24,7 +24,7 @@ namespace Fabric.Databus.Integration.Tests
         /// </summary>
         /// <param name="databaseName">The name of the SQL LocalDB database.</param>
         /// <param name="dataSource">The SQL Server instance to connect to, by default v11.0</param>
-        public TempLocalDb(string databaseName, string dataSource = @"(localdb)\v11.0")
+        public TempLocalDb(string databaseName, string dataSource = @"(localdb)\MSSQLLocalDB")
             : base(databaseName, dataSource)
         {
             this.DeleteDatabase();

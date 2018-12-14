@@ -176,7 +176,19 @@ FROM Text
 
                         var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 
-                        pipelineRunner.RunPipeline(config);
+                        try
+                        {
+                            pipelineRunner.RunPipeline(config);
+                        }
+                        catch (AggregateException e)
+                        {
+                            foreach (var exception in e.InnerExceptions)
+                            {
+                                Console.WriteLine(exception);
+                            }
+
+                            throw e.Flatten();
+                        }
 
                         // Assert
                         Assert.AreEqual(1 + 1, integrationTestFileWriter.Count); // first file is job.json

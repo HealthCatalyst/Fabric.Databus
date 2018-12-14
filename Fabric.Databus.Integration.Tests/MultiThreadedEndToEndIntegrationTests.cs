@@ -28,6 +28,7 @@ namespace Fabric.Databus.Integration.Tests
     using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
+    using Fabric.Databus.SqlGenerator;
     using Fabric.Shared;
     using Fabric.Shared.ReliableHttp.Interceptors;
     using Fabric.Shared.ReliableHttp.Interfaces;
@@ -58,16 +59,15 @@ namespace Fabric.Databus.Integration.Tests
 
             config.Config.UseMultipleThreads = true;
 
-            string connectionString = "Data Source=:memory:";
-
-            using (var connection = new SQLiteConnection(connectionString))
+            using (TempLocalDb db = new TempLocalDb("Test"))
+            using (var connection = db.CreateConnection())
             {
                 connection.Open();
 
                 // setup the database
                 string sql = "CREATE TABLE Text (TextID varchar(64), PatientID int, TextTXT varchar(255))";
 
-                SQLiteCommand command = connection.CreateCommand();
+                var command = connection.CreateCommand();
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
 
@@ -79,7 +79,7 @@ namespace Fabric.Databus.Integration.Tests
                 sql = @";WITH CTE AS ( SELECT
 Text.*,Text.[TextID] AS [KeyLevel1]
 FROM Text
- )  SELECT * from CTE LIMIT 1";
+ )  SELECT * from CTE";
                 command.CommandText = sql;
                 command.ExecuteNonQuery();
 
@@ -96,7 +96,7 @@ FROM Text
                         container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
                         container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
 
-                        container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
+                        container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
 
                         container.RegisterType<IQueueFactory, MultiThreadedQueueFactory>();
 
@@ -128,9 +128,9 @@ FROM Text
                                     Assert.AreEqual(expectedParameter, actualParameter);
                                 })
                             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                                              {
-                                                  Content = new StringContent(string.Empty)
-                                              })
+                            {
+                                Content = new StringContent(string.Empty)
+                            })
                             .Verifiable();
 
                         var expectedUri = new Uri("http://foo");
@@ -181,14 +181,14 @@ FROM Text
                         // Assert
                         Assert.AreEqual(1 + 1, integrationTestFileWriter.Count); // first file is job.json
 
-                       var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
+                        var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath));
 
                         Assert.IsTrue(
                             JToken.DeepEquals(
                                 expectedJson,
                                 JObject.Parse(integrationTestFileWriter.GetContents(expectedPath))));
-                        
+
                         handlerMock.Protected()
                             .Verify(
                                 "SendAsync",
@@ -217,8 +217,8 @@ FROM Text
                     connection.Close();
                 }
             }
-        }        
-        
+        }
+
         /// <summary>
         /// The can run successfully end to end.
         /// </summary>
@@ -293,9 +293,9 @@ FROM Text
                                     Assert.AreEqual(expectedParameter, actualParameter);
                                 })
                             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                                              {
-                                                  Content = new StringContent(string.Empty)
-                                              })
+                            {
+                                Content = new StringContent(string.Empty)
+                            })
                             .Verifiable();
 
                         var expectedUri = new Uri("http://foo");
@@ -364,7 +364,7 @@ FROM Text
                             JToken.DeepEquals(
                                 expectedJson,
                                 JObject.Parse(integrationTestFileWriter.GetContents(expectedPath))));
-                        
+
                         handlerMock.Protected()
                             .Verify(
                                 "SendAsync",
@@ -505,9 +505,9 @@ FROM Text
                                     Assert.AreEqual(expectedParameter, actualParameter);
                                 })
                             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
-                                              {
-                                                  Content = new StringContent(string.Empty)
-                                              })
+                            {
+                                Content = new StringContent(string.Empty)
+                            })
                             .Verifiable();
 
                         var expectedUri = new Uri("http://foo");

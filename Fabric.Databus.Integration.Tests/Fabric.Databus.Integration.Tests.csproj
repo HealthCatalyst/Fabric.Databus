@@ -138,6 +138,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LocalDb.cs" />
     <Compile Include="MultiThreadedEndToEndIntegrationTests.cs" />
     <Compile Include="SingleThreadedEndToEndIntegrationTests.cs" />
     <Compile Include="IntegrationTestFileStream.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="IntegrationTestFileWriter.cs" />
     <Compile Include="SqlLiteGenerator.cs" />
     <Compile Include="SqlLiteGeneratorFactory.cs" />
+    <Compile Include="TempLocalDb.cs" />
     <Compile Include="TestFileLoader.cs" />
     <Compile Include="SqlLiteIntegrationTests.cs" />
   </ItemGroup>

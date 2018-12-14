@@ -81,57 +81,64 @@ namespace Fabric.Databus.Schema
 
                     try
                     {
-                        var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess);
-
-                        var numberOfColumns = reader.FieldCount;
-
-                        var columnList = new List<ColumnInfo>(numberOfColumns);
-
-                        for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++)
+                        using (var reader = cmd.ExecuteReader(CommandBehavior.SequentialAccess))
                         {
-                            var columnName = reader.GetName(columnNumber);
+                            var numberOfColumns = reader.FieldCount;
 
-                            var columnType = reader.GetFieldType(columnNumber);
-                            columnList.Add(new ColumnInfo
+                            var columnList = new List<ColumnInfo>(numberOfColumns);
+
+                            for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++)
                             {
-                                index = columnNumber,
-                                Name = columnName,
-                                IsJoinColumn = columnName.Equals(this.topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
-                                SqlColumnType = columnType?.FullName,
-                                ElasticSearchType = SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
-                                IsCalculated = false,
-                            });
+                                var columnName = reader.GetName(columnNumber);
+
+                                var columnType = reader.GetFieldType(columnNumber);
+                                columnList.Add(
+                                    new ColumnInfo
+                                        {
+                                            index = columnNumber,
+                                            Name = columnName,
+                                            IsJoinColumn =
+                                                columnName.Equals(
+                                                    this.topLevelKeyColumn,
+                                                    StringComparison.OrdinalIgnoreCase),
+                                            SqlColumnType = columnType?.FullName,
+                                            ElasticSearchType =
+                                                SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
+                                            IsCalculated = false,
+                                        });
+                            }
+
+                            //// var joinColumnIndex = columnList.FirstOrDefault(c => c.IsJoinColumn).index;
+
+                            // add any calculated fields
+                            var calculatedFields = load.Fields.Where(f => f.Destination != null).Select(
+                                f => new ColumnInfo
+                                         {
+                                             sourceIndex =
+                                                 columnList.FirstOrDefault(
+                                                         c => c.Name.Equals(
+                                                             f.Source,
+                                                             StringComparison.OrdinalIgnoreCase))
+                                                     ?.index,
+                                             index = numberOfColumns++,
+                                             Name = f.Destination,
+                                             ElasticSearchType = f.DestinationType.ToString(),
+                                             IsCalculated = true,
+                                             Transform = f.Transform.ToString()
+                                         }).ToList();
+
+                            calculatedFields.ForEach(c => columnList.Add(c));
+
+
+                            dictionary.Add(
+                                new MappingItem
+                                    {
+                                        SequenceNumber = load.SequenceNumber,
+                                        PropertyPath = load.Path,
+                                        PropertyType = load.PropertyType,
+                                        Columns = columnList,
+                                    });
                         }
-
-                        //var joinColumnIndex = columnList.FirstOrDefault(c => c.IsJoinColumn).index;
-
-                        // add any calculated fields
-                        var calculatedFields = load.Fields.Where(f => f.Destination != null)
-                            .Select(f => new ColumnInfo
-                            {
-                                sourceIndex =
-                                    columnList.FirstOrDefault(
-                                            c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))
-                                        ?.index,
-                                index = numberOfColumns++,
-                                Name = f.Destination,
-                                ElasticSearchType = f.DestinationType.ToString(),
-                                IsCalculated = true,
-                                Transform = f.Transform.ToString()
-                            })
-                            .ToList();
-
-                        calculatedFields.ForEach(c => columnList.Add(c));
-
-
-                        dictionary.Add(new MappingItem
-                        {
-                            SequenceNumber = load.SequenceNumber,
-                            PropertyPath = load.Path,
-                            PropertyType = load.PropertyType,
-                            Columns = columnList,
-                        });
-
                     }
                     catch (Exception e)
                     {

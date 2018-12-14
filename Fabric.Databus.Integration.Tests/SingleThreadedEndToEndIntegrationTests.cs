@@ -87,7 +87,7 @@ FROM Text
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
                         container.RegisterInstance<ISqlConnectionFactory>(
-                            new SqlLiteConnectionFactory(new SqlLiteConnectionWrapper(connection)));
+                            new SqlLiteConnectionFactory(new DbConnectionWrapper(connection)));
 
                         var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
                         container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
@@ -266,7 +266,7 @@ FROM Text
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
                         container.RegisterInstance<ISqlConnectionFactory>(
-                            new SqlLiteConnectionFactory(new SqlLiteConnectionWrapper(connection)));
+                            new SqlLiteConnectionFactory(new DbConnectionWrapper(connection)));
 
                         var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
                         container.RegisterInstance<IFileWriter>(integrationTestFileWriter);

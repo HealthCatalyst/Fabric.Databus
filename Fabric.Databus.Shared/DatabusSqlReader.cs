@@ -92,88 +92,112 @@ namespace Fabric.Databus.Shared
             using (var conn = this.sqlConnectionFactory.GetConnection(this.connectionString))
             {
                 conn.Open();
-                var cmd = this.CreateSqlCommand(load, start, end, topLevelKeyColumn, incrementalColumns, conn, topLevelTableName);
 
-                try
+                using (var cmd = this.CreateSqlCommand(
+                    load,
+                    start,
+                    end,
+                    topLevelKeyColumn,
+                    incrementalColumns,
+                    conn,
+                    topLevelTableName))
                 {
-                    logger.Verbose("Sql Begin [{Path}]: {@load} {@cmd}", load.Path, load, cmd);
-                    var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
-
-                    /* var schema = reader.GetSchemaTable(); */
-
-                    var numberOfColumns = reader.FieldCount;
-
-                    var columnList = new List<ColumnInfo>(numberOfColumns);
-
-                    for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++)
+                    try
                     {
-                        var columnName = reader.GetName(columnNumber);
-
-                        var columnType = reader.GetFieldType(columnNumber);
-                        columnList.Add(new ColumnInfo
+                        logger.Verbose("Sql Begin [{Path}]: {@load} {@cmd}", load.Path, load, cmd);
+                        using (var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                         {
-                            index = columnNumber,
-                            Name = columnName,
-                            IsJoinColumn = columnName.Equals(topLevelKeyColumn, StringComparison.OrdinalIgnoreCase),
-                            ElasticSearchType = SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
-                            IsCalculated = false,
-                        });
-                    }
+                            /* var schema = reader.GetSchemaTable(); */
 
-                    var joinColumnIndex = 0;
+                            var numberOfColumns = reader.FieldCount;
 
-                    // add any calculated fields
-                    var calculatedFields = load.Fields.Where(f => f.Destination != null).Select(
-                        f => new ColumnInfo
-                        {
-                            sourceIndex =
-                                         columnList.FirstOrDefault(
-                                             c => c.Name.Equals(f.Source, StringComparison.OrdinalIgnoreCase))?.index,
-                            index = numberOfColumns++,
-                            Name = f.Destination,
-                            ElasticSearchType = f.DestinationType.ToString(),
-                            IsCalculated = true,
-                            Transform = f.Transform.ToString()
-                        }).ToList();
+                            var columnList = new List<ColumnInfo>(numberOfColumns);
 
-                    calculatedFields.ForEach(c => columnList.Add(c));
+                            for (int columnNumber = 0; columnNumber < numberOfColumns; columnNumber++)
+                            {
+                                var columnName = reader.GetName(columnNumber);
 
-                    // now write the data
-                    var data = new Dictionary<string, List<object[]>>();
+                                var columnType = reader.GetFieldType(columnNumber);
+                                columnList.Add(
+                                    new ColumnInfo
+                                    {
+                                        index = columnNumber,
+                                        Name = columnName,
+                                        IsJoinColumn =
+                                                columnName.Equals(
+                                                    topLevelKeyColumn,
+                                                    StringComparison.OrdinalIgnoreCase),
+                                        ElasticSearchType =
+                                                SqlTypeToElasticSearchTypeConvertor.GetElasticSearchType(columnType),
+                                        IsCalculated = false,
+                                    });
+                            }
 
-                    int rows = 0;
+                            var joinColumnIndex = 0;
 
-                    while (reader.Read())
-                    {
-                        rows++;
-                        var values = new object[numberOfColumns];
+                            // add any calculated fields
+                            var calculatedFields = load.Fields.Where(f => f.Destination != null).Select(
+                                f => new ColumnInfo
+                                {
+                                    sourceIndex =
+                                                 columnList.FirstOrDefault(
+                                                         c => c.Name.Equals(
+                                                             f.Source,
+                                                             StringComparison.OrdinalIgnoreCase))
+                                                     ?.index,
+                                    index = numberOfColumns++,
+                                    Name = f.Destination,
+                                    ElasticSearchType = f.DestinationType.ToString(),
+                                    IsCalculated = true,
+                                    Transform = f.Transform.ToString()
+                                }).ToList();
 
-                        reader.GetValues(values);
+                            calculatedFields.ForEach(c => columnList.Add(c));
 
-                        var key = Convert.ToString(values[joinColumnIndex]);
-                        if (!data.ContainsKey(key))
-                        {
-                            data.Add(key, new List<object[]> { values });
+                            // now write the data
+                            var data = new Dictionary<string, List<object[]>>();
+
+                            int rows = 0;
+
+                            while (reader.Read())
+                            {
+                                rows++;
+                                var values = new object[numberOfColumns];
+
+                                reader.GetValues(values);
+
+                                var key = Convert.ToString(values[joinColumnIndex]);
+                                if (!data.ContainsKey(key))
+                                {
+                                    data.Add(key, new List<object[]> { values });
+                                }
+                                else
+                                {
+                                    data[key].Add(values);
+                                }
+                            }
+
+                            logger.Verbose("Sql Finish [{Path}] ({rows}): {@load} {@cmd}", load.Path, rows, load, cmd);
+
+                            var parameters = new Dictionary<string, object>();
+                            foreach (DbParameter parameter in cmd.Parameters)
+                            {
+                                parameters.Add(parameter.ParameterName, parameter.Value);
+                            }
+
+                            return new ReadSqlDataResult
+                            {
+                                Data = data,
+                                ColumnList = columnList,
+                                SqlCommandText = cmd.CommandText,
+                                SqlCommandParameters = parameters
+                            };
                         }
-                        else
-                        {
-                            data[key].Add(values);
-                        }
                     }
-
-                    logger.Verbose("Sql Finish [{Path}] ({rows}): {@load} {@cmd}", load.Path, rows, load, cmd);
-
-                    var parameters = new Dictionary<string, object>();
-                    foreach (DbParameter parameter in cmd.Parameters)
+                    catch (Exception e)
                     {
-                        parameters.Add(parameter.ParameterName, parameter.Value);
+                        throw new DatabusSqlException(cmd.CommandText, e);
                     }
-
-                    return new ReadSqlDataResult { Data = data, ColumnList = columnList, SqlCommandText = cmd.CommandText, SqlCommandParameters = parameters };
-                }
-                catch (Exception e)
-                {
-                    throw new DatabusSqlException(cmd.CommandText, e);
                 }
             }
         }
@@ -303,18 +327,19 @@ namespace Fabric.Databus.Shared
                 }
 
                 // Logger.Verbose($"Start: {cmd.CommandText}");
-                var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
-
-                var list = new List<string>();
-
-                while (reader.Read())
+                using (var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                 {
-                    var obj = reader.GetValue(0);
-                    list.Add(Convert.ToString(obj));
-                }
+                    var list = new List<string>();
 
-                // Logger.Verbose($"Finish: {cmd.CommandText}");
-                return list;
+                    while (reader.Read())
+                    {
+                        var obj = reader.GetValue(0);
+                        list.Add(Convert.ToString(obj));
+                    }
+
+                    // Logger.Verbose($"Finish: {cmd.CommandText}");
+                    return list;
+                }
             }
         }
 

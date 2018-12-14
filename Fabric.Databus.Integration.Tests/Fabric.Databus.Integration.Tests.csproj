@@ -144,12 +144,13 @@
     <Compile Include="IntegrationTestFileStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlLiteConnectionFactory.cs" />
-    <Compile Include="SqlLiteConnectionWrapper.cs">
+    <Compile Include="DbConnectionWrapper.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="IntegrationTestFileWriter.cs" />
     <Compile Include="SqlLiteGenerator.cs" />
     <Compile Include="SqlLiteGeneratorFactory.cs" />
+    <Compile Include="SqlReuseConnectionFactory.cs" />
     <Compile Include="TempLocalDb.cs" />
     <Compile Include="TestFileLoader.cs" />
     <Compile Include="SqlLiteIntegrationTests.cs" />

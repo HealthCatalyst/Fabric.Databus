@@ -46,13 +46,14 @@ namespace Fabric.Databus.Integration.Tests
             sql = "select * from highscores";
 
             command.CommandText = sql;
-            var reader = command.ExecuteReader();
-
             var values = new object[2];
 
-            while (reader.Read())
+            using (var reader = command.ExecuteReader())
             {
-                var read = reader.GetValues(values);
+                while (reader.Read())
+                {
+                    var read = reader.GetValues(values);
+                }
             }
 
             connection.Close();

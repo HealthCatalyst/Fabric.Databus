@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlLiteConnectionWrapper.cs" company="">
+// <copyright file="DbConnectionWrapper.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlLiteConnectionWrapper type.
+//   Defines the DbConnectionWrapper type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,9 +15,9 @@ namespace Fabric.Databus.Integration.Tests
 
     /// <inheritdoc />
     /// <summary>
-    /// The sql lite connection wrapper.
+    /// This class wraps the connection so the connection does not get disposed when the wrapper is used in a using statement
     /// </summary>
-    public class SqlLiteConnectionWrapper : DbConnection
+    public class DbConnectionWrapper : DbConnection
     {
         /// <summary>
         /// The connection.
@@ -25,12 +25,12 @@ namespace Fabric.Databus.Integration.Tests
         private readonly DbConnection connection;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlLiteConnectionWrapper"/> class.
+        /// Initializes a new instance of the <see cref="DbConnectionWrapper"/> class.
         /// </summary>
         /// <param name="connection">
         /// The connection.
         /// </param>
-        public SqlLiteConnectionWrapper(DbConnection connection)
+        public DbConnectionWrapper(DbConnection connection)
         {
             this.connection = connection;
         }

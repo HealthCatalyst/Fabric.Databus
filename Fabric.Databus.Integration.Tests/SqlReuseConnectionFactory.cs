@@ -1,31 +1,32 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SqlLiteConnectionFactory.cs" company="">
+// <copyright file="SqlReuseConnectionFactory.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SqlLiteConnectionFactory type.
+//   Defines the SqlReuseConnectionFactory type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.Integration.Tests
 {
     using System.Data.Common;
+    using System.Data.SqlClient;
 
     using Fabric.Databus.Interfaces.Sql;
 
     /// <inheritdoc />
     /// <summary>
-    /// The sql lite connection factory.
+    /// The sql reuse connection factory.
     /// </summary>
-    public class SqlLiteConnectionFactory : ISqlConnectionFactory
+    public class SqlReuseConnectionFactory : ISqlConnectionFactory
     {
         /// <summary>
         /// The connection.
         /// </summary>
-        private readonly DbConnectionWrapper connection;
+        private readonly DbConnection connection;
 
         /// <inheritdoc />
-        public SqlLiteConnectionFactory(DbConnectionWrapper connection)
+        public SqlReuseConnectionFactory(DbConnection connection)
         {
             this.connection = connection;
         }

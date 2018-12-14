@@ -260,18 +260,24 @@ namespace Fabric.Databus.PipelineRunner
                     }
                 }
 
-                var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);
-
-                var foundRow = false;
-
-                while (reader.Read())
+                using (var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                 {
-                    foundRow = true;
+                    var foundRow = false;
+
+                    while (reader.Read())
+                    {
+                        foundRow = true;
+                    }
+
+                    logger.Information(
+                        "Validated data source {index} {path} {@load} {@StartTime}",
+                        numberOfDataSource,
+                        load.Path,
+                        load,
+                        DateTime.Now);
+
+                    return foundRow;
                 }
-
-                logger.Information("Validated data source {index} {path} {@load} {@StartTime}", numberOfDataSource, load.Path, load, DateTime.Now);
-
-                return foundRow;
             }
         }
 

@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.Integration.Tests
 {
+    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.IO;
     using System.Reflection;
@@ -44,7 +45,44 @@ namespace Fabric.Databus.Integration.Tests
                     return reader.ReadToEnd();
                 }
             }
+
             return string.Empty;
+        }
+
+        /// <summary>
+        /// The get file contents as list.
+        /// </summary>
+        /// <param name="folder">
+        /// The folder.
+        /// </param>
+        /// <param name="sampleFile">
+        /// The sample file.
+        /// </param>
+        /// <returns>
+        /// The <see cref="List{T}"/>.
+        /// </returns>
+        [Pure]
+        internal static List<string> GetFileContentsAsList(string folder, string sampleFile)
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var assemblyName = asm.GetName().Name;
+            var resource = $"{assemblyName}.{folder}.{sampleFile}";
+
+            var list = new List<string>();
+
+            using (var stream = asm.GetManifestResourceStream(resource))
+            {
+                if (stream != null)
+                {
+                    var reader = new StreamReader(stream);
+                    while (reader.Peek() >= 0)
+                    {
+                        list.Add(reader.ReadLine());
+                    }
+                }
+            }
+
+            return list;
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Fabric.Databus.Integration.Tests
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.FileWriters;
@@ -119,6 +120,17 @@ namespace Fabric.Databus.Integration.Tests
         public string GetContents(string expectedPath)
         {
             return this.files[expectedPath];
+        }
+
+        /// <summary>
+        /// The list files.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="List{T}"/>.
+        /// </returns>
+        public List<string> GetAllFileNames()
+        {
+            return this.files.Keys.ToList();
         }
     }
 }

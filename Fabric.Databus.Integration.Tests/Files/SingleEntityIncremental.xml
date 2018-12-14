@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
+  <Config>
+    <ConnectionString>Data Source=:memory:</ConnectionString>
+    <Url>http://foo</Url>
+    <LocalSaveFolder>foo</LocalSaveFolder>
+    <UseMultipleThreads>false</UseMultipleThreads>
+    <UrlUserName>myUser</UrlUserName>
+    <UrlPassword>myPassword</UrlPassword>
+    <UrlMethod>Put</UrlMethod>
+  </Config>
+  <Data>
+    <TopLevelDataSource Key="TextID" Path="$" Name="First" TableOrView="Text">
+      <IncrementalColumn Name="LastLoadIncrement"  Operator="GreaterThan" Type="int" Value="2"/>
+      <Column Name="TextID"/>
+      <Column Name="PatientID"/>
+      <Column Name="TextTXT"/>
+    </TopLevelDataSource>
+  </Data>
+</Job>

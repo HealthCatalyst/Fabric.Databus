@@ -94,7 +94,9 @@ namespace Fabric.Databus.Interfaces.Sql
         /// <summary>
         /// The add order by ascending.
         /// </summary>
-        /// <param name="tableName"></param>
+        /// <param name="tableName">
+        /// table name
+        /// </param>
         /// <param name="columnName">
         ///     The column name.
         /// </param>

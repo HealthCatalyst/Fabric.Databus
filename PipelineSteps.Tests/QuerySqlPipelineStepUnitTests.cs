@@ -221,13 +221,25 @@ namespace PipelineStep.Tests
                     new NullFileWriter(),
                     cancellationTokenSource.Token);
 
+                var topLevelDataSource = new TopLevelDataSource
+                                             {
+                                                 Key = "Id",
+                                                 MyIncrementalColumns =
+                                                     {
+                                                         new IncrementalColumn
+                                                             {
+                                                                 Name = "Id", Operator = "GreaterThan", Value = "3", Type = "int"
+                                                             }
+                                                     }
+                                             };
+
                 var sqlJobQueueItem = new SqlQueryDataSourceQueueItem
                 {
                     QueryId = "$",
                     DataSource = new DataSource { Path = "$" },
                     Start = "2",
                     End = "5",
-                    TopLevelDataSource = new TopLevelDataSource { Key = "Id" }
+                    TopLevelDataSource = topLevelDataSource
                 };
 
                 var stepNumber = 1;

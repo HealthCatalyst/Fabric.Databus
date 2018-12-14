@@ -29,7 +29,9 @@ namespace Fabric.Databus.Interfaces.Config
         /// </summary>
         string Value { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the type.
+        /// </summary>
         string Type { get; set; }
     }
 }

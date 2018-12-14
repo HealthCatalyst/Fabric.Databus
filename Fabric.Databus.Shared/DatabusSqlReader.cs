@@ -20,6 +20,7 @@ namespace Fabric.Databus.Shared
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Exceptions;
     using Fabric.Databus.Interfaces.Sql;
+    using Fabric.Databus.Shared.Sql;
     using Fabric.Databus.ZipCodeToGeoCode;
 
     using Serilog;
@@ -225,7 +226,7 @@ namespace Fabric.Databus.Shared
             // ReSharper disable once PossibleMultipleEnumeration
             foreach (var incrementalColumn in incrementalColumns)
             {
-                cmd.AddParameterWithValue($"@incrementColumnValue{++i}", incrementalColumn.Value);
+                cmd.AddParameterWithValueAndType($"@incrementColumnValue{++i}", DbType.String, incrementalColumn.Value);
             }
 
             cmd.CommandText = sqlGenerator.ToSqlString();
@@ -293,6 +294,13 @@ namespace Fabric.Databus.Shared
                 }
 
                 cmd.CommandText = this.GetQueryForEntityKeys(topLevelKeyColumn, maximumEntitiesToLoad, load);
+
+                int i = 0;
+                // ReSharper disable once PossibleMultipleEnumeration
+                foreach (var incrementalColumn in dataSource.IncrementalColumns)
+                {
+                    cmd.AddParameterWithValue($"@incrementColumnValue{++i}", incrementalColumn.Value);
+                }
 
                 // Logger.Verbose($"Start: {cmd.CommandText}");
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);

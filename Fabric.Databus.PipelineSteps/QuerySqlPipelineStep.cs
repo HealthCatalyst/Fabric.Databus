@@ -284,7 +284,7 @@ namespace Fabric.Databus.PipelineSteps
 
                 if (result.SqlCommandText != null)
                 {
-                    StringBuilder sb = new StringBuilder();
+                    var sb = new StringBuilder();
                     sb.AppendLine(result.SqlCommandText);
                     sb.AppendLine();
 

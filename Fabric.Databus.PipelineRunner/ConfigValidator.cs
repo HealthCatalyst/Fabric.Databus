@@ -21,6 +21,7 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Interfaces.Exceptions;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.Shared;
+    using Fabric.Databus.Shared.Sql;
 
     using Serilog;
 
@@ -124,7 +125,6 @@ namespace Fabric.Databus.PipelineRunner
 
                     // configValidationResult.Results.Add($"ElasticSearch Connection: {x}");
                 }
-
             }
             catch (Exception ex)
             {
@@ -248,7 +248,16 @@ namespace Fabric.Databus.PipelineRunner
                         topLevelKey,
                         load.Relationships,
                         load.SqlEntityColumnMappings,
-                        incrementalColumns).AddTopFilter(0).ToSqlString();
+                        // ReSharper disable once PossibleMultipleEnumeration
+                        incrementalColumns)
+                        .AddTopFilter(0).ToSqlString();
+
+                    int i = 0;
+                    // ReSharper disable once PossibleMultipleEnumeration
+                    foreach (var incrementalColumn in incrementalColumns)
+                    {
+                        cmd.AddParameterWithValueAndType($"@incrementColumnValue{++i}", DbType.String, incrementalColumn.Value);
+                    }
                 }
 
                 var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess);

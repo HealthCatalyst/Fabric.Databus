@@ -20,7 +20,6 @@ namespace Fabric.Databus.Client
     using Microsoft.Extensions.Configuration;
 
     using Serilog;
-    using Serilog.Core;
 
     using Unity;
 
@@ -73,14 +72,14 @@ namespace Fabric.Databus.Client
                 {
                     if (File.Exists(Path.Combine(System.AppContext.BaseDirectory, "serilog-config.json")))
                     {
-                        var configuration = new ConfigurationBuilder()
-                            .SetBasePath(System.AppContext.BaseDirectory)
-                            // ReSharper disable once StringLiteralTypo
-                            .AddJsonFile("serilog-config.json")
-                            .Build();
+                        //var configuration = new ConfigurationBuilder()
+                        //    .SetBasePath(System.AppContext.BaseDirectory)
+                        //    // ReSharper disable once StringLiteralTypo
+                        //    .AddJsonFile("serilog-config.json")
+                        //    .Build();
 
                         ILogger logger = new LoggerConfiguration()
-                            .ReadFrom.Configuration(configuration)
+                            // .ReadFrom.Configuration(configuration)
                             .CreateLogger();
                         container.RegisterInstance(logger);
 

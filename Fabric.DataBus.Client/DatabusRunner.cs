@@ -48,42 +48,11 @@ namespace Fabric.Databus.Client
             {
                 if (job.Config.LogToSeq || !string.IsNullOrWhiteSpace(job.Config.LogFile))
                 {
-                    var loggerConfiguration = new LoggerConfiguration().Enrich.With(new MyThreadIdEnricher());
-
-                    loggerConfiguration = job.Config.LogVerbose
-                                              ? loggerConfiguration.MinimumLevel.Verbose()
-                                              : loggerConfiguration.MinimumLevel.Information();
-
-                    if (!string.IsNullOrWhiteSpace(job.Config.LogFile))
-                    {
-                        loggerConfiguration =
-                            loggerConfiguration.WriteTo.File(job.Config.LogFile, rollingInterval: RollingInterval.Day);
-                    }
-
-                    ILogger logger = loggerConfiguration.CreateLogger();
-                    container.RegisterInstance(logger);
-
-
-                    logger.Information("DatabusRunner start with job config");
+                    CreateLoggerWithParameters(container, job);
                 }
                 else
                 {
-                    if (File.Exists(Path.Combine(System.AppContext.BaseDirectory, "serilog-config.json")))
-                    {
-                        //var configuration = new ConfigurationBuilder()
-                        //    .SetBasePath(System.AppContext.BaseDirectory)
-                        //    // ReSharper disable once StringLiteralTypo
-                        //    .AddJsonFile("serilog-config.json")
-                        //    .Build();
-
-                        ILogger logger = new LoggerConfiguration()
-                            // .ReadFrom.Configuration(configuration)
-                            .CreateLogger();
-                        container.RegisterInstance(logger);
-
-
-                        logger.Information("DatabusRunner start from serilog-config.json");
-                    }
+                    CreateLoggerWithConfigFile(container);
                 }
             }
 
@@ -99,6 +68,61 @@ namespace Fabric.Databus.Client
             var timeElapsed = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
             var threadText = job.Config.UseMultipleThreads ? "multiple threads" : "single thread";
             container.Resolve<ILogger>().Verbose("Finished in {timeElapsed} using {threadText}", timeElapsed, threadText);
+        }
+
+        /// <summary>
+        /// The create logger with config file.
+        /// </summary>
+        /// <param name="container">
+        /// The container.
+        /// </param>
+        private static void CreateLoggerWithConfigFile(IUnityContainer container)
+        {
+            if (File.Exists(Path.Combine(System.AppContext.BaseDirectory, "serilog-config.json")))
+            {
+                //var configuration = new ConfigurationBuilder()
+                //    .SetBasePath(System.AppContext.BaseDirectory)
+                //    // ReSharper disable once StringLiteralTypo
+                //    .AddJsonFile("serilog-config.json")
+                //    .Build();
+
+                ILogger logger = new LoggerConfiguration()
+                    // .ReadFrom.Configuration(configuration)
+                    .CreateLogger();
+                container.RegisterInstance(logger);
+
+                logger.Information("DatabusRunner start from serilog-config.json");
+            }
+        }
+
+        /// <summary>
+        /// The create logger with parameters.
+        /// </summary>
+        /// <param name="container">
+        /// The container.
+        /// </param>
+        /// <param name="job">
+        /// The job.
+        /// </param>
+        private static void CreateLoggerWithParameters(IUnityContainer container, IJob job)
+        {
+            var loggerConfiguration = new LoggerConfiguration().Enrich.With(new MyThreadIdEnricher());
+
+            loggerConfiguration = job.Config.LogVerbose
+                                      ? loggerConfiguration.MinimumLevel.Verbose()
+                                      : loggerConfiguration.MinimumLevel.Information();
+
+            if (!string.IsNullOrWhiteSpace(job.Config.LogFile))
+            {
+                loggerConfiguration = loggerConfiguration.WriteTo.File(
+                    job.Config.LogFile,
+                    rollingInterval: RollingInterval.Day);
+            }
+
+            ILogger logger = loggerConfiguration.CreateLogger();
+            container.RegisterInstance(logger);
+
+            logger.Information("DatabusRunner start with job config");
         }
     }
 }

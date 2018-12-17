@@ -9,8 +9,6 @@
     <description>Client for Fabric.Databus</description>
     <dependencies>
       <group targetFramework=".NETStandard2.0">
-        <dependency id="Microsoft.Extensions.Configuration" version="2.2.0" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Extensions.Configuration.Json" version="2.2.0" exclude="Build,Analyzers" />
         <dependency id="Newtonsoft.Json" version="12.0.1" exclude="Build,Analyzers" />
         <dependency id="Polly" version="6.1.2" exclude="Build,Analyzers" />
         <dependency id="Serilog" version="2.7.1" exclude="Build,Analyzers" />

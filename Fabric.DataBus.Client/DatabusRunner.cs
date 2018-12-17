@@ -17,8 +17,6 @@ namespace Fabric.Databus.Client
     using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared.Loggers;
 
-    using Microsoft.Extensions.Configuration;
-
     using Serilog;
 
     using Unity;

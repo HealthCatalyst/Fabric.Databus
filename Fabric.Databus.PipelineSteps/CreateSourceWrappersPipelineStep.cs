@@ -116,7 +116,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        protected override Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
+        protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask)
         {
             if (this.sourceWrapperCollection.Any())
             {
@@ -130,7 +130,7 @@ namespace Fabric.Databus.PipelineSteps
             // start a new collection for next batch
             this.sourceWrapperCollection = new SourceWrapperCollection();
 
-            return base.CompleteAsync(queryId, isLastThreadForThisTask);
+            return base.CompleteBatchAsync(queryId, isLastThreadForThisTask);
         }
 
         /// <inheritdoc />

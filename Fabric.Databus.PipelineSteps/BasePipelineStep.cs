@@ -238,6 +238,7 @@ namespace Fabric.Databus.PipelineSteps
                             this.totalItemsProcessedByThisProcessor,
                             wt1);
 
+                        await this.CompleteJobAsync(null, true);
                         await this.AddJobCompletionMessageToOutputQueueAsync();
                         break;
                     }
@@ -253,7 +254,7 @@ namespace Fabric.Databus.PipelineSteps
                             this.totalItemsProcessedByThisProcessor,
                             wt1);
 
-                        await this.CompleteAsync(null, true);
+                        await this.CompleteBatchAsync(null, true);
                         await this.AddBatchCompletionMessageToOutputQueueAsync(batchCompletedQueueItem.BatchNumber);
                         continue;
                     }
@@ -318,7 +319,7 @@ namespace Fabric.Databus.PipelineSteps
 
             currentProcessorCount = Interlocked.Decrement(ref processorCount);
             var isLastThreadForThisTask = currentProcessorCount < 1;
-            await this.CompleteAsync(this.workItemQueryId, isLastThreadForThisTask);
+            await this.CompleteBatchAsync(this.workItemQueryId, isLastThreadForThisTask);
 
             this.MyLogger.Verbose("Completed {QueryId}: queue: {InQueueCount}", this.workItemQueryId, this.InQueue.Count);
 
@@ -374,7 +375,7 @@ namespace Fabric.Databus.PipelineSteps
         /// </param>
         public void TestComplete(string queryId, bool isLastThreadForThisTask)
         {
-            this.CompleteAsync(queryId, isLastThreadForThisTask);
+            this.CompleteBatchAsync(queryId, isLastThreadForThisTask);
         }
 
         /// <summary>
@@ -467,7 +468,24 @@ namespace Fabric.Databus.PipelineSteps
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected virtual Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
+        protected virtual Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask)
+        {
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// The complete job async.
+        /// </summary>
+        /// <param name="queryId">
+        /// The query id.
+        /// </param>
+        /// <param name="isLastThreadForThisTask">
+        /// The is last thread for this task.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        protected virtual Task CompleteJobAsync(string queryId, bool isLastThreadForThisTask)
         {
             return Task.CompletedTask;
         }

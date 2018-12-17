@@ -115,7 +115,7 @@ namespace Fabric.Databus.PipelineRunner
         /// The count.
         /// </param>
         /// <returns>
-        /// The <see cref="IList"/>.
+        /// The <see cref="IList{T}"/>.
         /// </returns>
         [Pure]
         private IList<Task> CreateTasks(Func<IPipelineStep> functionPipelineStep, int count)

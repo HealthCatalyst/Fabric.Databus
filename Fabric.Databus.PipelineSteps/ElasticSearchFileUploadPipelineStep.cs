@@ -81,7 +81,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task CompleteAsync(string queryId, bool isLastThreadForThisTask)
+        protected override async System.Threading.Tasks.Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask)
         {
             if (isLastThreadForThisTask)
             {

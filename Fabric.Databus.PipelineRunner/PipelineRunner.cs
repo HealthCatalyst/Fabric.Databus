@@ -285,6 +285,13 @@ namespace Fabric.Databus.PipelineRunner
                     processors.Add(new PipelineStepInfo { Type = typeof(SendToRestApiPipelineStep), Count = 1 });
                 }
             }
+            else
+            {
+                processors.Add(
+                    name == PipelineNames.ElasticSearch
+                        ? new PipelineStepInfo { Type = typeof(NullElasticSearchFileUploadPipelineStep), Count = 1 }
+                        : new PipelineStepInfo { Type = typeof(NullSendToRestApiPipelineStep), Count = 1 });
+            }
 
             if (name == PipelineNames.ElasticSearch)
             {
@@ -299,6 +306,8 @@ namespace Fabric.Databus.PipelineRunner
 
                 this.container.RegisterInstance(elasticSearchUploader);
             }
+
+            processors.Add(new PipelineStepInfo { Type = typeof(BatchCompletedPipelineStep), Count = 1 });
 
             return processors;
         }

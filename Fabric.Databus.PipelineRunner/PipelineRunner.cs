@@ -390,6 +390,11 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterType<IFileWriter, FileWriter>();
             }
 
+            if (!this.container.IsRegistered<IEntitySavedToJsonLogger>())
+            {
+                this.container.RegisterType<IEntitySavedToJsonLogger, NullEntitySavedToJsonLogger>();
+            }
+
             if (!this.container.IsRegistered<IProgressMonitor>())
             {
                 IProgressMonitor progressMonitor = new ProgressMonitor(new NullProgressLogger());

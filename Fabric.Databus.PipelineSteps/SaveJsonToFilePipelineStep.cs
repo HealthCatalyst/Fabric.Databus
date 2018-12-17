@@ -37,6 +37,11 @@ namespace Fabric.Databus.PipelineSteps
         /// </summary>
         private readonly IEntityJsonWriter entityJsonWriter;
 
+        /// <summary>
+        /// The entity saved to json logger.
+        /// </summary>
+        private readonly IEntitySavedToJsonLogger entitySavedToJsonLogger;
+
         /// <inheritdoc />
         public SaveJsonToFilePipelineStep(
             IJobConfig jobConfig,
@@ -45,11 +50,13 @@ namespace Fabric.Databus.PipelineSteps
             IProgressMonitor progressMonitor,
             ITemporaryFileWriter fileWriter,
             IEntityJsonWriter entityJsonWriter,
+            IEntitySavedToJsonLogger entitySavedToJsonLogger,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.fileWriter = fileWriter ?? throw new System.ArgumentNullException(nameof(fileWriter));
             this.entityJsonWriter = entityJsonWriter ?? throw new System.ArgumentNullException(nameof(entityJsonWriter));
+            this.entitySavedToJsonLogger = entitySavedToJsonLogger ?? throw new System.ArgumentNullException(nameof(entitySavedToJsonLogger));
         }
 
         /// <inheritdoc />
@@ -66,10 +73,20 @@ namespace Fabric.Databus.PipelineSteps
         {
             var stream = new MemoryStream();
 
-            if (this.Config.LocalSaveFolder != null)
+            if (this.Config.LocalSaveFolder != null || this.entitySavedToJsonLogger.IsWritingEnabled)
             {
                 await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
+            }
 
+            if (this.entitySavedToJsonLogger.IsWritingEnabled)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                this.entitySavedToJsonLogger.LogSavedEntity(workItem.Id, stream);
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
+            if (this.Config.LocalSaveFolder != null)
+            {
                 this.fileWriter.CreateDirectory(this.Config.LocalSaveFolder);
 
                 string path = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $"{workItem.Id}.json");

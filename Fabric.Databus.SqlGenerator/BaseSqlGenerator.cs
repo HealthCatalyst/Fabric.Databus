@@ -94,6 +94,11 @@ namespace Fabric.Databus.SqlGenerator
             return this;
         }
 
+        public ISqlGenerator AddAllColumns()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <inheritdoc />
         public ISqlGenerator AddJoin(ISqlGeneratorJoin join)
         {

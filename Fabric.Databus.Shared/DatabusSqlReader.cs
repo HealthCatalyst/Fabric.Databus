@@ -16,6 +16,7 @@ namespace Fabric.Databus.Shared
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Fabric.Databus.Config;
     using Fabric.Databus.Interfaces;
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Exceptions;
@@ -329,6 +330,11 @@ namespace Fabric.Databus.Shared
                 // Logger.Verbose($"Start: {cmd.CommandText}");
                 using (var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                 {
+                    if (reader.FieldCount > 1)
+                    {
+                        throw new Exception("Too many columns returned in query");
+                    }
+
                     var list = new List<string>();
 
                     while (reader.Read())
@@ -372,12 +378,10 @@ namespace Fabric.Databus.Shared
             }
             else
             {
-                sqlGenerator.CreateSqlStatement(
-                    load.TableOrView,
-                    topLevelKeyColumn,
-                    load.Relationships,
-                    load.SqlEntityColumnMappings,
-                    load.IncrementalColumns);
+                sqlGenerator
+                    .SetEntity(load.TableOrView)
+                    .AddColumn(load.TableOrView, topLevelKeyColumn, null)
+                    .AddIncrementalColumns(load.TableOrView, load.IncrementalColumns);
             }
 
             sqlGenerator.AddOrderByAscending(load.TableOrView, topLevelKeyColumn);

@@ -49,10 +49,20 @@ namespace Fabric.Database.Shared.Tests
         public IEnumerable<ISqlRelationship> Relationships { get; set; } = new List<ISqlRelationship>();
 
         /// <inheritdoc />
-        public IEnumerable<ISqlEntityColumnMapping> SqlEntityColumnMappings { get; } = new List<ISqlEntityColumnMapping>();
+        public IEnumerable<ISqlEntityColumnMapping> SqlEntityColumnMappings => this.MySqlEntityColumnMappings;
+
+        /// <summary>
+        /// Gets or sets the data sources.
+        /// </summary>
+        public List<SqlEntityColumnMapping> MySqlEntityColumnMappings { get; set; } = new List<SqlEntityColumnMapping>();
 
         /// <inheritdoc />
-        public IEnumerable<IIncrementalColumn> IncrementalColumns { get; } = new List<IIncrementalColumn>();
+        public IEnumerable<IIncrementalColumn> IncrementalColumns => this.MyIncrementalColumns;
+
+        /// <summary>
+        /// Gets or sets the data sources.
+        /// </summary>
+        public List<IncrementalColumn> MyIncrementalColumns { get; set; } = new List<IncrementalColumn>();
 
         /// <inheritdoc />
         public string Key { get; set; }

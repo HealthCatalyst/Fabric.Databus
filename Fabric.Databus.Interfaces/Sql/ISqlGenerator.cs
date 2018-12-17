@@ -60,6 +60,14 @@ namespace Fabric.Databus.Interfaces.Sql
         ISqlGenerator AddColumn(string columnName);
 
         /// <summary>
+        /// The add all columns.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="ISqlGenerator"/>.
+        /// </returns>
+        ISqlGenerator AddAllColumns();
+
+        /// <summary>
         /// The add join.
         /// </summary>
         /// <param name="join">

@@ -104,8 +104,8 @@ ORDER BY Text.[TextID] ASC
 ";
 
             Assert.AreEqual(expected, sqlCommand.CommandText);
-        }        
-        
+        }
+
         /// <summary>
         /// The create sql command succeeds.
         /// </summary>
@@ -170,9 +170,9 @@ ORDER BY Text.[TextID] ASC
             string end = "10";
 
             var testDataSource = new TestDataSource
-                                     {
-                                         TableOrView = "Text",
-                                         Relationships = new List<ISqlRelationship>
+            {
+                TableOrView = "Text",
+                Relationships = new List<ISqlRelationship>
                                                              {
                                                                  new SqlRelationship
                                                                      {
@@ -188,7 +188,7 @@ ORDER BY Text.[TextID] ASC
                                                                                         }
                                                                      },
                                                              }
-                                     };
+            };
 
             var sqlCommand = databusSqlReader.CreateSqlCommand(
                 testDataSource,
@@ -281,26 +281,139 @@ ORDER BY Text.[TextID] ASC
         }
 
         /// <summary>
-        /// The create sql command succeeds.
+        /// The get query for entity keys unit tests.
         /// </summary>
-        [TestMethod]
-        public void GetQueryForEntityKeysWithJoinedEntityAndRangeAndIncrementalColumnsSucceeds()
+        [TestClass]
+        public class GetQueryForEntityKeysUnitTests
         {
-            var connectionString = string.Empty;
-            var sqlCommandTimeoutInSeconds = 1;
-
-            var databusSqlReader = new DatabusSqlReader(
-                connectionString,
-                sqlCommandTimeoutInSeconds,
-                new SqlConnectionFactory(),
-                new SqlGeneratorFactory());
-
-            var topLevelKeyColumn = "TextID";
-
-            var testDataSource = new TestTopLevelDataSource
+            /// <summary>
+            /// The create sql command succeeds.
+            /// </summary>
+            [TestMethod]
+            public void GetQueryForEntityKeysWithSingleEntitySucceeds()
             {
-                TableOrView = "Text",
-                Relationships = new List<ISqlRelationship>
+                var connectionString = string.Empty;
+                var sqlCommandTimeoutInSeconds = 1;
+
+                var databusSqlReader = new DatabusSqlReader(
+                    connectionString,
+                    sqlCommandTimeoutInSeconds,
+                    new SqlConnectionFactory(),
+                    new SqlGeneratorFactory());
+
+                var topLevelKeyColumn = "id0";
+
+                var testDataSource = new TestTopLevelDataSource
+                                         {
+                                             TableOrView = "[SAM].[HSAM].[Level0Entity]",
+                                             Name = null,
+                                             Sql = null,
+                                             Path = "$",
+                                             PropertyType = null,
+                                             MySqlEntityColumnMappings = new List<SqlEntityColumnMapping>
+                                                                             {
+                                                                                 new SqlEntityColumnMapping
+                                                                                     {
+                                                                                         Name = "col02", Alias = "col02"
+                                                                                     },
+                                                                                 new SqlEntityColumnMapping
+                                                                                     {
+                                                                                         Name = "col01", Alias = "col01"
+                                                                                     },
+                                                                                 new SqlEntityColumnMapping
+                                                                                     {
+                                                                                         Name = "id0", Alias = "id0"
+                                                                                     }
+                                                                             }
+                                         };
+
+                var actual = databusSqlReader.GetQueryForEntityKeys(topLevelKeyColumn, 0, testDataSource);
+
+                string expected = @"SELECT
+[SAM].[HSAM].[Level0Entity].[id0]
+FROM [SAM].[HSAM].[Level0Entity]
+WHERE 1=1
+ORDER BY [SAM].[HSAM].[Level0Entity].[id0] ASC
+";
+
+                Assert.AreEqual(expected, actual);
+            }
+            
+            /// <summary>
+            /// The create sql command succeeds.
+            /// </summary>
+            [TestMethod]
+            public void GetQueryForEntityKeysWithSingleEntityAndMaximumEntitiesSucceeds()
+            {
+                var connectionString = string.Empty;
+                var sqlCommandTimeoutInSeconds = 1;
+
+                var databusSqlReader = new DatabusSqlReader(
+                    connectionString,
+                    sqlCommandTimeoutInSeconds,
+                    new SqlConnectionFactory(),
+                    new SqlGeneratorFactory());
+
+                var topLevelKeyColumn = "id0";
+
+                var testDataSource = new TestTopLevelDataSource
+                                         {
+                                             TableOrView = "[SAM].[HSAM].[Level0Entity]",
+                                             Name = null,
+                                             Sql = null,
+                                             Path = "$",
+                                             PropertyType = null,
+                                             MySqlEntityColumnMappings = new List<SqlEntityColumnMapping>
+                                                                             {
+                                                                                 new SqlEntityColumnMapping
+                                                                                     {
+                                                                                         Name = "col02", Alias = "col02"
+                                                                                     },
+                                                                                 new SqlEntityColumnMapping
+                                                                                     {
+                                                                                         Name = "col01", Alias = "col01"
+                                                                                     },
+                                                                                 new SqlEntityColumnMapping
+                                                                                     {
+                                                                                         Name = "id0", Alias = "id0"
+                                                                                     }
+                                                                             }
+                                         };
+
+                var actual = databusSqlReader.GetQueryForEntityKeys(topLevelKeyColumn, 15, testDataSource);
+
+                string expected = @"SELECT
+TOP 15
+[SAM].[HSAM].[Level0Entity].[id0]
+FROM [SAM].[HSAM].[Level0Entity]
+WHERE 1=1
+ORDER BY [SAM].[HSAM].[Level0Entity].[id0] ASC
+";
+
+                Assert.AreEqual(expected, actual);
+            }
+
+            /// <summary>
+            /// The create sql command succeeds.
+            /// </summary>
+            [TestMethod]
+            public void GetQueryForEntityKeysWithJoinedEntityAndRangeAndRelationshipsSucceeds()
+            {
+                var connectionString = string.Empty;
+                var sqlCommandTimeoutInSeconds = 1;
+
+                var databusSqlReader = new DatabusSqlReader(
+                    connectionString,
+                    sqlCommandTimeoutInSeconds,
+                    new SqlConnectionFactory(),
+                    new SqlGeneratorFactory());
+
+                var topLevelKeyColumn = "TextID";
+
+                var testDataSource = new TestTopLevelDataSource
+                {
+                    TableOrView = "Text",
+                    Relationships = new List<ISqlRelationship>
                                                              {
                                                                  new SqlRelationship
                                                                      {
@@ -316,20 +429,20 @@ ORDER BY Text.[TextID] ASC
                                                                                         }
                                                                      },
                                                              }
-            };
+                };
 
-            var actual = databusSqlReader.GetQueryForEntityKeys(topLevelKeyColumn, 10, testDataSource);
+                var actual = databusSqlReader.GetQueryForEntityKeys(topLevelKeyColumn, 10, testDataSource);
 
-            string expected = @"SELECT
+                string expected = @"SELECT
 TOP 10
-Text.*,Text.[TextKEY] AS [KeyLevel2],Patient.[TextID] AS [KeyLevel1]
+Text.[TextID]
 FROM Text
-INNER JOIN Patient ON Patient.[TextKEY] = Text.[TextKEY]
 WHERE 1=1
 ORDER BY Text.[TextID] ASC
 ";
 
-            Assert.AreEqual(expected, actual);
+                Assert.AreEqual(expected, actual);
+            }
         }
     }
 }

@@ -1,0 +1,6 @@
+﻿CREATE TABLE Text (TextID varchar(64), PatientID int, TextTXT varchar(255))
+CREATE TABLE Patients (TextID varchar(64), PatientID int, PatientLastNM varchar(255))
+INSERT INTO Text (TextID, PatientID, TextTXT) values ('1', 9001, 'This is my first note')
+INSERT INTO Text (TextID, PatientID, TextTXT) values ('2', 9002, 'This is my second note')
+INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('1', 9001, 'Jones')
+INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('2', 9002, 'Smith')

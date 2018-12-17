@@ -55,32 +55,32 @@ namespace Fabric.Databus.Integration.Tests
         public void CanRunSingleEntityEndToEnd()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "SingleEntity.xml");
+
+            var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "SingleEntity.sql");
+            Assert.AreEqual(2, sqlLines.Count);
+
             var config = new ConfigReader().ReadXmlFromText(fileContents);
 
             config.Config.UseMultipleThreads = true;
 
-            using (TempLocalDb db = new TempLocalDb("Test"))
+            using (var db = new TempLocalDb("Test"))
             using (var connection = db.CreateConnection())
             {
                 connection.Open();
 
-                // setup the database
-                string sql = "CREATE TABLE Text (TextID varchar(64), PatientID int, TextTXT varchar(255))";
-
                 var command = connection.CreateCommand();
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
 
-                sql = "INSERT INTO Text (TextID, PatientID, TextTXT) values ('1', 9001, 'This is my first note')";
+                // setup the database
+                foreach (var sql in sqlLines)
+                {
+                    command.CommandText = sql;
+                    command.ExecuteNonQuery();
+                }
 
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-
-                sql = @";WITH CTE AS ( SELECT
+                command.CommandText = @";WITH CTE AS ( SELECT
 Text.*,Text.[TextID] AS [KeyLevel1]
 FROM Text
  )  SELECT * from CTE";
-                command.CommandText = sql;
                 command.ExecuteNonQuery();
 
                 using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
@@ -245,13 +245,12 @@ FROM Text
 
             config.Config.UseMultipleThreads = true;
 
-            string connectionString = "Data Source=:memory:";
-
-            using (var connection = new SQLiteConnection(connectionString))
+            using (var db = new TempLocalDb("Test"))
+            using (var connection = db.CreateConnection())
             {
                 connection.Open();
 
-                SQLiteCommand command = connection.CreateCommand();
+                var command = connection.CreateCommand();
 
                 // setup the database
                 foreach (var sql in sqlLines)
@@ -267,13 +266,13 @@ FROM Text
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
                         container.RegisterInstance<ISqlConnectionFactory>(
-                            new SqlLiteConnectionFactory(new DbConnectionWrapper(connection)));
+                            new SqlReuseConnectionFactory(new DbConnectionWrapper(connection)));
 
                         var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
                         container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
                         container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
 
-                        container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
+                        container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
 
                         container.RegisterType<IQueueFactory, MultiThreadedQueueFactory>();
 
@@ -414,43 +413,24 @@ FROM Text
         public void CanRunMultipleEntitiesEndToEnd()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "MultipleEntities.xml");
+            var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "MultipleEntities.sql");
+            Assert.AreEqual(6, sqlLines.Count);
 
             var config = new ConfigReader().ReadXmlFromText(fileContents);
 
-            string connectionString = "Data Source=:memory:";
-
-            using (var connection = new SQLiteConnection(connectionString))
+            using (var db = new TempLocalDb("Test"))
+            using (var connection = db.CreateConnection())
             {
                 connection.Open();
 
+                var command = connection.CreateCommand();
+
                 // setup the database
-                string sql = "CREATE TABLE Text (TextID varchar(64), PatientID int, TextTXT varchar(255))";
-
-                SQLiteCommand command = connection.CreateCommand();
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-
-                sql = "CREATE TABLE Patients (TextID varchar(64), PatientID int, PatientLastNM varchar(255))";
-
-                command = connection.CreateCommand();
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-
-                sql = "INSERT INTO Text (TextID, PatientID, TextTXT) values ('1', 9001, 'This is my first note')";
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-
-                sql = "INSERT INTO Text (TextID, PatientID, TextTXT) values ('2', 9002, 'This is my second note')";
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-
-                sql = "INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('1', 9001, 'Jones')";
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
-
-                sql = "INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('2', 9002, 'Smith')";
-                command.CommandText = sql;
-                command.ExecuteNonQuery();
+                foreach (var sql in sqlLines)
+                {
+                    command.CommandText = sql;
+                    command.ExecuteNonQuery();
+                }
 
                 using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
                 {
@@ -459,13 +439,13 @@ FROM Text
                         var container = new UnityContainer();
                         container.RegisterInstance<IProgressMonitor>(progressMonitor);
                         container.RegisterInstance<ISqlConnectionFactory>(
-                            new SqlLiteConnectionFactory(new DbConnectionWrapper(connection)));
+                            new SqlReuseConnectionFactory(new DbConnectionWrapper(connection)));
 
                         var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
                         container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
                         container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
 
-                        container.RegisterType<ISqlGeneratorFactory, SqlLiteGeneratorFactory>();
+                        container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
 
                         JObject expectedJson1 = new JObject(
                             new JProperty("TextID", "1"),

@@ -12,7 +12,7 @@
   </Config>
   <Data>
     <TopLevelDataSource Key="TextID" Path="$" Name="First" TableOrView="Text">
-      <IncrementalColumn Name="LastLoadIncrement"  Operator="GreaterThan" Type="int" Value="2"/>
+      <IncrementalColumn Name="LastLoadDTS"  Operator="GreaterThan" Type="datetime2" Value="1/2/2017"/>
       <Column Name="TextID"/>
       <Column Name="PatientID"/>
       <Column Name="TextTXT"/>

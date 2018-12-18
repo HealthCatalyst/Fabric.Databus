@@ -11,6 +11,7 @@ namespace Fabric.Databus.PipelineSteps
 {
     using System;
     using System.IO;
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -31,6 +32,11 @@ namespace Fabric.Databus.PipelineSteps
     /// </summary>
     public class SendToRestApiPipelineStep : BasePipelineStep<IJsonObjectQueueItem, EndPointQueueItem>
     {
+        /// <summary>
+        /// The number of entities uploaded.
+        /// </summary>
+        private static int numberOfEntitiesUploaded;
+
         /// <summary>
         /// The file uploader.
         /// </summary>
@@ -86,12 +92,30 @@ namespace Fabric.Databus.PipelineSteps
             var fileUploadResult = await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, this.Config.CompressFiles);
 
             await this.WriteDiagnosticsAsync(workItem, fileUploadResult);
+
+            if (fileUploadResult.StatusCode == HttpStatusCode.OK)
+            {
+                Interlocked.Increment(ref numberOfEntitiesUploaded);
+            }
         }
 
         /// <inheritdoc />
         protected override string GetId(IJsonObjectQueueItem workItem)
         {
             return workItem.Id;
+        }
+
+
+        /// <inheritdoc />
+        protected override Task CompleteBatchAsync(
+            string queryId,
+            bool isLastThreadForThisTask,
+            int batchNumber,
+            IBatchCompletedQueueItem batchCompletedQueueItem)
+        {
+            batchCompletedQueueItem.NumberOfEntitiesUploaded = numberOfEntitiesUploaded;
+            numberOfEntitiesUploaded = 0;
+            return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
 
         /// <summary>

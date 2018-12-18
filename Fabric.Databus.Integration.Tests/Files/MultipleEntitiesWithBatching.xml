@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
+  <Config>
+    <ConnectionString>NotUsed</ConnectionString>
+    <Url>http://foo</Url>
+    <LocalSaveFolder>foo</LocalSaveFolder>
+    <UseMultipleThreads>true</UseMultipleThreads>
+    <UrlUserName>myUser</UrlUserName>
+    <UrlPassword>myPassword</UrlPassword>
+    <EntitiesPerBatch>3</EntitiesPerBatch>
+  </Config>
+  <Data>
+    <TopLevelDataSource Key="TextID" Path="$" Name="First" TableOrView="Text">
+    </TopLevelDataSource>
+    <DataSource Path="$.patients" Name="Patients" TableOrView="Patients" PropertyType="object">
+      <Relationship>
+        <Source Entity="Text" Key="TextID"/>
+        <Destination Entity="Patients" Key="TextID"/>
+      </Relationship>
+    </DataSource>
+  </Data>
+</Job>

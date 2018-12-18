@@ -74,7 +74,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber)
+        protected override async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber, IBatchCompletedQueueItem batchCompletedQueueItem)
         {
             await this.FlushAllDocuments();
         }

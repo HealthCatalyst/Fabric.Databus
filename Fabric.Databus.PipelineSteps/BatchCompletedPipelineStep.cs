@@ -54,11 +54,11 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber)
+        protected override async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber, IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            this.batchEventsLogger.BatchCompleted(batchNumber);
+            this.batchEventsLogger.BatchCompleted(batchCompletedQueueItem);
 
-            await base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber);
+            await base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
 
         /// <inheritdoc />

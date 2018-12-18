@@ -11,11 +11,11 @@ namespace Fabric.Databus.QueueItems
 {
     using Fabric.Databus.Interfaces.Queues;
 
-    /// <inheritdoc />
+    /// <inheritdoc cref="IBatchCompletedQueueItem" />
     /// <summary>
     /// The batch completed queue item.
     /// </summary>
-    public class BatchCompletedQueueItem : IQueueItem
+    public class BatchCompletedQueueItem : IBatchCompletedQueueItem
     {
         /// <inheritdoc />
         public string QueryId { get; set; }
@@ -23,9 +23,19 @@ namespace Fabric.Databus.QueueItems
         /// <inheritdoc />
         public string PropertyName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the batch number.
-        /// </summary>
+        /// <inheritdoc />
         public int BatchNumber { get; set; }
+
+        /// <inheritdoc />
+        public string Start { get; set; }
+
+        /// <inheritdoc />
+        public string End { get; set; }
+
+        /// <inheritdoc />
+        public int NumberOfEntities { get; set; }
+
+        /// <inheritdoc />
+        public int NumberOfEntitiesUploaded { get; set; }
     }
 }

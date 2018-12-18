@@ -31,6 +31,11 @@ namespace Fabric.Databus.PipelineSteps
     /// </summary>
     public class WriteSourceWrapperCollectionToJsonPipelineStep : BasePipelineStep<SourceWrapperCollectionQueueItem, IJsonObjectQueueItem>
     {
+        /// <summary>
+        /// The number of entities in batch.
+        /// </summary>
+        private static int numberOfEntitiesInBatch;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Fabric.Databus.PipelineSteps.WriteSourceWrapperCollectionToJsonPipelineStep" /> class.
@@ -80,6 +85,8 @@ namespace Fabric.Databus.PipelineSteps
 
                 foreach (var entity in actualJson)
                 {
+                    Interlocked.Increment(ref numberOfEntitiesInBatch);
+
                     this.AddToOutputQueueAsync(
                         new JsonObjectQueueItem
                             {
@@ -97,6 +104,14 @@ namespace Fabric.Databus.PipelineSteps
         protected override string GetId(SourceWrapperCollectionQueueItem workItem)
         {
             return workItem.QueryId;
+        }
+
+        /// <inheritdoc />
+        protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber, IBatchCompletedQueueItem batchCompletedQueueItem)
+        {
+            batchCompletedQueueItem.NumberOfEntities = numberOfEntitiesInBatch;
+            numberOfEntitiesInBatch = 0;
+            return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
     }
 }

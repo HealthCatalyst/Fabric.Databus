@@ -254,8 +254,7 @@ namespace Fabric.Databus.PipelineSteps
                             this.totalItemsProcessedByThisProcessor,
                             wt1);
 
-                        await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber);
-                        await this.AddBatchCompletionMessageToOutputQueueAsync(batchCompletedQueueItem.BatchNumber);
+                        await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber, batchCompletedQueueItem);
                         continue;
                     }
 
@@ -376,9 +375,12 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="batchNumber">
         /// The batch Number.
         /// </param>
-        public void CompleteBatchForTesting(string queryId, bool isLastThreadForThisTask, int batchNumber)
+        /// <param name="batchCompletedQueueItem">
+        /// The batch Completed Queue Item.
+        /// </param>
+        public void CompleteBatchForTesting(string queryId, bool isLastThreadForThisTask, int batchNumber, BatchCompletedQueueItem batchCompletedQueueItem)
         {
-            this.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber);
+            this.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
 
         /// <summary>
@@ -471,12 +473,15 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="batchNumber">
         /// The batch Number.
         /// </param>
+        /// <param name="batchCompletedQueueItem">
+        /// The batch Completed Queue Item.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected virtual Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber)
+        protected virtual async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber, IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            return Task.CompletedTask;
+            await this.AddBatchCompletionMessageToOutputQueueAsync(batchCompletedQueueItem);
         }
 
         /// <summary>
@@ -510,15 +515,15 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The add batch completion message to output queue async.
         /// </summary>
-        /// <param name="batchNumber">
-        /// The batch number.
+        /// <param name="batchCompletedQueueItem">
+        /// batch completed queue item
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected async Task AddBatchCompletionMessageToOutputQueueAsync(int batchNumber)
+        protected async Task AddBatchCompletionMessageToOutputQueueAsync(IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            this.outQueue.AddBatchCompleted(new BatchCompletedQueueItem { BatchNumber = batchNumber });
+            this.outQueue.AddBatchCompleted(batchCompletedQueueItem);
 
             await Task.CompletedTask;
         }

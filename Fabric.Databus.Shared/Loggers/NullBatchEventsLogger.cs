@@ -10,12 +10,13 @@
 namespace Fabric.Databus.Shared.Loggers
 {
     using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
 
     /// <inheritdoc />
     public class NullBatchEventsLogger : IBatchEventsLogger
     {
         /// <inheritdoc />
-        public void BatchCompleted(int batchNumber)
+        public void BatchCompleted(IBatchCompletedQueueItem batchCompletedQueueItem)
         {
         }
     }

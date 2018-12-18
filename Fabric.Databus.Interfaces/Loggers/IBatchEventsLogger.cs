@@ -9,6 +9,8 @@
 
 namespace Fabric.Databus.Interfaces.Loggers
 {
+    using Fabric.Databus.Interfaces.Queues;
+
     /// <summary>
     /// The BatchCompletedLogger interface.
     /// </summary>
@@ -17,9 +19,9 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// <summary>
         /// The batch completed.
         /// </summary>
-        /// <param name="batchNumber">
-        /// The batch number.
+        /// <param name="batchCompletedQueueItem">
+        /// The batch Completed Queue Item.
         /// </param>
-        void BatchCompleted(int batchNumber);
+        void BatchCompleted(IBatchCompletedQueueItem batchCompletedQueueItem);
     }
 }

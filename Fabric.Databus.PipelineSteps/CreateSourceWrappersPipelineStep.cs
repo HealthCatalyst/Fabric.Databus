@@ -116,10 +116,13 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="batchNumber1">
         /// batch number
         /// </param>
+        /// <param name="batchCompletedQueueItem">
+        /// batch completed queue item
+        /// </param>
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber1)
+        protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber1, IBatchCompletedQueueItem batchCompletedQueueItem)
         {
             if (this.sourceWrapperCollection.Any())
             {
@@ -133,7 +136,7 @@ namespace Fabric.Databus.PipelineSteps
             // start a new collection for next batch
             this.sourceWrapperCollection = new SourceWrapperCollection();
 
-            return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber1);
+            return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber1, batchCompletedQueueItem);
         }
 
         /// <inheritdoc />

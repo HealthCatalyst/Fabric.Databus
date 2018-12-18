@@ -119,7 +119,13 @@ namespace Fabric.Databus.PipelineSteps
 
                 await this.WriteDiagnosticsWithNoBatches();
 
-                await this.AddBatchCompletionMessageToOutputQueueAsync(1);
+                await this.AddBatchCompletionMessageToOutputQueueAsync(
+                    new BatchCompletedQueueItem
+                        {
+                            BatchNumber = 1,
+                            Start = null,
+                            End = null
+                        });
             }
             else
             {
@@ -141,15 +147,22 @@ namespace Fabric.Databus.PipelineSteps
 
                     await this.WriteDiagnosticsWithNoBatches();
 
-                    await this.AddBatchCompletionMessageToOutputQueueAsync(currentBatchNumber);
+                    await this.AddBatchCompletionMessageToOutputQueueAsync(
+                        new BatchCompletedQueueItem
+                            {
+                                BatchNumber = 1,
+                                Start = null,
+                                End = null
+                            });
                 }
 
                 foreach (var range in rangesList)
                 {
+
                     await this.AddToOutputQueueAsync(
                         new SqlBatchQueueItem
                         {
-                            BatchNumber = currentBatchNumber++,
+                            BatchNumber = currentBatchNumber,
                             Start = range.Item1,
                             End = range.Item2,
                             Loads = workItem.Job.Data.DataSources,
@@ -163,9 +176,17 @@ namespace Fabric.Databus.PipelineSteps
 
                     await this.WriteDiagnosticsAsync(currentBatchNumber, range);
 
-                    await this.AddBatchCompletionMessageToOutputQueueAsync(currentBatchNumber);
+                    await this.AddBatchCompletionMessageToOutputQueueAsync(
+                        new BatchCompletedQueueItem
+                            {
+                                BatchNumber = currentBatchNumber,
+                                Start = range.Item1,
+                                End = range.Item2
+                            });
 
                     await this.WaitTillOutputQueueIsEmptyAsync(currentBatchNumber);
+
+                    currentBatchNumber++;
                 }
             }
 

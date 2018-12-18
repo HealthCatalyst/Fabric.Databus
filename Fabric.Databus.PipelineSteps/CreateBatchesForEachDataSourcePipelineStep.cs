@@ -101,8 +101,6 @@ namespace Fabric.Databus.PipelineSteps
 
             await this.WriteDiagnostics(workItem);
 
-            await this.AddBatchCompletionMessageToOutputQueueAsync(workItem.BatchNumber);
-
             await this.WaitTillOutputQueueIsEmptyAsync(workItem.BatchNumber);
         }
 

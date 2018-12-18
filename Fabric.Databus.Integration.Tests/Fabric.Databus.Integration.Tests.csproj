@@ -138,6 +138,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\TestBatchEventsLogger.cs" />
     <Compile Include="MultiThreadedEndToEndIntegrationTests.cs" />
     <Compile Include="IntegrationTestFileStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -218,6 +219,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Files\MultipleEntities.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\MultipleEntitiesWithBatching.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\MultipleEntitiesWithBatching.xml" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

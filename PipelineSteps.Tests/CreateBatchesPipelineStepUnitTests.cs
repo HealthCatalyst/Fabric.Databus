@@ -58,7 +58,7 @@ namespace PipelineStep.Tests
                 }
             };
 
-            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
+            var queueManager = new QueueManager(new InMemoryQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -66,7 +66,6 @@ namespace PipelineStep.Tests
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-
                 var mockRepository = new MockRepository(MockBehavior.Strict);
                 var mockDatabusSqlReader = mockRepository.Create<IDatabusSqlReader>();
 
@@ -111,8 +110,9 @@ namespace PipelineStep.Tests
                 Assert.IsNotNull(outputQueue);
                 Assert.AreEqual(1, outputQueue.Count);
 
-                var sqlBatchQueueItem = outputQueue.Take(CancellationToken.None);
+                var sqlBatchQueueItem = outputQueue.TakeGeneric(CancellationToken.None) as SqlBatchQueueItem;
 
+                Assert.IsNotNull(sqlBatchQueueItem);
                 Assert.AreEqual(1, sqlBatchQueueItem.BatchNumber);
                 Assert.AreEqual(null, sqlBatchQueueItem.Start);
                 Assert.AreEqual(null, sqlBatchQueueItem.End);
@@ -130,18 +130,18 @@ namespace PipelineStep.Tests
         {
             // Arrange
             var job = new Job
-                          {
-                              Config = new QueryConfig
-                                           {
-                                               LocalSaveFolder = Path.GetTempPath(),
-                                               EntitiesPerUploadFile = 1,
-                                               EntitiesPerBatch = 2,
-                                               MaximumEntitiesToLoad = 4
-                                           },
-                              Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
-                          };
+            {
+                Config = new QueryConfig
+                {
+                    LocalSaveFolder = Path.GetTempPath(),
+                    EntitiesPerUploadFile = 1,
+                    EntitiesPerBatch = 2,
+                    MaximumEntitiesToLoad = 4
+                },
+                Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
+            };
 
-            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
+            var queueManager = new QueueManager(new InMemoryQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -166,20 +166,20 @@ namespace PipelineStep.Tests
                     cancellationTokenSource.Token);
 
                 var sqlJobQueueItem = new SqlJobQueueItem
-                                          {
-                                              Job = new Job
-                                                        {
-                                                            Data = new JobData
-                                                                       {
-                                                                           MyTopLevelDataSource = new TopLevelDataSource
-                                                                                                      {
-                                                                                                          Key =
+                {
+                    Job = new Job
+                    {
+                        Data = new JobData
+                        {
+                            MyTopLevelDataSource = new TopLevelDataSource
+                            {
+                                Key =
                                                                                                               "TextID",
-                                                                                                          Path = "$"
-                                                                                                      }
-                                                                       }
-                                                        }
-                                          };
+                                Path = "$"
+                            }
+                        }
+                    }
+                };
 
                 var stepNumber = 1;
                 queueManager.CreateInputQueue<SqlJobQueueItem>(stepNumber);
@@ -202,7 +202,9 @@ namespace PipelineStep.Tests
                 Assert.IsNotNull(outputQueue);
                 Assert.AreEqual(1, outputQueue.Count);
 
-                var sqlBatchQueueItem = outputQueue.Take(CancellationToken.None);
+                var sqlBatchQueueItem = outputQueue.TakeGeneric(CancellationToken.None) as SqlBatchQueueItem;
+
+                Assert.IsNotNull(sqlBatchQueueItem);
 
                 Assert.AreEqual(1, sqlBatchQueueItem.BatchNumber);
                 Assert.AreEqual(null, sqlBatchQueueItem.Start);
@@ -221,18 +223,18 @@ namespace PipelineStep.Tests
         {
             // Arrange
             var job = new Job
-                          {
-                              Config = new QueryConfig
-                                           {
-                                               LocalSaveFolder = Path.GetTempPath(),
-                                               EntitiesPerUploadFile = 1,
-                                               EntitiesPerBatch = 2,
-                                               MaximumEntitiesToLoad = 4
-                                           },
-                              Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
-                          };
+            {
+                Config = new QueryConfig
+                {
+                    LocalSaveFolder = Path.GetTempPath(),
+                    EntitiesPerUploadFile = 1,
+                    EntitiesPerBatch = 2,
+                    MaximumEntitiesToLoad = 4
+                },
+                Data = new JobData { MyTopLevelDataSource = new TopLevelDataSource { Key = "TextID" } }
+            };
 
-            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
+            var queueManager = new QueueManager(new InMemoryQueueWithoutBlockingFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -298,15 +300,25 @@ namespace PipelineStep.Tests
                 Assert.IsNotNull(outputQueue);
                 Assert.AreEqual(2, outputQueue.Count);
 
-                var sqlBatchQueueItem = outputQueue.Take(CancellationToken.None);
+                var queueItem = outputQueue.TakeGeneric(CancellationToken.None);
+                Assert.IsTrue(queueItem is SqlBatchQueueItem);
+                var sqlBatchQueueItem = queueItem as SqlBatchQueueItem;
                 Assert.AreEqual(1, sqlBatchQueueItem.BatchNumber);
                 Assert.AreEqual("1", sqlBatchQueueItem.Start);
                 Assert.AreEqual("3", sqlBatchQueueItem.End);
 
-                sqlBatchQueueItem = outputQueue.Take(CancellationToken.None);
+                Assert.AreEqual(typeof(BatchCompletedQueueItem), outputQueue.TakeGeneric(CancellationToken.None).GetType());
+
+                queueItem = outputQueue.TakeGeneric(CancellationToken.None);
+                Assert.IsTrue(queueItem is SqlBatchQueueItem);
+                sqlBatchQueueItem = queueItem as SqlBatchQueueItem;
                 Assert.AreEqual(2, sqlBatchQueueItem.BatchNumber);
                 Assert.AreEqual("5", sqlBatchQueueItem.Start);
                 Assert.AreEqual("6", sqlBatchQueueItem.End);
+
+                Assert.AreEqual(typeof(BatchCompletedQueueItem), outputQueue.TakeGeneric(CancellationToken.None).GetType());
+
+                Assert.AreEqual(typeof(JobCompletedQueueItem), outputQueue.TakeGeneric(CancellationToken.None).GetType());
             }
         }
     }

@@ -2,7 +2,7 @@
 <Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
-    <ConnectionString>Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Test</ConnectionString>
+    <ConnectionString>Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Test;MultipleActiveResultSets=True</ConnectionString>
     <Url>http://foo</Url>
     <LocalSaveFolder>foo</LocalSaveFolder>
     <UseMultipleThreads>false</UseMultipleThreads>

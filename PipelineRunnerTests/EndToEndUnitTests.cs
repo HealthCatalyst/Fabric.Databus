@@ -25,9 +25,11 @@ namespace PipelineRunnerTests
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Pipeline;
+    using Fabric.Databus.Interfaces.Queues;
     using Fabric.Databus.Interfaces.Sql;
     using Fabric.Databus.PipelineRunner;
     using Fabric.Databus.Shared.Loggers;
+    using Fabric.Databus.Shared.Queues;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -80,8 +82,7 @@ namespace PipelineRunnerTests
                     It.IsAny<ILogger>(),
                     It.IsAny<string>(),
                     It.IsAny<IEnumerable<IIncrementalColumn>>(),
-                    It.IsAny<string>()
-                    )).ReturnsAsync(
+                    It.IsAny<string>())).ReturnsAsync(
                 new ReadSqlDataResult
                 {
                     ColumnList = new List<ColumnInfo>
@@ -148,6 +149,7 @@ namespace PipelineRunnerTests
                     container.RegisterInstance(mockConfigValidator.Object);
                     container.RegisterInstance(logger);
                     container.RegisterType<IPipelineExecutorFactory, SingleThreadedPipelineExecutorFactory>();
+                    container.RegisterType<IQueueFactory, InMemoryQueueWithoutBlockingFactory>();
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
@@ -287,6 +289,7 @@ namespace PipelineRunnerTests
                     container.RegisterInstance(mockConfigValidator.Object);
                     container.RegisterInstance(logger);
                     container.RegisterType<IPipelineExecutorFactory, MultiThreadedPipelineExecutorFactory>();
+                    container.RegisterType<IQueueFactory, InMemoryQueueWithoutBlockingFactory>();
 
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try

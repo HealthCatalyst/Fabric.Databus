@@ -26,15 +26,22 @@ namespace Fabric.Databus.PipelineSteps
     /// </summary>
     public class BatchCompletedPipelineStep : BasePipelineStep<EndPointQueueItem, EndPointQueueItem>
     {
+        /// <summary>
+        /// The batch completed logger.
+        /// </summary>
+        private readonly IBatchEventsLogger batchEventsLogger;
+
         /// <inheritdoc />
         public BatchCompletedPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
+            IBatchEventsLogger batchEventsLogger,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
+            this.batchEventsLogger = batchEventsLogger ?? throw new ArgumentNullException(nameof(batchEventsLogger));
         }
 
         /// <inheritdoc />
@@ -47,9 +54,11 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask)
+        protected override async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber)
         {
-            await base.CompleteBatchAsync(queryId, isLastThreadForThisTask);
+            this.batchEventsLogger.BatchCompleted(batchNumber);
+
+            await base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber);
         }
 
         /// <inheritdoc />

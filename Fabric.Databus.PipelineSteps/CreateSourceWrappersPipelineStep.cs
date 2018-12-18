@@ -38,14 +38,14 @@ namespace Fabric.Databus.PipelineSteps
         private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
 
         /// <summary>
-        /// The source wrapper collection.
-        /// </summary>
-        private SourceWrapperCollection sourceWrapperCollection = new SourceWrapperCollection();
-
-        /// <summary>
         /// The folder.
         /// </summary>
         private readonly string folder;
+
+        /// <summary>
+        /// The source wrapper collection.
+        /// </summary>
+        private SourceWrapperCollection sourceWrapperCollection = new SourceWrapperCollection();
 
         /// <summary>
         /// Gets or sets the batch number.
@@ -113,10 +113,13 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="isLastThreadForThisTask">
         /// The is last thread for this task.
         /// </param>
+        /// <param name="batchNumber1">
+        /// batch number
+        /// </param>
         /// <returns>
         /// The <see cref="T:System.Threading.Tasks.Task" />.
         /// </returns>
-        protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask)
+        protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber1)
         {
             if (this.sourceWrapperCollection.Any())
             {
@@ -130,7 +133,7 @@ namespace Fabric.Databus.PipelineSteps
             // start a new collection for next batch
             this.sourceWrapperCollection = new SourceWrapperCollection();
 
-            return base.CompleteBatchAsync(queryId, isLastThreadForThisTask);
+            return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber1);
         }
 
         /// <inheritdoc />

@@ -51,7 +51,7 @@ namespace PipelineStep.Tests
                 }
             };
 
-            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
+            var queueManager = new QueueManager(new InMemoryQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -106,9 +106,11 @@ namespace PipelineStep.Tests
 
                 Assert.AreEqual(1, outputQueue.Count);
 
-                var saveBatchQueueItem = outputQueue.Take(cancellationTokenSource.Token);
+                var saveBatchQueueItem = outputQueue.TakeGeneric(cancellationTokenSource.Token) as SaveBatchQueueItem;
 
                 Assert.AreEqual(0, outputQueue.Count);
+
+                Assert.IsNotNull(saveBatchQueueItem);
 
                 Assert.AreEqual(1, saveBatchQueueItem.ItemsToSave.Count);
 
@@ -120,12 +122,14 @@ namespace PipelineStep.Tests
 
                 // Act
                 // now complete the queue
-                createBatchItemsQueueProcessor.TestComplete(queryId, true);
+                createBatchItemsQueueProcessor.CompleteBatchForTesting(queryId, true, 1);
 
                 // Assert
                 Assert.AreEqual(1, outputQueue.Count);
 
-                saveBatchQueueItem = outputQueue.Take(cancellationTokenSource.Token);
+                saveBatchQueueItem = outputQueue.TakeGeneric(cancellationTokenSource.Token) as SaveBatchQueueItem;
+
+                Assert.IsNotNull(saveBatchQueueItem);
 
                 Assert.AreEqual(0, outputQueue.Count);
 

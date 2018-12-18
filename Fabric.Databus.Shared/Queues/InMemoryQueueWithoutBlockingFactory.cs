@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SingleThreadedQueueFactory.cs" company="">
+// <copyright file="InMemoryQueueWithoutBlockingFactory.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SingleThreadedQueueFactory type.
+//   Defines the InMemoryQueueWithoutBlockingFactory type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,16 +12,13 @@ namespace Fabric.Databus.Shared.Queues
     using Fabric.Databus.Interfaces.Queues;
 
     /// <inheritdoc />
-    /// <summary>
-    /// The queue factory.
-    /// </summary>
-    public class SingleThreadedQueueFactory : IQueueFactory
+    public class InMemoryQueueWithoutBlockingFactory : IQueueFactory
     {
         /// <inheritdoc />
         public IQueue Create<T>(string name)
             where T : class, IQueueItem
         {
-            return new SingleThreadedQueue<T>(name);
+            return new InMemoryQueueWithoutBlocking<T>(name);
         }
     }
 }

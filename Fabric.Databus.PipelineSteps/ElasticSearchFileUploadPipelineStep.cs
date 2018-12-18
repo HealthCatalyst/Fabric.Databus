@@ -16,8 +16,7 @@ namespace Fabric.Databus.PipelineSteps
     using Fabric.Databus.Interfaces.ElasticSearch;
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Interfaces.Queues;
-
-    using QueueItems;
+    using Fabric.Databus.QueueItems;
 
     using Serilog;
 
@@ -66,13 +65,13 @@ namespace Fabric.Databus.PipelineSteps
         protected override string LoggerName => "FileUpload";
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task HandleAsync(FileUploadQueueItem workItem)
+        protected override async Task HandleAsync(FileUploadQueueItem workItem)
         {
             await this.UploadFileAsync(workItem);
         }
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task BeginAsync(bool isFirstThreadForThisTask)
+        protected override async Task BeginAsync(bool isFirstThreadForThisTask)
         {
             if (isFirstThreadForThisTask)
             {
@@ -81,7 +80,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override async System.Threading.Tasks.Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask)
+        protected override async Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber)
         {
             if (isLastThreadForThisTask)
             {

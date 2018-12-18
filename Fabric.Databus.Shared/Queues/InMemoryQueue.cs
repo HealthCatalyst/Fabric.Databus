@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SingleThreadedQueue.cs" company="">
+// <copyright file="InMemoryQueue.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the SingleThreadedQueue type.
+//   Defines the InMemoryQueue type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -19,17 +19,18 @@ namespace Fabric.Databus.Shared.Queues
 
     /// <inheritdoc />
     /// <summary>
-    /// The simple blocking collection.
+    /// The advanced queue.
     /// </summary>
-    /// <typeparam name="T">type of item
+    /// <typeparam name="T">
+    /// type of queue
     /// </typeparam>
-    public class SingleThreadedQueue<T> : IQueue<T>
+    public class InMemoryQueue<T> : IQueue<T>
         where T : class, IQueueItem
     {
         /// <summary>
         /// The blocking collection.
         /// </summary>
-        private readonly BlockingCollection<T> blockingCollection;
+        private readonly BlockingCollection<IQueueItem> blockingCollection;
 
         /// <summary>
         /// The name.
@@ -37,20 +38,20 @@ namespace Fabric.Databus.Shared.Queues
         private readonly string name;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SingleThreadedQueue{T}"/> class.
+        /// Initializes a new instance of the <see cref="InMemoryQueue{T}"/> class.
         /// </summary>
         /// <param name="name">
         /// The name.
         /// </param>
-        public SingleThreadedQueue(string name)
+        public InMemoryQueue(string name)
         {
-            var concurrentQueue = new ConcurrentQueue<T>();
-            this.blockingCollection = new BlockingCollection<T>(concurrentQueue);
+            var concurrentQueue = new ConcurrentQueue<IQueueItem>();
+            this.blockingCollection = new BlockingCollection<IQueueItem>(concurrentQueue);
             this.name = name;
         }
 
         /// <inheritdoc />
-        public int Count => this.blockingCollection.Count;
+        public int Count => this.blockingCollection.Count(c => c is T);
 
         /// <inheritdoc />
         public bool IsCompleted => this.blockingCollection.IsCompleted;
@@ -59,29 +60,6 @@ namespace Fabric.Databus.Shared.Queues
         /// The name.
         /// </summary>
         public string Name => this.name;
-
-        /// <inheritdoc />
-        /// <summary>
-        /// The take.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns>
-        /// The <see cref="!:T" />.
-        /// </returns>
-        [System.Diagnostics.DebuggerNonUserCode]
-        [System.Diagnostics.DebuggerHidden]
-        public T Take(CancellationToken cancellationToken)
-        {
-            try
-            {
-                return this.blockingCollection.Take(cancellationToken);
-            }
-            catch (InvalidOperationException)
-            {
-            }
-
-            return default(T);
-        }
 
         /// <inheritdoc />
         /// <summary>
@@ -107,10 +85,12 @@ namespace Fabric.Databus.Shared.Queues
         }
 
         /// <inheritdoc />
-        public Task WaitTillEmptyAsync(CancellationToken cancellationToken)
+        public virtual async Task WaitTillEmptyAsync(CancellationToken cancellationToken)
         {
-            // do nothing since we don't wait for simple queue
-            return Task.CompletedTask;
+            while (this.Any())
+            {
+                await Task.Delay(1000, cancellationToken);
+            }
         }
 
         /// <inheritdoc />
@@ -122,11 +102,13 @@ namespace Fabric.Databus.Shared.Queues
         /// <inheritdoc />
         public void AddBatchCompleted(IQueueItem item)
         {
+            this.blockingCollection.Add(item);
         }
 
         /// <inheritdoc />
         public void AddJobCompleted(IQueueItem item)
         {
+            this.blockingCollection.Add(item);
         }
 
         /// <inheritdoc />
@@ -138,15 +120,16 @@ namespace Fabric.Databus.Shared.Queues
         /// <inheritdoc />
         public bool TryTake(out T cacheItem)
         {
-            var result = this.blockingCollection.TryTake(out cacheItem);
+            var result = this.blockingCollection.TryTake(out var cacheItem1);
 
+            cacheItem = cacheItem1 as T;
             return result;
         }
 
         /// <inheritdoc />
         public void CompleteAdding()
         {
-            this.blockingCollection.CompleteAdding();
+            // this.blockingCollection.CompleteAdding();
         }
     }
 }

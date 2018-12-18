@@ -55,17 +55,6 @@ namespace Fabric.Databus.Interfaces.Queues
         string Name { get; }
 
         /// <summary>
-        /// The take.
-        /// </summary>
-        /// <param name="cancellationToken">
-        ///     The cancellation token
-        /// </param>
-        /// <returns>
-        /// The <see cref="T"/>.
-        /// </returns>
-        T Take(CancellationToken cancellationToken);
-
-        /// <summary>
         /// The add.
         /// </summary>
         /// <param name="item">

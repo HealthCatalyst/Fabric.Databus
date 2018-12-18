@@ -180,6 +180,8 @@ END",
                 sb.InitialCatalog = databaseName1;
             }
 
+            sb.MultipleActiveResultSets = true;
+
             return sb.ConnectionString;
         }
     }

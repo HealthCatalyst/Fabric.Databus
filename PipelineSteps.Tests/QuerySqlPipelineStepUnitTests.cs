@@ -56,7 +56,7 @@ namespace PipelineStep.Tests
                 }
             };
 
-            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
+            var queueManager = new QueueManager(new InMemoryQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -141,7 +141,8 @@ namespace PipelineStep.Tests
                 Assert.IsNotNull(outputQueue);
                 Assert.AreEqual(4, outputQueue.Count);
 
-                var sqlDataLoadedQueueItem = outputQueue.Take(CancellationToken.None);
+                var sqlDataLoadedQueueItem = outputQueue.TakeGeneric(CancellationToken.None) as SqlDataLoadedQueueItem;
+                Assert.IsNotNull(sqlDataLoadedQueueItem);
                 Assert.AreEqual("$", sqlDataLoadedQueueItem.QueryId);
                 Assert.AreEqual(1, sqlDataLoadedQueueItem.Rows.Count);
                 Assert.AreEqual(2, sqlDataLoadedQueueItem.Rows[0].Length);
@@ -169,7 +170,7 @@ namespace PipelineStep.Tests
                 }
             };
 
-            var queueManager = new QueueManager(new SingleThreadedQueueFactory());
+            var queueManager = new QueueManager(new InMemoryQueueFactory());
 
             var logger = new LoggerConfiguration()
                 .WriteTo.Console()
@@ -266,7 +267,8 @@ namespace PipelineStep.Tests
                 Assert.IsNotNull(outputQueue);
                 Assert.AreEqual(4, outputQueue.Count);
 
-                var sqlDataLoadedQueueItem = outputQueue.Take(CancellationToken.None);
+                var sqlDataLoadedQueueItem = outputQueue.TakeGeneric(CancellationToken.None) as SqlDataLoadedQueueItem;
+                Assert.IsNotNull(sqlDataLoadedQueueItem);
                 Assert.AreEqual("$", sqlDataLoadedQueueItem.QueryId);
                 Assert.AreEqual(1, sqlDataLoadedQueueItem.Rows.Count);
                 Assert.AreEqual(2, sqlDataLoadedQueueItem.Rows[0].Length);

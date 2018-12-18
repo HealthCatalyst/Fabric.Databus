@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Integration.Tests
 {
     using System;
+    using System.Collections.Generic;
     using System.Data.SQLite;
     using System.Diagnostics;
     using System.IO;
@@ -41,6 +42,7 @@ namespace Fabric.Databus.Integration.Tests
     using Newtonsoft.Json.Linq;
 
     using Unity;
+    using Unity.Interception.Utilities;
 
     /// <summary>
     /// The end to end integration tests.
@@ -98,10 +100,33 @@ FROM Text
 
                         container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
 
-                        container.RegisterType<IQueueFactory, MultiThreadedQueueFactory>();
+                        container.RegisterType<IQueueFactory, InMemoryQueueFactory>();
 
                         // set up a mock web service
                         var mockRepository = new MockRepository(MockBehavior.Strict);
+
+                        var actualJsonObjects = new Dictionary<string, JObject>();
+
+                        var mockEntitySavedToJsonLogger = mockRepository.Create<IEntitySavedToJsonLogger>();
+                        mockEntitySavedToJsonLogger.Setup(service => service.IsWritingEnabled).Returns(true);
+                        mockEntitySavedToJsonLogger
+                            .Setup(service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()))
+                            .Callback<string, Stream>(
+                                (workItemId, stream) =>
+                                    {
+                                        using (var streamReader = new StreamReader(
+                                            stream,
+                                            Encoding.UTF8,
+                                            true,
+                                            1024,
+                                            true))
+                                        {
+                                            actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
+                                        }
+                                    });
+
+                        container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
+
                         JObject expectedJson = new JObject(
                             new JProperty("TextID", "1"),
                             new JProperty("PatientID", 9001),
@@ -191,6 +216,11 @@ FROM Text
                         }
 
                         // Assert
+                        Assert.AreEqual(1, actualJsonObjects.Count);
+                        mockEntitySavedToJsonLogger.Verify(
+                            service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()),
+                            Times.Once);
+
                         Assert.AreEqual(1 + 1, integrationTestFileWriter.Count); // first file is job.json
 
                         var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
@@ -274,7 +304,7 @@ FROM Text
 
                         container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
 
-                        container.RegisterType<IQueueFactory, MultiThreadedQueueFactory>();
+                        container.RegisterType<IQueueFactory, InMemoryQueueFactory>();
 
                         // set up a mock web service
                         var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -473,6 +503,27 @@ FROM Text
                         // set up a mock web service
                         var mockRepository = new MockRepository(MockBehavior.Strict);
 
+                        var actualJsonObjects = new Dictionary<string, JObject>();
+
+                        var mockEntitySavedToJsonLogger = mockRepository.Create<IEntitySavedToJsonLogger>();
+                        mockEntitySavedToJsonLogger.Setup(service => service.IsWritingEnabled).Returns(true);
+                        mockEntitySavedToJsonLogger
+                            .Setup(service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()))
+                            .Callback<string, Stream>(
+                                (workItemId, stream) =>
+                                    {
+                                        using (var streamReader = new StreamReader(
+                                            stream,
+                                            Encoding.UTF8,
+                                            true,
+                                            1024,
+                                            true))
+                                        {
+                                            actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
+                                        }
+                                    });
+                        container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
+
                         int numHttpCall = 0;
                         var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
                         httpMessageHandlerMock
@@ -516,7 +567,18 @@ FROM Text
 
                         var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 
-                        pipelineRunner.RunPipeline(config);
+                        try
+                        {
+                            pipelineRunner.RunPipeline(config);
+                        }
+                        catch (AggregateException e)
+                        {
+                            e.InnerExceptions.ForEach(Console.WriteLine);
+                            throw e.Flatten();
+                        }
+
+                        // assert
+                        Assert.AreEqual(2, actualJsonObjects.Count);
 
                         Assert.AreEqual(2 + 1, integrationTestFileWriter.Count); // first file is job.json
                         var expectedPath1 = integrationTestFileWriter.CombinePath(

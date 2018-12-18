@@ -159,6 +159,10 @@
       <Project>{EFC37D49-40FA-4F53-B956-B63F7EB47244}</Project>
       <Name>Fabric.Databus.QueueItems</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.TestHelper\Fabric.Databus.TestHelper.csproj">
+      <Project>{a6b2c693-4577-4fcc-a64c-3fb362fccac7}</Project>
+      <Name>Fabric.Databus.TestHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Shared.ReliableHttp\Fabric.Shared.ReliableHttp.csproj">
       <Project>{58da6e99-8dd9-4778-975e-c549e035b1cd}</Project>
       <Name>Fabric.Shared.ReliableHttp</Name>
@@ -174,6 +178,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

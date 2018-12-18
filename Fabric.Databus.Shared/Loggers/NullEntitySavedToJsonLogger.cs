@@ -23,7 +23,7 @@ namespace Fabric.Databus.Shared.Loggers
         public bool IsWritingEnabled => false;
 
         /// <inheritdoc />
-        public void LogSavedEntity(string workItemId, MemoryStream stream)
+        public void LogSavedEntity(string workItemId, Stream stream)
         {
             throw new NotImplementedException();
         }

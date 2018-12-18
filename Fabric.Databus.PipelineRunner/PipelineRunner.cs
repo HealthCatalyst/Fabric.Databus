@@ -335,11 +335,11 @@ namespace Fabric.Databus.PipelineRunner
             {
                 if (job.Config.UseMultipleThreads)
                 {
-                    this.container.RegisterType<IQueueFactory, MultiThreadedQueueFactory>();
+                    this.container.RegisterType<IQueueFactory, InMemoryQueueFactory>();
                 }
                 else
                 {
-                    this.container.RegisterType<IQueueFactory, SingleThreadedQueueFactory>();
+                    this.container.RegisterType<IQueueFactory, InMemoryQueueWithoutBlockingFactory>();
                 }
             }
 
@@ -402,6 +402,11 @@ namespace Fabric.Databus.PipelineRunner
             if (!this.container.IsRegistered<IEntitySavedToJsonLogger>())
             {
                 this.container.RegisterType<IEntitySavedToJsonLogger, NullEntitySavedToJsonLogger>();
+            }
+
+            if (!this.container.IsRegistered<IBatchEventsLogger>())
+            {
+                this.container.RegisterType<IBatchEventsLogger, NullBatchEventsLogger>();
             }
 
             if (!this.container.IsRegistered<IProgressMonitor>())

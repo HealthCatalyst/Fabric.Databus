@@ -118,6 +118,8 @@ namespace Fabric.Databus.PipelineSteps
                 });
 
                 await this.WriteDiagnosticsWithNoBatches();
+
+                await this.AddBatchCompletionMessageToOutputQueueAsync(1);
             }
             else
             {
@@ -138,6 +140,8 @@ namespace Fabric.Databus.PipelineSteps
                     });
 
                     await this.WriteDiagnosticsWithNoBatches();
+
+                    await this.AddBatchCompletionMessageToOutputQueueAsync(currentBatchNumber);
                 }
 
                 foreach (var range in rangesList)

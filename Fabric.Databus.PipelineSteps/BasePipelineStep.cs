@@ -254,7 +254,7 @@ namespace Fabric.Databus.PipelineSteps
                             this.totalItemsProcessedByThisProcessor,
                             wt1);
 
-                        await this.CompleteBatchAsync(null, true);
+                        await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber);
                         await this.AddBatchCompletionMessageToOutputQueueAsync(batchCompletedQueueItem.BatchNumber);
                         continue;
                     }
@@ -319,7 +319,7 @@ namespace Fabric.Databus.PipelineSteps
 
             currentProcessorCount = Interlocked.Decrement(ref processorCount);
             var isLastThreadForThisTask = currentProcessorCount < 1;
-            await this.CompleteBatchAsync(this.workItemQueryId, isLastThreadForThisTask);
+            // await this.CompleteBatchAsync(this.workItemQueryId, isLastThreadForThisTask);
 
             this.MyLogger.Verbose("Completed {QueryId}: queue: {InQueueCount}", this.workItemQueryId, this.InQueue.Count);
 
@@ -373,9 +373,12 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="isLastThreadForThisTask">
         /// The is last thread for this task.
         /// </param>
-        public void TestComplete(string queryId, bool isLastThreadForThisTask)
+        /// <param name="batchNumber">
+        /// The batch Number.
+        /// </param>
+        public void CompleteBatchForTesting(string queryId, bool isLastThreadForThisTask, int batchNumber)
         {
-            this.CompleteBatchAsync(queryId, isLastThreadForThisTask);
+            this.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber);
         }
 
         /// <summary>
@@ -460,15 +463,18 @@ namespace Fabric.Databus.PipelineSteps
         /// The complete.
         /// </summary>
         /// <param name="queryId">
-        ///     The query id.
+        /// The query id.
         /// </param>
         /// <param name="isLastThreadForThisTask">
-        ///     The is last thread for this task.
+        /// The is last thread for this task.
+        /// </param>
+        /// <param name="batchNumber">
+        /// The batch Number.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected virtual Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask)
+        protected virtual Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber)
         {
             return Task.CompletedTask;
         }

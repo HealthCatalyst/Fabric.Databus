@@ -301,6 +301,10 @@
       <Project>{104c7335-d0b6-4587-a1a9-843c69042ae2}</Project>
       <Name>Fabric.Databus.SqlGenerator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Fabric.Databus.TestHelper\Fabric.Databus.TestHelper.csproj">
+      <Project>{a6b2c693-4577-4fcc-a64c-3fb362fccac7}</Project>
+      <Name>Fabric.Databus.TestHelper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Shared\Fabric.Shared.csproj">
       <Project>{bb878905-9592-4a9d-a811-46e73d9f7f6a}</Project>
       <Name>Fabric.Shared</Name>

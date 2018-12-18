@@ -11,7 +11,6 @@ namespace Fabric.Databus.Integration.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.SQLite;
     using System.Diagnostics;
     using System.IO;
     using System.Net;
@@ -207,10 +206,7 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            foreach (var exception in e.InnerExceptions)
-                            {
-                                Console.WriteLine(exception);
-                            }
+                            e.InnerExceptions.ForEach(Console.WriteLine);
 
                             throw e.Flatten();
                         }
@@ -388,6 +384,7 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
+                            e.InnerExceptions.ForEach(Console.WriteLine);
                             throw e.Flatten();
                         }
 

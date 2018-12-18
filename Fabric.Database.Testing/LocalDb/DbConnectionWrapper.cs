@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Integration.Tests
+namespace Fabric.Database.Testing.LocalDb
 {
     using System;
     using System.Data;
@@ -24,8 +24,9 @@ namespace Fabric.Databus.Integration.Tests
         /// </summary>
         private readonly DbConnection connection;
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="DbConnectionWrapper"/> class.
+        /// Initializes a new instance of the <see cref="T:Fabric.Database.Testing.LocalDb.DbConnectionWrapper" /> class.
         /// </summary>
         /// <param name="connection">
         /// The connection.

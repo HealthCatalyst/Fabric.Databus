@@ -19,6 +19,8 @@ namespace Fabric.Databus.Integration.Tests
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Fabric.Database.Testing.FileLoader;
+    using Fabric.Database.Testing.LocalDb;
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ProgressMonitors;
     using Fabric.Databus.Interfaces.FileWriters;
@@ -64,7 +66,7 @@ namespace Fabric.Databus.Integration.Tests
 
             config.Config.UseMultipleThreads = true;
 
-            using (var db = new TempLocalDb("Test"))
+            using (var db = new TempLocalDb("Test1"))
             using (var connection = db.CreateConnection())
             {
                 connection.Open();
@@ -271,7 +273,7 @@ FROM Text
 
             config.Config.UseMultipleThreads = true;
 
-            using (var db = new TempLocalDb("Test"))
+            using (var db = new TempLocalDb("Test2"))
             using (var connection = db.CreateConnection())
             {
                 connection.Open();
@@ -445,7 +447,7 @@ FROM Text
 
             var config = new ConfigReader().ReadXmlFromText(fileContents);
 
-            using (var db = new TempLocalDb("Test"))
+            using (var db = new TempLocalDb("Test3"))
             using (var connection = db.CreateConnection())
             {
                 connection.Open();

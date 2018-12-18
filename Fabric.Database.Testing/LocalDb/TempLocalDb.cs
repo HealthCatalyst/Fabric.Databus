@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Integration.Tests
+namespace Fabric.Database.Testing.LocalDb
 {
     using System;
 
@@ -20,7 +20,7 @@ namespace Fabric.Databus.Integration.Tests
     {
         /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:Fabric.Databus.Integration.Tests.TempLocalDb" /> class.
+        /// Initializes a new instance of the <see cref="T:Fabric.Database.Testing.LocalDb.TempLocalDb" /> class.
         /// </summary>
         /// <param name="databaseName">The name of the SQL LocalDB database.</param>
         /// <param name="dataSource">The SQL Server instance to connect to, by default v11.0</param>

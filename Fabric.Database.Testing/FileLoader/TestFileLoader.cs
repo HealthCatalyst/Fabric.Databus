@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Integration.Tests
+namespace Fabric.Database.Testing.FileLoader
 {
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -32,9 +32,9 @@ namespace Fabric.Databus.Integration.Tests
         /// The <see cref="string"/>.
         /// </returns>
         [Pure]
-        internal static string GetFileContents(string folder, string sampleFile)
+        public static string GetFileContents(string folder, string sampleFile)
         {
-            var asm = Assembly.GetExecutingAssembly();
+            var asm = Assembly.GetCallingAssembly();
             var assemblyName = asm.GetName().Name;
             var resource = $"{assemblyName}.{folder}.{sampleFile}";
             using (var stream = asm.GetManifestResourceStream(resource))
@@ -62,9 +62,9 @@ namespace Fabric.Databus.Integration.Tests
         /// The <see cref="List{T}"/>.
         /// </returns>
         [Pure]
-        internal static List<string> GetFileContentsAsList(string folder, string sampleFile)
+        public static List<string> GetFileContentsAsList(string folder, string sampleFile)
         {
-            var asm = Assembly.GetExecutingAssembly();
+            var asm = Assembly.GetCallingAssembly();
             var assemblyName = asm.GetName().Name;
             var resource = $"{assemblyName}.{folder}.{sampleFile}";
 

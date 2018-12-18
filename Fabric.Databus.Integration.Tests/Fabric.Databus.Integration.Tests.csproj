@@ -138,20 +138,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LocalDb.cs" />
     <Compile Include="MultiThreadedEndToEndIntegrationTests.cs" />
     <Compile Include="IntegrationTestFileStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlLiteConnectionFactory.cs" />
-    <Compile Include="DbConnectionWrapper.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="IntegrationTestFileWriter.cs" />
     <Compile Include="SqlLiteGenerator.cs" />
     <Compile Include="SqlLiteGeneratorFactory.cs" />
     <Compile Include="SqlReuseConnectionFactory.cs" />
-    <Compile Include="TempLocalDb.cs" />
-    <Compile Include="TestFileLoader.cs" />
     <Compile Include="SqlLiteIntegrationTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +159,10 @@
     <EmbeddedResource Include="Files\MultipleEntities.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Fabric.Database.Testing\Fabric.Database.Testing.csproj">
+      <Project>{8b67f00f-4d7e-46fb-a62d-7bbf6a7d5bd0}</Project>
+      <Name>Fabric.Database.Testing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Fabric.Databus.Config\Fabric.Databus.Config.csproj">
       <Project>{c0ed4050-e7fb-4c68-adf1-6c8e290a2950}</Project>
       <Name>Fabric.Databus.Config</Name>

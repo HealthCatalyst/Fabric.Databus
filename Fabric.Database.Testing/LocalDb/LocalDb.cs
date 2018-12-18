@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.Integration.Tests
+namespace Fabric.Database.Testing.LocalDb
 {
     using System;
     using System.Data.SqlClient;

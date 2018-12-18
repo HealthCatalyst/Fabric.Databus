@@ -11,6 +11,7 @@ namespace Fabric.Databus.Integration.Tests
 {
     using System.Data.Common;
 
+    using Fabric.Database.Testing.LocalDb;
     using Fabric.Databus.Interfaces.Sql;
 
     /// <inheritdoc />

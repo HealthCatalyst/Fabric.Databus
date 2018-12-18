@@ -130,6 +130,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Database.Shared.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.TestHelper", "Fabric.Databus.TestHelper\Fabric.Databus.TestHelper.csproj", "{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Database.Testing", "Fabric.Database.Testing\Fabric.Database.Testing.csproj", "{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -256,6 +258,10 @@ Global
 		{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -298,6 +304,7 @@ Global
 		{58DA6E99-8DD9-4778-975E-C549E035B1CD} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{0FD33BAB-9E76-423E-86B1-83D8130BAF60} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 		{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
+		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

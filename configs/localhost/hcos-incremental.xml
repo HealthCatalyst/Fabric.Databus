@@ -14,7 +14,6 @@
   <Data>
     <TopLevelDataSource Key="TextKEY" Path="$" TableOrView="HCOSText.Data">
       <IncrementalColumn Name="LastLoadDTS" Operator="GreaterThanOrEqualTo" Type="datetime2" Value="2018-12-06 07:56:20.8170000"/>
-      <Column Name="TextKEY"/>
       <Column Name="root" Alias="root"/>
       <Column Name="extension" Alias="extension"/>
       <Column Name="extension_suffix" Alias="extension_suffix"/>

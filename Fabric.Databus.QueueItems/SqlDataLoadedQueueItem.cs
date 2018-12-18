@@ -55,5 +55,10 @@ namespace Fabric.Databus.QueueItems
         /// Gets or sets the property types.
         /// </summary>
         public IDictionary<string, string> PropertyTypes { get; set; }
+
+        /// <summary>
+        /// Gets or sets the top level key column.
+        /// </summary>
+        public string TopLevelKeyColumn { get; set; }
     }
 }

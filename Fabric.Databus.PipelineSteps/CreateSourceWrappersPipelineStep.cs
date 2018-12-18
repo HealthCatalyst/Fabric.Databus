@@ -52,6 +52,11 @@ namespace Fabric.Databus.PipelineSteps
         /// </summary>
         private int batchNumber;
 
+        /// <summary>
+        /// The top level key column.
+        /// </summary>
+        private string topLevelKeyColumn;
+
         /// <inheritdoc />
         public CreateSourceWrappersPipelineStep(
             IJobConfig jobConfig,
@@ -101,6 +106,8 @@ namespace Fabric.Databus.PipelineSteps
             await this.WriteDiagnostics(workItem);
 
             this.batchNumber = workItem.BatchNumber;
+
+            this.topLevelKeyColumn = workItem.TopLevelKeyColumn;
         }
 
         /// <inheritdoc />
@@ -129,7 +136,8 @@ namespace Fabric.Databus.PipelineSteps
                 this.AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
                 {
                     BatchNumber = this.batchNumber,
-                    SourceWrapperCollection = this.sourceWrapperCollection
+                    SourceWrapperCollection = this.sourceWrapperCollection,
+                    TopLevelKeyColumn = this.topLevelKeyColumn
                 });
             }
 

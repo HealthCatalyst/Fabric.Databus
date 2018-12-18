@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.PipelineSteps
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -71,6 +72,10 @@ namespace Fabric.Databus.PipelineSteps
         /// <inheritdoc />
         protected override Task HandleAsync(SourceWrapperCollectionQueueItem workItem)
         {
+            if (workItem.TopLevelKeyColumn == null)
+            {
+                throw new ArgumentNullException(nameof(workItem.TopLevelKeyColumn));
+            }
             workItem.SourceWrapperCollection.SortAll();
 
             using (var textWriter = new StringWriter())
@@ -83,15 +88,19 @@ namespace Fabric.Databus.PipelineSteps
                 var result = textWriter.ToString();
                 var actualJson = JArray.Parse(result);
 
+                int i = 0;
+
                 foreach (var entity in actualJson)
                 {
                     Interlocked.Increment(ref numberOfEntitiesInBatch);
+
+                    var itemId = entity.SelectToken(workItem.TopLevelKeyColumn)?.ToString() ?? $"{workItem.BatchNumber}-{++i}";
 
                     this.AddToOutputQueueAsync(
                         new JsonObjectQueueItem
                             {
                                 BatchNumber = workItem.BatchNumber,
-                                Id = entity.Children().First().First().ToString(),
+                                Id = itemId,
                                 Document = (JObject)entity
                             });
                 }

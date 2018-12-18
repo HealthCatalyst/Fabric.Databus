@@ -196,10 +196,6 @@ namespace Fabric.Databus.Shared
             {
                 writer.WriteStartArray();
             }
-            else
-            {
-                // writer.WriteStartObject();
-            }
 
             if (!this.isArray)
             {

@@ -245,8 +245,9 @@ namespace Fabric.Databus.PipelineSteps
                             Columns = result.ColumnList,
                             PropertyName = load.Path,
                             PropertyType = load.PropertyType,
-                            PropertyTypes = propertyTypes
-                        });
+                            PropertyTypes = propertyTypes,
+                            TopLevelKeyColumn = topLevelDataSource.Key
+                    });
             }
 
             // now all the source data has been loaded

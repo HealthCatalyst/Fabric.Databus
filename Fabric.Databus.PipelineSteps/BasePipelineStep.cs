@@ -378,9 +378,12 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="batchCompletedQueueItem">
         /// The batch Completed Queue Item.
         /// </param>
-        public void CompleteBatchForTesting(string queryId, bool isLastThreadForThisTask, int batchNumber, BatchCompletedQueueItem batchCompletedQueueItem)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task CompleteBatchForTestingAsync(string queryId, bool isLastThreadForThisTask, int batchNumber, BatchCompletedQueueItem batchCompletedQueueItem)
         {
-            this.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
+            await this.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
 
         /// <summary>

@@ -122,7 +122,7 @@ namespace PipelineStep.Tests
 
                 // Act
                 // now complete the queue
-                createBatchItemsQueueProcessor.CompleteBatchForTesting(queryId, true, 1, new BatchCompletedQueueItem());
+                await createBatchItemsQueueProcessor.CompleteBatchForTestingAsync(queryId, true, 1, new BatchCompletedQueueItem());
 
                 // Assert
                 Assert.AreEqual(1, outputQueue.Count);

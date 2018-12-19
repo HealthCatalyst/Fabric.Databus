@@ -20,13 +20,3 @@ CREATE VIEW [HCOSText].[Document] AS SELECT [BindingID], [BindingNM], [LastLoadD
 
 CREATE TABLE [HCOSText].[DocumentPeopleBASE](	[BindingID] [int] NOT NULL,	[BindingNM] [varchar](255) NOT NULL,	[LastLoadDTS] [datetime2](7) NOT NULL,	[TextKEY] [varchar](100) NULL,	[root] [varchar](255) NOT NULL,	[extension] [varchar](255) NOT NULL,	[role] [varchar](255) NOT NULL,	[last_name] [varchar](255) NULL,	[first_name] [varchar](255) NULL,	[middle_name] [varchar](255) NULL)
 CREATE VIEW [HCOSText].[DocumentPeople] AS SELECT [BindingID], [BindingNM], [LastLoadDTS], [TextKEY], [root], [extension], [role], [last_name], [first_name], [middle_name] FROM [HCOSText].[DocumentPeopleBASE]
-
-INSERT INTO Text (TextID, PatientID, TextTXT) values ('1', 9001, 'This is my first note')
-INSERT INTO Text (TextID, PatientID, TextTXT) values ('2', 9002, 'This is my second note')
-INSERT INTO Text (TextID, PatientID, TextTXT) values ('3', 9003, 'This is my third note')
-INSERT INTO Text (TextID, PatientID, TextTXT) values ('4', 9004, 'This is my fourth note')
-INSERT INTO Text (TextID, PatientID, TextTXT) values ('5', 9005, 'This is my fifth note')
-INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('1', 9001, 'Jones')
-INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('2', 9002, 'Smith')
-INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('3', 9003, 'Forbes')
-INSERT INTO Patients (TextID, PatientID, PatientLastNM) values ('4', 9004, 'Sandovsky')

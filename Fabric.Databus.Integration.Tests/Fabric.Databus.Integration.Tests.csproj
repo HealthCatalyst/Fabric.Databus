@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="Files\NestedEntities\58010A71478E5C521A4157B2FB8E1904ACAD37C324ECFFA359F14F02B4D7F4AF.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -233,6 +234,15 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Files\NestedEntitiesWithBatching.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Files\NestedEntities\HCOSText.DataBASE.Table.sql" />
+    <EmbeddedResource Include="Files\NestedEntities\HCOSText.DocumentBASE.Table.sql" />
+    <EmbeddedResource Include="Files\NestedEntities\HCOSText.DocumentPeopleBASE.Table.sql" />
+    <EmbeddedResource Include="Files\NestedEntities\HCOSText.PatientBASE.Table.sql" />
+    <EmbeddedResource Include="Files\NestedEntities\HCOSText.VisitBASE.Table.sql" />
+    <EmbeddedResource Include="Files\NestedEntities\HCOSText.VisitFacilityBASE.Table.sql" />
+    <EmbeddedResource Include="Files\NestedEntities\HCOSText.VisitPeopleBASE.Table.sql" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

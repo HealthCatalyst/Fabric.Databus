@@ -865,12 +865,11 @@ FROM Text
         /// The can run successfully end to end.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void CanRunNestedEntitiesEndToEndWithBatching()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "NestedEntitiesWithBatching.xml");
             var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "NestedEntitiesWithBatching.sql");
-            Assert.AreEqual(11, sqlLines.Count);
+            Assert.AreEqual(22, sqlLines.Count);
 
             var config = new ConfigReader().ReadXmlFromText(fileContents);
 
@@ -891,6 +890,27 @@ FROM Text
                     }
                 }
 
+                var files = new string[]
+                {
+                    "HCOSText.DataBASE.Table.sql",
+                    "HCOSText.PatientBASE.Table.sql",
+                    "HCOSText.VisitBASE.Table.sql",
+                    "HCOSText.VisitFacilityBASE.Table.sql",
+                    "HCOSText.VisitPeopleBASE.Table.sql",
+                    "HCOSText.DocumentBASE.Table.sql",
+                    "HCOSText.DocumentPeopleBASE.Table.sql"
+                };
+
+                foreach (var file in files)
+                {
+                    var contents = TestFileLoader.GetFileContents("Files\\NestedEntities", file);
+                    if (!string.IsNullOrWhiteSpace(contents))
+                    {
+                        command.CommandText = contents;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
                 using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
                 {
                     using (var cancellationTokenSource = new CancellationTokenSource())
@@ -905,29 +925,6 @@ FROM Text
                         container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
 
                         container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
-
-                        JObject expectedJson1 = new JObject(
-                            new JProperty("TextID", "1"),
-                            new JProperty("PatientID", 9001),
-                            new JProperty("TextTXT", "This is my first note"),
-                            new JProperty(
-                                "patients",
-                                new JObject(
-                                    new JProperty("TextID", "1"),
-                                    new JProperty("PatientID", 9001),
-                                    new JProperty("PatientLastNM", "Jones"))));
-
-                        JObject expectedJson2 = new JObject(
-                            new JProperty("TextID", "2"),
-                            new JProperty("PatientID", 9002),
-                            new JProperty("TextTXT", "This is my second note"),
-                            new JProperty(
-                                "patients",
-                                new JObject(
-                                    new JProperty("TextID", "2"),
-                                    new JProperty("PatientID", 9002),
-                                    new JProperty("PatientLastNM", "Smith"))));
-
 
                         // set up a mock web service
                         var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -962,7 +959,8 @@ FROM Text
                         var testQuerySqlLogger = new TestQuerySqlLogger();
                         container.RegisterInstance<IQuerySqlLogger>(testQuerySqlLogger);
 
-                        int numHttpCall = 0;
+                        var expectedJsonObjects = new Dictionary<string, JObject>();
+
                         var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
                         httpMessageHandlerMock
                             .Protected()
@@ -972,20 +970,11 @@ FROM Text
                                 ItExpr.IsAny<CancellationToken>())
                             .Callback<HttpRequestMessage, CancellationToken>((request, token) =>
                                 {
-                                    numHttpCall++;
-                                    if (numHttpCall < 3)
                                     {
                                         var content = request.Content.ReadAsStringAsync().Result;
-                                        var expectedJson = numHttpCall == 1 ? expectedJson1 : expectedJson2;
-                                        Assert.IsTrue(JToken.DeepEquals(expectedJson, JObject.Parse(content)), content);
-
-                                        Assert.AreEqual("Basic", request.Headers.Authorization.Scheme);
-                                        var actualParameter = request.Headers.Authorization.Parameter;
-
-                                        var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.UrlUserName}:{config.Config.UrlPassword}");
-                                        var expectedParameter = Convert.ToBase64String(expectedByteArray);
-
-                                        Assert.AreEqual(expectedParameter, actualParameter);
+                                        var jObject = JObject.Parse(content);
+                                        var selectToken = jObject.SelectToken("TextKEY");
+                                        expectedJsonObjects.Add(selectToken.ToString(), jObject);
                                     }
                                 })
                             .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
@@ -1019,12 +1008,12 @@ FROM Text
                         }
 
                         // assert
-                        Assert.AreEqual(2, testBatchEventsLogger.BatchStartedQueueItems.Count);
+                        Assert.AreEqual(4, testBatchEventsLogger.BatchStartedQueueItems.Count);
                         var batchStartedQueueItem = testBatchEventsLogger.BatchStartedQueueItems.First();
                         Assert.AreEqual(1, batchStartedQueueItem.BatchNumber);
                         Assert.AreEqual(3, batchStartedQueueItem.NumberOfEntities);
 
-                        Assert.AreEqual(2, testBatchEventsLogger.BatchCompletedQueueItems.Count);
+                        Assert.AreEqual(4, testBatchEventsLogger.BatchCompletedQueueItems.Count);
                         var batchCompletedQueueItem = testBatchEventsLogger.BatchCompletedQueueItems.First();
                         Assert.AreEqual(1, batchCompletedQueueItem.BatchNumber);
                         Assert.AreEqual(3, batchCompletedQueueItem.NumberOfEntities);
@@ -1032,42 +1021,37 @@ FROM Text
 
                         batchCompletedQueueItem = testBatchEventsLogger.BatchCompletedQueueItems.Skip(1).First();
                         Assert.AreEqual(2, batchCompletedQueueItem.BatchNumber);
-                        Assert.AreEqual(2, batchCompletedQueueItem.NumberOfEntities);
-                        Assert.AreEqual(2, batchCompletedQueueItem.NumberOfEntitiesUploaded);
+                        Assert.AreEqual(3, batchCompletedQueueItem.NumberOfEntities);
+                        Assert.AreEqual(3, batchCompletedQueueItem.NumberOfEntitiesUploaded);
 
-                        const int NumberOfEntities = 5;
+                        const int NumberOfEntities = 10;
 
-                        Assert.AreEqual(2 + 2, testQuerySqlLogger.QuerySqlCompletedEvents.Count); // one per entity per batch
+                        Assert.AreEqual(26 + 2, testQuerySqlLogger.QuerySqlCompletedEvents.Count); // one per entity per batch
                         Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.First().BatchNumber);
                         Assert.AreEqual(3, testQuerySqlLogger.QuerySqlCompletedEvents.First().RowCount);
                         Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(1).First().BatchNumber);
-                        Assert.AreEqual(3, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(1).First().RowCount);
-                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(2).First().BatchNumber);
-                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(2).First().RowCount);
-                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(3).First().BatchNumber);
-                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(3).First().RowCount);
 
                         Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.Count);
-                        Assert.AreEqual(5, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntities);
-                        Assert.AreEqual(5, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntitiesUploaded);
+                        Assert.AreEqual(NumberOfEntities, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntities);
+                        Assert.AreEqual(NumberOfEntities, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntitiesUploaded);
 
                         Assert.AreEqual(NumberOfEntities, actualJsonObjects.Count);
 
                         Assert.AreEqual(NumberOfEntities + 1, integrationTestFileWriter.Count); // first file is job.json
-                        var expectedPath1 = integrationTestFileWriter.CombinePath(
-                            config.Config.LocalSaveFolder,
-                            "1.json");
-                        Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath1));
 
-                        var contents = integrationTestFileWriter.GetContents(expectedPath1);
-                        var actualJson1 = JObject.Parse(contents);
-                        Assert.IsTrue(JToken.DeepEquals(expectedJson1, actualJson1), $"Expected:<{expectedJson1}>. Actual<{actualJson1}>");
+                        var expectedJsonFiles = new string[]
+                        {
+                            "58010A71478E5C521A4157B2FB8E1904ACAD37C324ECFFA359F14F02B4D7F4AF.json",
+                        };
 
-                        var expectedPath2 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "2.json");
-                        Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath2));
-                        var contents2 = integrationTestFileWriter.GetContents(expectedPath2);
-                        var actualJson2 = JObject.Parse(contents2);
-                        Assert.IsTrue(JToken.DeepEquals(expectedJson2, actualJson2), $"Expected:<{expectedJson2}>. Actual<{actualJson2}>");
+                        foreach (var expectedJsonFile in expectedJsonFiles)
+                        {
+                            var contents = TestFileLoader.GetFileContents("Files\\NestedEntities", expectedJsonFile);
+                            var entityId = expectedJsonFile.Replace(".json", string.Empty);
+                            var expectedJson = expectedJsonObjects[entityId];
+                            var jObject = JObject.Parse(contents);
+                            Assert.IsTrue(JToken.DeepEquals(expectedJson, jObject), expectedJsonFile);
+                        }
 
                         httpMessageHandlerMock.Protected()
                             .Verify(

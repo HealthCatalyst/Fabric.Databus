@@ -36,6 +36,7 @@ namespace Fabric.Database.Testing.FileLoader
         {
             var asm = Assembly.GetCallingAssembly();
             var assemblyName = asm.GetName().Name;
+            folder = folder.Replace("\\", ".");
             var resource = $"{assemblyName}.{folder}.{sampleFile}";
             using (var stream = asm.GetManifestResourceStream(resource))
             {

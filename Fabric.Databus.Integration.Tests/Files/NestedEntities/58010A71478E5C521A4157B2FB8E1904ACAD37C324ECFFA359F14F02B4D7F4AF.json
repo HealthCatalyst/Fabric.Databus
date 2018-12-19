@@ -1,0 +1,52 @@
+﻿{
+  "TextKEY": "58010A71478E5C521A4157B2FB8E1904ACAD37C324ECFFA359F14F02B4D7F4AF",
+  "root": "EPIC.DOCUMENT.OID",
+  "extension": "10000200",
+  "extension_suffix": null,
+  "data": " 1 Sally M. Smith\n\n1234567-8\n\n4/5/2006\n\nHISTORY OF PRESENT ILLNESS: Ms. Smith is a 43-year-old woman with past medical history that includes a pilonidal cyst. This was apparently removed when she was 18. Last July she presented with more pain in this area. On exam, it was apparently unclear if there was a recurrence. She was put on a course of Keflex and everything resolved. She presents to walk-in today saying that same thing has happened. She has had a couple days of increased swelling in this area. No fevers. Mild pain. Bowel movements are fine.\n\nPHYSICAL EXAMINATION: BP 122/74, pulse 82. She is afebrile. We had a female nurse chaperone in the room during the exam. In the upper aspect of her gluteal cleft there were several scars from her prior surgery. This area was mildly indurated. There was absolutely no erythema or fluctuance and it was not tender at all. No drainage.\n\nASSESSMENT AND PLAN: Possible recurrence of pilonidal cyst. We do not see any active evidence of an infection, but given her apparent response last July, we will give her another one-week course of Keflex. She will return to clinic if things do not resolve or if they get worse.\n\nNancy Student, MS3\n\nSeen with Joe Doctor, MD ",
+  "base64_data": "IDEgU2FsbHkgTS4gU21pdGgKCjEyMzQ1NjctOAoKNC81LzIwMDYKCkhJU1RPUlkgT0YgUFJFU0VOVCBJTExORVNTOiBNcy4gU21pdGggaXMgYSA0My15ZWFyLW9sZCB3b21hbiB3aXRoIHBhc3QgbWVkaWNhbCBoaXN0b3J5IHRoYXQgaW5jbHVkZXMgYSBwaWxvbmlkYWwgY3lzdC4gVGhpcyB3YXMgYXBwYXJlbnRseSByZW1vdmVkIHdoZW4gc2hlIHdhcyAxOC4gTGFzdCBKdWx5IHNoZSBwcmVzZW50ZWQgd2l0aCBtb3JlIHBhaW4gaW4gdGhpcyBhcmVhLiBPbiBleGFtLCBpdCB3YXMgYXBwYXJlbnRseSB1bmNsZWFyIGlmIHRoZXJlIHdhcyBhIHJlY3VycmVuY2UuIFNoZSB3YXMgcHV0IG9uIGEgY291cnNlIG9mIEtlZmxleCBhbmQgZXZlcnl0aGluZyByZXNvbHZlZC4gU2hlIHByZXNlbnRzIHRvIHdhbGstaW4gdG9kYXkgc2F5aW5nIHRoYXQgc2FtZSB0aGluZyBoYXMgaGFwcGVuZWQuIFNoZSBoYXMgaGFkIGEgY291cGxlIGRheXMgb2YgaW5jcmVhc2VkIHN3ZWxsaW5nIGluIHRoaXMgYXJlYS4gTm8gZmV2ZXJzLiBNaWxkIHBhaW4uIEJvd2VsIG1vdmVtZW50cyBhcmUgZmluZS4KClBIWVNJQ0FMIEVYQU1JTkFUSU9OOiBCUCAxMjIvNzQsIHB1bHNlIDgyLiBTaGUgaXMgYWZlYnJpbGUuIFdlIGhhZCBhIGZlbWFsZSBudXJzZSBjaGFwZXJvbmUgaW4gdGhlIHJvb20gZHVyaW5nIHRoZSBleGFtLiBJbiB0aGUgdXBwZXIgYXNwZWN0IG9mIGhlciBnbHV0ZWFsIGNsZWZ0IHRoZXJlIHdlcmUgc2V2ZXJhbCBzY2FycyBmcm9tIGhlciBwcmlvciBzdXJnZXJ5LiBUaGlzIGFyZWEgd2FzIG1pbGRseSBpbmR1cmF0ZWQuIFRoZXJlIHdhcyBhYnNvbHV0ZWx5IG5vIGVyeXRoZW1hIG9yIGZsdWN0dWFuY2UgYW5kIGl0IHdhcyBub3QgdGVuZGVyIGF0IGFsbC4gTm8gZHJhaW5hZ2UuCgpBU1NFU1NNRU5UIEFORCBQTEFOOiBQb3NzaWJsZSByZWN1cnJlbmNlIG9mIHBpbG9uaWRhbCBjeXN0LiBXZSBkbyBub3Qgc2VlIGFueSBhY3RpdmUgZXZpZGVuY2Ugb2YgYW4gaW5mZWN0aW9uLCBidXQgZ2l2ZW4gaGVyIGFwcGFyZW50IHJlc3BvbnNlIGxhc3QgSnVseSwgd2Ugd2lsbCBnaXZlIGhlciBhbm90aGVyIG9uZS13ZWVrIGNvdXJzZSBvZiBLZWZsZXguIFNoZSB3aWxsIHJldHVybiB0byBjbGluaWMgaWYgdGhpbmdzIGRvIG5vdCByZXNvbHZlIG9yIGlmIHRoZXkgZ2V0IHdvcnNlLgoKTmFuY3kgU3R1ZGVudCwgTVMzCgpTZWVuIHdpdGggSm9lIERvY3RvciwgTUQg",
+  "data_format": "text/plain",
+  "source_last_modified_at": "2014-09-21T16:18:00Z",
+  "source_versioned_at": "2016-05-10T10:29:11Z",
+  "patient": {
+    "extension": "Z100",
+    "root": "EPIC.MRN.OID",
+    "last_name": "Graves, Addie",
+    "first_name": "Graves, Addie",
+    "middle_name": "Graves, Addie",
+    "gender": "unknown",
+    "date_of_birth": "1953-03-29T00:00:00Z"
+  },
+  "visit": {
+    "extension": "7984617",
+    "root": "EPIC.VISIT.OID",
+    "admitted_at": "2009-05-04T09:26:00Z",
+    "discharged_at": "2009-05-04T23:59:00Z",
+    "facility": {
+      "extension": "2013",
+      "root": "EPIC.FACILITY.OID"
+    },
+    "people": [
+      {
+        "extension": "3103461",
+        "root": "EPIC.PERSONNEL.OID",
+        "role": "attending",
+        "last_name": "Porter",
+        "first_name": "Naila",
+        "middle_name": null
+      }
+    ]
+  },
+  "document": {
+    "extension": "1000006",
+    "root": "EPIC.DOCUMENT.OID",
+    "status": "unknown",
+    "confidentiality_code": "unknown",
+    "source_created_at": "2007-06-09T22:25:00Z",
+    "source_updated_at": "2014-10-23T09:59:00Z",
+    "type_root": "EPIC.DOCUMENT.TYPE.OID",
+    "type_extension": "1",
+    "type_description": "Progress Notes",
+    "date_of_service": "2007-06-10T04:25:00Z"
+  }
+}

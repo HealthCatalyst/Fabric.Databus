@@ -23,5 +23,13 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// The batch Completed Queue Item.
         /// </param>
         void BatchCompleted(IBatchCompletedQueueItem batchCompletedQueueItem);
+
+        /// <summary>
+        /// The batch started.
+        /// </summary>
+        /// <param name="batchCompletedQueueItem">
+        /// The batch completed queue item.
+        /// </param>
+        void BatchStarted(IBatchCompletedQueueItem batchCompletedQueueItem);
     }
 }

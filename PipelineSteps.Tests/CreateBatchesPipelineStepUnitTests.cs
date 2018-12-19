@@ -23,6 +23,7 @@ namespace PipelineStep.Tests
     using Fabric.Databus.PipelineSteps;
     using Fabric.Databus.QueueItems;
     using Fabric.Databus.Shared.FileWriters;
+    using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
     using Fabric.Shared;
 
@@ -76,6 +77,7 @@ namespace PipelineStep.Tests
                     new MockProgressMonitor(),
                     mockDatabusSqlReader.Object,
                     new NullFileWriter(),
+                    new NullBatchEventsLogger(),
                     cancellationTokenSource.Token);
 
                 var sqlJobQueueItem = new SqlJobQueueItem
@@ -163,6 +165,7 @@ namespace PipelineStep.Tests
                     new MockProgressMonitor(),
                     mockDatabusSqlReader.Object,
                     new NullFileWriter(),
+                    new NullBatchEventsLogger(), 
                     cancellationTokenSource.Token);
 
                 var sqlJobQueueItem = new SqlJobQueueItem
@@ -256,6 +259,7 @@ namespace PipelineStep.Tests
                     new MockProgressMonitor(),
                     mockDatabusSqlReader.Object,
                     new NullFileWriter(),
+                    new NullBatchEventsLogger(), 
                     cancellationTokenSource.Token);
 
                 var sqlJobQueueItem = new SqlJobQueueItem

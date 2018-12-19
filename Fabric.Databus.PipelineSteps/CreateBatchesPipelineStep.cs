@@ -42,6 +42,8 @@ namespace Fabric.Databus.PipelineSteps
         /// </summary>
         private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
 
+        private readonly IBatchEventsLogger batchEventsLogger;
+
         /// <summary>
         /// The folder.
         /// </summary>
@@ -65,6 +67,7 @@ namespace Fabric.Databus.PipelineSteps
         /// </param>
         /// <param name="databusSqlReader"></param>
         /// <param name="detailedTemporaryFileWriter"></param>
+        /// <param name="batchEventsLogger"></param>
         /// <param name="cancellationToken"></param>
         public CreateBatchesPipelineStep(
             IJobConfig jobConfig,
@@ -73,11 +76,13 @@ namespace Fabric.Databus.PipelineSteps
             IProgressMonitor progressMonitor,
             IDatabusSqlReader databusSqlReader,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
+            IBatchEventsLogger batchEventsLogger,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter;
+            this.batchEventsLogger = batchEventsLogger ?? throw new ArgumentNullException(nameof(batchEventsLogger));
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
                 this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
@@ -162,6 +167,15 @@ namespace Fabric.Databus.PipelineSteps
 
                 foreach (var range in rangesList)
                 {
+                    var batchCompletedQueueItem = new BatchCompletedQueueItem
+                                                      {
+                                                          BatchNumber = currentBatchNumber,
+                                                          TotalBatches = rangesList.Count,
+                                                          Start = range.Item1,
+                                                          End = range.Item2
+                                                      };
+
+                    this.batchEventsLogger.BatchStarted(batchCompletedQueueItem);
 
                     await this.AddToOutputQueueAsync(
                         new SqlBatchQueueItem
@@ -182,13 +196,7 @@ namespace Fabric.Databus.PipelineSteps
                     await this.WriteDiagnosticsAsync(currentBatchNumber, range);
 
                     await this.AddBatchCompletionMessageToOutputQueueAsync(
-                        new BatchCompletedQueueItem
-                            {
-                                BatchNumber = currentBatchNumber,
-                                TotalBatches = rangesList.Count,
-                                Start = range.Item1,
-                                End = range.Item2
-                            });
+                        batchCompletedQueueItem);
 
                     await this.WaitTillOutputQueueIsEmptyAsync(currentBatchNumber, rangesList.Count);
 

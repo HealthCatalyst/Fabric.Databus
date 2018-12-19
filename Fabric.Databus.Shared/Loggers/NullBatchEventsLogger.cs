@@ -19,5 +19,10 @@ namespace Fabric.Databus.Shared.Loggers
         public void BatchCompleted(IBatchCompletedQueueItem batchCompletedQueueItem)
         {
         }
+
+        /// <inheritdoc />
+        public void BatchStarted(IBatchCompletedQueueItem batchCompletedQueueItem)
+        {
+        }
     }
 }

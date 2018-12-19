@@ -128,9 +128,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared.ReliableHttp"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Database.Shared.Tests", "Fabric.Database.Shared.Tests\Fabric.Database.Shared.Tests.csproj", "{0FD33BAB-9E76-423E-86B1-83D8130BAF60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.TestHelper", "Fabric.Databus.TestHelper\Fabric.Databus.TestHelper.csproj", "{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.TestHelper", "Fabric.Databus.TestHelper\Fabric.Databus.TestHelper.csproj", "{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Database.Testing", "Fabric.Database.Testing\Fabric.Database.Testing.csproj", "{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Database.Testing", "Fabric.Database.Testing\Fabric.Database.Testing.csproj", "{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.PerformanceCounters", "Fabric.Shared.PerformanceCounters\Fabric.Shared.PerformanceCounters.csproj", "{E47DB5D9-46EC-4804-8CD4-1833A0B258AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.PerformanceCounters.UnitTests", "Fabric.Shared.PerformanceCounters.UnitTests\Fabric.Shared.PerformanceCounters.UnitTests.csproj", "{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -262,6 +266,14 @@ Global
 		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E47DB5D9-46EC-4804-8CD4-1833A0B258AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E47DB5D9-46EC-4804-8CD4-1833A0B258AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E47DB5D9-46EC-4804-8CD4-1833A0B258AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E47DB5D9-46EC-4804-8CD4-1833A0B258AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -305,6 +317,8 @@ Global
 		{0FD33BAB-9E76-423E-86B1-83D8130BAF60} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 		{A6B2C693-4577-4FCC-A64C-3FB362FCCAC7} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
+		{E47DB5D9-46EC-4804-8CD4-1833A0B258AF} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
+		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

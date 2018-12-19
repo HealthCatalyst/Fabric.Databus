@@ -25,10 +25,22 @@ namespace Fabric.Databus.Integration.Tests.Helpers
         /// </summary>
         public List<IBatchCompletedQueueItem> BatchCompletedQueueItems { get; } = new List<IBatchCompletedQueueItem>();
 
+        /// <summary>
+        /// Gets the batch started queue items.
+        /// </summary>
+        public List<IBatchCompletedQueueItem> BatchStartedQueueItems { get; } = new List<IBatchCompletedQueueItem>();
+
+
         /// <inheritdoc />
-        public void BatchCompleted(IBatchCompletedQueueItem batchCompletedQueueItem1)
+        public void BatchCompleted(IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            this.BatchCompletedQueueItems.Add(batchCompletedQueueItem1);
+            this.BatchCompletedQueueItems.Add(batchCompletedQueueItem);
+        }
+
+        /// <inheritdoc />
+        public void BatchStarted(IBatchCompletedQueueItem batchCompletedQueueItem)
+        {
+            this.BatchStartedQueueItems.Add(batchCompletedQueueItem);
         }
     }
 }

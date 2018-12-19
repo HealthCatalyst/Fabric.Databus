@@ -295,15 +295,14 @@ namespace Fabric.Databus.PipelineSteps
 
                     this.LogItemToConsole(wt, PipelineStepState.Processed);
 
-                    this.MyLogger.Verbose(
-                        "{Name}({queryId}) Processed: {id} Queue Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0} {@wt}",
+                    this.MyLogger.Debug(
+                        "{Name}({queryId}) Processed: {id} Queue Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
                         this.LoggerName,
                         this.workItemQueryId,
                         this.GetId(wt),
                         this.outQueue.Count,
                         totalItemsProcessed,
-                        this.totalItemsProcessedByThisProcessor,
-                        wt);
+                        this.totalItemsProcessedByThisProcessor);
                 }
                 catch (Exception e)
                 {

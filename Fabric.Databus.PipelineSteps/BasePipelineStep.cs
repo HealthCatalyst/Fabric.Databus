@@ -218,91 +218,10 @@ namespace Fabric.Databus.PipelineSteps
 
                 try
                 {
-                    stopWatch.Restart();
-
-                    IQueueItem wt1 = this.InQueue.TakeGeneric(this.cancellationToken);
-
-                    if (wt1 == null)
+                    if (await ProcessWorkItemAsync(stopWatch) == false)
                     {
                         break;
                     }
-
-                    if (wt1 is JobCompletedQueueItem jobCompletedQueueItem)
-                    {
-                        this.MyLogger.Verbose(
-                            "{Name} Job Completed. Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0} {@wt}",
-                            this.LoggerName,
-                            this.outQueue.Count,
-                            totalItemsProcessed,
-                            this.totalItemsProcessedByThisProcessor,
-                            wt1);
-
-                        await this.CompleteJobAsync(null, true, jobCompletedQueueItem);
-                        break;
-                    }
-
-                    if (wt1 is BatchCompletedQueueItem batchCompletedQueueItem)
-                    {
-                        this.MyLogger.Verbose(
-                            "{Name} Batch Completed (batch). Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0} {@wt}",
-                            this.LoggerName,
-                            wt1.BatchNumber,
-                            this.outQueue.Count,
-                            totalItemsProcessed,
-                            this.totalItemsProcessedByThisProcessor,
-                            wt1);
-
-                        await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber, batchCompletedQueueItem);
-                        continue;
-                    }
-
-                    var wt = wt1 as TQueueInItem ?? throw new Exception("wt1 is not TQueueItem");
-
-                    blockedTime = blockedTime.Add(stopWatch.Elapsed);
-
-                    this.workItemQueryId = wt.QueryId;
-
-                    this.LogItemToConsole(wt, PipelineStepState.Processing);
-
-                    stopWatch.Restart();
-
-                    try
-                    {
-                        // if we use await here then we go through all the items and nothing gets processed
-                        this.InternalHandleAsync(wt).Wait(this.cancellationToken);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new DatabusPipelineStepWorkItemException(wt1, e);
-                    }
-
-                    processingTime = processingTime.Add(stopWatch.Elapsed);
-
-                    var uniqueWorkItemId = this.GetId(wt);
-                    if (uniqueWorkItemId != null)
-                    {
-                        ProcessingTimeByQueryId.AddOrUpdate(
-                            uniqueWorkItemId,
-                            stopWatch.Elapsed,
-                            (myQueryId, previousElapsed) => previousElapsed.Add(stopWatch.Elapsed));
-                    }
-
-                    stopWatch.Stop();
-
-                    this.totalItemsProcessedByThisProcessor++;
-
-                    Interlocked.Increment(ref totalItemsProcessed);
-
-                    this.LogItemToConsole(wt, PipelineStepState.Processed);
-
-                    this.MyLogger.Debug(
-                        "{Name}({queryId}) Processed: {id} Queue Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
-                        this.LoggerName,
-                        this.workItemQueryId,
-                        this.GetId(wt),
-                        this.outQueue.Count,
-                        totalItemsProcessed,
-                        this.totalItemsProcessedByThisProcessor);
                 }
                 catch (Exception e)
                 {
@@ -562,6 +481,105 @@ namespace Fabric.Databus.PipelineSteps
             this.LogToConsole(null, null, PipelineStepState.Waiting, batchNumber, totalBatches);
 
             await this.outQueue.WaitTillEmptyAsync(this.cancellationToken);
+        }
+
+        /// <summary>
+        /// Separate this out to ensure the GC cleans up
+        /// </summary>
+        /// <param name="stopWatch"></param>
+        /// <returns></returns>
+        private async Task<bool> ProcessWorkItemAsync(Stopwatch stopWatch)
+        {
+            stopWatch.Restart();
+
+            IQueueItem wt1 = this.InQueue.TakeGeneric(this.cancellationToken);
+
+            if (wt1 == null)
+            {
+                return false;
+            }
+
+            if (wt1 is JobCompletedQueueItem jobCompletedQueueItem)
+            {
+                this.MyLogger.Verbose(
+                    "{Name} Job Completed. Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
+                    this.LoggerName,
+                    this.outQueue.Count,
+                    totalItemsProcessed,
+                    this.totalItemsProcessedByThisProcessor);
+
+                await this.CompleteJobAsync(null, true, jobCompletedQueueItem);
+                return false;
+            }
+
+            if (wt1 is BatchCompletedQueueItem batchCompletedQueueItem)
+            {
+                this.MyLogger.Verbose(
+                    "{Name} Batch Completed (batch). Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
+                    this.LoggerName,
+                    wt1.BatchNumber,
+                    this.outQueue.Count,
+                    totalItemsProcessed,
+                    this.totalItemsProcessedByThisProcessor
+                    );
+
+                await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber, batchCompletedQueueItem);
+                return true;
+            }
+
+            var wt = wt1 as TQueueInItem ?? throw new Exception("wt1 is not TQueueItem");
+
+            blockedTime = blockedTime.Add(stopWatch.Elapsed);
+
+            this.workItemQueryId = wt.QueryId;
+
+            this.LogItemToConsole(wt, PipelineStepState.Processing);
+
+            stopWatch.Restart();
+
+            try
+            {
+                // if we use await here then we go through all the items and nothing gets processed
+                this.InternalHandleAsync(wt).Wait(this.cancellationToken);
+            }
+            catch (Exception e)
+            {
+                throw new DatabusPipelineStepWorkItemException(wt1, e);
+            }
+
+            processingTime = processingTime.Add(stopWatch.Elapsed);
+
+            var uniqueWorkItemId = this.GetId(wt);
+            if (uniqueWorkItemId != null)
+            {
+                ProcessingTimeByQueryId.AddOrUpdate(
+                    uniqueWorkItemId,
+                    stopWatch.Elapsed,
+                    (myQueryId, previousElapsed) => previousElapsed.Add(stopWatch.Elapsed));
+            }
+
+            stopWatch.Stop();
+
+            this.totalItemsProcessedByThisProcessor++;
+
+            Interlocked.Increment(ref totalItemsProcessed);
+
+            this.LogItemToConsole(wt, PipelineStepState.Processed);
+
+            this.MyLogger.Debug(
+                "{Name}({queryId}) Processed: {id} Queue Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
+                this.LoggerName,
+                this.workItemQueryId,
+                this.GetId(wt),
+                this.outQueue.Count,
+                totalItemsProcessed,
+                this.totalItemsProcessedByThisProcessor);
+
+            // try to explicitly remove reference
+            wt = null;
+            wt1 = null;
+
+            return true;
         }
 
         /// <summary>

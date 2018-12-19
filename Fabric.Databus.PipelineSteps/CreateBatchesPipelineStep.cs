@@ -93,7 +93,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override sealed string LoggerName => "CreateBatches";
+        protected sealed override string LoggerName => "CreateBatches";
 
         /// <inheritdoc />
         /// <summary>
@@ -211,6 +211,9 @@ namespace Fabric.Databus.PipelineSteps
                         batchCompletedQueueItem);
 
                     await this.WaitTillOutputQueueIsEmptyAsync(currentBatchNumber, rangesList.Count);
+
+                    //Console.WriteLine("Hit enter to process next batch");
+                    //Console.ReadLine();
 
                     currentBatchNumber++;
                 }

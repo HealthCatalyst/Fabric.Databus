@@ -48,6 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "localhost", "localhost", "{
 		configs\localhost\edwadmin.xml = configs\localhost\edwadmin.xml
 		configs\localhost\fhir.xml = configs\localhost\fhir.xml
 		configs\localhost\fhir_elasticsearch.xml = configs\localhost\fhir_elasticsearch.xml
+		configs\localhost\hcos-huge.xml = configs\localhost\hcos-huge.xml
 		configs\localhost\hcos-incremental.xml = configs\localhost\hcos-incremental.xml
 		configs\localhost\hcos-send-to-api-multithreaded.xml = configs\localhost\hcos-send-to-api-multithreaded.xml
 		configs\localhost\hcos-send-to-api.xml = configs\localhost\hcos-send-to-api.xml
@@ -132,9 +133,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Databus.TestHelper",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Database.Testing", "Fabric.Database.Testing\Fabric.Database.Testing.csproj", "{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.PerformanceCounters", "Fabric.Shared.PerformanceCounters\Fabric.Shared.PerformanceCounters.csproj", "{E47DB5D9-46EC-4804-8CD4-1833A0B258AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared.PerformanceCounters", "Fabric.Shared.PerformanceCounters\Fabric.Shared.PerformanceCounters.csproj", "{E47DB5D9-46EC-4804-8CD4-1833A0B258AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Shared.PerformanceCounters.UnitTests", "Fabric.Shared.PerformanceCounters.UnitTests\Fabric.Shared.PerformanceCounters.UnitTests.csproj", "{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared.PerformanceCounters.UnitTests", "Fabric.Shared.PerformanceCounters.UnitTests\Fabric.Shared.PerformanceCounters.UnitTests.csproj", "{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

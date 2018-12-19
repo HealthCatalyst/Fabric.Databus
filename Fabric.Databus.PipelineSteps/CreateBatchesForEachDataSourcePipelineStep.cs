@@ -88,6 +88,7 @@ namespace Fabric.Databus.PipelineSteps
                     new SqlQueryDataSourceQueueItem
                     {
                         BatchNumber = workItem.BatchNumber,
+                        TotalBatches = workItem.TotalBatches,
                         QueryId = queryId,
                         PropertyName = dataSource.Path,
                         Seed = seed,
@@ -101,7 +102,7 @@ namespace Fabric.Databus.PipelineSteps
 
             await this.WriteDiagnostics(workItem);
 
-            await this.WaitTillOutputQueueIsEmptyAsync(workItem.BatchNumber);
+            await this.WaitTillOutputQueueIsEmptyAsync(workItem.BatchNumber, workItem.TotalBatches);
         }
 
         /// <inheritdoc />

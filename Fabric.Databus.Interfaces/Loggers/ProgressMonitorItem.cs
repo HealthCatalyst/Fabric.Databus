@@ -128,5 +128,10 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// Gets or sets the batch number.
         /// </summary>
         public int BatchNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total batches.
+        /// </summary>
+        public int TotalBatches { get; set; }
     }
 }

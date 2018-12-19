@@ -106,6 +106,7 @@ namespace Fabric.Databus.PipelineSteps
                         new JsonObjectQueueItem
                             {
                                 BatchNumber = workItem.BatchNumber,
+                                TotalBatches = workItem.TotalBatches,
                                 Id = itemId,
                                 Document = (JObject)entity
                             });

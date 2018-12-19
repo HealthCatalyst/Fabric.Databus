@@ -192,7 +192,6 @@ namespace Fabric.Databus.PipelineSteps
         /// </summary>
         protected abstract string LoggerName { get; }
 
-
         /// <summary>
         /// The unique id.
         /// </summary>
@@ -208,7 +207,7 @@ namespace Fabric.Databus.PipelineSteps
             var isFirstThreadForThisTask = currentProcessorCount < 2;
             await this.BeginAsync(isFirstThreadForThisTask);
 
-            this.LogToConsole(null, null, PipelineStepState.Starting, 0);
+            this.LogToConsole(null, null, PipelineStepState.Starting, 0, 0);
 
             this.workItemQueryId = null;
             var stopWatch = new Stopwatch();
@@ -277,7 +276,6 @@ namespace Fabric.Databus.PipelineSteps
                         throw new DatabusPipelineStepWorkItemException(wt1, e);
                     }
 
-
                     processingTime = processingTime.Add(stopWatch.Elapsed);
 
                     var uniqueWorkItemId = this.GetId(wt);
@@ -315,13 +313,9 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
 
-            currentProcessorCount = Interlocked.Decrement(ref processorCount);
-            var isLastThreadForThisTask = currentProcessorCount < 1;
-            // await this.CompleteBatchAsync(this.workItemQueryId, isLastThreadForThisTask);
-
             this.MyLogger.Verbose("Completed {QueryId}: queue: {InQueueCount}", this.workItemQueryId, this.InQueue.Count);
 
-            this.LogToConsole(null, null, PipelineStepState.Completed, 0);
+            this.LogToConsole(null, null, PipelineStepState.Completed, 0, 0);
         }
 
         /// <inheritdoc />
@@ -412,7 +406,7 @@ namespace Fabric.Databus.PipelineSteps
         {
             var myId = this.GetId(wt);
 
-            this.LogToConsole(myId, wt.QueryId, pipelineStepState, wt.BatchNumber);
+            this.LogToConsole(myId, wt.QueryId, pipelineStepState, wt.BatchNumber, wt.TotalBatches);
         }
 
         /// <summary>
@@ -558,12 +552,15 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="batchNumber">
         /// The batch Number.
         /// </param>
+        /// <param name="totalBatches">
+        /// The total Batches.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected async Task WaitTillOutputQueueIsEmptyAsync(int batchNumber)
+        protected async Task WaitTillOutputQueueIsEmptyAsync(int batchNumber, int totalBatches)
         {
-            this.LogToConsole(null, null, PipelineStepState.Waiting, batchNumber);
+            this.LogToConsole(null, null, PipelineStepState.Waiting, batchNumber, totalBatches);
 
             await this.outQueue.WaitTillEmptyAsync(this.cancellationToken);
         }
@@ -581,8 +578,17 @@ namespace Fabric.Databus.PipelineSteps
         ///     The pipeline Step State.
         /// </param>
         /// <param name="batchNumber">
-        /// batch number</param>
-        private void LogToConsole(string id1, string queryId, PipelineStepState pipelineStepState, int batchNumber)
+        ///     batch number
+        /// </param>
+        /// <param name="totalBatches">
+        /// total batches
+        /// </param>
+        private void LogToConsole(
+            string id1,
+            string queryId,
+            PipelineStepState pipelineStepState,
+            int batchNumber,
+            int totalBatches)
         {
             var timeElapsedProcessing = queryId != null && ProcessingTimeByQueryId.ContainsKey(queryId)
                                             ? ProcessingTimeByQueryId[queryId]
@@ -596,6 +602,7 @@ namespace Fabric.Databus.PipelineSteps
                                           {
                                               StepNumber = this.stepNumber,
                                               BatchNumber = batchNumber,
+                                              TotalBatches = totalBatches,
                                               QueryId = queryId,
                                               LoggerName = this.LoggerName,
                                               Id = id1,

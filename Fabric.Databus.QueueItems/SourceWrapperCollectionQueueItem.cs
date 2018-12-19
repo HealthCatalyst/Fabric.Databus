@@ -35,6 +35,8 @@ namespace Fabric.Databus.QueueItems
         /// <inheritdoc />
         public int BatchNumber { get; set; }
 
+        public int TotalBatches { get; set; }
+
         /// <summary>
         /// Gets or sets the top level key column.
         /// </summary>

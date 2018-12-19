@@ -136,6 +136,7 @@ namespace Fabric.Databus.PipelineSteps
                 this.AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
                 {
                     BatchNumber = this.batchNumber,
+                    TotalBatches = batchCompletedQueueItem.TotalBatches,
                     SourceWrapperCollection = this.sourceWrapperCollection,
                     TopLevelKeyColumn = this.topLevelKeyColumn
                 });

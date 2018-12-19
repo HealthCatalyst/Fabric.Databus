@@ -115,6 +115,8 @@ namespace Fabric.Databus.PipelineSteps
             await this.AddToOutputQueueAsync(new FileUploadQueueItem
                                                  {
                                                      BatchNumber = batchNumber,
+                                                     // ReSharper disable once PossibleMultipleEnumeration
+                                                     TotalBatches = documentCacheItems.First().TotalBatches,
                                                      Stream = stream
                                                  });
 

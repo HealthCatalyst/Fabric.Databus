@@ -33,5 +33,7 @@ namespace Fabric.Databus.QueueItems
 
         /// <inheritdoc />
         public int BatchNumber { get; set; }
+
+        public int TotalBatches { get; set; }
     }
 }

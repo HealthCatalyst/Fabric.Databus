@@ -108,7 +108,8 @@ namespace Fabric.Databus.PipelineSteps
                 workItem.End,
                 workItem.BatchNumber,
                 workItem.PropertyTypes,
-                workItem.TopLevelDataSource);
+                workItem.TopLevelDataSource,
+                workItem.TotalBatches);
         }
 
         /// <inheritdoc />
@@ -121,28 +122,31 @@ namespace Fabric.Databus.PipelineSteps
         /// The read one query from database.
         /// </summary>
         /// <param name="queryId">
-        ///     The query id.
+        /// The query id.
         /// </param>
         /// <param name="load">
-        ///     The load.
+        /// The load.
         /// </param>
         /// <param name="seed">
-        ///     The seed.
+        /// The seed.
         /// </param>
         /// <param name="start">
-        ///     The start.
+        /// The start.
         /// </param>
         /// <param name="end">
-        ///     The end.
+        /// The end.
         /// </param>
         /// <param name="workItemBatchNumber">
-        ///     The workItem batch number.
+        /// The workItem batch number.
         /// </param>
         /// <param name="propertyTypes">
-        ///     The property Types.
+        /// The property Types.
         /// </param>
         /// <param name="topLevelDataSource">
         /// top level data source
+        /// </param>
+        /// <param name="totalBatches">
+        /// The total Batches.
         /// </param>
         /// <exception cref="Exception">
         /// exception thrown
@@ -158,7 +162,8 @@ namespace Fabric.Databus.PipelineSteps
             string end,
             int workItemBatchNumber,
             IDictionary<string, string> propertyTypes,
-            ITopLevelDataSource topLevelDataSource)
+            ITopLevelDataSource topLevelDataSource,
+            int totalBatches)
         {
             try
             {
@@ -169,7 +174,8 @@ namespace Fabric.Databus.PipelineSteps
                     end,
                     workItemBatchNumber,
                     propertyTypes,
-                    topLevelDataSource);
+                    topLevelDataSource,
+                    totalBatches);
             }
             catch (Exception e)
             {
@@ -191,25 +197,29 @@ namespace Fabric.Databus.PipelineSteps
         /// The internal read one query from database.
         /// </summary>
         /// <param name="queryId">
-        ///     The query id.
+        /// The query id.
         /// </param>
         /// <param name="load">
-        ///     The load.
+        /// The load.
         /// </param>
         /// <param name="start">
-        ///     The start.
+        /// The start.
         /// </param>
         /// <param name="end">
-        ///     The end.
+        /// The end.
         /// </param>
         /// <param name="batchNumber">
-        ///     The batch number.
+        /// The batch number.
         /// </param>
         /// <param name="propertyTypes">
-        ///     The property Types.
+        /// The property Types.
         /// </param>
         /// <param name="topLevelDataSource">
-        /// top level data source</param>
+        /// top level data source
+        /// </param>
+        /// <param name="totalBatches">
+        /// The total Batches.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
@@ -220,7 +230,8 @@ namespace Fabric.Databus.PipelineSteps
             string end,
             int batchNumber,
             IDictionary<string, string> propertyTypes,
-            ITopLevelDataSource topLevelDataSource)
+            ITopLevelDataSource topLevelDataSource,
+            int totalBatches)
         {
             var result = await this.databusSqlReader.ReadDataFromQueryAsync(
                              load,
@@ -239,6 +250,7 @@ namespace Fabric.Databus.PipelineSteps
                     new SqlDataLoadedQueueItem
                         {
                             BatchNumber = batchNumber,
+                            TotalBatches = totalBatches,
                             QueryId = queryId,
                             JoinColumnValue = frame.Key,
                             Rows = frame.Value,

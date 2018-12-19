@@ -28,5 +28,10 @@ namespace Fabric.Databus.Interfaces.Queues
         /// Gets or sets the batch number.
         /// </summary>
         int BatchNumber { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total batches.
+        /// </summary>
+        int TotalBatches { get; set; }
     }
 }

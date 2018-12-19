@@ -26,6 +26,8 @@ namespace Fabric.Databus.QueueItems
 
         public int BatchNumber { get; set; }
 
+        public int TotalBatches { get; set; }
+
         /// <summary>
         /// Gets or sets the job.
         /// </summary>

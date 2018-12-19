@@ -35,7 +35,12 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The number of entities uploaded.
         /// </summary>
-        private static int numberOfEntitiesUploaded;
+        private static int numberOfEntitiesUploadedForBatch;
+
+        /// <summary>
+        /// The number of entities uploaded for job.
+        /// </summary>
+        private static int numberOfEntitiesUploadedForJob;
 
         /// <summary>
         /// The file uploader.
@@ -95,7 +100,9 @@ namespace Fabric.Databus.PipelineSteps
 
             if (fileUploadResult.StatusCode == HttpStatusCode.OK)
             {
-                Interlocked.Increment(ref numberOfEntitiesUploaded);
+                Interlocked.Increment(ref numberOfEntitiesUploadedForBatch);
+                Interlocked.Increment(ref numberOfEntitiesUploadedForJob);
+
             }
         }
 
@@ -113,9 +120,17 @@ namespace Fabric.Databus.PipelineSteps
             int batchNumber,
             IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            batchCompletedQueueItem.NumberOfEntitiesUploaded = numberOfEntitiesUploaded;
-            numberOfEntitiesUploaded = 0;
+            batchCompletedQueueItem.NumberOfEntitiesUploaded = numberOfEntitiesUploadedForBatch;
+            numberOfEntitiesUploadedForBatch = 0;
             return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
+        }
+
+        /// <inheritdoc />
+        protected override Task CompleteJobAsync(string queryId, bool isLastThreadForThisTask, IJobCompletedQueueItem jobCompletedQueueItem)
+        {
+            jobCompletedQueueItem.NumberOfEntitiesUploaded = numberOfEntitiesUploadedForJob;
+            numberOfEntitiesUploadedForJob = 0;
+            return base.CompleteJobAsync(queryId, isLastThreadForThisTask, jobCompletedQueueItem);
         }
 
         /// <summary>

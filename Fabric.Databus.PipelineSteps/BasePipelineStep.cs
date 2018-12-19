@@ -228,7 +228,7 @@ namespace Fabric.Databus.PipelineSteps
                         break;
                     }
 
-                    if (wt1 is JobCompletedQueueItem)
+                    if (wt1 is JobCompletedQueueItem jobCompletedQueueItem)
                     {
                         this.MyLogger.Verbose(
                             "{Name} Job Completed. Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0} {@wt}",
@@ -238,8 +238,7 @@ namespace Fabric.Databus.PipelineSteps
                             this.totalItemsProcessedByThisProcessor,
                             wt1);
 
-                        await this.CompleteJobAsync(null, true);
-                        await this.AddJobCompletionMessageToOutputQueueAsync();
+                        await this.CompleteJobAsync(null, true, jobCompletedQueueItem);
                         break;
                     }
 
@@ -491,17 +490,23 @@ namespace Fabric.Databus.PipelineSteps
         /// The complete job async.
         /// </summary>
         /// <param name="queryId">
-        /// The query id.
+        ///     The query id.
         /// </param>
         /// <param name="isLastThreadForThisTask">
-        /// The is last thread for this task.
+        ///     The is last thread for this task.
+        /// </param>
+        /// <param name="jobCompletedQueueItem">
+        /// job completed queue item
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected virtual Task CompleteJobAsync(string queryId, bool isLastThreadForThisTask)
+        protected virtual async Task CompleteJobAsync(
+            string queryId,
+            bool isLastThreadForThisTask,
+            IJobCompletedQueueItem jobCompletedQueueItem)
         {
-            return Task.CompletedTask;
+            await this.AddJobCompletionMessageToOutputQueueAsync(jobCompletedQueueItem);
         }
 
         /// <summary>
@@ -534,12 +539,15 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The add batch completion message to output queue async.
         /// </summary>
+        /// <param name="jobCompletedQueueItem">
+        /// job completed queue item
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        protected async Task AddJobCompletionMessageToOutputQueueAsync()
+        protected async Task AddJobCompletionMessageToOutputQueueAsync(IJobCompletedQueueItem jobCompletedQueueItem)
         {
-            this.outQueue.AddJobCompleted(new JobCompletedQueueItem());
+            this.outQueue.AddJobCompleted(jobCompletedQueueItem);
 
             await Task.CompletedTask;
         }

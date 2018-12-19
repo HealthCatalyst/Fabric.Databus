@@ -190,7 +190,7 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
 
-            await this.AddJobCompletionMessageToOutputQueueAsync();
+            await this.AddJobCompletionMessageToOutputQueueAsync(new JobCompletedQueueItem());
         }
 
         /// <inheritdoc />

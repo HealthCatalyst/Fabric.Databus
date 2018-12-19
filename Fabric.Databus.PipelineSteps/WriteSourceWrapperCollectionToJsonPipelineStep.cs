@@ -37,6 +37,11 @@ namespace Fabric.Databus.PipelineSteps
         /// </summary>
         private static int numberOfEntitiesInBatch;
 
+        /// <summary>
+        /// The number of entities in job.
+        /// </summary>
+        private static int numberOfEntitiesInJob;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Fabric.Databus.PipelineSteps.WriteSourceWrapperCollectionToJsonPipelineStep" /> class.
@@ -93,6 +98,7 @@ namespace Fabric.Databus.PipelineSteps
                 foreach (var entity in actualJson)
                 {
                     Interlocked.Increment(ref numberOfEntitiesInBatch);
+                    Interlocked.Increment(ref numberOfEntitiesInJob);
 
                     var itemId = entity.SelectToken(workItem.TopLevelKeyColumn)?.ToString() ?? $"{workItem.BatchNumber}-{++i}";
 
@@ -121,6 +127,14 @@ namespace Fabric.Databus.PipelineSteps
             batchCompletedQueueItem.NumberOfEntities = numberOfEntitiesInBatch;
             numberOfEntitiesInBatch = 0;
             return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
+        }
+
+        /// <inheritdoc />
+        protected override Task CompleteJobAsync(string queryId, bool isLastThreadForThisTask, IJobCompletedQueueItem jobCompletedQueueItem)
+        {
+            jobCompletedQueueItem.NumberOfEntities = numberOfEntitiesInJob;
+            numberOfEntitiesInJob = 0;
+            return base.CompleteJobAsync(queryId, isLastThreadForThisTask, jobCompletedQueueItem);
         }
     }
 }

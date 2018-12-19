@@ -308,6 +308,7 @@ namespace Fabric.Databus.PipelineRunner
             }
 
             processors.Add(new PipelineStepInfo { Type = typeof(BatchCompletedPipelineStep), Count = 1 });
+            processors.Add(new PipelineStepInfo { Type = typeof(JobCompletedPipelineStep), Count = 1 });
 
             return processors;
         }
@@ -407,6 +408,11 @@ namespace Fabric.Databus.PipelineRunner
             if (!this.container.IsRegistered<IBatchEventsLogger>())
             {
                 this.container.RegisterType<IBatchEventsLogger, NullBatchEventsLogger>();
+            }
+
+            if (!this.container.IsRegistered<IJobEventsLogger>())
+            {
+                this.container.RegisterType<IJobEventsLogger, NullJobEventsLogger>();
             }
 
             if (!this.container.IsRegistered<IProgressMonitor>())

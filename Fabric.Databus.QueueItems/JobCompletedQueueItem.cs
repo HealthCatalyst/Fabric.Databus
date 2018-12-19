@@ -15,7 +15,7 @@ namespace Fabric.Databus.QueueItems
     /// <summary>
     /// The job completed queue item.
     /// </summary>
-    public class JobCompletedQueueItem : IQueueItem
+    public class JobCompletedQueueItem : IJobCompletedQueueItem
     {
         /// <inheritdoc />
         public string QueryId { get; set; }
@@ -23,6 +23,13 @@ namespace Fabric.Databus.QueueItems
         /// <inheritdoc />
         public string PropertyName { get; set; }
 
+        /// <inheritdoc />
         public int BatchNumber { get; set; }
+
+        /// <inheritdoc />
+        public int NumberOfEntities { get; set; }
+
+        /// <inheritdoc />
+        public int NumberOfEntitiesUploaded { get; set; }
     }
 }

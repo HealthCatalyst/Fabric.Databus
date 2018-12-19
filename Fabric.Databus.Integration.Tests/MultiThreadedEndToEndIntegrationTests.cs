@@ -133,6 +133,9 @@ FROM Text
                         var testBatchEventsLogger = new TestBatchEventsLogger();
                         container.RegisterInstance<IBatchEventsLogger>(testBatchEventsLogger);
 
+                        var testJobEventsLogger = new TestJobEventsLogger();
+                        container.RegisterInstance<IJobEventsLogger>(testJobEventsLogger);
+
                         JObject expectedJson = new JObject(
                             new JProperty("TextID", "1"),
                             new JProperty("PatientID", 9001),
@@ -223,6 +226,10 @@ FROM Text
                         var batchCompletedQueueItem = testBatchEventsLogger.BatchCompletedQueueItems.First();
                         Assert.AreEqual(1, batchCompletedQueueItem.BatchNumber);
                         Assert.AreEqual(1, batchCompletedQueueItem.NumberOfEntities);
+
+                        Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.Count);
+                        Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntities);
+                        Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntitiesUploaded);
 
                         Assert.AreEqual(1, actualJsonObjects.Count);
                         mockEntitySavedToJsonLogger.Verify(
@@ -713,6 +720,9 @@ FROM Text
                         var testBatchEventsLogger = new TestBatchEventsLogger();
                         container.RegisterInstance<IBatchEventsLogger>(testBatchEventsLogger);
 
+                        var testJobEventsLogger = new TestJobEventsLogger();
+                        container.RegisterInstance<IJobEventsLogger>(testJobEventsLogger);
+
                         int numHttpCall = 0;
                         var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
                         httpMessageHandlerMock
@@ -781,11 +791,15 @@ FROM Text
                         Assert.AreEqual(2, batchCompletedQueueItem.NumberOfEntities);
                         Assert.AreEqual(2, batchCompletedQueueItem.NumberOfEntitiesUploaded);
 
-                        var numberOfEntities = 5;
+                        const int NumberOfEntities = 5;
 
-                        Assert.AreEqual(numberOfEntities, actualJsonObjects.Count);
+                        Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.Count);
+                        Assert.AreEqual(5, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntities);
+                        Assert.AreEqual(5, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntitiesUploaded);
 
-                        Assert.AreEqual(numberOfEntities + 1, integrationTestFileWriter.Count); // first file is job.json
+                        Assert.AreEqual(NumberOfEntities, actualJsonObjects.Count);
+
+                        Assert.AreEqual(NumberOfEntities + 1, integrationTestFileWriter.Count); // first file is job.json
                         var expectedPath1 = integrationTestFileWriter.CombinePath(
                             config.Config.LocalSaveFolder,
                             "1.json");
@@ -804,7 +818,7 @@ FROM Text
                         httpMessageHandlerMock.Protected()
                             .Verify(
                                 "SendAsync",
-                                Times.Exactly(numberOfEntities),
+                                Times.Exactly(NumberOfEntities),
                                 ItExpr.Is<HttpRequestMessage>(
                                     req => req.Method == HttpMethod.Put
                                            && req.RequestUri == expectedUri),

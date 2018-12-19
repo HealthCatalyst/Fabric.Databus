@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Linq;
+
 namespace Fabric.Databus.Config
 {
     using System.Collections.Generic;
@@ -38,6 +40,15 @@ namespace Fabric.Databus.Config
         [XmlAttribute("Path")]
         [DataMember]
         public string Path { get; set; }
+
+        /// <inheritdoc />
+        public int NestingLevel => this.Path.GetNestedLevel();
+
+        public IDataSource PrependRelationships(IEnumerable<ISqlRelationship> relationships)
+        {
+            this.MyRelationships = relationships.OfType<SqlRelationship>().Concat(this.MyRelationships).ToList();
+            return this;
+        }
 
         /// <inheritdoc />
         [XmlAttribute("PropertyType")]

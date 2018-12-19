@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using Fabric.Databus.Config;
+
 namespace Fabric.Databus.Shared
 {
     using System;
@@ -140,8 +142,7 @@ namespace Fabric.Databus.Shared
 
                 if (sourceWrapper.PropertyName != "$")
                 {
-                    var lastIndexOf = sourceWrapper.PropertyName.LastIndexOf('.');
-                    var parentPropertyName = sourceWrapper.PropertyName.Substring(0, lastIndexOf);
+                    var parentPropertyName = sourceWrapper.PropertyName.GetPathOfParent() ?? throw new ArgumentNullException(nameof(sourceWrapper));
 
                     if (!this.sortedWrappers.Any(wrapper => wrapper.PropertyName.Equals(parentPropertyName)))
                     {

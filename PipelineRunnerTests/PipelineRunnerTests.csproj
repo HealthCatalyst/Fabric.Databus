@@ -262,6 +262,7 @@
     <Compile Include="ConfigReaderTests.cs" />
     <Compile Include="SqlRelationshipManagerUnitTests.cs" />
     <Compile Include="SqlGeneratorUnitTests.cs" />
+    <Compile Include="RelationshipInheritorUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

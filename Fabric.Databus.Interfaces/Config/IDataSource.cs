@@ -68,5 +68,9 @@ namespace Fabric.Databus.Interfaces.Config
         /// Gets the sql entity column mappings.
         /// </summary>
         IEnumerable<ISqlEntityColumnMapping> SqlEntityColumnMappings { get; }
+
+        int NestingLevel { get; }
+
+        IDataSource PrependRelationships(IEnumerable<ISqlRelationship> relationships);
     }
 }

@@ -7,25 +7,23 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Fabric.Databus.Config;
+using Fabric.Databus.Interfaces.Config;
+using Fabric.Databus.Interfaces.FileWriters;
+using Fabric.Databus.Interfaces.Loggers;
+using Fabric.Databus.Interfaces.Queues;
+using Fabric.Databus.QueueItems;
+using Fabric.Databus.Shared;
+using Serilog;
+
 namespace Fabric.Databus.PipelineSteps
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using Fabric.Databus.Interfaces.Config;
-    using Fabric.Databus.Interfaces.FileWriters;
-    using Fabric.Databus.Interfaces.Loggers;
-    using Fabric.Databus.Interfaces.Queues;
-    using Fabric.Databus.Shared;
-
-    using QueueItems;
-
-    using Serilog;
-
     /// <inheritdoc />
     /// <summary>
     /// The sql combine source wrappers pipeline step.
@@ -69,19 +67,19 @@ namespace Fabric.Databus.PipelineSteps
         {
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
 
-            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && Config.LocalSaveFolder != null)
             {
-                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
+                folder = this.detailedTemporaryFileWriter.CombinePath(Config.LocalSaveFolder, $"{UniqueId}-{LoggerName}");
             }
         }
 
         /// <inheritdoc />
-        protected override sealed string LoggerName => "CreateSourceWrappers";
+        protected sealed override string LoggerName => "CreateSourceWrappers";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(SqlDataLoadedQueueItem workItem)
         {
-            var keyLevels = workItem.PropertyName.Count(c => c == '.');
+            var keyLevels = workItem.PropertyName.GetNestedLevel();
 
             var keys = new List<string>();
             for (var i = 0; i < keyLevels + 1; i++)
@@ -93,7 +91,7 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
 
-            this.sourceWrapperCollection.Add(
+            sourceWrapperCollection.Add(
                 new SourceWrapper(
                     workItem.QueryId,
                     workItem.Columns,
@@ -101,13 +99,13 @@ namespace Fabric.Databus.PipelineSteps
                     workItem.Rows,
                     keys,
                     workItem.PropertyType != "object",
-                    this.Config.KeepTemporaryLookupColumnsInOutput));
+                    Config.KeepTemporaryLookupColumnsInOutput));
 
-            await this.WriteDiagnostics(workItem);
+            await WriteDiagnostics(workItem);
 
-            this.batchNumber = workItem.BatchNumber;
+            batchNumber = workItem.BatchNumber;
 
-            this.topLevelKeyColumn = workItem.TopLevelKeyColumn;
+            topLevelKeyColumn = workItem.TopLevelKeyColumn;
         }
 
         /// <inheritdoc />
@@ -131,19 +129,19 @@ namespace Fabric.Databus.PipelineSteps
         /// </returns>
         protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber1, IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            if (this.sourceWrapperCollection.Any())
+            if (sourceWrapperCollection.Any())
             {
-                this.AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
+                AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
                 {
-                    BatchNumber = this.batchNumber,
+                    BatchNumber = batchNumber,
                     TotalBatches = batchCompletedQueueItem.TotalBatches,
-                    SourceWrapperCollection = this.sourceWrapperCollection,
-                    TopLevelKeyColumn = this.topLevelKeyColumn
+                    SourceWrapperCollection = sourceWrapperCollection,
+                    TopLevelKeyColumn = topLevelKeyColumn
                 });
             }
 
             // start a new collection for next batch
-            this.sourceWrapperCollection = new SourceWrapperCollection();
+            sourceWrapperCollection = new SourceWrapperCollection();
 
             return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber1, batchCompletedQueueItem);
         }
@@ -165,18 +163,18 @@ namespace Fabric.Databus.PipelineSteps
         /// </returns>
         private async Task WriteDiagnostics(SqlDataLoadedQueueItem workItem)
         {
-            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
+            if (detailedTemporaryFileWriter?.IsWritingEnabled == true && folder != null)
             {
-                var filepath = this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.QueryId}.csv");
+                var filepath = detailedTemporaryFileWriter.CombinePath(folder, $"{workItem.QueryId}.csv");
 
-                this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
+                detailedTemporaryFileWriter.CreateDirectory(folder);
 
-                using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
+                using (var stream = detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
                 {
                     using (var streamWriter = new StreamWriter(stream))
                     {
                         var columns = workItem.Columns.Select(c => c.Name).ToList();
-                        var text = $@"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
+                        var text = @"""Key""," + string.Join(",", columns.Select(c => $@"""{c}"""));
 
                         await streamWriter.WriteLineAsync(text);
 

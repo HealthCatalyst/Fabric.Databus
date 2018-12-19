@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Linq;
+
 namespace Fabric.Database.Shared.Tests.Helpers
 {
     using System.Collections.Generic;
@@ -47,5 +49,14 @@ namespace Fabric.Database.Shared.Tests.Helpers
 
         /// <inheritdoc />
         public IEnumerable<ISqlEntityColumnMapping> SqlEntityColumnMappings { get; } = new List<ISqlEntityColumnMapping>();
+
+        /// <inheritdoc />
+        public int NestingLevel => this.Path.GetNestedLevel();
+
+        public IDataSource PrependRelationships(IEnumerable<ISqlRelationship> relationships)
+        {
+            this.Relationships = relationships.Concat(this.Relationships).ToList();
+            return this;
+        }
     }
 }

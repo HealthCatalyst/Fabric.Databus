@@ -859,6 +859,231 @@ FROM Text
                     connection.Close();
                 }
             }
+        }        
+        
+        /// <summary>
+        /// The can run successfully end to end.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void CanRunNestedEntitiesEndToEndWithBatching()
+        {
+            var fileContents = TestFileLoader.GetFileContents("Files", "NestedEntitiesWithBatching.xml");
+            var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "NestedEntitiesWithBatching.sql");
+            Assert.AreEqual(11, sqlLines.Count);
+
+            var config = new ConfigReader().ReadXmlFromText(fileContents);
+
+            using (var db = new TempLocalDb("NestedEntitiesWithBatching"))
+            using (var connection = db.CreateConnection())
+            {
+                connection.Open();
+
+                var command = connection.CreateCommand();
+
+                // setup the database
+                foreach (var sql in sqlLines)
+                {
+                    if (!string.IsNullOrWhiteSpace(sql))
+                    {
+                        command.CommandText = sql;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                using (var progressMonitor = new ProgressMonitor(new TestConsoleProgressLogger()))
+                {
+                    using (var cancellationTokenSource = new CancellationTokenSource())
+                    {
+                        var container = new UnityContainer();
+                        container.RegisterInstance<IProgressMonitor>(progressMonitor);
+                        container.RegisterInstance<ISqlConnectionFactory>(
+                            new SqlReuseConnectionFactory(new DbConnectionWrapper(connection)));
+
+                        var integrationTestFileWriter = new IntegrationTestFileWriter { IsWritingEnabled = true };
+                        container.RegisterInstance<IFileWriter>(integrationTestFileWriter);
+                        container.RegisterInstance<ITemporaryFileWriter>(integrationTestFileWriter);
+
+                        container.RegisterType<ISqlGeneratorFactory, SqlGeneratorFactory>();
+
+                        JObject expectedJson1 = new JObject(
+                            new JProperty("TextID", "1"),
+                            new JProperty("PatientID", 9001),
+                            new JProperty("TextTXT", "This is my first note"),
+                            new JProperty(
+                                "patients",
+                                new JObject(
+                                    new JProperty("TextID", "1"),
+                                    new JProperty("PatientID", 9001),
+                                    new JProperty("PatientLastNM", "Jones"))));
+
+                        JObject expectedJson2 = new JObject(
+                            new JProperty("TextID", "2"),
+                            new JProperty("PatientID", 9002),
+                            new JProperty("TextTXT", "This is my second note"),
+                            new JProperty(
+                                "patients",
+                                new JObject(
+                                    new JProperty("TextID", "2"),
+                                    new JProperty("PatientID", 9002),
+                                    new JProperty("PatientLastNM", "Smith"))));
+
+
+                        // set up a mock web service
+                        var mockRepository = new MockRepository(MockBehavior.Strict);
+
+                        var actualJsonObjects = new Dictionary<string, JObject>();
+
+                        var mockEntitySavedToJsonLogger = mockRepository.Create<IEntitySavedToJsonLogger>();
+                        mockEntitySavedToJsonLogger.Setup(service => service.IsWritingEnabled).Returns(true);
+                        mockEntitySavedToJsonLogger
+                            .Setup(service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()))
+                            .Callback<string, Stream>(
+                                (workItemId, stream) =>
+                                    {
+                                        using (var streamReader = new StreamReader(
+                                            stream,
+                                            Encoding.UTF8,
+                                            true,
+                                            1024,
+                                            true))
+                                        {
+                                            actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
+                                        }
+                                    });
+                        container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
+
+                        var testBatchEventsLogger = new TestBatchEventsLogger();
+                        container.RegisterInstance<IBatchEventsLogger>(testBatchEventsLogger);
+
+                        var testJobEventsLogger = new TestJobEventsLogger();
+                        container.RegisterInstance<IJobEventsLogger>(testJobEventsLogger);
+
+                        var testQuerySqlLogger = new TestQuerySqlLogger();
+                        container.RegisterInstance<IQuerySqlLogger>(testQuerySqlLogger);
+
+                        int numHttpCall = 0;
+                        var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+                        httpMessageHandlerMock
+                            .Protected()
+                            .Setup<Task<HttpResponseMessage>>(
+                                "SendAsync",
+                                ItExpr.IsAny<HttpRequestMessage>(),
+                                ItExpr.IsAny<CancellationToken>())
+                            .Callback<HttpRequestMessage, CancellationToken>((request, token) =>
+                                {
+                                    numHttpCall++;
+                                    if (numHttpCall < 3)
+                                    {
+                                        var content = request.Content.ReadAsStringAsync().Result;
+                                        var expectedJson = numHttpCall == 1 ? expectedJson1 : expectedJson2;
+                                        Assert.IsTrue(JToken.DeepEquals(expectedJson, JObject.Parse(content)), content);
+
+                                        Assert.AreEqual("Basic", request.Headers.Authorization.Scheme);
+                                        var actualParameter = request.Headers.Authorization.Parameter;
+
+                                        var expectedByteArray = Encoding.ASCII.GetBytes($"{config.Config.UrlUserName}:{config.Config.UrlPassword}");
+                                        var expectedParameter = Convert.ToBase64String(expectedByteArray);
+
+                                        Assert.AreEqual(expectedParameter, actualParameter);
+                                    }
+                                })
+                            .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK)
+                            {
+                                Content = new StringContent(string.Empty)
+                            })
+                            .Verifiable();
+
+                        var expectedUri = new Uri("http://foo");
+
+                        var mockHttpClientFactory = mockRepository.Create<IHttpClientFactory>();
+                        mockHttpClientFactory.Setup(service => service.Create())
+                            .Returns(new HttpClient(httpMessageHandlerMock.Object));
+
+                        container.RegisterInstance(mockHttpClientFactory.Object);
+
+                        // Act
+                        var stopwatch = new Stopwatch();
+                        stopwatch.Start();
+
+                        var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+
+                        try
+                        {
+                            pipelineRunner.RunPipeline(config);
+                        }
+                        catch (AggregateException e)
+                        {
+                            e.InnerExceptions.ForEach(Console.WriteLine);
+                            throw e.Flatten();
+                        }
+
+                        // assert
+                        Assert.AreEqual(2, testBatchEventsLogger.BatchStartedQueueItems.Count);
+                        var batchStartedQueueItem = testBatchEventsLogger.BatchStartedQueueItems.First();
+                        Assert.AreEqual(1, batchStartedQueueItem.BatchNumber);
+                        Assert.AreEqual(3, batchStartedQueueItem.NumberOfEntities);
+
+                        Assert.AreEqual(2, testBatchEventsLogger.BatchCompletedQueueItems.Count);
+                        var batchCompletedQueueItem = testBatchEventsLogger.BatchCompletedQueueItems.First();
+                        Assert.AreEqual(1, batchCompletedQueueItem.BatchNumber);
+                        Assert.AreEqual(3, batchCompletedQueueItem.NumberOfEntities);
+                        Assert.AreEqual(3, batchCompletedQueueItem.NumberOfEntitiesUploaded);
+
+                        batchCompletedQueueItem = testBatchEventsLogger.BatchCompletedQueueItems.Skip(1).First();
+                        Assert.AreEqual(2, batchCompletedQueueItem.BatchNumber);
+                        Assert.AreEqual(2, batchCompletedQueueItem.NumberOfEntities);
+                        Assert.AreEqual(2, batchCompletedQueueItem.NumberOfEntitiesUploaded);
+
+                        const int NumberOfEntities = 5;
+
+                        Assert.AreEqual(2 + 2, testQuerySqlLogger.QuerySqlCompletedEvents.Count); // one per entity per batch
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.First().BatchNumber);
+                        Assert.AreEqual(3, testQuerySqlLogger.QuerySqlCompletedEvents.First().RowCount);
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(1).First().BatchNumber);
+                        Assert.AreEqual(3, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(1).First().RowCount);
+                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(2).First().BatchNumber);
+                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(2).First().RowCount);
+                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(3).First().BatchNumber);
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(3).First().RowCount);
+
+                        Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.Count);
+                        Assert.AreEqual(5, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntities);
+                        Assert.AreEqual(5, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntitiesUploaded);
+
+                        Assert.AreEqual(NumberOfEntities, actualJsonObjects.Count);
+
+                        Assert.AreEqual(NumberOfEntities + 1, integrationTestFileWriter.Count); // first file is job.json
+                        var expectedPath1 = integrationTestFileWriter.CombinePath(
+                            config.Config.LocalSaveFolder,
+                            "1.json");
+                        Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath1));
+
+                        var contents = integrationTestFileWriter.GetContents(expectedPath1);
+                        var actualJson1 = JObject.Parse(contents);
+                        Assert.IsTrue(JToken.DeepEquals(expectedJson1, actualJson1), $"Expected:<{expectedJson1}>. Actual<{actualJson1}>");
+
+                        var expectedPath2 = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "2.json");
+                        Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath2));
+                        var contents2 = integrationTestFileWriter.GetContents(expectedPath2);
+                        var actualJson2 = JObject.Parse(contents2);
+                        Assert.IsTrue(JToken.DeepEquals(expectedJson2, actualJson2), $"Expected:<{expectedJson2}>. Actual<{actualJson2}>");
+
+                        httpMessageHandlerMock.Protected()
+                            .Verify(
+                                "SendAsync",
+                                Times.Exactly(NumberOfEntities),
+                                ItExpr.Is<HttpRequestMessage>(
+                                    req => req.Method == HttpMethod.Put
+                                           && req.RequestUri == expectedUri),
+                                ItExpr.IsAny<CancellationToken>());
+
+                        stopwatch.Stop();
+                    }
+
+                    connection.Close();
+                }
+            }
         }
     }
 }

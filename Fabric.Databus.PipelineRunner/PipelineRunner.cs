@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Linq;
+
 namespace Fabric.Databus.PipelineRunner
 {
     using System;
@@ -173,6 +175,9 @@ namespace Fabric.Databus.PipelineRunner
                 {
                     dataSource.Path = $"$.{dataSource.Path}";
                 }
+
+                RelationshipInheritor.InheritRelationships(job.Data.DataSources, dataSource,
+                    job.Data.TopLevelDataSource.TableOrView);
             }
 
             this.container.Resolve<IConfigValidator>().ValidateDataSourcesAsync(job, logger);

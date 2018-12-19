@@ -140,6 +140,7 @@
   <ItemGroup>
     <Compile Include="Helpers\TestBatchEventsLogger.cs" />
     <Compile Include="Helpers\TestJobEventsLogger.cs" />
+    <Compile Include="Helpers\TestQuerySqlLogger.cs" />
     <Compile Include="MultiThreadedEndToEndIntegrationTests.cs" />
     <Compile Include="IntegrationTestFileStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

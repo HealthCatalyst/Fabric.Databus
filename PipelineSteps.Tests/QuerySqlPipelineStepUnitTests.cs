@@ -22,6 +22,7 @@ namespace PipelineStep.Tests
     using Fabric.Databus.PipelineSteps;
     using Fabric.Databus.QueueItems;
     using Fabric.Databus.Shared.FileWriters;
+    using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
     using Fabric.Shared;
 
@@ -106,6 +107,7 @@ namespace PipelineStep.Tests
                     queueManager,
                     new MockProgressMonitor(),
                     new NullFileWriter(),
+                    new NullQuerySqlLogger(), 
                     cancellationTokenSource.Token);
 
                 var sqlJobQueueItem = new SqlQueryDataSourceQueueItem
@@ -220,6 +222,7 @@ namespace PipelineStep.Tests
                     queueManager,
                     new MockProgressMonitor(),
                     new NullFileWriter(),
+                    new NullQuerySqlLogger(), 
                     cancellationTokenSource.Token);
 
                 var topLevelDataSource = new TopLevelDataSource

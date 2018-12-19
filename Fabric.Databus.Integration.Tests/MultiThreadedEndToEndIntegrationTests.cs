@@ -136,6 +136,9 @@ FROM Text
                         var testJobEventsLogger = new TestJobEventsLogger();
                         container.RegisterInstance<IJobEventsLogger>(testJobEventsLogger);
 
+                        var testQuerySqlLogger = new TestQuerySqlLogger();
+                        container.RegisterInstance<IQuerySqlLogger>(testQuerySqlLogger);
+
                         JObject expectedJson = new JObject(
                             new JProperty("TextID", "1"),
                             new JProperty("PatientID", 9001),
@@ -222,6 +225,11 @@ FROM Text
                         }
 
                         // Assert
+                        Assert.AreEqual(1, testBatchEventsLogger.BatchStartedQueueItems.Count);
+                        var batchStartedQueueItem = testBatchEventsLogger.BatchStartedQueueItems.First();
+                        Assert.AreEqual(1, batchStartedQueueItem.BatchNumber);
+                        Assert.AreEqual(1, batchStartedQueueItem.NumberOfEntities);
+
                         Assert.AreEqual(1, testBatchEventsLogger.BatchCompletedQueueItems.Count);
                         var batchCompletedQueueItem = testBatchEventsLogger.BatchCompletedQueueItems.First();
                         Assert.AreEqual(1, batchCompletedQueueItem.BatchNumber);
@@ -230,6 +238,9 @@ FROM Text
                         Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.Count);
                         Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntities);
                         Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntitiesUploaded);
+
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlStartedEvents.Count);
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.Count);
 
                         Assert.AreEqual(1, actualJsonObjects.Count);
                         mockEntitySavedToJsonLogger.Verify(
@@ -723,6 +734,9 @@ FROM Text
                         var testJobEventsLogger = new TestJobEventsLogger();
                         container.RegisterInstance<IJobEventsLogger>(testJobEventsLogger);
 
+                        var testQuerySqlLogger = new TestQuerySqlLogger();
+                        container.RegisterInstance<IQuerySqlLogger>(testQuerySqlLogger);
+
                         int numHttpCall = 0;
                         var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
                         httpMessageHandlerMock
@@ -780,6 +794,11 @@ FROM Text
                         }
 
                         // assert
+                        Assert.AreEqual(2, testBatchEventsLogger.BatchStartedQueueItems.Count);
+                        var batchStartedQueueItem = testBatchEventsLogger.BatchStartedQueueItems.First();
+                        Assert.AreEqual(1, batchStartedQueueItem.BatchNumber);
+                        Assert.AreEqual(3, batchStartedQueueItem.NumberOfEntities);
+
                         Assert.AreEqual(2, testBatchEventsLogger.BatchCompletedQueueItems.Count);
                         var batchCompletedQueueItem = testBatchEventsLogger.BatchCompletedQueueItems.First();
                         Assert.AreEqual(1, batchCompletedQueueItem.BatchNumber);
@@ -792,6 +811,16 @@ FROM Text
                         Assert.AreEqual(2, batchCompletedQueueItem.NumberOfEntitiesUploaded);
 
                         const int NumberOfEntities = 5;
+
+                        Assert.AreEqual(2 + 2, testQuerySqlLogger.QuerySqlCompletedEvents.Count); // one per entity per batch
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.First().BatchNumber);
+                        Assert.AreEqual(3, testQuerySqlLogger.QuerySqlCompletedEvents.First().RowCount);
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(1).First().BatchNumber);
+                        Assert.AreEqual(3, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(1).First().RowCount);
+                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(2).First().BatchNumber);
+                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(2).First().RowCount);
+                        Assert.AreEqual(2, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(3).First().BatchNumber);
+                        Assert.AreEqual(1, testQuerySqlLogger.QuerySqlCompletedEvents.Skip(3).First().RowCount);
 
                         Assert.AreEqual(1, testJobEventsLogger.JobCompletedQueueItems.Count);
                         Assert.AreEqual(5, testJobEventsLogger.JobCompletedQueueItems.First().NumberOfEntities);

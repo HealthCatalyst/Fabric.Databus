@@ -415,6 +415,11 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterType<IJobEventsLogger, NullJobEventsLogger>();
             }
 
+            if (!this.container.IsRegistered<IQuerySqlLogger>())
+            {
+                this.container.RegisterType<IQuerySqlLogger, NullQuerySqlLogger>();
+            }
+
             if (!this.container.IsRegistered<IProgressMonitor>())
             {
                 IProgressMonitor progressMonitor = new ProgressMonitor(new NullProgressLogger());

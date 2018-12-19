@@ -11,6 +11,7 @@ namespace Fabric.Databus.PipelineSteps
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -50,6 +51,8 @@ namespace Fabric.Databus.PipelineSteps
         /// </summary>
         private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
 
+        private readonly IQuerySqlLogger querySqlLogger;
+
         /// <inheritdoc />
         /// <summary>
         /// Initializes a new instance of the <see cref="T:QuerySqlPipelineStep.QuerySqlPipelineStep" /> class.
@@ -72,21 +75,24 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="detailedTemporaryFileWriter">
         /// file writer
         /// </param>
+        /// <param name="querySqlLogger"></param>
         /// <param name="cancellationToken">
         /// cancellation token
         /// </param>
         public QuerySqlPipelineStep(
-            IJobConfig jobConfig, 
-            IDatabusSqlReader databusSqlReader, 
-            ILogger logger, 
-            IQueueManager queueManager, 
+            IJobConfig jobConfig,
+            IDatabusSqlReader databusSqlReader,
+            ILogger logger,
+            IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
+            IQuerySqlLogger querySqlLogger,
             CancellationToken cancellationToken)
             : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
         {
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
+            this.querySqlLogger = querySqlLogger ?? throw new ArgumentNullException(nameof(querySqlLogger));
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
                 this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
@@ -233,6 +239,20 @@ namespace Fabric.Databus.PipelineSteps
             ITopLevelDataSource topLevelDataSource,
             int totalBatches)
         {
+            var stopwatch = new Stopwatch();
+
+            this.querySqlLogger.SqlQueryStarted(
+                new QuerySqlLogEvent
+                {
+                    Name = load.Name,
+                    Path = load.Path,
+                    BatchNumber = batchNumber,
+                    SequenceNumber = load.SequenceNumber,
+                    Sql = load.Sql,
+                    TableOrView = load.TableOrView,
+                });
+
+            stopwatch.Start();
             var result = await this.databusSqlReader.ReadDataFromQueryAsync(
                              load,
                              start,
@@ -242,23 +262,39 @@ namespace Fabric.Databus.PipelineSteps
                              topLevelDataSource.IncrementalColumns,
                              topLevelDataSource.TableOrView);
 
-            await this.WriteDiagnosticsAsync(queryId, batchNumber, result);
+            stopwatch.Stop();
+
+            await this.WriteDiagnosticsAsync(queryId, batchNumber, result, stopwatch.Elapsed);
+
+            this.querySqlLogger.SqlQueryCompleted(
+                new QuerySqlLogEvent
+                {
+                    Name = load.Name,
+                    Path = load.Path,
+                    BatchNumber = batchNumber,
+                    SequenceNumber = load.SequenceNumber,
+                    Sql = result.SqlCommandText,
+                    SqlParameters = result.SqlCommandParameters?.ToList(),
+                    TableOrView = load.TableOrView,
+                    TimeElapsed = stopwatch.Elapsed,
+                    RowCount = result.Data.Count
+                });
 
             foreach (var frame in result.Data)
             {
                 await this.AddToOutputQueueAsync(
                     new SqlDataLoadedQueueItem
-                        {
-                            BatchNumber = batchNumber,
-                            TotalBatches = totalBatches,
-                            QueryId = queryId,
-                            JoinColumnValue = frame.Key,
-                            Rows = frame.Value,
-                            Columns = result.ColumnList,
-                            PropertyName = load.Path,
-                            PropertyType = load.PropertyType,
-                            PropertyTypes = propertyTypes,
-                            TopLevelKeyColumn = topLevelDataSource.Key
+                    {
+                        BatchNumber = batchNumber,
+                        TotalBatches = totalBatches,
+                        QueryId = queryId,
+                        JoinColumnValue = frame.Key,
+                        Rows = frame.Value,
+                        Columns = result.ColumnList,
+                        PropertyName = load.Path,
+                        PropertyType = load.PropertyType,
+                        PropertyTypes = propertyTypes,
+                        TopLevelKeyColumn = topLevelDataSource.Key
                     });
             }
 
@@ -282,10 +318,13 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="result">
         /// The result.
         /// </param>
+        /// <param name="elapsed">
+        /// The elapsed.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task WriteDiagnosticsAsync(string queryId, int batchNumber, ReadSqlDataResult result)
+        private async Task WriteDiagnosticsAsync(string queryId, int batchNumber, ReadSqlDataResult result, TimeSpan elapsed)
         {
             if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {
@@ -308,6 +347,8 @@ namespace Fabric.Databus.PipelineSteps
                             sb.AppendLine($"{parameter.Key} = {parameter.Value}");
                         }
                     }
+
+                    sb.AppendLine($"Time: {elapsed:c}");
 
                     await this.detailedTemporaryFileWriter.WriteToFileAsync(
                         this.detailedTemporaryFileWriter.CombinePath(path, "query.sql"),

@@ -21,7 +21,6 @@ namespace PipelineRunnerTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Unity;
-    using Unity.Interception.Utilities;
 
     /// <summary>
     /// The sanity tests.
@@ -78,11 +77,17 @@ namespace PipelineRunnerTests
 
             Console.WriteLine("Directories");
             var directories = Directory.EnumerateDirectories(localSaveFolder);
-            directories.ForEach(Console.WriteLine);
+            foreach (var directory in directories)
+            {
+                Console.WriteLine(directory);
+            }
 
             Console.WriteLine("Files");
             var files = Directory.GetFiles(localSaveFolder);
-            files.ForEach(Console.WriteLine);
+            foreach (var file in files)
+            {
+                Console.WriteLine(file);
+            }
         }
     }
 }

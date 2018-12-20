@@ -7,46 +7,39 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Fabric.Database.Testing.FileLoader;
+using Fabric.Database.Testing.LocalDb;
+using Fabric.Databus.Config;
+using Fabric.Databus.Domain.ProgressMonitors;
+using Fabric.Databus.Integration.Tests.Helpers;
+using Fabric.Databus.Interfaces.FileWriters;
+using Fabric.Databus.Interfaces.Loggers;
+using Fabric.Databus.Interfaces.Queues;
+using Fabric.Databus.Interfaces.Sql;
+using Fabric.Databus.Shared.Loggers;
+using Fabric.Databus.Shared.Queues;
+using Fabric.Databus.SqlGenerator;
+using Fabric.Shared;
+using Fabric.Shared.ReliableHttp.Interceptors;
+using Fabric.Shared.ReliableHttp.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Moq.Protected;
+using Newtonsoft.Json.Linq;
+using Unity;
+
 namespace Fabric.Databus.Integration.Tests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    using Fabric.Database.Testing.FileLoader;
-    using Fabric.Database.Testing.LocalDb;
-    using Fabric.Databus.Config;
-    using Fabric.Databus.Domain.ProgressMonitors;
-    using Fabric.Databus.Integration.Tests.Helpers;
-    using Fabric.Databus.Interfaces.FileWriters;
-    using Fabric.Databus.Interfaces.Loggers;
-    using Fabric.Databus.Interfaces.Queues;
-    using Fabric.Databus.Interfaces.Sql;
-    using Fabric.Databus.PipelineRunner;
-    using Fabric.Databus.Shared.Loggers;
-    using Fabric.Databus.Shared.Queues;
-    using Fabric.Databus.SqlGenerator;
-    using Fabric.Shared;
-    using Fabric.Shared.ReliableHttp.Interceptors;
-    using Fabric.Shared.ReliableHttp.Interfaces;
-
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
-    using Moq.Protected;
-
-    using Newtonsoft.Json.Linq;
-
-    using Unity;
-    using Unity.Interception.Utilities;
-
     /// <summary>
     /// The end to end integration tests.
     /// </summary>
@@ -211,7 +204,7 @@ FROM Text
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
 
-                        var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+                        var pipelineRunner = new PipelineRunner.PipelineRunner(container, cancellationTokenSource.Token);
 
                         try
                         {
@@ -219,7 +212,7 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            e.InnerExceptions.ForEach(Console.WriteLine);
+                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
 
                             throw e.Flatten();
                         }
@@ -406,7 +399,7 @@ FROM Text
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
 
-                        var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+                        var pipelineRunner = new PipelineRunner.PipelineRunner(container, cancellationTokenSource.Token);
 
                         try
                         {
@@ -414,7 +407,7 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            e.InnerExceptions.ForEach(Console.WriteLine);
+                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
                             throw e.Flatten();
                         }
 
@@ -549,7 +542,7 @@ FROM Text
                                             actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
                                         }
                                     });
-                        container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
+                        container.RegisterInstance(mockEntitySavedToJsonLogger.Object);
 
                         int numHttpCall = 0;
                         var httpMessageHandlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
@@ -592,7 +585,7 @@ FROM Text
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
 
-                        var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+                        var pipelineRunner = new PipelineRunner.PipelineRunner(container, cancellationTokenSource.Token);
 
                         try
                         {
@@ -600,7 +593,7 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            e.InnerExceptions.ForEach(Console.WriteLine);
+                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
                             throw e.Flatten();
                         }
 
@@ -638,8 +631,8 @@ FROM Text
                     connection.Close();
                 }
             }
-        }        
-        
+        }
+
         /// <summary>
         /// The can run successfully end to end.
         /// </summary>
@@ -726,7 +719,7 @@ FROM Text
                                             actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
                                         }
                                     });
-                        container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
+                        container.RegisterInstance(mockEntitySavedToJsonLogger.Object);
 
                         var testBatchEventsLogger = new TestBatchEventsLogger();
                         container.RegisterInstance<IBatchEventsLogger>(testBatchEventsLogger);
@@ -781,7 +774,7 @@ FROM Text
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
 
-                        var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+                        var pipelineRunner = new PipelineRunner.PipelineRunner(container, cancellationTokenSource.Token);
 
                         try
                         {
@@ -789,7 +782,7 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            e.InnerExceptions.ForEach(Console.WriteLine);
+                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
                             throw e.Flatten();
                         }
 
@@ -859,8 +852,8 @@ FROM Text
                     connection.Close();
                 }
             }
-        }        
-        
+        }
+
         /// <summary>
         /// The can run successfully end to end.
         /// </summary>
@@ -890,7 +883,7 @@ FROM Text
                     }
                 }
 
-                var files = new string[]
+                var files = new[]
                 {
                     "HCOSText.DataBASE.Table.sql",
                     "HCOSText.PatientBASE.Table.sql",
@@ -948,7 +941,7 @@ FROM Text
                                             actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
                                         }
                                     });
-                        container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
+                        container.RegisterInstance(mockEntitySavedToJsonLogger.Object);
 
                         var testBatchEventsLogger = new TestBatchEventsLogger();
                         container.RegisterInstance<IBatchEventsLogger>(testBatchEventsLogger);
@@ -995,7 +988,7 @@ FROM Text
                         var stopwatch = new Stopwatch();
                         stopwatch.Start();
 
-                        var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
+                        var pipelineRunner = new PipelineRunner.PipelineRunner(container, cancellationTokenSource.Token);
 
                         try
                         {
@@ -1003,7 +996,7 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            e.InnerExceptions.ForEach(Console.WriteLine);
+                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
                             throw e.Flatten();
                         }
 
@@ -1039,9 +1032,9 @@ FROM Text
 
                         Assert.AreEqual(NumberOfEntities + 1, integrationTestFileWriter.Count); // first file is job.json
 
-                        var expectedJsonFiles = new string[]
+                        var expectedJsonFiles = new[]
                         {
-                            "58010A71478E5C521A4157B2FB8E1904ACAD37C324ECFFA359F14F02B4D7F4AF.json",
+                            "58010A71478E5C521A4157B2FB8E1904ACAD37C324ECFFA359F14F02B4D7F4AF.json"
                         };
 
                         foreach (var expectedJsonFile in expectedJsonFiles)

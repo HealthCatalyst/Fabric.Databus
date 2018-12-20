@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using Unity;
+
 namespace Fabric.Databus.Nuget.Console
 {
     using System;
@@ -22,8 +24,6 @@ namespace Fabric.Databus.Nuget.Console
     using Fabric.Databus.Shared.Loggers;
 
     using Serilog;
-
-    using Unity;
 
     using Console = System.Console;
 

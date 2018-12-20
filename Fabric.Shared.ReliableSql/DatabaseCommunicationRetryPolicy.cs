@@ -41,6 +41,7 @@ namespace Fabric.Shared.ReliableSql
         private readonly int[] sqlExceptions =
             {
                 -2, /* timeout */ 53, // connection failure
+                109, /*transport level error */
                 701, // Out of Memory
                 1204, // Lock Issue
                 1205, // Deadlock Victim
@@ -94,13 +95,13 @@ namespace Fabric.Shared.ReliableSql
         }
 
         /// <inheritdoc />
-        public async Task Execute(Func<Task> operation, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(Func<Task> operation, CancellationToken cancellationToken)
         {
             await this.retryPolicyAsync.ExecuteAsync(operation.Invoke);
         }
 
         /// <inheritdoc />
-        public async Task<TResult> Execute<TResult>(Func<Task<TResult>> operation, CancellationToken cancellationToken)
+        public async Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> operation, CancellationToken cancellationToken)
         {
             return await this.retryPolicyAsync.ExecuteAsync(operation.Invoke);
         }

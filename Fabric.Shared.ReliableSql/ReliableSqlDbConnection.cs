@@ -7,6 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Fabric.Shared.ReliableSql
 {
     using System.Data;
@@ -26,6 +30,8 @@ namespace Fabric.Shared.ReliableSql
         /// </summary>
         private readonly IReliableRetryPolicy retryPolicy;
 
+        private string underlyingConnectionString;
+
         /// <inheritdoc />
         public ReliableSqlDbConnection(
             SqlConnection connection,
@@ -33,6 +39,7 @@ namespace Fabric.Shared.ReliableSql
         {
             this.retryPolicy = retryPolicy;
             this.underlyingConnection = connection;
+            this.underlyingConnectionString = this.underlyingConnection.ConnectionString;
         }
 
         /// <inheritdoc />
@@ -88,11 +95,32 @@ namespace Fabric.Shared.ReliableSql
         {
             this.retryPolicy.Execute(() =>
             {
-                if (this.underlyingConnection.State != ConnectionState.Open)
+                try
                 {
-                    this.underlyingConnection.Open();
+                    if (this.underlyingConnection.State != ConnectionState.Open)
+                    {
+                        this.underlyingConnection.Open();
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw;
                 }
             });
+        }
+
+        public override async Task OpenAsync(CancellationToken cancellationToken)
+        {
+            await this.retryPolicy.ExecuteAsync(() =>
+                {
+                    if (this.underlyingConnection.State != ConnectionState.Open)
+                    {
+                        return this.underlyingConnection.OpenAsync(cancellationToken);
+                    }
+
+                    return Task.CompletedTask;
+                },
+                cancellationToken);
         }
 
         /// <inheritdoc />

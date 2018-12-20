@@ -52,7 +52,7 @@ namespace Fabric.Shared.ReliableSql
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task Execute(Func<Task> operation, CancellationToken cancellationToken);
+        Task ExecuteAsync(Func<Task> operation, CancellationToken cancellationToken);
 
         /// <summary>
         /// The execute.
@@ -69,6 +69,6 @@ namespace Fabric.Shared.ReliableSql
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task<TResult> Execute<TResult>(Func<Task<TResult>> operation, CancellationToken cancellationToken);
+        Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> operation, CancellationToken cancellationToken);
     }
 }

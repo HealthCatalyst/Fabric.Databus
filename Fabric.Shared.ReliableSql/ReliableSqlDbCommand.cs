@@ -13,6 +13,8 @@ namespace Fabric.Shared.ReliableSql
     using System.Data;
     using System.Data.Common;
     using System.Data.SqlClient;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     /// <inheritdoc />
     /// <summary>
@@ -123,6 +125,21 @@ namespace Fabric.Shared.ReliableSql
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
         {
             return this.retryPolicy.Execute(() => this.underlyingSqlCommand.ExecuteReader(behavior));
+        }
+
+        protected override async Task<DbDataReader> ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+        {
+            return await this.retryPolicy.ExecuteAsync(async () => await this.underlyingSqlCommand.ExecuteReaderAsync(behavior, cancellationToken), cancellationToken);
+        }
+
+        public override Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
+        {
+            return this.retryPolicy.ExecuteAsync(() => this.underlyingSqlCommand.ExecuteNonQueryAsync(cancellationToken), cancellationToken);
+        }
+
+        public override Task<object> ExecuteScalarAsync(CancellationToken cancellationToken)
+        {
+            return this.retryPolicy.ExecuteAsync(() => this.underlyingSqlCommand.ExecuteScalarAsync(cancellationToken), cancellationToken);
         }
 
         /// <inheritdoc />

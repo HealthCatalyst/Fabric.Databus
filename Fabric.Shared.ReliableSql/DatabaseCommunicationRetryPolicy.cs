@@ -41,6 +41,7 @@ namespace Fabric.Shared.ReliableSql
         private readonly int[] sqlExceptions =
             {
                 -2, /* timeout */ 53, // connection failure
+                64, // network name is not available
                 109, /*transport level error */
                 701, // Out of Memory
                 1204, // Lock Issue
@@ -73,7 +74,11 @@ namespace Fabric.Shared.ReliableSql
                 .Handle<SqlException>(exception => this.sqlExceptions.Contains(exception.Number))
                 .WaitAndRetryAsync(
                     RetryCount,
-                    attempt => TimeSpan.FromMilliseconds(WaitBetweenRetriesInMilliseconds));
+                    attempt => TimeSpan.FromMilliseconds(WaitBetweenRetriesInMilliseconds),
+                    onRetryAsync: async (outcome, retryNumber, context) =>
+                    {
+                        await Task.CompletedTask;
+                    });
 
             this.retryPolicy = Policy
                 .Handle<SqlException>(exception => this.sqlExceptions.Contains(exception.Number))

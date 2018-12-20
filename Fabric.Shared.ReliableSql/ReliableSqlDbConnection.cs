@@ -30,7 +30,7 @@ namespace Fabric.Shared.ReliableSql
         /// </summary>
         private readonly IReliableRetryPolicy retryPolicy;
 
-        private string underlyingConnectionString;
+        private readonly string underlyingConnectionString;
 
         /// <inheritdoc />
         public ReliableSqlDbConnection(
@@ -102,7 +102,7 @@ namespace Fabric.Shared.ReliableSql
                         this.underlyingConnection.Open();
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw;
                 }
@@ -132,7 +132,8 @@ namespace Fabric.Shared.ReliableSql
         /// <inheritdoc />
         protected override DbCommand CreateDbCommand()
         {
-            return new ReliableSqlDbCommand(this.underlyingConnection.CreateCommand(), this.retryPolicy);
+            var result = new ReliableSqlDbCommand(this.underlyingConnection.CreateCommand(), this.retryPolicy);
+            return result;
         }
 
         /// <inheritdoc />

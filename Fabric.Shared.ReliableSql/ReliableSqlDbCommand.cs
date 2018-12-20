@@ -129,7 +129,14 @@ namespace Fabric.Shared.ReliableSql
 
         protected override async Task<DbDataReader> ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
         {
-            return await this.retryPolicy.ExecuteAsync(async () => await this.underlyingSqlCommand.ExecuteReaderAsync(behavior, cancellationToken), cancellationToken);
+            return await this.retryPolicy.ExecuteAsync(async () =>
+            {
+                if (this.DbConnection.State != ConnectionState.Open)
+                {
+                    await this.DbConnection.OpenAsync(cancellationToken);
+                }
+                return await this.underlyingSqlCommand.ExecuteReaderAsync(behavior, cancellationToken);
+            }, cancellationToken);
         }
 
         public override Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)

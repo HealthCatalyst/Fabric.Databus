@@ -21,11 +21,9 @@ namespace Fabric.Shared.ReliableHttp
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
-    using Fabric.Shared.ReliableHttp.Events;
-    using Fabric.Shared.ReliableHttp.Exceptions;
-    using Fabric.Shared.ReliableHttp.Interfaces;
-
+    using Events;
+    using Exceptions;
+    using Interfaces;
     using Polly;
     using Polly.Retry;
 
@@ -54,6 +52,9 @@ namespace Fabric.Shared.ReliableHttp
         /// </summary>
         private readonly IHttpRequestInterceptor httpRequestInterceptor;
 
+        private readonly IHttpRequestLogger httpRequestLogger;
+        private readonly IHttpResponseLogger httpResponseLogger;
+
         /// <summary>
         /// The http response interceptor.
         /// </summary>
@@ -75,7 +76,7 @@ namespace Fabric.Shared.ReliableHttp
                 HttpStatusCode.BadGateway, // 502
                 HttpStatusCode.ServiceUnavailable, // 503
                 HttpStatusCode.GatewayTimeout, // 504
-                HttpStatusCode.Conflict, // 409
+                HttpStatusCode.Conflict // 409
             };
 
         /// <summary>
@@ -95,6 +96,8 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="httpRequestInterceptor">
         /// The http Request Interceptor.
         /// </param>
+        /// <param name="httpRequestLogger"></param>
+        /// <param name="httpResponseLogger"></param>
         /// <param name="httpResponseInterceptor">
         /// The http Response Interceptor.
         /// </param>
@@ -102,11 +105,15 @@ namespace Fabric.Shared.ReliableHttp
             CancellationToken cancellationToken,
             IHttpClientFactory httpClientFactory,
             IHttpRequestInterceptor httpRequestInterceptor,
+            IHttpRequestLogger httpRequestLogger,
+            IHttpResponseLogger httpResponseLogger,
             IHttpResponseInterceptor httpResponseInterceptor)
         {
             this.cancellationToken = cancellationToken;
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             this.httpRequestInterceptor = httpRequestInterceptor ?? throw new ArgumentNullException(nameof(httpRequestInterceptor));
+            this.httpRequestLogger = httpRequestLogger ?? throw new ArgumentNullException(nameof(httpRequestLogger));
+            this.httpResponseLogger = httpResponseLogger ?? throw new ArgumentNullException(nameof(httpResponseLogger));
             this.httpResponseInterceptor = httpResponseInterceptor ?? throw new ArgumentNullException(nameof(httpResponseInterceptor));
         }
 
@@ -146,9 +153,9 @@ namespace Fabric.Shared.ReliableHttp
         {
             var method = Convert.ToString(httpMethod);
 
-            this.OnNavigating(new NavigatingEventArgs(resourceId, method, fullUri));
+            OnNavigating(new NavigatingEventArgs(resourceId, method, fullUri));
 
-            var policy = this.GetRetryPolicy(resourceId, method, fullUri);
+            var policy = GetRetryPolicy(resourceId, method, fullUri);
 
             var stopwatch = new Stopwatch();
 
@@ -170,24 +177,37 @@ namespace Fabric.Shared.ReliableHttp
 
                                                    using (var requestContent = new StreamContent(memoryStream))
                                                    {
+                                                       requestContent.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
+
                                                        httpRequestMessage.Content = requestContent;
 
-                                                       this.httpRequestInterceptor.InterceptRequest(
+                                                       httpRequestInterceptor.InterceptRequest(
                                                            httpMethod,
                                                            httpRequestMessage);
 
-                                                       return await this.httpClientFactory.Create().SendAsync(
+                                                       httpRequestLogger.InterceptRequest(httpMethod,
+                                                           httpRequestMessage);
+
+                                                       return await httpClientFactory.Create().SendAsync(
                                                                   httpRequestMessage,
-                                                                  this.cancellationToken);
+                                                                  cancellationToken);
                                                    }
                                                }
                                            });
 
 
-                this.OnNavigated(
+                OnNavigated(
                     new NavigatedEventArgs(resourceId, method, fullUri, httpResponse.StatusCode.ToString(), httpResponse.Content));
 
-                this.httpResponseInterceptor.InterceptResponse(
+                httpResponseInterceptor.InterceptResponse(
+                    httpMethod,
+                    fullUri,
+                    stream,
+                    httpResponse.StatusCode,
+                    httpResponse.Content,
+                    stopwatch.ElapsedMilliseconds);
+
+                httpResponseLogger.InterceptResponse(
                     httpMethod,
                     fullUri,
                     stream,
@@ -232,7 +252,7 @@ namespace Fabric.Shared.ReliableHttp
             await stringContent.CopyToAsync(ms);
             ms.Seek(0, SeekOrigin.Begin);
 
-            return await this.SendAsync(httpMethod, string.Empty, uri, ms);
+            return await SendAsync(httpMethod, string.Empty, uri, ms);
         }
 
         /// <summary>
@@ -252,7 +272,7 @@ namespace Fabric.Shared.ReliableHttp
             var allText = File.ReadAllText(filename);
             var stringContent = new StringContent(allText, Encoding.UTF8, ContentTypeHeader);
 
-            return await this.PutAsync(uri, stringContent);
+            return await PutAsync(uri, stringContent);
         }
 
         /// <summary>
@@ -284,7 +304,7 @@ namespace Fabric.Shared.ReliableHttp
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            return await this.PutAsync(uri, content).ConfigureAwait(false);
+            return await PutAsync(uri, content).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -316,7 +336,7 @@ namespace Fabric.Shared.ReliableHttp
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            return await this.SendAsync(url, httpMethod, content).ConfigureAwait(false);
+            return await SendAsync(url, httpMethod, content).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -345,7 +365,7 @@ namespace Fabric.Shared.ReliableHttp
             StreamContent content = new StreamContent(ms);
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
 
-            return await this.SendAsync(url, httpMethod, content).ConfigureAwait(false);
+            return await SendAsync(url, httpMethod, content).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -364,7 +384,7 @@ namespace Fabric.Shared.ReliableHttp
         {
             var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
 
-            return await this.PutAsync(url, stringContent);
+            return await PutAsync(url, stringContent);
         }
 
         /// <summary>
@@ -383,7 +403,7 @@ namespace Fabric.Shared.ReliableHttp
         {
             var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
 
-            return await this.PostAsync(url, stringContent);
+            return await PostAsync(url, stringContent);
         }
 
         /// <summary>
@@ -400,7 +420,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </returns>
         public async Task<SendAsyncResult> PostAsync(Uri url, HttpContent stringContent)
         {
-            return await this.SendAsync(url, HttpMethod.Post, stringContent);
+            return await SendAsync(url, HttpMethod.Post, stringContent);
         }
 
         /// <summary>
@@ -417,9 +437,9 @@ namespace Fabric.Shared.ReliableHttp
             var httpMethod = HttpMethod.Delete;
             using (var request = new HttpRequestMessage(httpMethod, requestUri))
             {
-                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
+                httpRequestInterceptor.InterceptRequest(httpMethod, request);
 
-                return await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
+                return await httpClientFactory.Create().SendAsync(request, cancellationToken);
             }
         }
 
@@ -437,9 +457,9 @@ namespace Fabric.Shared.ReliableHttp
             var httpMethod = HttpMethod.Get;
             using (var request = new HttpRequestMessage(httpMethod, host))
             {
-                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
+                httpRequestInterceptor.InterceptRequest(httpMethod, request);
 
-                var result = await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
+                var result = await httpClientFactory.Create().SendAsync(request, cancellationToken);
 
                 return await result.Content.ReadAsStringAsync();
             }
@@ -453,7 +473,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </param>
         private void OnNavigating(NavigatingEventArgs e)
         {
-            this.Navigating?.Invoke(this, e);
+            Navigating?.Invoke(this, e);
         }
 
         /// <summary>
@@ -464,7 +484,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </param>
         private void OnNavigated(NavigatedEventArgs e)
         {
-            this.Navigated?.Invoke(this, e);
+            Navigated?.Invoke(this, e);
         }
 
         /// <summary>
@@ -475,7 +495,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </param>
         private void OnTransientError(TransientErrorEventArgs e)
         {
-            this.TransientError?.Invoke(this, e);
+            TransientError?.Invoke(this, e);
         }
 
         /// <summary>
@@ -492,7 +512,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </returns>
         private async Task<SendAsyncResult> PutAsync(Uri url, HttpContent content)
         {
-            return await this.SendAsync(url, HttpMethod.Put, content);
+            return await SendAsync(url, HttpMethod.Put, content);
         }
 
         /// <summary>
@@ -514,13 +534,13 @@ namespace Fabric.Shared.ReliableHttp
         {
             return Policy.Handle<HttpRequestException>().Or<TaskCanceledException>()
                 .OrResult<HttpResponseMessage>(
-                    message => this.httpStatusCodesWorthRetrying.Contains(message.StatusCode))
+                    message => httpStatusCodesWorthRetrying.Contains(message.StatusCode))
                 .WaitAndRetryAsync(
                     MaxRetryCount,
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(SecondsBetweenRetries, retryAttempt)),
                     async (result, timeSpan, retryCount, context) =>
                         {
-                            this.cancellationToken.ThrowIfCancellationRequested();
+                            cancellationToken.ThrowIfCancellationRequested();
 
                             if (result.Result != null)
                             {
@@ -530,7 +550,7 @@ namespace Fabric.Shared.ReliableHttp
                                 }
 
                                 var errorContent = await result.Result.Content.ReadAsStringAsync();
-                                this.OnTransientError(
+                                OnTransientError(
                                     new TransientErrorEventArgs(
                                         resourceId,
                                         method,
@@ -542,7 +562,7 @@ namespace Fabric.Shared.ReliableHttp
                             }
                             else
                             {
-                                this.OnTransientError(
+                                OnTransientError(
                                     new TransientErrorEventArgs(
                                         resourceId,
                                         method,

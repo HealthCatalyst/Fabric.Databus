@@ -84,7 +84,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override sealed string LoggerName => "SendToRestApi";
+        protected sealed override string LoggerName => "SendToRestApi";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(IJsonObjectQueueItem workItem)

@@ -508,6 +508,16 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterType<IHttpResponseInterceptor, DummyHttpResponseInterceptor>();
             }
 
+            if (!this.container.IsRegistered<IHttpRequestLogger>())
+            {
+                this.container.RegisterType<IHttpRequestLogger, DummyHttpRequestLogger>();
+            }
+
+            if (!this.container.IsRegistered<IHttpResponseLogger>())
+            {
+                this.container.RegisterType<IHttpResponseLogger, DummyHttpResponseLogger>();
+            }
+
             if (job.Config.UseMultipleThreads)
             {
                 if (!this.container.IsRegistered<IPipelineExecutorFactory>())

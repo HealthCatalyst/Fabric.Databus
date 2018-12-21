@@ -90,7 +90,9 @@ namespace Fabric.Databus.Http
         /// <param name="httpResponseInterceptor">
         ///     http response interceptor</param>
         /// <param name="httpMethod">http method</param>
+        /// <param name="httpResponseLogger"></param>
         /// <param name="cancellationToken">cancellation token</param>
+        /// <param name="httpRequestLogger"></param>
         public FileUploader(
             ILogger logger,
             List<string> hosts,
@@ -98,6 +100,8 @@ namespace Fabric.Databus.Http
             IHttpRequestInterceptor httpRequestInterceptor,
             IHttpResponseInterceptor httpResponseInterceptor,
             HttpMethod httpMethod,
+            IHttpRequestLogger httpRequestLogger,
+            IHttpResponseLogger httpResponseLogger,
             CancellationToken cancellationToken)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -108,22 +112,24 @@ namespace Fabric.Databus.Http
                 cancellationToken,
                 httpClientFactory,
                 httpRequestInterceptor,
+                httpRequestLogger,
+                httpResponseLogger,
                 httpResponseInterceptor);
         }
 
         /// <inheritdoc />
         public async Task<IFileUploadResult> SendStreamToHostsAsync(
             string relativeUrl,
-            int batch,
+            int batchNumber,
             Stream stream,
             bool doLogContent,
             bool doCompress)
         {
-            var hostNumber = batch % this.hosts.Count;
+            var hostNumber = batchNumber % this.hosts.Count;
 
             var url = new Uri(new Uri(this.hosts[hostNumber]), relativeUrl);
 
-            return await this.SendStreamToUrlAsync(url, batch, stream, doLogContent, doCompress);
+            return await this.SendStreamToUrlAsync(url, batchNumber, stream, doLogContent, doCompress);
         }
 
         /// <summary>
@@ -133,7 +139,7 @@ namespace Fabric.Databus.Http
         ///     The url.
         /// </param>
         /// <param name="batch">
-        ///     The batch.
+        ///     The batchNumber.
         /// </param>
         /// <param name="stream">
         ///     The stream.
@@ -156,7 +162,7 @@ namespace Fabric.Databus.Http
         {
             try
             {
-                this.logger.Verbose("Sending file {batch} of size {Length} to {url}", batch, stream.Length, url);
+                this.logger.Verbose("Sending file {batchNumber} of size {Length} to {url}", batch, stream.Length, url);
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
                 string requestContent;

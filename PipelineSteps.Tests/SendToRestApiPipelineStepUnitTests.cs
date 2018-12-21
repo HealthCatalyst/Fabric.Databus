@@ -125,6 +125,20 @@ namespace PipelineStep.Tests
                         It.IsAny<HttpContent>(),
                         It.IsAny<long>()));
 
+                var mockHttpRequestLogger = mockRepository.Create<IHttpRequestLogger>();
+                mockHttpRequestLogger.Setup(
+                    service => service.InterceptRequest(It.IsAny<HttpMethod>(), It.IsAny<HttpRequestMessage>()));
+
+                var mockHttpResponseLogger = mockRepository.Create<IHttpResponseLogger>();
+                mockHttpResponseLogger.Setup(
+                    service => service.InterceptResponse(
+                        HttpMethod.Put,
+                        It.IsAny<Uri>(),
+                        It.IsAny<Stream>(),
+                        It.IsAny<HttpStatusCode>(),
+                        It.IsAny<HttpContent>(),
+                        It.IsAny<long>()));
+
                 var fileUploader = new FileUploader(
                     logger,
                     hosts,
@@ -132,6 +146,8 @@ namespace PipelineStep.Tests
                     mockHttpRequestInjector.Object,
                     mockHttpResponseInjector.Object,
                     HttpMethod.Put,
+                    mockHttpRequestLogger.Object,
+                    mockHttpResponseLogger.Object,
                     CancellationToken.None);
 
                 IEntityJsonWriter entityJsonWriter = new EntityJsonWriter();

@@ -90,7 +90,9 @@ namespace Fabric.Databus.ElasticSearch
         /// <param name="httpRequestInterceptor"></param>
         /// <param name="httpResponseInterceptor"></param>
         /// <param name="method"></param>
+        /// <param name="httpResponseLogger"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="httpRequestLogger"></param>
         public ElasticSearchUploader(
             bool keepIndexOnline,
             ILogger logger,
@@ -102,8 +104,10 @@ namespace Fabric.Databus.ElasticSearch
             IHttpRequestInterceptor httpRequestInterceptor,
             IHttpResponseInterceptor httpResponseInterceptor,
             HttpMethod method,
+            IHttpRequestLogger httpRequestLogger,
+            IHttpResponseLogger httpResponseLogger,
             CancellationToken cancellationToken)
-        : base(logger, hosts, httpClientFactory, httpRequestInterceptor, httpResponseInterceptor, method, cancellationToken)
+        : base(logger, hosts, httpClientFactory, httpRequestInterceptor, httpResponseInterceptor, method, httpRequestLogger, httpResponseLogger,  cancellationToken)
         {
             if (httpClientFactory == null)
             {

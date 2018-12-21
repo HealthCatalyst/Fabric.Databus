@@ -42,6 +42,9 @@ namespace Fabric.Databus.Http
         /// </summary>
         private readonly IHttpResponseInterceptor httpResponseInterceptor;
 
+        private readonly IHttpRequestLogger httpRequestLogger;
+        private readonly IHttpResponseLogger httpResponseLogger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FileUploaderFactory"/> class. 
         /// </summary>
@@ -57,22 +60,31 @@ namespace Fabric.Databus.Http
         /// <param name="httpResponseInterceptor">
         /// The http ResponseContent Interceptor.
         /// </param>
+        /// <param name="httpRequestLogger"></param>
+        /// <param name="httpResponseLogger"></param>
         public FileUploaderFactory(
             ILogger logger,
             IHttpClientFactory httpClientFactory,
             IHttpRequestInterceptor httpRequestInterceptor,
-            IHttpResponseInterceptor httpResponseInterceptor)
+            IHttpResponseInterceptor httpResponseInterceptor,
+            IHttpRequestLogger httpRequestLogger,
+            IHttpResponseLogger httpResponseLogger)
         {
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
             this.httpRequestInterceptor = httpRequestInterceptor;
             this.httpResponseInterceptor = httpResponseInterceptor;
+            this.httpRequestLogger = httpRequestLogger ?? throw new ArgumentNullException(nameof(httpRequestLogger));
+            this.httpResponseLogger = httpResponseLogger ?? throw new ArgumentNullException(nameof(httpResponseLogger));
         }
 
         /// <inheritdoc />
         public IFileUploader Create(List<string> urls, HttpMethod method, CancellationToken cancellationToken)
         {
-            return new FileUploader(this.logger, urls, this.httpClientFactory, this.httpRequestInterceptor, this.httpResponseInterceptor, method, cancellationToken);
+            return new FileUploader(this.logger, 
+                urls, this.httpClientFactory, this.httpRequestInterceptor, this.httpResponseInterceptor, method,
+                this.httpRequestLogger, this.httpResponseLogger,
+                cancellationToken);
         }
     }
 }

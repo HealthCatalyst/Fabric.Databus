@@ -29,6 +29,7 @@
                 sb.AppendLine("------------------- REQUEST ----------------------------");
                 sb.AppendLine($"{request.Method} {request.RequestUri}");
                 sb.AppendLine($"{request.Headers}");
+                sb.AppendLine($"{request.ToString()}");
 
                 HttpResponseMessage response = await base.SendAsync(request, cancellationToken);
 
@@ -57,6 +58,7 @@
                 sb.AppendLine("------------------- RESPONSE ----------------------------");
                 sb.AppendLine($"{response.StatusCode} {response.ReasonPhrase}");
                 sb.AppendLine($"{response.Headers}");
+                sb.AppendLine($"{request.ToString()}");
 
                 if (response.Content != null)
                 {

@@ -46,7 +46,7 @@ namespace Fabric.Databus.Shared.Loggers
         }
 
         /// <inheritdoc />
-        public async Task LogRequestAsync(HttpMethod method, HttpRequestMessage request, string requestId)
+        public async Task LogRequestAsync(string requestId, HttpMethod method, HttpRequestMessage request)
         {
             if (this.temporaryFileWriter?.IsWritingEnabled == true)
             {

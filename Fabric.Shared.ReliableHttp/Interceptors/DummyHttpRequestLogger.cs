@@ -18,7 +18,7 @@ namespace Fabric.Shared.ReliableHttp.Interceptors
     public class DummyHttpRequestLogger : IHttpRequestLogger
     {
         /// <inheritdoc />
-        public Task LogRequestAsync(HttpMethod method, HttpRequestMessage request, string requestId)
+        public Task LogRequestAsync(string requestId, HttpMethod method, HttpRequestMessage request)
         {
             return Task.CompletedTask;
         }

@@ -22,13 +22,13 @@ namespace Fabric.Shared.ReliableHttp.Interceptors
     {
         /// <inheritdoc />
         public Task LogResponseAsync(
+            string requestId,
             HttpMethod httpMethod,
             Uri fullUri,
             Stream requestContent,
             HttpStatusCode responseStatusCode,
             HttpContent responseContent,
-            long stopwatchElapsedMilliseconds,
-            string requestId)
+            long stopwatchElapsedMilliseconds)
         {
             return Task.CompletedTask;
         }

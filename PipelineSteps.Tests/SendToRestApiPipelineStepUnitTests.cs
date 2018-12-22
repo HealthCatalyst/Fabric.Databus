@@ -113,33 +113,21 @@ namespace PipelineStep.Tests
 
                 var mockHttpRequestInjector = mockRepository.Create<IHttpRequestInterceptor>();
                 mockHttpRequestInjector.Setup(
-                    service => service.InterceptRequest(It.IsAny<HttpMethod>(), It.IsAny<HttpRequestMessage>()));
+                    service => service.InterceptRequestAsync(It.IsAny<string>(), It.IsAny<HttpMethod>(), It.IsAny<HttpRequestMessage>()))
+                    .Returns(Task.CompletedTask);
 
                 var mockHttpResponseInjector = mockRepository.Create<IHttpResponseInterceptor>();
                 mockHttpResponseInjector.Setup(
-                    service => service.InterceptResponse(
-                        HttpMethod.Put,
-                        It.IsAny<Uri>(),
-                        It.IsAny<Stream>(),
-                        It.IsAny<HttpStatusCode>(),
-                        It.IsAny<HttpContent>(),
-                        It.IsAny<long>()));
+                    service => service.InterceptResponseAsync(It.IsAny<string>(), HttpMethod.Put, It.IsAny<Uri>(), It.IsAny<Stream>(), It.IsAny<HttpStatusCode>(), It.IsAny<HttpContent>(), It.IsAny<long>())).Returns(Task.CompletedTask);
 
                 var mockHttpRequestLogger = mockRepository.Create<IHttpRequestLogger>();
                 mockHttpRequestLogger.Setup(
-                    service => service.LogRequestAsync(It.IsAny<HttpMethod>(), It.IsAny<HttpRequestMessage>(), It.IsAny<string>()))
+                    service => service.LogRequestAsync(It.IsAny<string>(), It.IsAny<HttpMethod>(), It.IsAny<HttpRequestMessage>()))
                     .Returns(Task.CompletedTask);
 
                 var mockHttpResponseLogger = mockRepository.Create<IHttpResponseLogger>();
                 mockHttpResponseLogger.Setup(
-                    service => service.LogResponseAsync(
-                        HttpMethod.Put,
-                        It.IsAny<Uri>(),
-                        It.IsAny<Stream>(),
-                        It.IsAny<HttpStatusCode>(),
-                        It.IsAny<HttpContent>(),
-                        It.IsAny<long>(),
-                        It.IsAny<string>()))
+                    service => service.LogResponseAsync(It.IsAny<string>(), HttpMethod.Put, It.IsAny<Uri>(), It.IsAny<Stream>(), It.IsAny<HttpStatusCode>(), It.IsAny<HttpContent>(), It.IsAny<long>()))
                     .Returns(Task.CompletedTask);
 
                 var fileUploader = new FileUploader(

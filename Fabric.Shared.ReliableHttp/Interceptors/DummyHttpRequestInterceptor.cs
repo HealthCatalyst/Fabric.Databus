@@ -10,6 +10,7 @@
 namespace Fabric.Shared.ReliableHttp.Interceptors
 {
     using System.Net.Http;
+    using System.Threading.Tasks;
 
     using Fabric.Shared.ReliableHttp.Interfaces;
 
@@ -20,8 +21,9 @@ namespace Fabric.Shared.ReliableHttp.Interceptors
     public class DummyHttpRequestInterceptor : IHttpRequestInterceptor
     {
         /// <inheritdoc />
-        public void InterceptRequest(HttpMethod method, HttpRequestMessage request)
+        public Task InterceptRequestAsync(string requestId, HttpMethod method, HttpRequestMessage request)
         {
+            return Task.CompletedTask;
         }
     }
 }

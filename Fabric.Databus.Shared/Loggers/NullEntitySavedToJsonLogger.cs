@@ -11,6 +11,7 @@ namespace Fabric.Databus.Shared.Loggers
 {
     using System;
     using System.IO;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Loggers;
 
@@ -23,7 +24,7 @@ namespace Fabric.Databus.Shared.Loggers
         public bool IsWritingEnabled => false;
 
         /// <inheritdoc />
-        public void LogSavedEntity(string workItemId, Stream stream)
+        public Task LogSavedEntityAsync(string workItemId, Stream stream)
         {
             throw new NotImplementedException();
         }

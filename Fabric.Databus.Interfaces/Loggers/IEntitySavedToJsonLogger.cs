@@ -10,9 +10,10 @@
 namespace Fabric.Databus.Interfaces.Loggers
 {
     using System.IO;
+    using System.Threading.Tasks;
 
     /// <summary>
-    /// The EntitySavedToJsonLogger interface.
+    /// The EntitySavedToJSONLogger interface.
     /// </summary>
     public interface IEntitySavedToJsonLogger
     {
@@ -25,11 +26,14 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// The log saved entity.
         /// </summary>
         /// <param name="workItemId">
-        ///     The work item id.
+        /// The work item id.
         /// </param>
         /// <param name="stream">
-        ///     The stream.
+        /// The stream.
         /// </param>
-        void LogSavedEntity(string workItemId, Stream stream);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task LogSavedEntityAsync(string workItemId, Stream stream);
     }
 }

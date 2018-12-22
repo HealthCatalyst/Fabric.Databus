@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.PipelineSteps
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -35,11 +36,13 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The entity json writer.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IEntityJsonWriter entityJsonWriter;
 
         /// <summary>
         /// The entity saved to json logger.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IEntitySavedToJsonLogger entitySavedToJsonLogger;
 
         /// <inheritdoc />
@@ -81,7 +84,7 @@ namespace Fabric.Databus.PipelineSteps
             if (this.entitySavedToJsonLogger.IsWritingEnabled)
             {
                 stream.Seek(0, SeekOrigin.Begin);
-                this.entitySavedToJsonLogger.LogSavedEntity(workItem.Id, stream);
+                await this.entitySavedToJsonLogger.LogSavedEntityAsync(workItem.Id, stream);
                 stream.Seek(0, SeekOrigin.Begin);
             }
 

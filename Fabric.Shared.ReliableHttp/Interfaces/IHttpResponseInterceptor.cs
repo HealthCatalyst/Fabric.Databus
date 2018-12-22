@@ -13,6 +13,7 @@ namespace Fabric.Shared.ReliableHttp.Interfaces
     using System.IO;
     using System.Net;
     using System.Net.Http;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// The HttpResponseInterceptor interface.
@@ -22,6 +23,9 @@ namespace Fabric.Shared.ReliableHttp.Interfaces
         /// <summary>
         /// The intercept.
         /// </summary>
+        /// <param name="requestId">
+        /// request id
+        /// </param>
         /// <param name="httpMethod">
         ///     The http Method.
         /// </param>
@@ -40,7 +44,11 @@ namespace Fabric.Shared.ReliableHttp.Interfaces
         /// <param name="stopwatchElapsedMilliseconds">
         ///     The stopwatch elapsed milliseconds.
         /// </param>
-        void InterceptResponse(
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task InterceptResponseAsync(
+            string requestId,
             HttpMethod httpMethod,
             Uri fullUri,
             Stream requestContent,

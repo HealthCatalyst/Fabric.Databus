@@ -23,6 +23,9 @@ namespace Fabric.Shared.ReliableHttp.Interfaces
         /// <summary>
         /// The intercept.
         /// </summary>
+        /// <param name="requestId">
+        /// request id
+        /// </param>
         /// <param name="httpMethod">
         ///     The http Method.
         /// </param>
@@ -41,17 +44,16 @@ namespace Fabric.Shared.ReliableHttp.Interfaces
         /// <param name="stopwatchElapsedMilliseconds">
         ///     The stopwatch elapsed milliseconds.
         /// </param>
-        /// <param name="requestId"></param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
         Task LogResponseAsync(
+            string requestId,
             HttpMethod httpMethod,
             Uri fullUri,
             Stream requestContent,
             HttpStatusCode responseStatusCode,
             HttpContent responseContent,
-            long stopwatchElapsedMilliseconds,
-            string requestId);
+            long stopwatchElapsedMilliseconds);
     }
 }

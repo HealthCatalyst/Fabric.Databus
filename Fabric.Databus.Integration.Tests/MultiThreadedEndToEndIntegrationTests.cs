@@ -111,7 +111,7 @@ FROM Text
                         var mockEntitySavedToJsonLogger = mockRepository.Create<IEntitySavedToJsonLogger>();
                         mockEntitySavedToJsonLogger.Setup(service => service.IsWritingEnabled).Returns(true);
                         mockEntitySavedToJsonLogger
-                            .Setup(service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()))
+                            .Setup(service => service.LogSavedEntityAsync(It.IsAny<string>(), It.IsAny<Stream>()))
                             .Callback<string, Stream>(
                                 (workItemId, stream) =>
                                     {
@@ -140,15 +140,15 @@ FROM Text
                                         {
                                             actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
                                         }
-                                    });
+                                    }).Returns(Task.CompletedTask);
 
                         container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
 
                         var mockHttpRequestLogger = mockRepository.Create<IHttpRequestLogger>();
                         mockHttpRequestLogger.Setup(
-                                service => service.LogRequestAsync(HttpMethod.Put, It.IsAny<HttpRequestMessage>(), It.IsAny<string>()))
-                            .Callback<HttpMethod, HttpRequestMessage, string>(
-                                async (method, request, requestId) =>
+                                service => service.LogRequestAsync(It.IsAny<string>(), HttpMethod.Put, It.IsAny<HttpRequestMessage>()))
+                            .Callback<string, HttpMethod, HttpRequestMessage>(
+                                async (requestId, method, request) =>
                                     {
                                         var buffer = await request.Content.ReadAsByteArrayAsync();
 
@@ -214,25 +214,28 @@ FROM Text
 
                         var mockHttpRequestInterceptor = mockRepository.Create<IHttpRequestInterceptor>();
                         mockHttpRequestInterceptor.Setup(
-                            service => service.InterceptRequest(HttpMethod.Put, It.IsAny<HttpRequestMessage>()))
-                            .Callback<HttpMethod, HttpRequestMessage>(
-                                (method, message) =>
+                            service => service.InterceptRequestAsync(It.IsAny<string>(), HttpMethod.Put, It.IsAny<HttpRequestMessage>()))
+                            .Callback<string, HttpMethod, HttpRequestMessage>(
+                                async (requestId, method, message) =>
                                     {
-                                        basicAuthorizationRequestInterceptor.InterceptRequest(method, message);
+                                        await basicAuthorizationRequestInterceptor.InterceptRequestAsync(requestId, method, message);
                                     })
+                            .Returns(Task.CompletedTask)
                             .Verifiable();
 
                         container.RegisterInstance(mockHttpRequestInterceptor.Object);
 
                         var mockHttpResponseInterceptor = mockRepository.Create<IHttpResponseInterceptor>();
                         mockHttpResponseInterceptor.Setup(
-                            service => service.InterceptResponse(
+                            service => service.InterceptResponseAsync(
+                                It.IsAny<string>(),
                                 HttpMethod.Put,
                                 expectedUri,
                                 It.IsAny<Stream>(),
                                 HttpStatusCode.OK,
                                 It.IsAny<HttpContent>(),
                                 It.IsAny<long>()))
+                            .Returns(Task.CompletedTask)
                             .Verifiable();
 
                         container.RegisterInstance(mockHttpResponseInterceptor.Object);
@@ -277,7 +280,7 @@ FROM Text
 
                         Assert.AreEqual(1, actualJsonObjects.Count);
                         mockEntitySavedToJsonLogger.Verify(
-                            service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()),
+                            service => service.LogSavedEntityAsync(It.IsAny<string>(), It.IsAny<Stream>()),
                             Times.Once);
 
                         var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
@@ -298,11 +301,12 @@ FROM Text
                                 ItExpr.IsAny<CancellationToken>());
 
                         mockHttpRequestInterceptor.Verify(
-                            interceptor => interceptor.InterceptRequest(HttpMethod.Put, It.IsAny<HttpRequestMessage>()),
+                            interceptor => interceptor.InterceptRequestAsync(It.IsAny<string>(), HttpMethod.Put, It.IsAny<HttpRequestMessage>()),
                             Times.Once);
 
                         mockHttpResponseInterceptor.Verify(
-                            service => service.InterceptResponse(
+                            service => service.InterceptResponseAsync(
+                                It.IsAny<string>(),
                                 HttpMethod.Put,
                                 expectedUri,
                                 It.IsAny<Stream>(),
@@ -410,25 +414,28 @@ FROM Text
 
                         var mockHttpRequestInterceptor = mockRepository.Create<IHttpRequestInterceptor>();
                         mockHttpRequestInterceptor.Setup(
-                            service => service.InterceptRequest(HttpMethod.Put, It.IsAny<HttpRequestMessage>()))
-                            .Callback<HttpMethod, HttpRequestMessage>(
-                                (method, message) =>
+                            service => service.InterceptRequestAsync(It.IsAny<string>(), HttpMethod.Put, It.IsAny<HttpRequestMessage>()))
+                            .Callback<string, HttpMethod, HttpRequestMessage>(
+                                async (requestId, method, message) =>
                                     {
-                                        basicAuthorizationRequestInterceptor.InterceptRequest(method, message);
+                                        await basicAuthorizationRequestInterceptor.InterceptRequestAsync(requestId, method, message);
                                     })
+                            .Returns(Task.CompletedTask)
                             .Verifiable();
 
                         container.RegisterInstance(mockHttpRequestInterceptor.Object);
 
                         var mockHttpResponseInterceptor = mockRepository.Create<IHttpResponseInterceptor>();
                         mockHttpResponseInterceptor.Setup(
-                            service => service.InterceptResponse(
+                            service => service.InterceptResponseAsync(
+                                It.IsAny<string>(),
                                 HttpMethod.Put,
                                 expectedUri,
                                 It.IsAny<Stream>(),
                                 HttpStatusCode.OK,
                                 It.IsAny<HttpContent>(),
                                 It.IsAny<long>()))
+                            .Returns(Task.CompletedTask)
                             .Verifiable();
 
                         container.RegisterInstance(mockHttpResponseInterceptor.Object);
@@ -476,17 +483,11 @@ FROM Text
                                 ItExpr.IsAny<CancellationToken>());
 
                         mockHttpRequestInterceptor.Verify(
-                            interceptor => interceptor.InterceptRequest(HttpMethod.Put, It.IsAny<HttpRequestMessage>()),
+                            interceptor => interceptor.InterceptRequestAsync(It.IsAny<string>(), HttpMethod.Put, It.IsAny<HttpRequestMessage>()),
                             Times.Once);
 
                         mockHttpResponseInterceptor.Verify(
-                            service => service.InterceptResponse(
-                                HttpMethod.Put,
-                                expectedUri,
-                                It.IsAny<Stream>(),
-                                HttpStatusCode.OK,
-                                It.IsAny<HttpContent>(),
-                                It.IsAny<long>()),
+                            service => service.InterceptResponseAsync(It.IsAny<string>(), HttpMethod.Put, expectedUri, It.IsAny<Stream>(), HttpStatusCode.OK, It.IsAny<HttpContent>(), It.IsAny<long>()),
                             Times.Once);
                         stopwatch.Stop();
                     }
@@ -568,7 +569,7 @@ FROM Text
                         var mockEntitySavedToJsonLogger = mockRepository.Create<IEntitySavedToJsonLogger>();
                         mockEntitySavedToJsonLogger.Setup(service => service.IsWritingEnabled).Returns(true);
                         mockEntitySavedToJsonLogger
-                            .Setup(service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()))
+                            .Setup(service => service.LogSavedEntityAsync(It.IsAny<string>(), It.IsAny<Stream>()))
                             .Callback<string, Stream>(
                                 (workItemId, stream) =>
                                     {
@@ -581,7 +582,8 @@ FROM Text
                                         {
                                             actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
                                         }
-                                    });
+                                    })
+                            .Returns(Task.CompletedTask);
                         container.RegisterInstance(mockEntitySavedToJsonLogger.Object);
 
                         int numHttpCall = 0;
@@ -739,7 +741,6 @@ FROM Text
                                     new JProperty("PatientID", 9002),
                                     new JProperty("PatientLastNM", "Smith"))));
 
-
                         // set up a mock web service
                         var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -748,7 +749,7 @@ FROM Text
                         var mockEntitySavedToJsonLogger = mockRepository.Create<IEntitySavedToJsonLogger>();
                         mockEntitySavedToJsonLogger.Setup(service => service.IsWritingEnabled).Returns(true);
                         mockEntitySavedToJsonLogger
-                            .Setup(service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()))
+                            .Setup(service => service.LogSavedEntityAsync(It.IsAny<string>(), It.IsAny<Stream>()))
                             .Callback<string, Stream>(
                                 (workItemId, stream) =>
                                     {
@@ -761,7 +762,7 @@ FROM Text
                                         {
                                             actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
                                         }
-                                    });
+                                    }).Returns(Task.CompletedTask);
                         container.RegisterInstance(mockEntitySavedToJsonLogger.Object);
 
                         var testBatchEventsLogger = new TestBatchEventsLogger();
@@ -969,7 +970,7 @@ FROM Text
                         var mockEntitySavedToJsonLogger = mockRepository.Create<IEntitySavedToJsonLogger>();
                         mockEntitySavedToJsonLogger.Setup(service => service.IsWritingEnabled).Returns(true);
                         mockEntitySavedToJsonLogger
-                            .Setup(service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()))
+                            .Setup(service => service.LogSavedEntityAsync(It.IsAny<string>(), It.IsAny<Stream>()))
                             .Callback<string, Stream>(
                                 (workItemId, stream) =>
                                     {
@@ -982,7 +983,7 @@ FROM Text
                                         {
                                             actualJsonObjects.Add(workItemId, JObject.Parse(streamReader.ReadToEnd()));
                                         }
-                                    });
+                                    }).Returns(Task.CompletedTask);
                         container.RegisterInstance(mockEntitySavedToJsonLogger.Object);
 
                         var testBatchEventsLogger = new TestBatchEventsLogger();

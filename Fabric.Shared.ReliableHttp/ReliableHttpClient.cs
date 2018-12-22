@@ -205,14 +205,9 @@ namespace Fabric.Shared.ReliableHttp
 
                                                        httpRequestMessage.Content = requestContent;
 
-                                                       this.httpRequestInterceptor.InterceptRequest(
-                                                           httpMethod,
-                                                           httpRequestMessage);
+                                                       await this.httpRequestInterceptor.InterceptRequestAsync(requestId, httpMethod, httpRequestMessage);
 
-                                                       await this.httpRequestLogger.LogRequestAsync(
-                                                           httpMethod,
-                                                           httpRequestMessage,
-                                                           requestId);
+                                                       await this.httpRequestLogger.LogRequestAsync(requestId, httpMethod, httpRequestMessage);
 
                                                        return await this.httpClientFactory.Create().SendAsync(
                                                                   httpRequestMessage,
@@ -224,22 +219,9 @@ namespace Fabric.Shared.ReliableHttp
                 this.OnNavigated(
                     new NavigatedEventArgs(resourceId, method, fullUri, httpResponse.StatusCode.ToString(), httpResponse.Content));
 
-                this.httpResponseInterceptor.InterceptResponse(
-                    httpMethod,
-                    fullUri,
-                    stream,
-                    httpResponse.StatusCode,
-                    httpResponse.Content,
-                    stopwatch.ElapsedMilliseconds);
+                await this.httpResponseInterceptor.InterceptResponseAsync(requestId, httpMethod, fullUri, stream, httpResponse.StatusCode, httpResponse.Content, stopwatch.ElapsedMilliseconds);
 
-                await this.httpResponseLogger.LogResponseAsync(
-                    httpMethod,
-                    fullUri,
-                    stream,
-                    httpResponse.StatusCode,
-                    httpResponse.Content,
-                    stopwatch.ElapsedMilliseconds,
-                    requestId);
+                await this.httpResponseLogger.LogResponseAsync(requestId, httpMethod, fullUri, stream, httpResponse.StatusCode, httpResponse.Content, stopwatch.ElapsedMilliseconds);
 
                 return new SendAsyncResult
                 {
@@ -491,15 +473,18 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="requestUri">
         /// The request uri.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<HttpResponseMessage> DeleteAsync(Uri requestUri)
+        public async Task<HttpResponseMessage> DeleteAsync(Uri requestUri, string requestId)
         {
             var httpMethod = HttpMethod.Delete;
             using (var request = new HttpRequestMessage(httpMethod, requestUri))
             {
-                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
+                await this.httpRequestInterceptor.InterceptRequestAsync(requestId, httpMethod, request);
 
                 return await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
             }
@@ -511,15 +496,18 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="host">
         /// The host.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<string> GetStringAsync(string host)
+        public async Task<string> GetStringAsync(string host, string requestId)
         {
             var httpMethod = HttpMethod.Get;
             using (var request = new HttpRequestMessage(httpMethod, host))
             {
-                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
+                await this.httpRequestInterceptor.InterceptRequestAsync(requestId, httpMethod, request);
 
                 var result = await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
 

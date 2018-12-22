@@ -48,13 +48,13 @@ namespace Fabric.Databus.Shared.Loggers
 
         /// <inheritdoc />
         public async Task LogResponseAsync(
+            string requestId,
             HttpMethod httpMethod,
             Uri fullUri,
             Stream requestContent,
             HttpStatusCode responseStatusCode,
             HttpContent responseContent,
-            long stopwatchElapsedMilliseconds,
-            string requestId)
+            long stopwatchElapsedMilliseconds)
         {
             if (this.temporaryFileWriter?.IsWritingEnabled == true)
             {

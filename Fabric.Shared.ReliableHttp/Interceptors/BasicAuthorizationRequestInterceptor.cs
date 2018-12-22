@@ -12,6 +12,7 @@ namespace Fabric.Shared.ReliableHttp.Interceptors
     using System;
     using System.Net.Http;
     using System.Text;
+    using System.Threading.Tasks;
 
     using Fabric.Shared.ReliableHttp.Interfaces;
 
@@ -47,9 +48,10 @@ namespace Fabric.Shared.ReliableHttp.Interceptors
         }
 
         /// <inheritdoc />
-        public void InterceptRequest(HttpMethod method, HttpRequestMessage request)
+        public Task InterceptRequestAsync(string requestId, HttpMethod method, HttpRequestMessage request)
         {
             this.AddAuthorizationToken(request);
+            return Task.CompletedTask;
         }
 
         /// <summary>

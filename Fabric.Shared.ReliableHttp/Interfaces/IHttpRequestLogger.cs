@@ -20,18 +20,18 @@ namespace Fabric.Shared.ReliableHttp.Interfaces
         /// <summary>
         /// The intercept request.
         /// </summary>
+        /// <param name="requestId">
+        ///     The requestId.
+        /// </param>
         /// <param name="method">
-        /// The method.
+        ///     The method.
         /// </param>
         /// <param name="request">
-        /// The request.
-        /// </param>
-        /// <param name="requestId">
-        /// The requestId.
+        ///     The request.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task LogRequestAsync(HttpMethod method, HttpRequestMessage request, string requestId);
+        Task LogRequestAsync(string requestId, HttpMethod method, HttpRequestMessage request);
     }
 }

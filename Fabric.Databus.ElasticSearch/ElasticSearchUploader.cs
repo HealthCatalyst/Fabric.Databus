@@ -139,7 +139,7 @@ namespace Fabric.Databus.ElasticSearch
 
             var requestUri = new Uri(new Uri(host), $"/{this.index}");
 
-            await this.reliableHttpClient.DeleteAsync(requestUri);
+            await this.reliableHttpClient.DeleteAsync(requestUri, "DeleteIndex");
 
             // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
             await this.reliableHttpClient.PostAsync(new Uri(new Uri(host), "/_forcemerge?only_expunge_deletes=true"), null, "ForceMerge");
@@ -190,12 +190,14 @@ namespace Fabric.Databus.ElasticSearch
 
             var requestUri = new Uri(new Uri(host), relativeUrl);
 
-            await this.reliableHttpClient.DeleteAsync(requestUri);
+            await this.reliableHttpClient.DeleteAsync(requestUri, "DeleteIndex");
 
             // now also delete the alias in case it was pointing to some other index
 
             // DELETE /logs_20162801/_alias/current_day
-            await this.reliableHttpClient.DeleteAsync(new Uri(new Uri(host), "/_all/_alias/" + this.alias));
+            await this.reliableHttpClient.DeleteAsync(
+                new Uri(new Uri(host), "/_all/_alias/" + this.alias),
+                "DeleteAlias");
         }
 
         /// <inheritdoc />
@@ -401,7 +403,7 @@ namespace Fabric.Databus.ElasticSearch
         {
             var host = this.hosts.First();
 
-            return await this.reliableHttpClient.GetStringAsync(host);
+            return await this.reliableHttpClient.GetStringAsync(host, "TestElasticSearchConnection");
         }
 
         /// <inheritdoc />

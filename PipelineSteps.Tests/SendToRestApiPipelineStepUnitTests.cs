@@ -127,17 +127,20 @@ namespace PipelineStep.Tests
 
                 var mockHttpRequestLogger = mockRepository.Create<IHttpRequestLogger>();
                 mockHttpRequestLogger.Setup(
-                    service => service.InterceptRequest(It.IsAny<HttpMethod>(), It.IsAny<HttpRequestMessage>()));
+                    service => service.LogRequestAsync(It.IsAny<HttpMethod>(), It.IsAny<HttpRequestMessage>(), It.IsAny<string>()))
+                    .Returns(Task.CompletedTask);
 
                 var mockHttpResponseLogger = mockRepository.Create<IHttpResponseLogger>();
                 mockHttpResponseLogger.Setup(
-                    service => service.InterceptResponse(
+                    service => service.LogResponseAsync(
                         HttpMethod.Put,
                         It.IsAny<Uri>(),
                         It.IsAny<Stream>(),
                         It.IsAny<HttpStatusCode>(),
                         It.IsAny<HttpContent>(),
-                        It.IsAny<long>()));
+                        It.IsAny<long>(),
+                        It.IsAny<string>()))
+                    .Returns(Task.CompletedTask);
 
                 var fileUploader = new FileUploader(
                     logger,

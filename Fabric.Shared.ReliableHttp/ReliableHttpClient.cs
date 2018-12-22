@@ -48,11 +48,23 @@ namespace Fabric.Shared.ReliableHttp
         private const int MaxRetryCount = 5;
 
         /// <summary>
+        /// The UTF8 encoding without BOM.
+        /// </summary>
+        private readonly UTF8Encoding utf8EncodingWithoutBOM = new UTF8Encoding(false, true);
+
+        /// <summary>
         /// The http request injector.
         /// </summary>
         private readonly IHttpRequestInterceptor httpRequestInterceptor;
 
+        /// <summary>
+        /// The http request logger.
+        /// </summary>
         private readonly IHttpRequestLogger httpRequestLogger;
+
+        /// <summary>
+        /// The http response logger.
+        /// </summary>
         private readonly IHttpResponseLogger httpResponseLogger;
 
         /// <summary>
@@ -96,8 +108,12 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="httpRequestInterceptor">
         /// The http Request Interceptor.
         /// </param>
-        /// <param name="httpRequestLogger"></param>
-        /// <param name="httpResponseLogger"></param>
+        /// <param name="httpRequestLogger">
+        /// http request logger
+        /// </param>
+        /// <param name="httpResponseLogger">
+        /// http response logger
+        /// </param>
         /// <param name="httpResponseInterceptor">
         /// The http Response Interceptor.
         /// </param>
@@ -146,16 +162,24 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="stream">
         ///     The stream.
         /// </param>
+        /// <param name="requestId">
+        /// request id
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<SendAsyncResult> SendAsync(HttpMethod httpMethod, string resourceId, Uri fullUri, Stream stream)
+        public async Task<SendAsyncResult> SendAsync(
+            HttpMethod httpMethod,
+            string resourceId,
+            Uri fullUri,
+            Stream stream,
+            string requestId)
         {
             var method = Convert.ToString(httpMethod);
 
-            OnNavigating(new NavigatingEventArgs(resourceId, method, fullUri));
+            this.OnNavigating(new NavigatingEventArgs(resourceId, method, fullUri));
 
-            var policy = GetRetryPolicy(resourceId, method, fullUri);
+            var policy = this.GetRetryPolicy(resourceId, method, fullUri);
 
             var stopwatch = new Stopwatch();
 
@@ -181,25 +205,26 @@ namespace Fabric.Shared.ReliableHttp
 
                                                        httpRequestMessage.Content = requestContent;
 
-                                                       httpRequestInterceptor.InterceptRequest(
+                                                       this.httpRequestInterceptor.InterceptRequest(
                                                            httpMethod,
                                                            httpRequestMessage);
 
-                                                       httpRequestLogger.InterceptRequest(httpMethod,
-                                                           httpRequestMessage);
+                                                       await this.httpRequestLogger.LogRequestAsync(
+                                                           httpMethod,
+                                                           httpRequestMessage,
+                                                           requestId);
 
-                                                       return await httpClientFactory.Create().SendAsync(
+                                                       return await this.httpClientFactory.Create().SendAsync(
                                                                   httpRequestMessage,
-                                                                  cancellationToken);
+                                                                  this.cancellationToken);
                                                    }
                                                }
                                            });
 
-
-                OnNavigated(
+                this.OnNavigated(
                     new NavigatedEventArgs(resourceId, method, fullUri, httpResponse.StatusCode.ToString(), httpResponse.Content));
 
-                httpResponseInterceptor.InterceptResponse(
+                this.httpResponseInterceptor.InterceptResponse(
                     httpMethod,
                     fullUri,
                     stream,
@@ -207,13 +232,14 @@ namespace Fabric.Shared.ReliableHttp
                     httpResponse.Content,
                     stopwatch.ElapsedMilliseconds);
 
-                httpResponseLogger.InterceptResponse(
+                await this.httpResponseLogger.LogResponseAsync(
                     httpMethod,
                     fullUri,
                     stream,
                     httpResponse.StatusCode,
                     httpResponse.Content,
-                    stopwatch.ElapsedMilliseconds);
+                    stopwatch.ElapsedMilliseconds,
+                    requestId);
 
                 return new SendAsyncResult
                 {
@@ -243,16 +269,23 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="stringContent">
         /// The string content.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<SendAsyncResult> SendAsync(Uri uri, HttpMethod httpMethod, HttpContent stringContent)
+        public async Task<SendAsyncResult> SendAsync(
+            Uri uri,
+            HttpMethod httpMethod,
+            HttpContent stringContent,
+            string requestId)
         {
             var ms = new MemoryStream();
             await stringContent.CopyToAsync(ms);
             ms.Seek(0, SeekOrigin.Begin);
 
-            return await SendAsync(httpMethod, string.Empty, uri, ms);
+            return await this.SendAsync(httpMethod, string.Empty, uri, ms, requestId);
         }
 
         /// <summary>
@@ -264,15 +297,18 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="filename">
         /// The filename.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<SendAsyncResult> PutAsyncFile(Uri uri, string filename)
+        public async Task<SendAsyncResult> PutAsyncFile(Uri uri, string filename, string requestId)
         {
             var allText = File.ReadAllText(filename);
-            var stringContent = new StringContent(allText, Encoding.UTF8, ContentTypeHeader);
+            var stringContent = new StringContent(allText, this.utf8EncodingWithoutBOM, ContentTypeHeader);
 
-            return await PutAsync(uri, stringContent);
+            return await this.PutAsync(uri, stringContent, requestId);
         }
 
         /// <summary>
@@ -284,15 +320,19 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="filename">
         /// The filename.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
         public async Task<SendAsyncResult> PutAsyncFileCompressed(
             Uri uri,
-            string filename)
+            string filename,
+            string requestId)
         {
             var allText = File.ReadAllText(filename);
-            byte[] jsonBytes = Encoding.UTF8.GetBytes(allText);
+            byte[] jsonBytes = this.utf8EncodingWithoutBOM.GetBytes(allText);
             var ms = new MemoryStream();
             using (var gzip = new GZipStream(ms, CompressionMode.Compress, true))
             {
@@ -304,23 +344,32 @@ namespace Fabric.Shared.ReliableHttp
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            return await PutAsync(uri, content).ConfigureAwait(false);
+            return await this.PutAsync(uri, content, requestId).ConfigureAwait(false);
         }
 
         /// <summary>
         /// The put async stream compressed.
         /// </summary>
         /// <param name="url">
-        ///     the url
+        /// the url
         /// </param>
-        /// <param name="httpMethod">http method</param>
+        /// <param name="httpMethod">
+        /// http method
+        /// </param>
         /// <param name="stream">
-        ///     The stream.
+        /// The stream.
+        /// </param>
+        /// <param name="requestId">
+        /// The request Id.
         /// </param>
         /// <returns>
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
-        public async Task<SendAsyncResult> SendAsyncStreamCompressed(Uri url, HttpMethod httpMethod, Stream stream)
+        public async Task<SendAsyncResult> SendAsyncStreamCompressed(
+            Uri url,
+            HttpMethod httpMethod,
+            Stream stream,
+            string requestId)
         {
             stream.Position = 0;
             var ms = new MemoryStream();
@@ -336,36 +385,40 @@ namespace Fabric.Shared.ReliableHttp
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
             content.Headers.ContentEncoding.Add("gzip");
 
-            return await SendAsync(url, httpMethod, content).ConfigureAwait(false);
+            return await this.SendAsync(url, httpMethod, content, requestId).ConfigureAwait(false);
         }
 
         /// <summary>
         /// The put async stream.
         /// </summary>
         /// <param name="url">
-        ///     The url.
+        /// The url.
         /// </param>
         /// <param name="httpMethod">
-        ///     http method</param>
+        /// http method
+        /// </param>
         /// <param name="stream">
-        ///     The stream.
+        /// The stream.
+        /// </param>
+        /// <param name="requestId">
+        /// The request Id.
         /// </param>
         /// <returns>
         /// The <see cref="ConfiguredTaskAwaitable"/>.
         /// </returns>
-        public async Task<SendAsyncResult> SendAsyncStream(Uri url, HttpMethod httpMethod, Stream stream)
+        public async Task<SendAsyncResult> SendAsyncStream(Uri url, HttpMethod httpMethod, Stream stream, string requestId)
         {
             stream.Position = 0;
-            MemoryStream ms = new MemoryStream();
+            var ms = new MemoryStream();
             stream.CopyTo(ms);
 
             stream.Dispose();
 
             ms.Position = 0;
-            StreamContent content = new StreamContent(ms);
+            var content = new StreamContent(ms);
             content.Headers.ContentType = new MediaTypeHeaderValue(ContentTypeHeader);
 
-            return await SendAsync(url, httpMethod, content).ConfigureAwait(false);
+            return await this.SendAsync(url, httpMethod, content, requestId).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -377,14 +430,17 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="text">
         /// The text.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<SendAsyncResult> PutAsyncString(Uri url, string text)
+        public async Task<SendAsyncResult> PutAsyncString(Uri url, string text, string requestId)
         {
-            var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
+            var stringContent = new StringContent(text, this.utf8EncodingWithoutBOM, ContentTypeHeader);
 
-            return await PutAsync(url, stringContent);
+            return await this.PutAsync(url, stringContent, requestId);
         }
 
         /// <summary>
@@ -396,14 +452,17 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="text">
         /// The text.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<SendAsyncResult> PostAsyncString(Uri url, string text)
+        public async Task<SendAsyncResult> PostAsyncString(Uri url, string text, string requestId)
         {
-            var stringContent = new StringContent(text, Encoding.UTF8, ContentTypeHeader);
+            var stringContent = new StringContent(text, this.utf8EncodingWithoutBOM, ContentTypeHeader);
 
-            return await PostAsync(url, stringContent);
+            return await this.PostAsync(url, stringContent, requestId);
         }
 
         /// <summary>
@@ -415,12 +474,15 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="stringContent">
         /// The string content.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public async Task<SendAsyncResult> PostAsync(Uri url, HttpContent stringContent)
+        public async Task<SendAsyncResult> PostAsync(Uri url, HttpContent stringContent, string requestId)
         {
-            return await SendAsync(url, HttpMethod.Post, stringContent);
+            return await this.SendAsync(url, HttpMethod.Post, stringContent, requestId);
         }
 
         /// <summary>
@@ -437,9 +499,9 @@ namespace Fabric.Shared.ReliableHttp
             var httpMethod = HttpMethod.Delete;
             using (var request = new HttpRequestMessage(httpMethod, requestUri))
             {
-                httpRequestInterceptor.InterceptRequest(httpMethod, request);
+                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
 
-                return await httpClientFactory.Create().SendAsync(request, cancellationToken);
+                return await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
             }
         }
 
@@ -457,9 +519,9 @@ namespace Fabric.Shared.ReliableHttp
             var httpMethod = HttpMethod.Get;
             using (var request = new HttpRequestMessage(httpMethod, host))
             {
-                httpRequestInterceptor.InterceptRequest(httpMethod, request);
+                this.httpRequestInterceptor.InterceptRequest(httpMethod, request);
 
-                var result = await httpClientFactory.Create().SendAsync(request, cancellationToken);
+                var result = await this.httpClientFactory.Create().SendAsync(request, this.cancellationToken);
 
                 return await result.Content.ReadAsStringAsync();
             }
@@ -473,7 +535,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </param>
         private void OnNavigating(NavigatingEventArgs e)
         {
-            Navigating?.Invoke(this, e);
+            this.Navigating?.Invoke(this, e);
         }
 
         /// <summary>
@@ -484,7 +546,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </param>
         private void OnNavigated(NavigatedEventArgs e)
         {
-            Navigated?.Invoke(this, e);
+            this.Navigated?.Invoke(this, e);
         }
 
         /// <summary>
@@ -495,7 +557,7 @@ namespace Fabric.Shared.ReliableHttp
         /// </param>
         private void OnTransientError(TransientErrorEventArgs e)
         {
-            TransientError?.Invoke(this, e);
+            this.TransientError?.Invoke(this, e);
         }
 
         /// <summary>
@@ -507,12 +569,15 @@ namespace Fabric.Shared.ReliableHttp
         /// <param name="content">
         /// The content.
         /// </param>
+        /// <param name="requestId">
+        /// The request Id.
+        /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task<SendAsyncResult> PutAsync(Uri url, HttpContent content)
+        private async Task<SendAsyncResult> PutAsync(Uri url, HttpContent content, string requestId)
         {
-            return await SendAsync(url, HttpMethod.Put, content);
+            return await this.SendAsync(url, HttpMethod.Put, content, requestId);
         }
 
         /// <summary>
@@ -534,13 +599,13 @@ namespace Fabric.Shared.ReliableHttp
         {
             return Policy.Handle<HttpRequestException>().Or<TaskCanceledException>()
                 .OrResult<HttpResponseMessage>(
-                    message => httpStatusCodesWorthRetrying.Contains(message.StatusCode))
+                    message => this.httpStatusCodesWorthRetrying.Contains(message.StatusCode))
                 .WaitAndRetryAsync(
                     MaxRetryCount,
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(SecondsBetweenRetries, retryAttempt)),
                     async (result, timeSpan, retryCount, context) =>
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
+                            this.cancellationToken.ThrowIfCancellationRequested();
 
                             if (result.Result != null)
                             {
@@ -550,7 +615,7 @@ namespace Fabric.Shared.ReliableHttp
                                 }
 
                                 var errorContent = await result.Result.Content.ReadAsStringAsync();
-                                OnTransientError(
+                                this.OnTransientError(
                                     new TransientErrorEventArgs(
                                         resourceId,
                                         method,
@@ -562,7 +627,7 @@ namespace Fabric.Shared.ReliableHttp
                             }
                             else
                             {
-                                OnTransientError(
+                                this.OnTransientError(
                                     new TransientErrorEventArgs(
                                         resourceId,
                                         method,

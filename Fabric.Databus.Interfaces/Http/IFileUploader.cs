@@ -24,8 +24,8 @@ namespace Fabric.Databus.Interfaces.Http
         /// <param name="relativeUrl">
         ///     The relative url.
         /// </param>
-        /// <param name="batchNumber">
-        ///     The batchNumber.
+        /// <param name="requestId">
+        ///     The requestId.
         /// </param>
         /// <param name="stream">
         ///     The stream.
@@ -41,7 +41,7 @@ namespace Fabric.Databus.Interfaces.Http
         /// </returns>
         Task<IFileUploadResult> SendStreamToHostsAsync(
             string relativeUrl,
-            int batchNumber,
+            string requestId,
             Stream stream,
             bool doLogContent,
             bool doCompress);

@@ -122,15 +122,7 @@ namespace Fabric.Databus.ElasticSearch
             this.entityType = entityType ?? throw new ArgumentNullException(nameof(entityType));
         }
 
-        /// <summary>
-        /// The create index and mappings.
-        /// </summary>
-        /// <param name="folder">
-        /// The folder.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
+        /// <inheritdoc />
         public async Task CreateIndexAndMappings(string folder)
         {
             var host = this.hosts.First();
@@ -142,16 +134,17 @@ namespace Fabric.Databus.ElasticSearch
 
             await this.reliableHttpClient.PostAsyncString(
                 new Uri(new Uri(host), "/_aliases?pretty"),
-                text);
+                text,
+                "GetAliases");
 
             var requestUri = new Uri(new Uri(host), $"/{this.index}");
 
             await this.reliableHttpClient.DeleteAsync(requestUri);
 
             // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
-            await this.reliableHttpClient.PostAsync(new Uri(new Uri(host), "/_forcemerge?only_expunge_deletes=true"), null);
+            await this.reliableHttpClient.PostAsync(new Uri(new Uri(host), "/_forcemerge?only_expunge_deletes=true"), null, "ForceMerge");
 
-            await this.reliableHttpClient.PutAsyncFile(requestUri, folder + @"\mainmapping.json");
+            await this.reliableHttpClient.PutAsyncFile(requestUri, folder + @"\mainmapping.json", "MainMapping");
 
             await this.InternalUploadAllFilesInFolder("mapping*", $"/{this.index}/_mapping/{this.entityType}", folder);
 
@@ -164,11 +157,13 @@ namespace Fabric.Databus.ElasticSearch
             {
                 await this.reliableHttpClient.PutAsyncString(
                     new Uri(new Uri(host), "/" + this.index + "/_settings"),
-                    "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
+                    "{ \"index\" : {\"refresh_interval\" : \"-1\" } }",
+                    "DisableRefresh");
 
                 await this.reliableHttpClient.PutAsyncString(
                     new Uri(new Uri(host), "/" + this.index + "/_settings"),
-                    "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
+                    "{ \"index\" : {\"number_of_replicas\" : \"0\" } }",
+                    "DisableReplica");
             }
         }
 
@@ -190,7 +185,8 @@ namespace Fabric.Databus.ElasticSearch
 
             await this.reliableHttpClient.PostAsyncString(
                 new Uri(new Uri(host), "/_aliases?pretty"),
-                text);
+                text,
+                "PostAliases");
 
             var requestUri = new Uri(new Uri(host), relativeUrl);
 
@@ -216,16 +212,18 @@ namespace Fabric.Databus.ElasticSearch
                 var host = this.hosts.First() ?? throw new ArgumentNullException("hosts.First()");
 
                 // curl -XPOST 'http://localhost:9200/_forcemerge?only_expunge_deletes=true'
-                await this.reliableHttpClient.PostAsync(new Uri(new Uri(host), "/_forcemerge?only_expunge_deletes=true"), null);
+                await this.reliableHttpClient.PostAsync(new Uri(new Uri(host), "/_forcemerge?only_expunge_deletes=true"), null, "ForceMerge");
 
                 // https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-codec
                 await this.reliableHttpClient.PutAsyncString(
                     new Uri(new Uri(host), "/" + this.index + "/_settings"),
-                    "{ \"index\" : {\"refresh_interval\" : \"-1\" } }");
+                    "{ \"index\" : {\"refresh_interval\" : \"-1\" } }",
+                    "DisableRefresh");
 
                 await this.reliableHttpClient.PutAsyncString(
                     new Uri(new Uri(host), "/" + this.index + "/_settings"),
-                    "{ \"index\" : {\"number_of_replicas\" : \"0\" } }");
+                    "{ \"index\" : {\"number_of_replicas\" : \"0\" } }",
+                    "DisableReplicas");
             }
         }
 
@@ -245,14 +243,16 @@ namespace Fabric.Databus.ElasticSearch
             {
                 await this.reliableHttpClient.PutAsyncString(
                     new Uri(new Uri(host), "/" + this.index + "/_settings"),
-                    "{ \"index\" : {\"number_of_replicas\" : \"1\" } }");
+                    "{ \"index\" : {\"number_of_replicas\" : \"1\" } }",
+                    "1");
 
                 await this.reliableHttpClient.PutAsyncString(
                     new Uri(new Uri(host), "/" + this.index + "/_settings"),
-                    "{ \"index\" : {\"refresh_interval\" : \"1s\" } }");
+                    "{ \"index\" : {\"refresh_interval\" : \"1s\" } }",
+                    "EnableRefresh");
 
                 // curl -XPOST %ESURL%/patients2/_forcemerge?max_num_segments=5
-                await this.reliableHttpClient.PostAsync(new Uri(new Uri(host), "/" + this.index + "/_forcemerge?max_num_segments=5"), null);
+                await this.reliableHttpClient.PostAsync(new Uri(new Uri(host), "/" + this.index + "/_forcemerge?max_num_segments=5"), null, "ForceMerge");
 
                 // curl -XPOST %ESURL%/_aliases?pretty --data "{\"actions\" : [{ \"remove\" : { \"index\" : \"patients2\", \"alias\" : \"patients\" } }]}"
                 // await
@@ -266,7 +266,8 @@ namespace Fabric.Databus.ElasticSearch
 
             await this.reliableHttpClient.PostAsyncString(
                 new Uri(new Uri(host), "/_aliases?pretty"),
-                text);
+                text,
+                "PostAliases");
         }
 
         /// <inheritdoc />
@@ -283,7 +284,8 @@ namespace Fabric.Databus.ElasticSearch
                        + "\" } }]}";
             await this.reliableHttpClient.PostAsyncString(
                 new Uri(new Uri(host), "/_aliases?pretty"),
-                text);
+                text,
+                "PostAliases");
         }
 
         /// <inheritdoc />
@@ -312,7 +314,7 @@ namespace Fabric.Databus.ElasticSearch
         /// The send data to hosts.
         /// </summary>
         /// <param name="batch">
-        /// The batch.
+        /// The requestId.
         /// </param>
         /// <param name="stream">
         /// The stream.
@@ -333,7 +335,7 @@ namespace Fabric.Databus.ElasticSearch
             bool doCompress)
         {
             var relativeUrl = $"/{this.index}/{this.entityType}/_bulk?pretty";
-            await this.SendStreamToHostsAsync(relativeUrl, batch, stream, doLogContent, doCompress);
+            await this.SendStreamToHostsAsync(relativeUrl, Convert.ToString(batch), stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
@@ -341,7 +343,7 @@ namespace Fabric.Databus.ElasticSearch
         /// The send main mapping file to hosts.
         /// </summary>
         /// <param name="batch">
-        /// The batch.
+        /// The requestId.
         /// </param>
         /// <param name="stream">
         /// The stream.
@@ -362,7 +364,7 @@ namespace Fabric.Databus.ElasticSearch
             bool doCompress)
         {
             var relativeUrl = $"/{this.index}";
-            await this.SendStreamToHostsAsync(relativeUrl, batch, stream, doLogContent, doCompress);
+            await this.SendStreamToHostsAsync(relativeUrl, Convert.ToString(batch), stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
@@ -370,7 +372,7 @@ namespace Fabric.Databus.ElasticSearch
         /// The send nested mapping file to hosts.
         /// </summary>
         /// <param name="batch">
-        /// The batch.
+        /// The requestId.
         /// </param>
         /// <param name="stream">
         /// The stream.
@@ -391,7 +393,7 @@ namespace Fabric.Databus.ElasticSearch
             bool doCompress)
         {
             var relativeUrl = $"/{this.index}/_mapping/{this.entityType}";
-            await this.SendStreamToHostsAsync(relativeUrl, batch, stream, doLogContent, doCompress);
+            await this.SendStreamToHostsAsync(relativeUrl, Convert.ToString(batch), stream, doLogContent, doCompress);
         }
 
         /// <inheritdoc />
@@ -417,7 +419,7 @@ namespace Fabric.Databus.ElasticSearch
 
             if (!this.keepIndexOnline)
             {
-                await this.reliableHttpClient.PostAsyncString(new Uri(new Uri(host), "/" + this.index + "/_refresh"), null);
+                await this.reliableHttpClient.PostAsyncString(new Uri(new Uri(host), "/" + this.index + "/_refresh"), null, "RefreshIndex");
             }
         }
 
@@ -428,8 +430,8 @@ namespace Fabric.Databus.ElasticSearch
         /// <param name="url">
         ///     The url.
         /// </param>
-        /// <param name="batch">
-        ///     The batch.
+        /// <param name="requestId">
+        ///     The requestId.
         /// </param>
         /// <param name="stream">
         ///     The stream.
@@ -445,14 +447,14 @@ namespace Fabric.Databus.ElasticSearch
         /// </returns>
         protected override async Task<IFileUploadResult> SendStreamToUrlAsync(
             Uri url,
-            int batch,
+            string requestId,
             Stream stream,
             bool doLogContent,
             bool doCompress)
         {
             try
             {
-                this.logger.Verbose("Sending file {batch} of size {streamLength} to {url}", batch, stream.Length, url);
+                this.logger.Verbose("Sending file {requestId} of size {streamLength} to {url}", requestId, stream.Length, url);
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
                 string requestContent;
@@ -477,8 +479,8 @@ namespace Fabric.Databus.ElasticSearch
 
 
                 var response = doCompress
-                                   ? await this.reliableHttpClient.SendAsyncStreamCompressed(url, this.httpMethod, stream)
-                                   : await this.reliableHttpClient.SendAsyncStream(url, this.httpMethod, stream);
+                                   ? await this.reliableHttpClient.SendAsyncStreamCompressed(url, this.httpMethod, stream, requestId)
+                                   : await this.reliableHttpClient.SendAsyncStream(url, this.httpMethod, stream, requestId);
 
                 var responseContent = await response.ResponseContent.ReadAsStringAsync();
 
@@ -502,8 +504,8 @@ namespace Fabric.Databus.ElasticSearch
                             // _queuedFiles.Enqueue(filepath);
                             this.requestFailures++;
                             this.logger.Error(
-                                "ElasticSearchUpload Failed: {batch} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}",
-                                batch,
+                                "ElasticSearchUpload Failed: {requestId} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}",
+                                requestId,
                                 response.StatusCode,
                                 this.currentRequests,
                                 this.QueuedFiles.Count,
@@ -515,8 +517,8 @@ namespace Fabric.Databus.ElasticSearch
                     else
                     {
                         this.logger.Verbose(
-                            "ElasticSearchUpload Succeeded: {batch} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}",
-                            batch,
+                            "ElasticSearchUpload Succeeded: {requestId} status: {StatusCode} requests:{currentRequests} Left:{QueuedFiles}/{totalFiles}, Speed/file: {milliSecondsPerFile}, This file: {millisecsForThisFile}",
+                            requestId,
                             response.StatusCode,
                             this.currentRequests,
                             this.QueuedFiles.Count,
@@ -553,16 +555,19 @@ namespace Fabric.Databus.ElasticSearch
         /// The url.
         /// </param>
         /// <param name="filepath">
-        /// The filepath.
+        /// The file path.
+        /// </param>
+        /// <param name="batch">
+        /// The requestId.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task SendFileToUrl(string url, string filepath)
+        private async Task SendFileToUrl(string url, string filepath, int batch)
         {
             try
             {
-                // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
+                //// http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
 
                 var baseUri = url;
 
@@ -572,7 +577,7 @@ namespace Fabric.Databus.ElasticSearch
                 Interlocked.Increment(ref this.currentRequests);
                 var requestStartTimeMillisecs = this.Stopwatch.ElapsedMilliseconds;
 
-                var response = await this.reliableHttpClient.PutAsyncFileCompressed(new Uri(new Uri(baseUri), url), filepath);
+                var response = await this.reliableHttpClient.PutAsyncFileCompressed(new Uri(new Uri(baseUri), url), filepath, Convert.ToString(batch));
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -646,6 +651,7 @@ namespace Fabric.Databus.ElasticSearch
         {
             if (!this.QueuedFiles.IsEmpty)
             {
+                int i = 0;
 #pragma warning disable IDE0018 // Inline variable declaration
                 // ReSharper disable once InlineOutVariableDeclaration
                 string filename;
@@ -654,7 +660,6 @@ namespace Fabric.Databus.ElasticSearch
                 {
                     try
                     {
-
                         await this.maxThread.WaitAsync();
 
                         if (this.requestFailures > 0)
@@ -668,7 +673,7 @@ namespace Fabric.Databus.ElasticSearch
                         var url = this.hosts[hostNumber] + relativeUrl;
 
                         // var url = hosts.First() + @"/_cluster/health?pretty";
-                        await this.SendFileToUrl(url, filename);
+                        await this.SendFileToUrl(url, filename, ++i);
                     }
                     finally
                     {

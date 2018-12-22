@@ -510,12 +510,12 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IHttpRequestLogger>())
             {
-                this.container.RegisterType<IHttpRequestLogger, DummyHttpRequestLogger>();
+                this.container.RegisterInstance<IHttpRequestLogger>(new DatabusHttpRequestLogger(this.container.Resolve<ITemporaryFileWriter>(), job.Config.LocalSaveFolder));
             }
 
             if (!this.container.IsRegistered<IHttpResponseLogger>())
             {
-                this.container.RegisterType<IHttpResponseLogger, DummyHttpResponseLogger>();
+                this.container.RegisterInstance<IHttpResponseLogger>(new DatabusHttpResponseLogger(this.container.Resolve<ITemporaryFileWriter>(), job.Config.LocalSaveFolder));
             }
 
             if (job.Config.UseMultipleThreads)

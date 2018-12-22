@@ -78,6 +78,7 @@ namespace Fabric.Databus.PipelineSteps
             using (var textWriter = new StreamWriter(stream, Encoding.UTF8, 1024, true))
             using (var writer = new JsonTextWriter(textWriter))
             {
+                // ReSharper disable once PossibleMultipleEnumeration
                 foreach (var documentCacheItem in documentCacheItems)
                 {
                     var doc = documentCacheItem.Document;

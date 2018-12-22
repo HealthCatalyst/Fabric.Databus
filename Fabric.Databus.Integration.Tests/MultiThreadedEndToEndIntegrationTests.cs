@@ -7,39 +7,44 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Fabric.Database.Testing.FileLoader;
-using Fabric.Database.Testing.LocalDb;
-using Fabric.Databus.Config;
-using Fabric.Databus.Domain.ProgressMonitors;
-using Fabric.Databus.Integration.Tests.Helpers;
-using Fabric.Databus.Interfaces.FileWriters;
-using Fabric.Databus.Interfaces.Loggers;
-using Fabric.Databus.Interfaces.Queues;
-using Fabric.Databus.Interfaces.Sql;
-using Fabric.Databus.Shared.Loggers;
-using Fabric.Databus.Shared.Queues;
-using Fabric.Databus.SqlGenerator;
-using Fabric.Shared;
-using Fabric.Shared.ReliableHttp.Interceptors;
-using Fabric.Shared.ReliableHttp.Interfaces;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using Moq.Protected;
-using Newtonsoft.Json.Linq;
-using Unity;
-
 namespace Fabric.Databus.Integration.Tests
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using Fabric.Database.Testing.FileLoader;
+    using Fabric.Database.Testing.LocalDb;
+    using Fabric.Databus.Config;
+    using Fabric.Databus.Domain.ProgressMonitors;
+    using Fabric.Databus.Integration.Tests.Helpers;
+    using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Databus.Interfaces.Sql;
+    using Fabric.Databus.Shared.Loggers;
+    using Fabric.Databus.Shared.Queues;
+    using Fabric.Databus.SqlGenerator;
+    using Fabric.Shared;
+    using Fabric.Shared.ReliableHttp.Interceptors;
+    using Fabric.Shared.ReliableHttp.Interfaces;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+    using Moq.Protected;
+
+    using Newtonsoft.Json.Linq;
+
+    using Unity;
+
     /// <summary>
     /// The end to end integration tests.
     /// </summary>
@@ -110,6 +115,22 @@ FROM Text
                             .Callback<string, Stream>(
                                 (workItemId, stream) =>
                                     {
+                                        stream.Seek(0, SeekOrigin.Begin);
+
+                                        // verify that Byte Order Mark (BOM) is not included
+                                        using (var reader = new BinaryReader(
+                                            stream,
+                                            Encoding.UTF8,
+                                            true))
+                                        {
+                                            var buffer = reader.ReadBytes(3);
+
+                                            Assert.AreNotEqual(239, buffer[0], "BOM was found in string");
+                                            Assert.AreEqual((int)'{', buffer[0]);
+                                        }
+
+                                        stream.Seek(0, SeekOrigin.Begin);
+
                                         using (var streamReader = new StreamReader(
                                             stream,
                                             Encoding.UTF8,
@@ -122,6 +143,22 @@ FROM Text
                                     });
 
                         container.RegisterInstance<IEntitySavedToJsonLogger>(mockEntitySavedToJsonLogger.Object);
+
+                        var mockHttpRequestLogger = mockRepository.Create<IHttpRequestLogger>();
+                        mockHttpRequestLogger.Setup(
+                                service => service.LogRequestAsync(HttpMethod.Put, It.IsAny<HttpRequestMessage>(), It.IsAny<string>()))
+                            .Callback<HttpMethod, HttpRequestMessage, string>(
+                                async (method, request, requestId) =>
+                                    {
+                                        var buffer = await request.Content.ReadAsByteArrayAsync();
+
+                                        // verify that Byte Order Mark (BOM) is not included
+                                        Assert.AreNotEqual(239, buffer[0], "BOM was found in string");
+                                        Assert.AreEqual((int)'{', buffer[0]);
+                                    })
+                            .Returns(Task.CompletedTask);
+
+                        container.RegisterInstance<IHttpRequestLogger>(mockHttpRequestLogger.Object);
 
                         var testBatchEventsLogger = new TestBatchEventsLogger();
                         container.RegisterInstance<IBatchEventsLogger>(testBatchEventsLogger);
@@ -212,7 +249,10 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
+                            foreach (var inner in e.InnerExceptions)
+                            {
+                                Console.WriteLine(inner);
+                            }
 
                             throw e.Flatten();
                         }
@@ -239,8 +279,6 @@ FROM Text
                         mockEntitySavedToJsonLogger.Verify(
                             service => service.LogSavedEntity(It.IsAny<string>(), It.IsAny<Stream>()),
                             Times.Once);
-
-                        Assert.AreEqual(1 + 1, integrationTestFileWriter.Count); // first file is job.json
 
                         var expectedPath = integrationTestFileWriter.CombinePath(config.Config.LocalSaveFolder, "1.json");
                         Assert.IsTrue(integrationTestFileWriter.ContainsFile(expectedPath));
@@ -407,13 +445,15 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
+                            foreach (var inner in e.InnerExceptions)
+                            {
+                                Console.WriteLine(inner);
+                            }
+
                             throw e.Flatten();
                         }
 
                         // Assert
-                        Assert.AreEqual(1 + 1, integrationTestFileWriter.Count, integrationTestFileWriter.GetAllFileNames().ToCsv()); // first file is job.json
-
                         var expectedPath = integrationTestFileWriter.CombinePath(
                             config.Config.LocalSaveFolder,
                             "2.json");
@@ -593,14 +633,17 @@ FROM Text
                         }
                         catch (AggregateException e)
                         {
-                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
+                            foreach (var inner in e.InnerExceptions)
+                            {
+                                Console.WriteLine(inner);
+                            }
+
                             throw e.Flatten();
                         }
 
                         // assert
                         Assert.AreEqual(2, actualJsonObjects.Count);
 
-                        Assert.AreEqual(2 + 1, integrationTestFileWriter.Count); // first file is job.json
                         var expectedPath1 = integrationTestFileWriter.CombinePath(
                             config.Config.LocalSaveFolder,
                             "1.json");
@@ -821,7 +864,6 @@ FROM Text
 
                         Assert.AreEqual(NumberOfEntities, actualJsonObjects.Count);
 
-                        Assert.AreEqual(NumberOfEntities + 1, integrationTestFileWriter.Count); // first file is job.json
                         var expectedPath1 = integrationTestFileWriter.CombinePath(
                             config.Config.LocalSaveFolder,
                             "1.json");
@@ -1030,8 +1072,6 @@ FROM Text
 
                         Assert.AreEqual(NumberOfEntities, actualJsonObjects.Count);
 
-                        Assert.AreEqual(NumberOfEntities + 1, integrationTestFileWriter.Count); // first file is job.json
-
                         var expectedJsonFiles = new[]
                         {
                             "58010A71478E5C521A4157B2FB8E1904ACAD37C324ECFFA359F14F02B4D7F4AF.json"
@@ -1042,8 +1082,8 @@ FROM Text
                             var contents = TestFileLoader.GetFileContents("Files\\NestedEntities", expectedJsonFile);
                             var entityId = expectedJsonFile.Replace(".json", string.Empty);
                             var expectedJson = expectedJsonObjects[entityId];
-                            var jObject = JObject.Parse(contents);
-                            Assert.IsTrue(JToken.DeepEquals(expectedJson, jObject), expectedJsonFile);
+                            var document = JObject.Parse(contents);
+                            Assert.IsTrue(JToken.DeepEquals(expectedJson, document), expectedJsonFile);
                         }
 
                         httpMessageHandlerMock.Protected()

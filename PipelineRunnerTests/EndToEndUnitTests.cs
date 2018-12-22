@@ -117,7 +117,7 @@ namespace PipelineRunnerTests
             mockFileUploader.Setup(
                 service => service.SendStreamToHostsAsync(
                     It.IsAny<string>(),
-                    It.IsAny<int>(),
+                    It.IsAny<string>(),
                     It.IsAny<Stream>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>())).ReturnsAsync(new FileUploadResult { StatusCode = HttpStatusCode.OK });
@@ -256,7 +256,7 @@ namespace PipelineRunnerTests
             mockFileUploader.Setup(
                 service => service.SendStreamToHostsAsync(
                     It.IsAny<string>(),
-                    It.IsAny<int>(),
+                    It.IsAny<string>(),
                     It.IsAny<Stream>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>()))

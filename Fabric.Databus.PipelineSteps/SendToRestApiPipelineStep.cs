@@ -84,7 +84,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected sealed override string LoggerName => "SendToRestApi";
+        protected override sealed string LoggerName => "SendToRestApi";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(IJsonObjectQueueItem workItem)
@@ -94,7 +94,7 @@ namespace Fabric.Databus.PipelineSteps
             await this.entityJsonWriter.WriteToStreamAsync(workItem.Document, stream);
 
             // now send to Rest Api
-            var fileUploadResult = await this.fileUploader.SendStreamToHostsAsync(string.Empty, 1, stream, false, this.Config.CompressFiles);
+            var fileUploadResult = await this.fileUploader.SendStreamToHostsAsync(string.Empty, workItem.Id, stream, false, this.Config.CompressFiles);
 
             await this.WriteDiagnosticsAsync(workItem, fileUploadResult);
 

@@ -76,23 +76,32 @@ namespace Fabric.Databus.Http
         /// Initializes a new instance of the <see cref="FileUploader"/> class.
         /// </summary>
         /// <param name="logger">
-        ///     The logger.
+        /// The logger.
         /// </param>
         /// <param name="hosts">
-        ///     The hosts.
+        /// The hosts.
         /// </param>
         /// <param name="httpClientFactory">
-        ///     The http client factory.
+        /// The http client factory.
         /// </param>
         /// <param name="httpRequestInterceptor">
-        ///     The http Request Injector.
+        /// The http Request Injector.
         /// </param>
         /// <param name="httpResponseInterceptor">
-        ///     http response interceptor</param>
-        /// <param name="httpMethod">http method</param>
-        /// <param name="httpResponseLogger"></param>
-        /// <param name="cancellationToken">cancellation token</param>
-        /// <param name="httpRequestLogger"></param>
+        /// http response interceptor
+        /// </param>
+        /// <param name="httpMethod">
+        /// http method
+        /// </param>
+        /// <param name="httpRequestLogger">
+        /// request logger
+        /// </param>
+        /// <param name="httpResponseLogger">
+        /// response logger
+        /// </param>
+        /// <param name="cancellationToken">
+        /// cancellation token
+        /// </param>
         public FileUploader(
             ILogger logger,
             List<string> hosts,
@@ -120,16 +129,16 @@ namespace Fabric.Databus.Http
         /// <inheritdoc />
         public async Task<IFileUploadResult> SendStreamToHostsAsync(
             string relativeUrl,
-            int batchNumber,
+            string requestId,
             Stream stream,
             bool doLogContent,
             bool doCompress)
         {
-            var hostNumber = batchNumber % this.hosts.Count;
+            var hostNumber = 0;
 
             var url = new Uri(new Uri(this.hosts[hostNumber]), relativeUrl);
 
-            return await this.SendStreamToUrlAsync(url, batchNumber, stream, doLogContent, doCompress);
+            return await this.SendStreamToUrlAsync(url, requestId, stream, doLogContent, doCompress);
         }
 
         /// <summary>
@@ -138,8 +147,8 @@ namespace Fabric.Databus.Http
         /// <param name="url">
         ///     The url.
         /// </param>
-        /// <param name="batch">
-        ///     The batchNumber.
+        /// <param name="requestId">
+        ///     The requestId.
         /// </param>
         /// <param name="stream">
         ///     The stream.
@@ -155,14 +164,14 @@ namespace Fabric.Databus.Http
         /// </returns>
         protected virtual async Task<IFileUploadResult> SendStreamToUrlAsync(
             Uri url,
-            int batch,
+            string requestId,
             Stream stream,
             bool doLogContent,
             bool doCompress)
         {
             try
             {
-                this.logger.Verbose("Sending file {batchNumber} of size {Length} to {url}", batch, stream.Length, url);
+                this.logger.Verbose("Sending file {requestId} of size {Length} to {url}", requestId, stream.Length, url);
 
                 // http://stackoverflow.com/questions/30310099/correct-way-to-compress-webapi-post
                 string requestContent;
@@ -185,8 +194,8 @@ namespace Fabric.Databus.Http
                 this.Stopwatch.Reset();
 
                 var response = doCompress
-                                   ? await this.reliableHttpClient.SendAsyncStreamCompressed(url, this.httpMethod, stream)
-                                   : await this.reliableHttpClient.SendAsyncStream(url, this.httpMethod, stream);
+                                   ? await this.reliableHttpClient.SendAsyncStreamCompressed(url, this.httpMethod, stream, requestId)
+                                   : await this.reliableHttpClient.SendAsyncStream(url, this.httpMethod, stream, requestId);
 
                 var responseContent = response.ResponseContent;
 

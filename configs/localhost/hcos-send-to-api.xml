@@ -2,7 +2,7 @@
 <Job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:noNamespaceSchemaLocation="..\..\Fabric.Databus.Config\Fabric.Databus.Config.xsd">
   <Config>
-    <ConnectionString>server=HCS-DEV0002;initial catalog=SAM;Trusted_Connection=True;</ConnectionString>
+    <ConnectionString>server=(local);initial catalog=SAMHCOS;Trusted_Connection=True;</ConnectionString>
     <Url>http://localhost:5000/api/values</Url>
     <UploadToUrl>true</UploadToUrl>
     <UrlMethod>Post</UrlMethod>
@@ -31,8 +31,8 @@
     </TopLevelDataSource>
     <DataSource Path="$.patient" PropertyType="object" TableOrView="HCOSText.Patient">
       <Relationship>
-        <Source Entity="HCOSText.Data" Key="TextKEY"/>
-        <Destination Entity="HCOSText.Patient" Key="TextKEY"/>
+        <Source Entity="HCOSText.Data" Key="PatientKEY"/>
+        <Destination Entity="HCOSText.Patient" Key="PatientKEY"/>
       </Relationship>
       <Column Name="extension" Alias="extension"/>
       <Column Name="root" Alias="root"/>
@@ -44,8 +44,8 @@
     </DataSource>
     <DataSource Path="$.visit" PropertyType="object" TableOrView="HCOSText.Visit">
       <Relationship>
-        <Source Entity="HCOSText.Data" Key="TextKEY"/>
-        <Destination Entity="HCOSText.Visit" Key="TextKEY"/>
+        <Source Entity="HCOSText.Data" Key="VisitKEY"/>
+        <Destination Entity="HCOSText.Visit" Key="VisitKEY"/>
       </Relationship>
       <Column Name="extension" Alias="extension"/>
       <Column Name="root" Alias="root"/>
@@ -54,16 +54,24 @@
     </DataSource>
     <DataSource Path="$.visit.facility" PropertyType="object" TableOrView="HCOSText.VisitFacility">
       <Relationship>
-        <Source Entity="HCOSText.Data" Key="TextKEY"/>
-        <Destination Entity="HCOSText.VisitFacility" Key="TextKEY"/>
+        <Source Entity="HCOSText.Data" Key="VisitKEY"/>
+        <Destination Entity="HCOSText.Visit" Key="VisitKEY"/>
+      </Relationship>
+      <Relationship>
+        <Source Entity="HCOSText.Visit" Key="VisitFacilityKEY"/>
+        <Destination Entity="HCOSText.VisitFacility" Key="VisitFacilityKEY"/>
       </Relationship>
       <Column Name="extension" Alias="extension"/>
       <Column Name="root" Alias="root"/>
     </DataSource>
     <DataSource Path="$.visit.people" PropertyType="array" TableOrView="HCOSText.VisitPeople">
       <Relationship>
-        <Source Entity="HCOSText.Data" Key="TextKEY"/>
-        <Destination Entity="HCOSText.VisitPeople" Key="TextKEY"/>
+        <Source Entity="HCOSText.Data" Key="VisitKEY"/>
+        <Destination Entity="HCOSText.Visit" Key="VisitKEY"/>
+      </Relationship>
+      <Relationship>
+        <Source Entity="HCOSText.Visit" Key="VisitPeopleKEY"/>
+        <Destination Entity="HCOSText.VisitPeople" Key="VisitPeopleKEY"/>
       </Relationship>
       <Column Name="extension" Alias="extension"/>
       <Column Name="root" Alias="root"/>

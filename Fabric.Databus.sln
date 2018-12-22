@@ -137,6 +137,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared.PerformanceCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fabric.Shared.PerformanceCounters.UnitTests", "Fabric.Shared.PerformanceCounters.UnitTests\Fabric.Shared.PerformanceCounters.UnitTests.csproj", "{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fabric.Databus.Json.Tests", "Fabric.Databus.Json.Tests\Fabric.Databus.Json.Tests.csproj", "{7D40A8D1-3DC6-46E3-901B-3F154E360B15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -275,6 +277,10 @@ Global
 		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D40A8D1-3DC6-46E3-901B-3F154E360B15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D40A8D1-3DC6-46E3-901B-3F154E360B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D40A8D1-3DC6-46E3-901B-3F154E360B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D40A8D1-3DC6-46E3-901B-3F154E360B15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -320,6 +326,7 @@ Global
 		{8B67F00F-4D7E-46FB-A62D-7BBF6A7D5BD0} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 		{E47DB5D9-46EC-4804-8CD4-1833A0B258AF} = {D4A68346-FF80-41DA-8E69-32CDA0A7F8B9}
 		{77AE29D8-E3D9-41AA-9E64-357A0DF59C08} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
+		{7D40A8D1-3DC6-46E3-901B-3F154E360B15} = {AA32DFFD-FEB5-4676-995E-A41DAE5752E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {44DBC0CC-512E-4126-B1F3-B456CF44B07E}

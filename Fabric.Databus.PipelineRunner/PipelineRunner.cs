@@ -7,14 +7,12 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Linq;
-
 namespace Fabric.Databus.PipelineRunner
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     using Fabric.Databus.Config;
@@ -42,16 +40,12 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Shared.Loggers;
     using Fabric.Databus.Shared.Queues;
     using Fabric.Databus.SqlGenerator;
-    using Fabric.Shared;
     using Fabric.Shared.ReliableHttp.Interceptors;
     using Fabric.Shared.ReliableHttp.Interfaces;
-
-    using Newtonsoft.Json;
 
     using QueueItems;
 
     using Serilog;
-    using Serilog.Core;
 
     using Unity;
 
@@ -125,6 +119,7 @@ namespace Fabric.Databus.PipelineRunner
             {
                 throw new ArgumentNullException(nameof(job));
             }
+
             if (job.Config == null)
             {
                 throw new ArgumentNullException(nameof(job.Config));
@@ -140,7 +135,6 @@ namespace Fabric.Databus.PipelineRunner
             this.InitContainerWithDefaults(job);
 
             var logger = this.container.Resolve<ILogger>();
-
 
             if (config.WriteTemporaryFilesToDisk)
             {
@@ -176,7 +170,9 @@ namespace Fabric.Databus.PipelineRunner
                     dataSource.Path = $"$.{dataSource.Path}";
                 }
 
-                RelationshipInheritor.InheritRelationships(job.Data.DataSources, dataSource,
+                RelationshipInheritor.InheritRelationships(
+                    job.Data.DataSources,
+                    dataSource,
                     job.Data.TopLevelDataSource.TableOrView);
             }
 
@@ -324,6 +320,7 @@ namespace Fabric.Databus.PipelineRunner
         /// <param name="job">
         /// The job.
         /// </param>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private void InitContainerWithDefaults(IJob job)
         {
             if (!this.container.IsRegistered<ILogger>())
@@ -427,7 +424,7 @@ namespace Fabric.Databus.PipelineRunner
 
             if (!this.container.IsRegistered<IProgressMonitor>())
             {
-                IProgressMonitor progressMonitor = new ProgressMonitor(new NullProgressLogger());
+                var progressMonitor = new ProgressMonitor(new NullProgressLogger());
                 this.container.RegisterInstance<IProgressMonitor>(progressMonitor);
             }
 

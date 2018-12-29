@@ -10,8 +10,6 @@
 namespace Fabric.Databus.PipelineSteps
 {
     using System;
-    using System.Collections.Generic;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -25,6 +23,9 @@ namespace Fabric.Databus.PipelineSteps
     /// <inheritdoc />
     public class JobCompletedPipelineStep : BasePipelineStep<EndPointQueueItem, EndPointQueueItem>
     {
+        /// <summary>
+        /// The job events logger.
+        /// </summary>
         private readonly IJobEventsLogger jobEventsLogger;
 
         /// <inheritdoc />

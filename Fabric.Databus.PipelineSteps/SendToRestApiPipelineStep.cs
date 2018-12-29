@@ -10,6 +10,7 @@
 namespace Fabric.Databus.PipelineSteps
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Net;
     using System.Threading;
@@ -35,12 +36,12 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The number of entities uploaded.
         /// </summary>
-        private static int numberOfEntitiesUploadedForBatch;
+        private int numberOfEntitiesUploadedForBatch;
 
         /// <summary>
         /// The number of entities uploaded for job.
         /// </summary>
-        private static int numberOfEntitiesUploadedForJob;
+        private int numberOfEntitiesUploadedForJob;
 
         /// <summary>
         /// The file uploader.
@@ -55,6 +56,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The entity json writer.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IEntityJsonWriter entityJsonWriter;
 
         /// <summary>
@@ -102,7 +104,6 @@ namespace Fabric.Databus.PipelineSteps
             {
                 Interlocked.Increment(ref numberOfEntitiesUploadedForBatch);
                 Interlocked.Increment(ref numberOfEntitiesUploadedForJob);
-
             }
         }
 
@@ -111,7 +112,6 @@ namespace Fabric.Databus.PipelineSteps
         {
             return workItem.Id;
         }
-
 
         /// <inheritdoc />
         protected override Task CompleteBatchAsync(

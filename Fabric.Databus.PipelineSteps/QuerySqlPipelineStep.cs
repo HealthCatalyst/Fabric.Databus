@@ -12,6 +12,7 @@ namespace Fabric.Databus.PipelineSteps
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -44,6 +45,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The databus sql reader.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IDatabusSqlReader databusSqlReader;
 
         /// <summary>
@@ -51,6 +53,10 @@ namespace Fabric.Databus.PipelineSteps
         /// </summary>
         private readonly IDetailedTemporaryFileWriter detailedTemporaryFileWriter;
 
+        /// <summary>
+        /// The query sql logger.
+        /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IQuerySqlLogger querySqlLogger;
 
         /// <inheritdoc />

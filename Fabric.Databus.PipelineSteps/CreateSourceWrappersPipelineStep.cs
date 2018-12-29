@@ -7,23 +7,25 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Fabric.Databus.Config;
-using Fabric.Databus.Interfaces.Config;
-using Fabric.Databus.Interfaces.FileWriters;
-using Fabric.Databus.Interfaces.Loggers;
-using Fabric.Databus.Interfaces.Queues;
-using Fabric.Databus.QueueItems;
-using Fabric.Databus.Shared;
-using Serilog;
-
 namespace Fabric.Databus.PipelineSteps
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using Fabric.Databus.Config;
+    using Fabric.Databus.Interfaces.Config;
+    using Fabric.Databus.Interfaces.FileWriters;
+    using Fabric.Databus.Interfaces.Loggers;
+    using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Databus.QueueItems;
+    using Fabric.Databus.Shared;
+
+    using Serilog;
+
     /// <inheritdoc />
     /// <summary>
     /// The sql combine source wrappers pipeline step.
@@ -67,14 +69,14 @@ namespace Fabric.Databus.PipelineSteps
         {
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
 
-            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && Config.LocalSaveFolder != null)
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.Config.LocalSaveFolder != null)
             {
-                folder = this.detailedTemporaryFileWriter.CombinePath(Config.LocalSaveFolder, $"{UniqueId}-{LoggerName}");
+                this.folder = this.detailedTemporaryFileWriter.CombinePath(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
             }
         }
 
         /// <inheritdoc />
-        protected sealed override string LoggerName => "CreateSourceWrappers";
+        protected override sealed string LoggerName => "CreateSourceWrappers";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(SqlDataLoadedQueueItem workItem)
@@ -91,7 +93,7 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
 
-            sourceWrapperCollection.Add(
+            this.sourceWrapperCollection.Add(
                 new SourceWrapper(
                     workItem.QueryId,
                     workItem.Columns,
@@ -99,13 +101,13 @@ namespace Fabric.Databus.PipelineSteps
                     workItem.Rows,
                     keys,
                     workItem.PropertyType != "object",
-                    Config.KeepTemporaryLookupColumnsInOutput));
+                    this.Config.KeepTemporaryLookupColumnsInOutput));
 
-            await WriteDiagnostics(workItem);
+            await this.WriteDiagnostics(workItem);
 
-            batchNumber = workItem.BatchNumber;
+            this.batchNumber = workItem.BatchNumber;
 
-            topLevelKeyColumn = workItem.TopLevelKeyColumn;
+            this.topLevelKeyColumn = workItem.TopLevelKeyColumn;
         }
 
         /// <inheritdoc />
@@ -129,19 +131,19 @@ namespace Fabric.Databus.PipelineSteps
         /// </returns>
         protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber1, IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            if (sourceWrapperCollection.Any())
+            if (this.sourceWrapperCollection.Any())
             {
-                AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
+                this.AddToOutputQueueAsync(new SourceWrapperCollectionQueueItem
                 {
-                    BatchNumber = batchNumber,
+                    BatchNumber = this.batchNumber,
                     TotalBatches = batchCompletedQueueItem.TotalBatches,
-                    SourceWrapperCollection = sourceWrapperCollection,
-                    TopLevelKeyColumn = topLevelKeyColumn
+                    SourceWrapperCollection = this.sourceWrapperCollection,
+                    TopLevelKeyColumn = this.topLevelKeyColumn
                 });
             }
 
             // start a new collection for next batch
-            sourceWrapperCollection = new SourceWrapperCollection();
+            this.sourceWrapperCollection = new SourceWrapperCollection();
 
             return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber1, batchCompletedQueueItem);
         }
@@ -163,13 +165,13 @@ namespace Fabric.Databus.PipelineSteps
         /// </returns>
         private async Task WriteDiagnostics(SqlDataLoadedQueueItem workItem)
         {
-            if (detailedTemporaryFileWriter?.IsWritingEnabled == true && folder != null)
+            if (this.detailedTemporaryFileWriter?.IsWritingEnabled == true && this.folder != null)
             {
-                var filepath = detailedTemporaryFileWriter.CombinePath(folder, $"{workItem.QueryId}.csv");
+                var filepath = this.detailedTemporaryFileWriter.CombinePath(this.folder, $"{workItem.QueryId}.csv");
 
-                detailedTemporaryFileWriter.CreateDirectory(folder);
+                this.detailedTemporaryFileWriter.CreateDirectory(this.folder);
 
-                using (var stream = detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
+                using (var stream = this.detailedTemporaryFileWriter.OpenStreamForWriting(filepath))
                 {
                     using (var streamWriter = new StreamWriter(stream))
                     {

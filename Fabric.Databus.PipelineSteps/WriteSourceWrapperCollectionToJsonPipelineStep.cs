@@ -11,7 +11,6 @@ namespace Fabric.Databus.PipelineSteps
 {
     using System;
     using System.IO;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -35,12 +34,12 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The number of entities in batch.
         /// </summary>
-        private static int numberOfEntitiesInBatch;
+        private int numberOfEntitiesInBatch;
 
         /// <summary>
         /// The number of entities in job.
         /// </summary>
-        private static int numberOfEntitiesInJob;
+        private int numberOfEntitiesInJob;
 
         /// <inheritdoc />
         /// <summary>
@@ -81,6 +80,7 @@ namespace Fabric.Databus.PipelineSteps
             {
                 throw new ArgumentNullException(nameof(workItem.TopLevelKeyColumn));
             }
+
             workItem.SourceWrapperCollection.SortAll();
 
             using (var textWriter = new StringWriter())
@@ -97,8 +97,8 @@ namespace Fabric.Databus.PipelineSteps
 
                 foreach (var entity in actualJson)
                 {
-                    Interlocked.Increment(ref numberOfEntitiesInBatch);
-                    Interlocked.Increment(ref numberOfEntitiesInJob);
+                    Interlocked.Increment(ref this.numberOfEntitiesInBatch);
+                    Interlocked.Increment(ref this.numberOfEntitiesInJob);
 
                     var itemId = entity.SelectToken(workItem.TopLevelKeyColumn)?.ToString() ?? $"{workItem.BatchNumber}-{++i}";
 
@@ -125,16 +125,16 @@ namespace Fabric.Databus.PipelineSteps
         /// <inheritdoc />
         protected override Task CompleteBatchAsync(string queryId, bool isLastThreadForThisTask, int batchNumber, IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            batchCompletedQueueItem.NumberOfEntities = numberOfEntitiesInBatch;
-            numberOfEntitiesInBatch = 0;
+            batchCompletedQueueItem.NumberOfEntities = this.numberOfEntitiesInBatch;
+            this.numberOfEntitiesInBatch = 0;
             return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
 
         /// <inheritdoc />
         protected override Task CompleteJobAsync(string queryId, bool isLastThreadForThisTask, IJobCompletedQueueItem jobCompletedQueueItem)
         {
-            jobCompletedQueueItem.NumberOfEntities = numberOfEntitiesInJob;
-            numberOfEntitiesInJob = 0;
+            jobCompletedQueueItem.NumberOfEntities = this.numberOfEntitiesInJob;
+            this.numberOfEntitiesInJob = 0;
             return base.CompleteJobAsync(queryId, isLastThreadForThisTask, jobCompletedQueueItem);
         }
     }

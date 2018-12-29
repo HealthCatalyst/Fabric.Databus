@@ -11,6 +11,7 @@ namespace Fabric.Databus.PipelineSteps
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The databus sql reader.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IDatabusSqlReader databusSqlReader;
 
         /// <summary>
@@ -93,7 +95,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected sealed override string LoggerName => "CreateBatches";
+        protected override sealed string LoggerName => "CreateBatches";
 
         /// <inheritdoc />
         /// <summary>
@@ -149,7 +151,6 @@ namespace Fabric.Databus.PipelineSteps
                 var rangesList = ranges.ToList();
                 if (!rangesList.Any())
                 {
-
                     var batchCompletedQueueItem = new BatchCompletedQueueItem
                                                       {
                                                           BatchNumber = 1,
@@ -157,7 +158,6 @@ namespace Fabric.Databus.PipelineSteps
                                                           Start = null,
                                                           End = null
                                                       };
-
 
                     this.batchEventsLogger.BatchStarted(batchCompletedQueueItem);
 
@@ -212,8 +212,8 @@ namespace Fabric.Databus.PipelineSteps
 
                     await this.WaitTillOutputQueueIsEmptyAsync(currentBatchNumber, rangesList.Count);
 
-                    //Console.WriteLine("Hit enter to process next batch");
-                    //Console.ReadLine();
+                    //// Console.WriteLine("Hit enter to process next batch");
+                    //// Console.ReadLine();
 
                     currentBatchNumber++;
                 }

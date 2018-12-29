@@ -352,12 +352,6 @@ namespace Fabric.Databus.PipelineRunner
                 this.container.RegisterInstance<IQueueManager>(queueManager);
             }
 
-            if (!this.container.IsRegistered<IDocumentDictionary>())
-            {
-                var documentDictionary = new DocumentDictionary(MaximumDocumentsInQueue);
-                this.container.RegisterInstance<IDocumentDictionary>(documentDictionary);
-            }
-
             if (!this.container.IsRegistered<IJobConfig>())
             {
                 this.container.RegisterInstance<IJobConfig>(job.Config);

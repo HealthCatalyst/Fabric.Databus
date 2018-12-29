@@ -36,12 +36,13 @@ namespace Fabric.Databus.PipelineSteps
 
         /// <inheritdoc />
         public CreateJsonBatchesPipelineStep(
-            IJobConfig jobConfig, 
-            ILogger logger, 
-            IQueueManager queueManager, 
-            IProgressMonitor progressMonitor, 
-            CancellationToken cancellationToken) 
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState) 
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             if (this.Config.EntitiesPerUploadFile < 1)
             {

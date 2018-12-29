@@ -97,7 +97,7 @@ namespace Fabric.Databus.Interfaces.Loggers
         /// <summary>
         /// Gets or sets a value indicating whether is in queue completed.
         /// </summary>
-        public PipelineStepState State { get; set; }
+        public PipelineStepStatus Status { get; set; }
 
         /// <summary>
         /// Gets or sets the in queue name.

@@ -41,19 +41,19 @@ namespace Fabric.Databus.PipelineSteps
         /// </param>
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="pipelineStepState"></param>
         public DummyMappingUploadPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
-            CancellationToken cancellationToken) 
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState) 
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
         }
 
-        /// <summary>
-        /// The logger name.
-        /// </summary>
+        /// <inheritdoc />
         protected override string LoggerName => "NullMappingUpload";
 
         /// <inheritdoc />

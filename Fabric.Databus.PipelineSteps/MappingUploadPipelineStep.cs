@@ -53,14 +53,16 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="pipelineStepState"></param>
         public MappingUploadPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IElasticSearchUploader elasticSearchUploader,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.folder = Path.Combine(this.Config.LocalSaveFolder, $"{this.UniqueId}-{this.LoggerName}");
@@ -75,7 +77,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The logger name.
         /// </summary>
-        protected override string LoggerName => "MappingUpload";
+        protected override sealed string LoggerName => "MappingUpload";
 
         /// <inheritdoc />
         /// <summary>
@@ -110,24 +112,24 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The upload files.
         /// </summary>
-        /// <param name="wt">
-        /// The wt.
+        /// <param name="workItem">
+        /// The workItem.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task UploadFilesAsync(MappingUploadQueueItem wt)
+        private async Task UploadFilesAsync(MappingUploadQueueItem workItem)
         {
-            if (string.IsNullOrEmpty(wt.PropertyName))
+            if (string.IsNullOrEmpty(workItem.PropertyName))
             {
-                await this.elasticSearchUploader.SendMainMappingFileToHostsAsync(1, wt.Stream, doLogContent: true, doCompress: false);
+                await this.elasticSearchUploader.SendMainMappingFileToHostsAsync(1, workItem.Stream, doLogContent: true, doCompress: false);
             }
             else
             {
-                await this.elasticSearchUploader.SendNestedMappingFileToHostsAsync(1, wt.Stream, doLogContent: true, doCompress: false);
+                await this.elasticSearchUploader.SendNestedMappingFileToHostsAsync(1, workItem.Stream, doLogContent: true, doCompress: false);
             }
 
-            this.MyLogger.Verbose("Uploaded mapping file: {PropertyName} {@wt}", wt.PropertyName, wt);
+            this.MyLogger.Verbose("Uploaded mapping file: {PropertyName} {@workItem}", workItem.PropertyName, workItem);
         }
     }
 }

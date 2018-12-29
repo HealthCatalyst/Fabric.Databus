@@ -61,8 +61,9 @@ namespace Fabric.Databus.PipelineSteps
             IProgressMonitor progressMonitor,
             ISchemaLoader schemaLoader,
             IDetailedTemporaryFileWriter fileWriter,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.elasticSearchUploader = elasticSearchUploader ?? throw new ArgumentNullException(nameof(elasticSearchUploader));
             this.schemaLoader = schemaLoader ?? throw new ArgumentNullException(nameof(schemaLoader));

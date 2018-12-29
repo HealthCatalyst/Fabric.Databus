@@ -60,13 +60,15 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="cancellationToken">
         /// The cancellation token.
         /// </param>
+        /// <param name="pipelineStepState"></param>
         public WriteSourceWrapperCollectionToJsonPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
         }
 

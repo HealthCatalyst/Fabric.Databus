@@ -145,7 +145,7 @@ namespace Fabric.Databus.Domain.ProgressMonitors
         {
             this.progressMonitorItems.Where(a => a.Value.UniqueStepId == uniqueId)
                 .ToList()
-                .ForEach(a => a.Value.State = PipelineStepState.Completed);
+                .ForEach(a => a.Value.Status = PipelineStepStatus.Completed);
         }
 
         /// <summary>

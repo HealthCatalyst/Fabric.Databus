@@ -48,14 +48,16 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="cancellationToken">
         /// The cancellation token.
         /// </param>
+        /// <param name="pipelineStepState"></param>
         public JobCompletedPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IJobEventsLogger jobEventsLogger,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.jobEventsLogger = jobEventsLogger ?? throw new ArgumentNullException(nameof(jobEventsLogger));
         }

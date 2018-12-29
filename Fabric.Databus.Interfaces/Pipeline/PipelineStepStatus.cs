@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PipelineStepState.cs" company="">
+// <copyright file="PipelineStepStatus.cs" company="">
 //   
 // </copyright>
 // <summary>
@@ -12,7 +12,7 @@ namespace Fabric.Databus.Interfaces.Pipeline
     /// <summary>
     /// The pipeline step state.
     /// </summary>
-    public enum PipelineStepState
+    public enum PipelineStepStatus
     {
         /// <summary>
         /// The unknown.

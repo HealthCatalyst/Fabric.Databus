@@ -46,27 +46,29 @@ namespace Fabric.Databus.PipelineSteps
         /// Initializes a new instance of the <see cref="T:Fabric.Databus.PipelineSteps.FileSavePipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
-        /// The queue context.
+        ///     The queue context.
         /// </param>
         /// <param name="logger">
-        /// The logger.
+        ///     The logger.
         /// </param>
         /// <param name="queueManager">
-        /// The queue manager.
+        ///     The queue manager.
         /// </param>
         /// <param name="progressMonitor">
-        /// The progress monitor.
+        ///     The progress monitor.
         /// </param>
         /// <param name="fileWriter"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="pipelineStepState"></param>
         public FileSavePipelineStep(
-            IJobConfig jobConfig, 
-            ILogger logger, 
-            IQueueManager queueManager, 
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             ITemporaryFileWriter fileWriter,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
         }
@@ -100,19 +102,19 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The save file.
         /// </summary>
-        /// <param name="wt">
-        /// The wt.
+        /// <param name="workItem">
+        /// The workItem.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task SaveFile(FileUploadQueueItem wt)
+        private async Task SaveFile(FileUploadQueueItem workItem)
         {
             if (this.Config.WriteTemporaryFilesToDisk)
             {
                 var fileExtension = this.Config.CompressFiles ? @".json.gz" : @".json";
 
-                var path = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $@"data-{wt.BatchNumber}{fileExtension}");
+                var path = this.fileWriter.CombinePath(this.Config.LocalSaveFolder, $@"data-{workItem.BatchNumber}{fileExtension}");
 
                 var semaphoreSlim = this.locks.GetOrAdd(path, s => new SemaphoreSlim(1, 1));
 
@@ -128,8 +130,8 @@ namespace Fabric.Databus.PipelineSteps
                         {
                             using (var zipStream = new GZipStream(fileStream, CompressionMode.Compress, false))
                             {
-                                wt.Stream.Seek(0, SeekOrigin.Begin);
-                                await wt.Stream.CopyToAsync(zipStream);
+                                workItem.Stream.Seek(0, SeekOrigin.Begin);
+                                await workItem.Stream.CopyToAsync(zipStream);
 
                                 fileStream.Flush();
                             }
@@ -139,8 +141,8 @@ namespace Fabric.Databus.PipelineSteps
                     {
                         using (var fileStream = this.fileWriter.CreateFile(path))
                         {
-                            wt.Stream.Seek(0, SeekOrigin.Begin);
-                            await wt.Stream.CopyToAsync(fileStream);
+                            workItem.Stream.Seek(0, SeekOrigin.Begin);
+                            await workItem.Stream.CopyToAsync(fileStream);
 
                             fileStream.Flush();
                         }
@@ -156,7 +158,7 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
 
-            await this.AddToOutputQueueAsync(wt);
+            await this.AddToOutputQueueAsync(workItem);
         }
     }
 }

@@ -54,8 +54,9 @@ namespace Fabric.Databus.PipelineSteps
             ITemporaryFileWriter fileWriter,
             IEntityJsonWriter entityJsonWriter,
             IEntitySavedToJsonLogger entitySavedToJsonLogger,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.fileWriter = fileWriter ?? throw new System.ArgumentNullException(nameof(fileWriter));
             this.entityJsonWriter = entityJsonWriter ?? throw new System.ArgumentNullException(nameof(entityJsonWriter));

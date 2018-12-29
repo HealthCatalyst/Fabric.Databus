@@ -108,7 +108,8 @@ namespace PipelineStep.Tests
                     new MockProgressMonitor(),
                     new NullFileWriter(),
                     new NullQuerySqlLogger(), 
-                    cancellationTokenSource.Token);
+                    cancellationTokenSource.Token,
+                    new PipelineStepState());
 
                 var sqlJobQueueItem = new SqlQueryDataSourceQueueItem
                 {
@@ -223,7 +224,8 @@ namespace PipelineStep.Tests
                     new MockProgressMonitor(),
                     new NullFileWriter(),
                     new NullQuerySqlLogger(), 
-                    cancellationTokenSource.Token);
+                    cancellationTokenSource.Token,
+                    new PipelineStepState());
 
                 var topLevelDataSource = new TopLevelDataSource
                                              {

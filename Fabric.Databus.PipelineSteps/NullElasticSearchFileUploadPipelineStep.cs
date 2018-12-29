@@ -24,8 +24,14 @@ namespace Fabric.Databus.PipelineSteps
     public class NullElasticSearchFileUploadPipelineStep : BasePipelineStep<FileUploadQueueItem, EndPointQueueItem>
     {
         /// <inheritdoc />
-        public NullElasticSearchFileUploadPipelineStep(IJobConfig jobConfig, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor, CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+        public NullElasticSearchFileUploadPipelineStep(
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
         }
 

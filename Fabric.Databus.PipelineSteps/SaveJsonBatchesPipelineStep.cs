@@ -22,7 +22,6 @@ namespace Fabric.Databus.PipelineSteps
     using Fabric.Databus.Json;
 
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
     using QueueItems;
 
@@ -31,19 +30,15 @@ namespace Fabric.Databus.PipelineSteps
     /// <inheritdoc />
     public class SaveJsonBatchesPipelineStep : BasePipelineStep<SaveBatchQueueItem, FileUploadQueueItem>
     {
-        /// <summary>
-        /// The current batch file number.
-        /// </summary>
-        private static int currentBatchFileNumber = 0;
-
         /// <inheritdoc />
         public SaveJsonBatchesPipelineStep(
-            IJobConfig jobConfig, 
-            ILogger logger, 
-            IQueueManager queueManager, 
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
             IProgressMonitor progressMonitor,
-            CancellationToken cancellationToken) 
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState) 
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
         }
 
@@ -99,7 +94,7 @@ namespace Fabric.Databus.PipelineSteps
                     await writer.WritePropertyNameAsync("doc");
 
                     await doc.WriteToAsync(writer);
-                    //writer.WriteRaw(doc.ToString());
+                    //// writer.WriteRaw(doc.ToString());
 
                     // https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-update.html
                     await writer.WritePropertyNameAsync("doc_as_upsert");
@@ -111,7 +106,7 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
 
-            var batchNumber = Interlocked.Increment(ref currentBatchFileNumber);
+            var batchNumber = Interlocked.Increment(ref this.pipelineStepState.currentBatchFileNumber);
 
             await this.AddToOutputQueueAsync(new FileUploadQueueItem
                                                  {

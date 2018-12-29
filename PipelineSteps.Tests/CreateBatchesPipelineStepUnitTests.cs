@@ -78,7 +78,8 @@ namespace PipelineStep.Tests
                     mockDatabusSqlReader.Object,
                     new NullFileWriter(),
                     new NullBatchEventsLogger(),
-                    cancellationTokenSource.Token);
+                    cancellationTokenSource.Token,
+                    new PipelineStepState());
 
                 var sqlJobQueueItem = new SqlJobQueueItem
                 {
@@ -166,7 +167,8 @@ namespace PipelineStep.Tests
                     mockDatabusSqlReader.Object,
                     new NullFileWriter(),
                     new NullBatchEventsLogger(), 
-                    cancellationTokenSource.Token);
+                    cancellationTokenSource.Token,
+                    new PipelineStepState());
 
                 var sqlJobQueueItem = new SqlJobQueueItem
                 {
@@ -260,7 +262,8 @@ namespace PipelineStep.Tests
                     mockDatabusSqlReader.Object,
                     new NullFileWriter(),
                     new NullBatchEventsLogger(), 
-                    cancellationTokenSource.Token);
+                    cancellationTokenSource.Token,
+                    new PipelineStepState());
 
                 var sqlJobQueueItem = new SqlJobQueueItem
                                           {

@@ -57,7 +57,7 @@ namespace Fabric.Databus.Shared.Loggers
             var processed = progressMonitorItem.TotalItemsProcessed;
 
             var text =
-                $"{key,30} {loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {string.Empty,4} {inQueueCount,7} {processed,10} {@out,7} {time,15} {progressMonitorItem.State,10} {progressMonitorItem.BatchNumber, 5}/{progressMonitorItem.TotalBatches,5}";
+                $"{key,30} {loggerName,25}({queueProcessorCount,3}/{maxQueueProcessorCount,3}) {string.Empty,4} {inQueueCount,7} {processed,10} {@out,7} {time,15} {progressMonitorItem.Status,10} {progressMonitorItem.BatchNumber, 5}/{progressMonitorItem.TotalBatches,5}";
 
             this.AppendLine(text);
         }
@@ -74,7 +74,7 @@ namespace Fabric.Databus.Shared.Loggers
             const string Out = "Out";
             const string Processed = "Processed";
 
-            const string State = "State";
+            const string State = "Status";
             const string Batch = "Batch";
             const string TotalBatches = "Total";
 

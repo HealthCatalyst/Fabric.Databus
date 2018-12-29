@@ -34,16 +34,6 @@ namespace Fabric.Databus.PipelineSteps
     public class SendToRestApiPipelineStep : BasePipelineStep<IJsonObjectQueueItem, EndPointQueueItem>
     {
         /// <summary>
-        /// The number of entities uploaded.
-        /// </summary>
-        private int numberOfEntitiesUploadedForBatch;
-
-        /// <summary>
-        /// The number of entities uploaded for job.
-        /// </summary>
-        private int numberOfEntitiesUploadedForJob;
-
-        /// <summary>
         /// The file uploader.
         /// </summary>
         private readonly IFileUploader fileUploader;
@@ -73,8 +63,9 @@ namespace Fabric.Databus.PipelineSteps
             IFileUploader fileUploader,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             IEntityJsonWriter entityJsonWriter,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.fileUploader = fileUploader ?? throw new ArgumentNullException(nameof(fileUploader));
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
@@ -102,8 +93,8 @@ namespace Fabric.Databus.PipelineSteps
 
             if (fileUploadResult.StatusCode == HttpStatusCode.OK)
             {
-                Interlocked.Increment(ref numberOfEntitiesUploadedForBatch);
-                Interlocked.Increment(ref numberOfEntitiesUploadedForJob);
+                Interlocked.Increment(ref this.pipelineStepState.numberOfEntitiesUploadedForBatch);
+                Interlocked.Increment(ref this.pipelineStepState.numberOfEntitiesUploadedForJob);
             }
         }
 
@@ -120,16 +111,16 @@ namespace Fabric.Databus.PipelineSteps
             int batchNumber,
             IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            batchCompletedQueueItem.NumberOfEntitiesUploaded = numberOfEntitiesUploadedForBatch;
-            numberOfEntitiesUploadedForBatch = 0;
+            batchCompletedQueueItem.NumberOfEntitiesUploaded = this.pipelineStepState.numberOfEntitiesUploadedForBatch;
+            this.pipelineStepState.numberOfEntitiesUploadedForBatch = 0;
             return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
 
         /// <inheritdoc />
         protected override Task CompleteJobAsync(string queryId, bool isLastThreadForThisTask, IJobCompletedQueueItem jobCompletedQueueItem)
         {
-            jobCompletedQueueItem.NumberOfEntitiesUploaded = numberOfEntitiesUploadedForJob;
-            numberOfEntitiesUploadedForJob = 0;
+            jobCompletedQueueItem.NumberOfEntitiesUploaded = this.pipelineStepState.numberOfEntitiesUploadedForJob;
+            this.pipelineStepState.numberOfEntitiesUploadedForJob = 0;
             return base.CompleteJobAsync(queryId, isLastThreadForThisTask, jobCompletedQueueItem);
         }
 

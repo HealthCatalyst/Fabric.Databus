@@ -49,14 +49,16 @@ namespace Fabric.Databus.PipelineSteps
         /// </param>
         /// <param name="progressMonitor"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="pipelineStepState"></param>
         public ElasticSearchFileUploadPipelineStep(
             IJobConfig jobConfig, 
             IElasticSearchUploader elasticSearchUploader, 
             ILogger logger, 
             IQueueManager queueManager, 
             IProgressMonitor progressMonitor,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.elasticSearchUploader = elasticSearchUploader;
         }
@@ -97,21 +99,21 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The upload file.
         /// </summary>
-        /// <param name="wt">
-        /// The wt.
+        /// <param name="workItem">
+        /// The workItem.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task UploadFileAsync(FileUploadQueueItem wt)
+        private async Task UploadFileAsync(FileUploadQueueItem workItem)
         {
             await this.elasticSearchUploader.SendDataToHostsAsync(
-                    wt.BatchNumber,
-                    wt.Stream,
+                    workItem.BatchNumber,
+                    workItem.Stream,
                     doLogContent: false,
                     doCompress: this.Config.CompressFiles);
 
-            this.MyLogger.Verbose("Uploaded batch: {BatchNumber}", wt.BatchNumber);
+            this.MyLogger.Verbose("Uploaded batch: {BatchNumber}", workItem.BatchNumber);
         }
     }
 }

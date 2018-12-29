@@ -9,6 +9,7 @@
 
 namespace Fabric.Databus.PipelineSteps
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -30,6 +31,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The databus sql reader.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IDatabusSqlReader databusSqlReader;
 
         /// <inheritdoc />
@@ -39,8 +41,9 @@ namespace Fabric.Databus.PipelineSteps
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.databusSqlReader = databusSqlReader;
         }

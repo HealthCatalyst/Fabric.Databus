@@ -38,8 +38,9 @@ namespace Fabric.Databus.PipelineSteps
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IBatchEventsLogger batchEventsLogger,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.batchEventsLogger = batchEventsLogger ?? throw new ArgumentNullException(nameof(batchEventsLogger));
         }

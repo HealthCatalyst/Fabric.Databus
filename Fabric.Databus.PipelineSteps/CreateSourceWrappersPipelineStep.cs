@@ -64,8 +64,9 @@ namespace Fabric.Databus.PipelineSteps
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
 

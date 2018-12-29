@@ -64,27 +64,28 @@ namespace Fabric.Databus.PipelineSteps
         /// Initializes a new instance of the <see cref="T:QuerySqlPipelineStep.QuerySqlPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
-        /// The queue context.
+        ///     The queue context.
         /// </param>
         /// <param name="databusSqlReader">
-        /// The databus sql reader.
+        ///     The databus sql reader.
         /// </param>
         /// <param name="logger">
-        /// The logger.
+        ///     The logger.
         /// </param>
         /// <param name="queueManager">
-        /// The queue Manager.
+        ///     The queue Manager.
         /// </param>
         /// <param name="progressMonitor">
-        /// The progress monitor
+        ///     The progress monitor
         /// </param>
         /// <param name="detailedTemporaryFileWriter">
-        /// file writer
+        ///     file writer
         /// </param>
         /// <param name="querySqlLogger"></param>
         /// <param name="cancellationToken">
-        /// cancellation token
+        ///     cancellation token
         /// </param>
+        /// <param name="pipelineStepState"></param>
         public QuerySqlPipelineStep(
             IJobConfig jobConfig,
             IDatabusSqlReader databusSqlReader,
@@ -93,8 +94,9 @@ namespace Fabric.Databus.PipelineSteps
             IProgressMonitor progressMonitor,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             IQuerySqlLogger querySqlLogger,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));

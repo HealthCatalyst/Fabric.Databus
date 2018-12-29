@@ -59,21 +59,22 @@ namespace Fabric.Databus.PipelineSteps
         /// Initializes a new instance of the <see cref="T:CreateBatchesPipelineStep.CreateBatchesPipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
-        /// The queue context.
+        ///     The queue context.
         /// </param>
         /// <param name="logger">
-        /// The logger.
+        ///     The logger.
         /// </param>
         /// <param name="queueManager">
-        /// The queue Manager.
+        ///     The queue Manager.
         /// </param>
         /// <param name="progressMonitor">
-        /// The progress Monitor.
+        ///     The progress Monitor.
         /// </param>
         /// <param name="databusSqlReader"></param>
         /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="batchEventsLogger"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="pipelineStepState"></param>
         public CreateBatchesPipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
@@ -82,8 +83,9 @@ namespace Fabric.Databus.PipelineSteps
             IDatabusSqlReader databusSqlReader,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
             IBatchEventsLogger batchEventsLogger,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.databusSqlReader = databusSqlReader ?? throw new ArgumentNullException(nameof(databusSqlReader));
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter;

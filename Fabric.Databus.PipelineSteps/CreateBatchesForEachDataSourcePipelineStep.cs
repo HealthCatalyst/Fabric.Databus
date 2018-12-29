@@ -43,23 +43,25 @@ namespace Fabric.Databus.PipelineSteps
         /// Initializes a new instance of the <see cref="T:CreateBatchesForEachDataSourcePipelineStep.CreateBatchesForEachDataSourcePipelineStep" /> class.
         /// </summary>
         /// <param name="jobConfig">
-        /// The queue context.
+        ///     The queue context.
         /// </param>
         /// <param name="logger">
-        /// The logger.
+        ///     The logger.
         /// </param>
         /// <param name="queueManager"></param>
         /// <param name="progressMonitor"></param>
         /// <param name="detailedTemporaryFileWriter"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="pipelineStepState"></param>
         public CreateBatchesForEachDataSourcePipelineStep(
             IJobConfig jobConfig,
             ILogger logger,
             IQueueManager queueManager,
             IProgressMonitor progressMonitor,
             IDetailedTemporaryFileWriter detailedTemporaryFileWriter,
-            CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.detailedTemporaryFileWriter = detailedTemporaryFileWriter ?? throw new ArgumentNullException(nameof(detailedTemporaryFileWriter));
 

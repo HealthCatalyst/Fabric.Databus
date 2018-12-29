@@ -10,6 +10,7 @@
 namespace Fabric.Databus.PipelineSteps
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -42,6 +43,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <summary>
         /// The entity json writer.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly IEntityJsonWriter entityJsonWriter;
 
         /// <summary>
@@ -66,6 +68,7 @@ namespace Fabric.Databus.PipelineSteps
         /// <param name="fileWriter"></param>
         /// <param name="entityJsonWriter"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="pipelineStepState"></param>
         public SaveSchemaPipelineStep(
             IJobConfig jobConfig, 
             ILogger logger, 
@@ -73,8 +76,9 @@ namespace Fabric.Databus.PipelineSteps
             IProgressMonitor progressMonitor,
             ITemporaryFileWriter fileWriter,
             IEntityJsonWriter entityJsonWriter,
-            CancellationToken cancellationToken) 
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState) 
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
             this.fileWriter = fileWriter ?? throw new ArgumentNullException(nameof(fileWriter));
             this.entityJsonWriter = entityJsonWriter ?? throw new ArgumentNullException(nameof(entityJsonWriter));
@@ -83,7 +87,7 @@ namespace Fabric.Databus.PipelineSteps
         }
 
         /// <inheritdoc />
-        protected override string LoggerName => "SaveSchema";
+        protected override sealed string LoggerName => "SaveSchema";
 
         /// <inheritdoc />
         protected override async Task HandleAsync(SaveSchemaQueueItem workItem)

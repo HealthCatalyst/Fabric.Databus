@@ -64,7 +64,8 @@ namespace PipelineStep.Tests
                     logger,
                     queueManager,
                     new MockProgressMonitor(),
-                    cancellationTokenSource.Token);
+                    cancellationTokenSource.Token,
+                    new PipelineStepState());
 
                 var stepNumber = 1;
                 queueManager.CreateInputQueue<IJsonObjectQueueItem>(stepNumber);

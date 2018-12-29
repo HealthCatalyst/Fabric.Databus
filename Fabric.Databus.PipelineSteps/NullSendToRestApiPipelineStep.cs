@@ -26,8 +26,14 @@ namespace Fabric.Databus.PipelineSteps
     public class NullSendToRestApiPipelineStep : BasePipelineStep<IJsonObjectQueueItem, EndPointQueueItem>
     {
         /// <inheritdoc />
-        public NullSendToRestApiPipelineStep(IJobConfig jobConfig, ILogger logger, IQueueManager queueManager, IProgressMonitor progressMonitor, CancellationToken cancellationToken)
-            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken)
+        public NullSendToRestApiPipelineStep(
+            IJobConfig jobConfig,
+            ILogger logger,
+            IQueueManager queueManager,
+            IProgressMonitor progressMonitor,
+            CancellationToken cancellationToken,
+            PipelineStepState pipelineStepState)
+            : base(jobConfig, logger, queueManager, progressMonitor, cancellationToken, pipelineStepState)
         {
         }
 

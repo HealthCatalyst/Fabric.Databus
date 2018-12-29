@@ -19,12 +19,14 @@ namespace Fabric.Databus.PipelineRunner
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Pipeline;
     using Fabric.Databus.Interfaces.Queues;
+    using Fabric.Databus.PipelineSteps;
 
     using Unity;
     using Unity.Resolution;
 
+    /// <inheritdoc />
     /// <summary>
-    /// The multi threader pipeline executor.
+    /// The multi thread pipeline executor.
     /// </summary>
     public class MultiThreadedPipelineExecutor : PipelineExecutorBase
     {
@@ -53,13 +55,16 @@ namespace Fabric.Databus.PipelineRunner
 
             foreach (var pipelineStep in pipelineSteps)
             {
+                var pipelineStepState = new PipelineStepState();
+
                 // ReSharper disable once ConvertToLocalFunction
 #pragma warning disable IDE0039 // Use local function
                 Func<IPipelineStep> functionPipelineStep =
 #pragma warning restore IDE0039 // Use local function
                     () => (IPipelineStep)this.container.Resolve(
-                    pipelineStep.Type,
-                    new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token));
+                        pipelineStep.Type,
+                        new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token),
+                        new ParameterOverride("pipelineStepState", pipelineStepState));
 
                 var tasksForPipelineStep = this.CreateTasks(functionPipelineStep, pipelineStep.Count);
 

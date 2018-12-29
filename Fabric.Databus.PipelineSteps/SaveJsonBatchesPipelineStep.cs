@@ -106,7 +106,7 @@ namespace Fabric.Databus.PipelineSteps
                 }
             }
 
-            var batchNumber = Interlocked.Increment(ref this.pipelineStepState.currentBatchFileNumber);
+            var batchNumber = this.pipelineStepState.IncrementCurrentBatchFileNumber();
 
             await this.AddToOutputQueueAsync(new FileUploadQueueItem
                                                  {

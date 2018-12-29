@@ -156,8 +156,8 @@ namespace Fabric.Databus.PipelineSteps
         /// <inheritdoc />
         public async Task MonitorWorkQueueAsync()
         {
-            var currentProcessorCount = Interlocked.Increment(ref this.pipelineStepState.currentInstancesOfStep);
-            Interlocked.Increment(ref this.pipelineStepState.maximumInstancesOfStep);
+            var currentProcessorCount = this.pipelineStepState.IncrementCurrentInstancesOfStep();
+            this.pipelineStepState.IncrementMaximumInstancesOfStep();
 
             var isFirstThreadForThisTask = currentProcessorCount < 2;
             await this.BeginAsync(isFirstThreadForThisTask);
@@ -181,7 +181,7 @@ namespace Fabric.Databus.PipelineSteps
                 catch (Exception e)
                 {
                     this.MyLogger.Verbose("{@Exception}", e);
-                    this.pipelineStepState.errorText = e.ToString();
+                    this.pipelineStepState.ErrorText = e.ToString();
                     throw new DatabusPipelineStepException(this.LoggerName, e);
                 }
             }
@@ -295,7 +295,7 @@ namespace Fabric.Databus.PipelineSteps
         {
             // Logger.Verbose($"AddToOutputQueueAsync {item.ToJson()}");
             this.outQueue.Add(item);
-            Interlocked.Increment(ref this.pipelineStepState.totalItemsAddedToOutputQueue);
+            this.pipelineStepState.IncrementTotalItemsAddedToOutputQueue();
 
             if (this.workItemQueryId != null)
             {
@@ -464,7 +464,7 @@ namespace Fabric.Databus.PipelineSteps
                     "{Name} Job Completed. Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
                     this.LoggerName,
                     this.outQueue.Count,
-                    this.pipelineStepState.totalItemsProcessed,
+                    this.pipelineStepState.TotalItemsProcessed,
                     this.totalItemsProcessedByThisProcessor);
 
                 await this.CompleteJobAsync(null, true, jobCompletedQueueItem);
@@ -478,7 +478,7 @@ namespace Fabric.Databus.PipelineSteps
                     this.LoggerName,
                     wt1.BatchNumber,
                     this.outQueue.Count,
-                    this.pipelineStepState.totalItemsProcessed,
+                    this.pipelineStepState.TotalItemsProcessed,
                     this.totalItemsProcessedByThisProcessor);
 
                 await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber, batchCompletedQueueItem);
@@ -487,7 +487,7 @@ namespace Fabric.Databus.PipelineSteps
 
             var wt = wt1 as TQueueInItem ?? throw new Exception("wt1 is not TQueueItem");
 
-            this.pipelineStepState.blockedTime = this.pipelineStepState.blockedTime.Add(stopWatch.Elapsed);
+            this.pipelineStepState.BlockedTime = this.pipelineStepState.BlockedTime.Add(stopWatch.Elapsed);
 
             this.workItemQueryId = wt.QueryId;
 
@@ -505,7 +505,7 @@ namespace Fabric.Databus.PipelineSteps
                 throw new DatabusPipelineStepWorkItemException(wt1, e);
             }
 
-            this.pipelineStepState.processingTime = this.pipelineStepState.processingTime.Add(stopWatch.Elapsed);
+            this.pipelineStepState.ProcessingTime = this.pipelineStepState.ProcessingTime.Add(stopWatch.Elapsed);
 
             var uniqueWorkItemId = this.GetId(wt);
             if (uniqueWorkItemId != null)
@@ -520,7 +520,7 @@ namespace Fabric.Databus.PipelineSteps
 
             this.totalItemsProcessedByThisProcessor++;
 
-            Interlocked.Increment(ref this.pipelineStepState.totalItemsProcessed);
+            this.pipelineStepState.IncrementTotalItemsProcessed();
 
             this.LogItemToConsole(wt, PipelineStepStatus.Processed);
 
@@ -530,7 +530,7 @@ namespace Fabric.Databus.PipelineSteps
                 this.workItemQueryId,
                 this.GetId(wt),
                 this.outQueue.Count,
-                this.pipelineStepState.totalItemsProcessed,
+                this.pipelineStepState.TotalItemsProcessed,
                 this.totalItemsProcessedByThisProcessor);
 
             // try to explicitly remove reference
@@ -569,11 +569,11 @@ namespace Fabric.Databus.PipelineSteps
         {
             var timeElapsedProcessing = queryId != null && this.pipelineStepState.ProcessingTimeByQueryId.ContainsKey(queryId)
                                             ? this.pipelineStepState.ProcessingTimeByQueryId[queryId]
-                                            : this.pipelineStepState.processingTime;
+                                            : this.pipelineStepState.ProcessingTime;
 
             var itemsAddedToOutputQueue = this.workItemQueryId != null && this.pipelineStepState.TotalItemsAddedToOutputQueueByQueryId.ContainsKey(this.workItemQueryId)
                                               ? this.pipelineStepState.TotalItemsAddedToOutputQueueByQueryId[this.workItemQueryId]
-                                              : this.pipelineStepState.totalItemsAddedToOutputQueue;
+                                              : this.pipelineStepState.TotalItemsAddedToOutputQueue;
 
             var progressMonitorItem = new ProgressMonitorItem
                                           {
@@ -588,13 +588,13 @@ namespace Fabric.Databus.PipelineSteps
                                               InQueueName = this.InQueue.Name,
                                               Status = pipelineStepStatus,
                                               TimeElapsedProcessing = timeElapsedProcessing,
-                                              TimeElapsedBlocked = this.pipelineStepState.blockedTime,
-                                              TotalItemsProcessed = this.pipelineStepState.totalItemsProcessed,
+                                              TimeElapsedBlocked = this.pipelineStepState.BlockedTime,
+                                              TotalItemsProcessed = this.pipelineStepState.TotalItemsProcessed,
                                               TotalItemsAddedToOutputQueue = itemsAddedToOutputQueue,
                                               OutQueueName = this.outQueue.Name,
-                                              QueueProcessorCount = this.pipelineStepState.currentInstancesOfStep,
-                                              MaxQueueProcessorCount = this.pipelineStepState.maximumInstancesOfStep,
-                                              ErrorText = this.pipelineStepState.errorText,
+                                              QueueProcessorCount = this.pipelineStepState.CurrentInstancesOfStep,
+                                              MaxQueueProcessorCount = this.pipelineStepState.MaximumInstancesOfStep,
+                                              ErrorText = this.pipelineStepState.ErrorText,
                                           };
 
             this.progressMonitor.SetProgressItem(progressMonitorItem);

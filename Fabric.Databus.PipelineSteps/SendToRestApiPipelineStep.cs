@@ -93,8 +93,8 @@ namespace Fabric.Databus.PipelineSteps
 
             if (fileUploadResult.StatusCode == HttpStatusCode.OK)
             {
-                Interlocked.Increment(ref this.pipelineStepState.numberOfEntitiesUploadedForBatch);
-                Interlocked.Increment(ref this.pipelineStepState.numberOfEntitiesUploadedForJob);
+                this.pipelineStepState.IncrementNumberOfEntitiesUploadedForBatch();
+                this.pipelineStepState.IncrementNumberOfEntitiesUploadedForJob();
             }
         }
 
@@ -111,16 +111,16 @@ namespace Fabric.Databus.PipelineSteps
             int batchNumber,
             IBatchCompletedQueueItem batchCompletedQueueItem)
         {
-            batchCompletedQueueItem.NumberOfEntitiesUploaded = this.pipelineStepState.numberOfEntitiesUploadedForBatch;
-            this.pipelineStepState.numberOfEntitiesUploadedForBatch = 0;
+            batchCompletedQueueItem.NumberOfEntitiesUploaded = this.pipelineStepState.NumberOfEntitiesUploadedForBatch;
+            this.pipelineStepState.ResetNumberOfEntitiesUploadedForBatch();
             return base.CompleteBatchAsync(queryId, isLastThreadForThisTask, batchNumber, batchCompletedQueueItem);
         }
 
         /// <inheritdoc />
         protected override Task CompleteJobAsync(string queryId, bool isLastThreadForThisTask, IJobCompletedQueueItem jobCompletedQueueItem)
         {
-            jobCompletedQueueItem.NumberOfEntitiesUploaded = this.pipelineStepState.numberOfEntitiesUploadedForJob;
-            this.pipelineStepState.numberOfEntitiesUploadedForJob = 0;
+            jobCompletedQueueItem.NumberOfEntitiesUploaded = this.pipelineStepState.NumberOfEntitiesUploadedForJob;
+            this.pipelineStepState.ResetNumberOfEntitiesUploadedForJob();
             return base.CompleteJobAsync(queryId, isLastThreadForThisTask, jobCompletedQueueItem);
         }
 

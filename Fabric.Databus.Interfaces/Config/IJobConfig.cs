@@ -9,6 +9,8 @@
 
 namespace Fabric.Databus.Interfaces.Config
 {
+    using System.Diagnostics.CodeAnalysis;
+
     /// <summary>
     /// The JobConfig interface.
     /// </summary>
@@ -62,11 +64,17 @@ namespace Fabric.Databus.Interfaces.Config
         /// <summary>
         /// Gets or sets the sql command timeout in seconds.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         int SqlCommandTimeoutInSeconds { get; set; }
 
         /// <summary>
         /// Gets or sets the entity type.
         /// </summary>
         string EntityType { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether track performance.
+        /// </summary>
+        bool TrackPerformance { get; set; }
     }
 }

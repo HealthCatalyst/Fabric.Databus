@@ -56,11 +56,6 @@ namespace Fabric.Databus.PipelineRunner
     public class PipelineRunner : IImportRunner
     {
         /// <summary>
-        /// The maximum documents in queue.
-        /// </summary>
-        private const int MaximumDocumentsInQueue = 1 * 1000;
-
-        /// <summary>
         /// The timeout in milliseconds.
         /// </summary>
         private const int TimeoutInMilliseconds = 30 * 60 * 1000; // 5 * 60 * 60 * 1000;

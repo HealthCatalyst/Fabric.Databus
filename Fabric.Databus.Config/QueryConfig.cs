@@ -10,6 +10,7 @@
 namespace Fabric.Databus.Config
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Net.Http;
     using System.Runtime.Serialization;
     using System.Xml.Serialization;
@@ -26,6 +27,7 @@ namespace Fabric.Databus.Config
         /// <summary>
         /// The default sql command timeout in seconds.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private const int DefaultSqlCommandTimeoutInSeconds = 120;
 
 
@@ -155,5 +157,8 @@ namespace Fabric.Databus.Config
 
         /// <inheritdoc />
         public bool LogVerbose { get; set; }
+
+        /// <inheritdoc />
+        public bool TrackPerformance { get; set; }
     }
 }

@@ -299,7 +299,10 @@ namespace Fabric.Databus.PipelineSteps
 
             if (this.workItemQueryId != null)
             {
-                this.pipelineStepState.TotalItemsAddedToOutputQueueByQueryId.AddOrUpdate(this.workItemQueryId, 1, (key, currentValue) => currentValue + 1);
+                if (this.Config.TrackPerformance)
+                {
+                    this.pipelineStepState.TotalItemsAddedToOutputQueueByQueryId.AddOrUpdate(this.workItemQueryId, 1, (key, currentValue) => currentValue + 1);
+                }
             }
 
             return Task.CompletedTask;
@@ -510,10 +513,13 @@ namespace Fabric.Databus.PipelineSteps
             var uniqueWorkItemId = this.GetId(wt);
             if (uniqueWorkItemId != null)
             {
-                this.pipelineStepState.ProcessingTimeByQueryId.AddOrUpdate(
+                if (this.Config.TrackPerformance)
+                {
+                    this.pipelineStepState.ProcessingTimeByQueryId.AddOrUpdate(
                     uniqueWorkItemId,
                     stopWatch.Elapsed,
                     (myQueryId, previousElapsed) => previousElapsed.Add(stopWatch.Elapsed));
+                }
             }
 
             stopWatch.Stop();
@@ -576,26 +582,26 @@ namespace Fabric.Databus.PipelineSteps
                                               : this.pipelineStepState.TotalItemsAddedToOutputQueue;
 
             var progressMonitorItem = new ProgressMonitorItem
-                                          {
-                                              StepNumber = this.stepNumber,
-                                              BatchNumber = batchNumber,
-                                              TotalBatches = totalBatches,
-                                              QueryId = queryId,
-                                              LoggerName = this.LoggerName,
-                                              Id = id1,
-                                              UniqueStepId = this.UniqueId,
-                                              InQueueCount = this.InQueue.Count,
-                                              InQueueName = this.InQueue.Name,
-                                              Status = pipelineStepStatus,
-                                              TimeElapsedProcessing = timeElapsedProcessing,
-                                              TimeElapsedBlocked = this.pipelineStepState.BlockedTime,
-                                              TotalItemsProcessed = this.pipelineStepState.TotalItemsProcessed,
-                                              TotalItemsAddedToOutputQueue = itemsAddedToOutputQueue,
-                                              OutQueueName = this.outQueue.Name,
-                                              QueueProcessorCount = this.pipelineStepState.CurrentInstancesOfStep,
-                                              MaxQueueProcessorCount = this.pipelineStepState.MaximumInstancesOfStep,
-                                              ErrorText = this.pipelineStepState.ErrorText,
-                                          };
+            {
+                StepNumber = this.stepNumber,
+                BatchNumber = batchNumber,
+                TotalBatches = totalBatches,
+                QueryId = queryId,
+                LoggerName = this.LoggerName,
+                Id = id1,
+                UniqueStepId = this.UniqueId,
+                InQueueCount = this.InQueue.Count,
+                InQueueName = this.InQueue.Name,
+                Status = pipelineStepStatus,
+                TimeElapsedProcessing = timeElapsedProcessing,
+                TimeElapsedBlocked = this.pipelineStepState.BlockedTime,
+                TotalItemsProcessed = this.pipelineStepState.TotalItemsProcessed,
+                TotalItemsAddedToOutputQueue = itemsAddedToOutputQueue,
+                OutQueueName = this.outQueue.Name,
+                QueueProcessorCount = this.pipelineStepState.CurrentInstancesOfStep,
+                MaxQueueProcessorCount = this.pipelineStepState.MaximumInstancesOfStep,
+                ErrorText = this.pipelineStepState.ErrorText,
+            };
 
             this.progressMonitor.SetProgressItem(progressMonitorItem);
 

@@ -28,7 +28,7 @@ namespace Fabric.Databus.Shared.Queues
         where T : class, IQueueItem
     {
         /// <summary>
-        /// The blocking collection.
+        /// The blocking underlyingConcurrentQueue.
         /// </summary>
         private readonly BlockingCollection<IQueueItem> blockingCollection;
 
@@ -38,6 +38,11 @@ namespace Fabric.Databus.Shared.Queues
         private readonly string name;
 
         /// <summary>
+        /// The underlying concurrent queue.
+        /// </summary>
+        private readonly ConcurrentQueue<IQueueItem> underlyingConcurrentQueue;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="InMemoryQueue{T}"/> class.
         /// </summary>
         /// <param name="name">
@@ -45,8 +50,8 @@ namespace Fabric.Databus.Shared.Queues
         /// </param>
         public InMemoryQueue(string name)
         {
-            var concurrentQueue = new ConcurrentQueue<IQueueItem>();
-            this.blockingCollection = new BlockingCollection<IQueueItem>(concurrentQueue);
+            this.underlyingConcurrentQueue = new ConcurrentQueue<IQueueItem>();
+            this.blockingCollection = new BlockingCollection<IQueueItem>(this.underlyingConcurrentQueue);
             this.name = name;
         }
 
@@ -91,6 +96,30 @@ namespace Fabric.Databus.Shared.Queues
             {
                 await Task.Delay(1000, cancellationToken);
             }
+        }
+
+        /// <inheritdoc />
+        public TQueueInItem Take<TQueueInItem>(CancellationToken cancellationToken)
+            where TQueueInItem : class, IQueueItem
+        {
+            try
+            {
+                IQueueItem item;
+                if (this.underlyingConcurrentQueue.TryPeek(out item))
+                {
+                    if (item is TQueueInItem)
+                    {
+
+                    }
+                }
+
+                return this.blockingCollection.Take(cancellationToken) as TQueueInItem;
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            return default(TQueueInItem);
         }
 
         /// <inheritdoc />

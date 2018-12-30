@@ -110,5 +110,20 @@ namespace Fabric.Databus.Interfaces.Queues
         /// The <see cref="Task"/>.
         /// </returns>
         Task WaitTillEmptyAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// The take.
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// The cancellation token.
+        /// </param>
+        /// <typeparam name="TQueueInItem">
+        /// type of queue item
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="TQueueInItem"/>.
+        /// </returns>
+        TQueueInItem Take<TQueueInItem>(CancellationToken cancellationToken)
+            where TQueueInItem : class, IQueueItem;
     }
 }

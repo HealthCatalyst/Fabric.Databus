@@ -130,6 +130,13 @@ namespace Fabric.Databus.Shared.Queues
         }
 
         /// <inheritdoc />
+        public TQueueInItem Take<TQueueInItem>(CancellationToken cancellationToken)
+            where TQueueInItem : class, IQueueItem
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
         public void Add(T item)
         {
             this.BlockIfNeeded();

@@ -78,6 +78,11 @@ namespace Fabric.Databus.PipelineSteps
         private string workItemQueryId;
 
         /// <summary>
+        /// The is first thread for this task.
+        /// </summary>
+        private bool isFirstThreadForThisTask;
+
+        /// <summary>
         /// The pipeline step state.
         /// </summary>
         protected readonly PipelineStepState pipelineStepState;
@@ -159,8 +164,8 @@ namespace Fabric.Databus.PipelineSteps
             var currentProcessorCount = this.pipelineStepState.IncrementCurrentInstancesOfStep();
             this.pipelineStepState.IncrementMaximumInstancesOfStep();
 
-            var isFirstThreadForThisTask = currentProcessorCount < 2;
-            await this.BeginAsync(isFirstThreadForThisTask);
+            this.isFirstThreadForThisTask = currentProcessorCount < 2;
+            await this.BeginAsync(this.isFirstThreadForThisTask);
 
             this.LogToConsole(null, null, PipelineStepStatus.Starting, 0, 0);
 
@@ -454,63 +459,72 @@ namespace Fabric.Databus.PipelineSteps
         {
             stopWatch.Restart();
 
-            IQueueItem wt1 = this.InQueue.TakeGeneric(this.cancellationToken);
+            TQueueInItem workItem;
 
-            if (wt1 == null)
+            if (this.isFirstThreadForThisTask)
             {
-                return false;
-            }
+                IQueueItem wt1 = this.InQueue.TakeGeneric(this.cancellationToken);
 
-            if (wt1 is JobCompletedQueueItem jobCompletedQueueItem)
+                if (wt1 == null)
+                {
+                    return false;
+                }
+
+                if (wt1 is JobCompletedQueueItem jobCompletedQueueItem)
+                {
+                    this.MyLogger.Verbose(
+                        "{Name} Job Completed. Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
+                        this.LoggerName,
+                        this.outQueue.Count,
+                        this.pipelineStepState.TotalItemsProcessed,
+                        this.totalItemsProcessedByThisProcessor);
+
+                    await this.CompleteJobAsync(null, true, jobCompletedQueueItem);
+                    return false;
+                }
+
+                if (wt1 is BatchCompletedQueueItem batchCompletedQueueItem)
+                {
+                    this.MyLogger.Verbose(
+                        "{Name} Batch Completed (batch). Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
+                        this.LoggerName,
+                        wt1.BatchNumber,
+                        this.outQueue.Count,
+                        this.pipelineStepState.TotalItemsProcessed,
+                        this.totalItemsProcessedByThisProcessor);
+
+                    await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber, batchCompletedQueueItem);
+                    return true;
+                }
+
+                workItem = wt1 as TQueueInItem ?? throw new Exception("wt1 is not TQueueItem");
+            }
+            else
             {
-                this.MyLogger.Verbose(
-                    "{Name} Job Completed. Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
-                    this.LoggerName,
-                    this.outQueue.Count,
-                    this.pipelineStepState.TotalItemsProcessed,
-                    this.totalItemsProcessedByThisProcessor);
-
-                await this.CompleteJobAsync(null, true, jobCompletedQueueItem);
-                return false;
+                workItem = this.InQueue.Take<TQueueInItem>(this.cancellationToken);
             }
-
-            if (wt1 is BatchCompletedQueueItem batchCompletedQueueItem)
-            {
-                this.MyLogger.Verbose(
-                    "{Name} Batch Completed (batch). Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
-                    this.LoggerName,
-                    wt1.BatchNumber,
-                    this.outQueue.Count,
-                    this.pipelineStepState.TotalItemsProcessed,
-                    this.totalItemsProcessedByThisProcessor);
-
-                await this.CompleteBatchAsync(null, true, batchCompletedQueueItem.BatchNumber, batchCompletedQueueItem);
-                return true;
-            }
-
-            var wt = wt1 as TQueueInItem ?? throw new Exception("wt1 is not TQueueItem");
 
             this.pipelineStepState.BlockedTime = this.pipelineStepState.BlockedTime.Add(stopWatch.Elapsed);
 
-            this.workItemQueryId = wt.QueryId;
+            this.workItemQueryId = workItem.QueryId;
 
-            this.LogItemToConsole(wt, PipelineStepStatus.Processing);
+            this.LogItemToConsole(workItem, PipelineStepStatus.Processing);
 
             stopWatch.Restart();
 
             try
             {
                 // if we use await here then we go through all the items and nothing gets processed
-                this.InternalHandleAsync(wt).Wait(this.cancellationToken);
+                this.InternalHandleAsync(workItem).Wait(this.cancellationToken);
             }
             catch (Exception e)
             {
-                throw new DatabusPipelineStepWorkItemException(wt1, e);
+                throw new DatabusPipelineStepWorkItemException(workItem, e);
             }
 
             this.pipelineStepState.ProcessingTime = this.pipelineStepState.ProcessingTime.Add(stopWatch.Elapsed);
 
-            var uniqueWorkItemId = this.GetId(wt);
+            var uniqueWorkItemId = this.GetId(workItem);
             if (uniqueWorkItemId != null)
             {
                 if (this.Config.TrackPerformance)
@@ -528,22 +542,20 @@ namespace Fabric.Databus.PipelineSteps
 
             this.pipelineStepState.IncrementTotalItemsProcessed();
 
-            this.LogItemToConsole(wt, PipelineStepStatus.Processed);
+            this.LogItemToConsole(workItem, PipelineStepStatus.Processed);
 
             this.MyLogger.Debug(
                 "{Name}({queryId}) Processed: {id} Queue Length: {QueueLength} {totalItemsProcessed},  {totalItemsProcessedByThisProcessor0}",
                 this.LoggerName,
                 this.workItemQueryId,
-                this.GetId(wt),
+                this.GetId(workItem),
                 this.outQueue.Count,
                 this.pipelineStepState.TotalItemsProcessed,
                 this.totalItemsProcessedByThisProcessor);
 
             // try to explicitly remove reference
             // ReSharper disable once RedundantAssignment
-            wt = null;
-            // ReSharper disable once RedundantAssignment
-            wt1 = null;
+            workItem = null;
 
             return true;
         }

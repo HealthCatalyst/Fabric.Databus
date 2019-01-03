@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MockProgressMonitor.cs" company="">
+// <copyright file="DummyProgressMonitor.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   Defines the MockProgressMonitor type.
+//   Defines the DummyProgressMonitor type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ namespace PipelineStep.Tests
     /// <summary>
     /// The mock progress monitor.
     /// </summary>
-    public class MockProgressMonitor : IProgressMonitor
+    public class DummyProgressMonitor : IProgressMonitor
     {
         /// <inheritdoc />
         public Action JobHistoryUpdateAction { get; set; }

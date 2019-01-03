@@ -105,7 +105,9 @@ namespace PipelineRunnerTests
 
             var mockConfigValidator = mockRepository.Create<IConfigValidator>();
             mockConfigValidator.Setup(service => service.ValidateJob(It.IsAny<IJob>(), It.IsAny<ILogger>()));
-            mockConfigValidator.Setup(service => service.ValidateDataSourcesAsync(It.IsAny<IJob>(), It.IsAny<ILogger>()));
+            mockConfigValidator
+                .Setup(service => service.ValidateDataSourcesAsync(It.IsAny<IJob>(), It.IsAny<ILogger>()))
+                .Returns(Task.CompletedTask);
 
             var mockFileUploaderFactory = mockRepository.Create<IElasticSearchUploaderFactory>();
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();
@@ -237,7 +239,9 @@ namespace PipelineRunnerTests
 
             var mockConfigValidator = mockRepository.Create<IConfigValidator>();
             mockConfigValidator.Setup(service => service.ValidateJob(It.IsAny<IJob>(), It.IsAny<ILogger>()));
-            mockConfigValidator.Setup(service => service.ValidateDataSourcesAsync(It.IsAny<IJob>(), It.IsAny<ILogger>()));
+            mockConfigValidator
+                .Setup(service => service.ValidateDataSourcesAsync(It.IsAny<IJob>(), It.IsAny<ILogger>()))
+                .Returns(Task.CompletedTask);
 
             var mockFileUploaderFactory = mockRepository.Create<IElasticSearchUploaderFactory>();
             var mockFileUploader = mockRepository.Create<IElasticSearchUploader>();

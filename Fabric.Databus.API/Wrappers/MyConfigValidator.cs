@@ -37,10 +37,10 @@ namespace Fabric.Databus.API.Wrappers
         }
 
         /// <inheritdoc />
-        public void ValidateDataSourcesAsync(IJob job, ILogger logger)
+        public async Task ValidateDataSourcesAsync(IJob job, ILogger logger)
         {
             var configValidator = CreateConfigValidator();
-            configValidator.ValidateDataSourcesAsync(job, logger);
+            await configValidator.ValidateDataSourcesAsync(job, logger);
         }
 
         /// <summary>

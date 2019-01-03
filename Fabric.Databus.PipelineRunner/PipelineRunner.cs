@@ -171,7 +171,7 @@ namespace Fabric.Databus.PipelineRunner
                     job.Data.TopLevelDataSource.TableOrView);
             }
 
-            this.container.Resolve<IConfigValidator>().ValidateDataSourcesAsync(job, logger);
+            this.container.Resolve<IConfigValidator>().ValidateDataSourcesAsync(job, logger).Wait();
 
             // add job to the first queue
             var sqlJobQueue = this.container.Resolve<IQueueManager>()

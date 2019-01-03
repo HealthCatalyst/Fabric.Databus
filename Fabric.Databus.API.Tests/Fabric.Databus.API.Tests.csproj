@@ -7,15 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Files\badjob.xml" />
     <None Remove="Files\job.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Files\badjob.xml" />
     <EmbeddedResource Include="Files\job.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
     <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
     <PackageReference Include="Nancy.Testing" Version="2.0.0-clinteastwood" />

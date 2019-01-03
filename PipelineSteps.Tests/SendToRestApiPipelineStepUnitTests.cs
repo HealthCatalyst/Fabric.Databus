@@ -147,7 +147,7 @@ namespace PipelineStep.Tests
                     job.Config,
                     logger,
                     queueManager,
-                    new MockProgressMonitor(),
+                    new DummyProgressMonitor(),
                     fileUploader,
                     new NullFileWriter(), 
                     entityJsonWriter,

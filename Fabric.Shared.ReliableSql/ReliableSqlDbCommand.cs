@@ -13,6 +13,7 @@ namespace Fabric.Shared.ReliableSql
     using System.Data;
     using System.Data.Common;
     using System.Data.SqlClient;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -25,6 +26,7 @@ namespace Fabric.Shared.ReliableSql
         /// <summary>
         /// The underlying sql command.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly SqlCommand underlyingSqlCommand;
 
         /// <summary>
@@ -115,6 +117,19 @@ namespace Fabric.Shared.ReliableSql
             this.retryPolicy.Execute(() => this.underlyingSqlCommand.Prepare());
         }
 
+
+        /// <inheritdoc />
+        public override Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
+        {
+            return this.retryPolicy.ExecuteAsync(() => this.underlyingSqlCommand.ExecuteNonQueryAsync(cancellationToken), cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public override Task<object> ExecuteScalarAsync(CancellationToken cancellationToken)
+        {
+            return this.retryPolicy.ExecuteAsync(() => this.underlyingSqlCommand.ExecuteScalarAsync(cancellationToken), cancellationToken);
+        }
+
         /// <inheritdoc />
         protected override DbParameter CreateDbParameter()
         {
@@ -127,26 +142,20 @@ namespace Fabric.Shared.ReliableSql
             return this.retryPolicy.Execute(() => this.underlyingSqlCommand.ExecuteReader(behavior));
         }
 
+        /// <inheritdoc />
         protected override async Task<DbDataReader> ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
         {
-            return await this.retryPolicy.ExecuteAsync(async () =>
-            {
-                if (this.DbConnection.State != ConnectionState.Open)
-                {
-                    await this.DbConnection.OpenAsync(cancellationToken);
-                }
-                return await this.underlyingSqlCommand.ExecuteReaderAsync(behavior, cancellationToken);
-            }, cancellationToken);
-        }
+            return await this.retryPolicy.ExecuteAsync(
+                       async () =>
+                           {
+                               if (this.DbConnection.State != ConnectionState.Open)
+                               {
+                                   await this.DbConnection.OpenAsync(cancellationToken);
+                               }
 
-        public override Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
-        {
-            return this.retryPolicy.ExecuteAsync(() => this.underlyingSqlCommand.ExecuteNonQueryAsync(cancellationToken), cancellationToken);
-        }
-
-        public override Task<object> ExecuteScalarAsync(CancellationToken cancellationToken)
-        {
-            return this.retryPolicy.ExecuteAsync(() => this.underlyingSqlCommand.ExecuteScalarAsync(cancellationToken), cancellationToken);
+                               return await this.underlyingSqlCommand.ExecuteReaderAsync(behavior, cancellationToken);
+                           },
+                       cancellationToken);
         }
 
         /// <inheritdoc />

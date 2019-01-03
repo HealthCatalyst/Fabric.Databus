@@ -89,22 +89,20 @@ namespace Fabric.Databus.PipelineRunner
 
                 configValidationResult.Results.Add("Config format: OK");
 
-                //var ping = new Ping();
+                this.ValidateJob(job, logger);
 
-                //PingReply pingResult = null;
-                //ping.SendPingAsync("dockerhost").ContinueWith((a) => pingResult = a.Result).Wait();
+                ////var ping = new Ping();
 
-                //configValidationResult.Results.Add($"ping dockerhost: {pingResult?.Address}");
+                ////PingReply pingResult = null;
+                ////ping.SendPingAsync("dockerhost").ContinueWith((a) => pingResult = a.Result).Wait();
+
+                ////configValidationResult.Results.Add($"ping dockerhost: {pingResult?.Address}");
 
                 configValidationResult.Results.Add($"Sql Connection String: {job.Config.ConnectionString}");
 
-                await this.CheckDatabaseConnectionStringIsValid(job);
+                await this.CheckDatabaseConnectionStringIsValidAsync(job);
 
                 configValidationResult.Results.Add($"Sql Connection String: OK");
-
-                var firstQueryIsValid = await this.CheckFirstQueryIsValid(job, logger) ? "OK" : "No Rows";
-
-                configValidationResult.Results.Add($"First Query: {firstQueryIsValid}");
 
                 int i = 0;
                 foreach (var load in job.Data.DataSources)
@@ -148,7 +146,7 @@ namespace Fabric.Databus.PipelineRunner
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        public Task<bool> CheckDatabaseConnectionStringIsValid(IJob job)
+        public Task<bool> CheckDatabaseConnectionStringIsValidAsync(IJob job)
         {
             if (string.IsNullOrWhiteSpace(job.Config.ConnectionString))
             {
@@ -162,25 +160,6 @@ namespace Fabric.Databus.PipelineRunner
             }
 
             return Task.FromResult(true);
-        }
-
-        /// <summary>
-        /// The check first query is valid.
-        /// </summary>
-        /// <param name="job">
-        ///     The job.
-        /// </param>
-        /// <param name="logger">
-        /// The logger
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        public async Task<bool> CheckFirstQueryIsValid(IJob job, ILogger logger)
-        {
-            var load = job.Data.DataSources.First(c => c.Path == null);
-
-            return await this.CheckQueryIsValidAsync(job, load, logger, 1, job.Data.TopLevelDataSource.Key, job.Data.TopLevelDataSource.IncrementalColumns);
         }
 
         /// <summary>
@@ -264,23 +243,31 @@ namespace Fabric.Databus.PipelineRunner
                     }
                 }
 
-                using (var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                try
                 {
-                    var foundRow = false;
 
-                    while (reader.Read())
+                    using (var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        foundRow = true;
+                        var foundRow = false;
+
+                        while (reader.Read())
+                        {
+                            foundRow = true;
+                        }
+
+                        logger.Information(
+                            "Validated data source {index} {path} {@load} {@StartTime}",
+                            numberOfDataSource,
+                            load.Path,
+                            load,
+                            DateTime.Now);
+
+                        return foundRow;
                     }
-
-                    logger.Information(
-                        "Validated data source {index} {path} {@load} {@StartTime}",
-                        numberOfDataSource,
-                        load.Path,
-                        load,
-                        DateTime.Now);
-
-                    return foundRow;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(cmd.CommandText, e);
                 }
             }
         }
@@ -305,7 +292,7 @@ namespace Fabric.Databus.PipelineRunner
                 throw new DatabusValidationException("No connection string was passed");
             }
 
-            if (!this.CheckDatabaseConnectionStringIsValid(job).Result)
+            if (!this.CheckDatabaseConnectionStringIsValidAsync(job).Result)
             {
                 throw new DatabusValidationException($"Unable to connect to connection string: [{job.Config.ConnectionString}]");
             }
@@ -361,7 +348,7 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public async void ValidateDataSourcesAsync(IJob job, ILogger logger)
+        public async Task ValidateDataSourcesAsync(IJob job, ILogger logger)
         {
             int numberOfDataSource = 0;
             foreach (var dataSource in job.Data.DataSources)

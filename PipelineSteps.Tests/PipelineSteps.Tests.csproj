@@ -106,7 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CreateJsonBatchesPipelineStepUnitTests.cs" />
-    <Compile Include="MockProgressMonitor.cs" />
+    <Compile Include="DummyProgressMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SendToRestApiPipelineStepUnitTests.cs" />
     <Compile Include="CreateBatchesPipelineStepUnitTests.cs" />

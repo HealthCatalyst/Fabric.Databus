@@ -63,7 +63,7 @@ namespace PipelineStep.Tests
                     job.Config,
                     logger,
                     queueManager,
-                    new MockProgressMonitor(),
+                    new DummyProgressMonitor(),
                     cancellationTokenSource.Token,
                     new PipelineStepState());
 

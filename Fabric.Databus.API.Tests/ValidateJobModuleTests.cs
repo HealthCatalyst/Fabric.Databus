@@ -9,6 +9,9 @@
 
 namespace Fabric.Databus.API.Tests
 {
+    using System.Threading.Tasks;
+
+    using Fabric.Database.Testing.FileLoader;
     using Fabric.Databus.API.Configuration;
     using Fabric.Databus.API.Modules;
     using Fabric.Databus.API.Wrappers;
@@ -29,9 +32,17 @@ namespace Fabric.Databus.API.Tests
         /// <summary>
         /// The can validate job.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         [TestMethod]
-        public void CanValidateJob()
+        public async Task CanValidateJobAsync()
         {
+            var fileContents = TestFileLoader.GetFileContents("Files", "job.xml");
+
+            Assert.IsNotNull(fileContents);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(fileContents));
+
             var logger = new LoggerConfiguration().CreateLogger();
             var jobScheduler = new JobScheduler(
                 logger,
@@ -49,12 +60,16 @@ namespace Fabric.Databus.API.Tests
                             new ValidateJobModule(logger, jobScheduler, appConfiguration));
                     });
 
-            var response = browser.Post(
-                "/",
+            var response = await browser.Post(
+                "/validate",
                 (with) =>
                     {
                         with.HttpRequest();
+                        with.Body(fileContents);
+                        with.Header("Accept", "application/json");
                     });
+
+            Assert.AreEqual(Nancy.HttpStatusCode.OK, response.StatusCode);
         }
     }
 }

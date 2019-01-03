@@ -11,6 +11,8 @@ namespace Fabric.Databus.API
 {
     using System;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
@@ -26,7 +28,10 @@ namespace Fabric.Databus.API
         /// <param name="args">
         /// The args.
         /// </param>
-        public static void Main(string[] args)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public static async Task<int> Main(string[] args)
         {
             Console.WriteLine("Current folder: " + Directory.GetCurrentDirectory());
 
@@ -47,7 +52,18 @@ namespace Fabric.Databus.API
 
             Console.WriteLine("Databus is ready");
 
-            host.Run();
+            var cts = new CancellationTokenSource();
+
+            // handle the SIGTERM signal that docker sends: https://stackoverflow.com/questions/38291567/killing-gracefully-a-net-core-daemon-running-on-linux/47474693#47474693
+            AppDomain.CurrentDomain.ProcessExit += (s, e) =>
+                {
+                    Console.WriteLine("Received a ProcessExit command!");
+                    cts.Cancel();
+                };
+
+            await host.RunAsync(cts.Token);
+
+            return 0;
         }
     }
 }

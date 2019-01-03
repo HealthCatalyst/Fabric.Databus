@@ -30,6 +30,8 @@
     <PackageReference Include="NEST" Version="6.4.0" />
     <PackageReference Include="Serilog" Version="2.7.1" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="6.5.0" />
+    <PackageReference Include="Unity.Abstractions" Version="3.3.1" />
+    <PackageReference Include="Unity.Container" Version="5.8.13" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fabric.Databus.Domain\Fabric.Databus.Domain.csproj" />

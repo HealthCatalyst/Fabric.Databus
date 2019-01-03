@@ -41,12 +41,12 @@ namespace Fabric.Databus.API
             container.Register<JsonSerializer, CustomJsonSerializer>();
             //container.Register<IJobHistoryStore, ElasticSearchJobHistoryStore>();
             container.Register<IJobHistoryStore, InMemoryJobHistoryStore>();
-            container.Register<IConfigValidator, ConfigValidator>();
+            container.Register<IConfigValidator, MyConfigValidator>();
             container.Register<IJobStatusTrackerFactory, JobStatusTrackerFactory>();
 
-            //Multi-instance lifetimes
+            // Multi-instance lifetimes
             container.Register<IJobStatusTracker, JobStatusTracker>().AsMultiInstance();
-            container.Register<IImportRunner, PipelineRunner>().AsMultiInstance();
+            container.Register<IImportRunner, MyPipelineRunner>().AsMultiInstance();
             container.Register<IJobScheduler, JobScheduler>().AsMultiInstance();
         }
 

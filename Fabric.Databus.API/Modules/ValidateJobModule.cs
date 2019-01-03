@@ -38,11 +38,11 @@ namespace Fabric.Databus.API.Modules
                     {
                         var jobName = string.Empty; // parameters.jobName;
 
-                var httpFiles = this.Request.Files.ToList();
+                        var httpFiles = this.Request.Files.ToList();
 
-                var body = RequestStream.FromStream(this.Request.Body).AsString();
-                return await jobScheduler.ValidateJobAsync(body, jobName, logger);
-            });
+                        var body = RequestStream.FromStream(this.Request.Body).AsString();
+                        return await jobScheduler.ValidateJobAsync(body, jobName, logger);
+                    });
         }
     }
 }

@@ -98,11 +98,12 @@ namespace Fabric.Databus.API
                 buildFunc(next => RequestLoggingMiddleware.Inject(next, log));
                 buildFunc(next => PerformanceLoggingMiddleware.Inject(next, log));
                 buildFunc(next => new DiagnosticsMiddleware(next, levelSwitch).Inject);
-                buildFunc(next => new MonitoringMiddleware(next, HealthCheck).Inject);
+                buildFunc(next => new MonitoringMiddleware(next, this.HealthCheck).Inject);
                 if (appConfig.EnableAuthorization)
                 {
                     buildFunc.UseAuthPlatform(appConfig.Scopes.Split(','));
                 }
+
                 buildFunc.UseNancy(opt => opt.Bootstrapper = new Bootstrapper(log, appConfig));
             });
         }

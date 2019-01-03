@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Fabric.Databus.API
+namespace Fabric.Databus.API.Wrappers
 {
     using System.Threading;
 

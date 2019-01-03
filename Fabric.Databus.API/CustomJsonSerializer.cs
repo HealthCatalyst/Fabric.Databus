@@ -1,12 +1,23 @@
-﻿using Newtonsoft.Json;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="CustomJsonSerializer.cs" company="">
+//   
+// </copyright>
+// <summary>
+//   Defines the CustomJsonSerializer type.
+// </summary>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Fabric.Databus.API
 {
-    public class CustomJsonSerializer : JsonSerializer
+    using Newtonsoft.Json;
+
+    /// <inheritdoc />
+    public sealed class CustomJsonSerializer : JsonSerializer
     {
+        /// <inheritdoc />
         public CustomJsonSerializer()
         {
-            Formatting = Formatting.Indented;
+            this.Formatting = Formatting.Indented;
         }
     }
 }

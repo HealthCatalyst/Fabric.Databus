@@ -12,6 +12,7 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Data;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
 
@@ -31,11 +32,13 @@ namespace Fabric.Databus.PipelineRunner
         /// <summary>
         /// The sql connection factory.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly ISqlConnectionFactory sqlConnectionFactory;
 
         /// <summary>
         /// The sql generator factory.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         private readonly ISqlGeneratorFactory sqlGeneratorFactory;
 
         /// <summary>
@@ -47,6 +50,7 @@ namespace Fabric.Databus.PipelineRunner
         /// <param name="sqlGeneratorFactory">
         /// The sql Generator Factory.
         /// </param>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
         public ConfigValidator(ISqlConnectionFactory sqlConnectionFactory, ISqlGeneratorFactory sqlGeneratorFactory)
         {
             this.sqlConnectionFactory = sqlConnectionFactory;

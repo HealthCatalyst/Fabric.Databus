@@ -11,6 +11,7 @@ using Serilog;
 
 namespace Fabric.Databus.API
 {
+    using Fabric.Databus.API.Wrappers;
     using Fabric.Databus.PipelineRunner;
 
     public class Bootstrapper : DefaultNancyBootstrapper

@@ -25,14 +25,14 @@ namespace Fabric.Databus.API.Modules
     /// <summary>
     /// The validate job module.
     /// </summary>
-    public class ValidateJobModule : NancyModule
+    public sealed class ValidateJobModule : NancyModule
     {
         /// <inheritdoc />
         public ValidateJobModule(ILogger logger, IJobScheduler jobScheduler, IAppConfiguration configuration) : base("/validate")
         {
             this.RequiresClaimsIfAuthorizationEnabled(configuration, claim => claim.Value.Equals("fabric/databus.validate", StringComparison.OrdinalIgnoreCase));
 
-            Post(
+            this.Post(
                 "/",
                 async parameters =>
                     {
@@ -40,7 +40,7 @@ namespace Fabric.Databus.API.Modules
 
                 var httpFiles = this.Request.Files.ToList();
 
-                var body = RequestStream.FromStream(Request.Body).AsString();
+                var body = RequestStream.FromStream(this.Request.Body).AsString();
                 return await jobScheduler.ValidateJobAsync(body, jobName, logger);
             });
         }

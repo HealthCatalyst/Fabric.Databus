@@ -7,15 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using Unity;
-
 namespace Fabric.Databus.Nuget.Console
 {
     using System;
     using System.Diagnostics;
-    using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Client;
     using Fabric.Databus.Config;
@@ -23,7 +21,7 @@ namespace Fabric.Databus.Nuget.Console
     using Fabric.Databus.Interfaces.Loggers;
     using Fabric.Databus.Shared.Loggers;
 
-    using Serilog;
+    using Unity;
 
     using Console = System.Console;
 
@@ -38,9 +36,13 @@ namespace Fabric.Databus.Nuget.Console
         /// <param name="args">
         /// The args.
         /// </param>
-        /// <exception cref="Exception">exception thrown
+        /// <exception cref="Exception">
+        /// exception thrown
         /// </exception>
-        public static void Main(string[] args)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public static async Task Main(string[] args)
         {
             Console.WriteLine("Running Fabric.Databus.Nuget.Console");
 
@@ -67,7 +69,7 @@ namespace Fabric.Databus.Nuget.Console
 
                         var pipelineRunner = new DatabusRunner();
 
-                        pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
+                        await pipelineRunner.RunRestApiPipelineAsync(container, config, cancellationTokenSource.Token);
                     }
                 }
 
@@ -77,7 +79,7 @@ namespace Fabric.Databus.Nuget.Console
                 Console.WriteLine($"Finished in {timeElapsed} using {threadText}");
 
 #if TRUE
-                Log.CloseAndFlush();
+                Serilog.Log.CloseAndFlush();
 
                 //file.Flush();
                 //file.Close();

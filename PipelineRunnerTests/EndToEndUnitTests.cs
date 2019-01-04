@@ -49,7 +49,7 @@ namespace PipelineRunnerTests
         /// The test elastic search pipeline.
         /// </summary>
         [TestMethod]
-        public void TestElasticSearchPipelineSingleThreaded()
+        public async Task TestElasticSearchPipelineSingleThreaded()
         {
             var sql = @"fake sql";
 
@@ -156,7 +156,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunPipelineAsync(job);
+                        await pipelineRunner.RunPipelineAsync(job);
                     }
                     catch (OperationCanceledException e)
                     {
@@ -181,7 +181,7 @@ namespace PipelineRunnerTests
         /// The test elastic search pipeline.
         /// </summary>
         [TestMethod]
-        public void TestElasticSearchPipelineMultiThreaded()
+        public async Task TestElasticSearchPipelineMultiThreaded()
         {
             var sql = @"fake sql";
 
@@ -298,7 +298,7 @@ namespace PipelineRunnerTests
                     var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
                     try
                     {
-                        pipelineRunner.RunPipelineAsync(job);
+                        await pipelineRunner.RunPipelineAsync(job);
                     }
                     catch (OperationCanceledException e)
                     {

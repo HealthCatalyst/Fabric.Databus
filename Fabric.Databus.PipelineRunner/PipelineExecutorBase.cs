@@ -11,6 +11,7 @@ namespace Fabric.Databus.PipelineRunner
 {
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Pipeline;
@@ -53,6 +54,9 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public abstract void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> pipelineSteps, int timeoutInMilliseconds);
+        public abstract Task RunPipelineTasksAsync(
+            IQueryConfig config,
+            IList<PipelineStepInfo> pipelineSteps,
+            int timeoutInMilliseconds);
     }
 }

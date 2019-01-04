@@ -14,6 +14,7 @@ namespace Fabric.Databus.PipelineRunner
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.ConfigValidators;
@@ -91,12 +92,12 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public void RunPipeline(IJob job, IJobStatusTracker jobStatusTracker)
+        public async Task RunPipelineAsync(IJob job, IJobStatusTracker jobStatusTracker)
         {
             jobStatusTracker.TrackStart();
             try
             {
-                this.RunPipeline(job);
+                await this.RunPipelineAsync(job);
             }
             catch (Exception e)
             {
@@ -108,7 +109,7 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public void RunPipeline(IJob job)
+        public async Task RunPipelineAsync(IJob job)
         {
             if (job == null)
             {
@@ -140,7 +141,9 @@ namespace Fabric.Databus.PipelineRunner
             if (!string.IsNullOrWhiteSpace(job.Config.LocalSaveFolder) && temporaryFileWriter.IsWritingEnabled)
             {
                 // temporaryFileWriter.WriteToFileAsync(temporaryFileWriter.CombinePath(job.Config.LocalSaveFolder, "job.json"), job.ToJsonPretty());
-                temporaryFileWriter.WriteToFileAsync(temporaryFileWriter.CombinePath(job.Config.LocalSaveFolder, "job.xml"), new ConfigReader().WriteXml(job));
+                await temporaryFileWriter.WriteToFileAsync(
+                    temporaryFileWriter.CombinePath(job.Config.LocalSaveFolder, "job.xml"),
+                    new ConfigReader().WriteXml(job));
             }
 
             this.container.Resolve<IConfigValidator>().ValidateJob(job, logger);
@@ -171,7 +174,7 @@ namespace Fabric.Databus.PipelineRunner
                     job.Data.TopLevelDataSource.TableOrView);
             }
 
-            this.container.Resolve<IConfigValidator>().ValidateDataSourcesAsync(job, logger).Wait();
+            await this.container.Resolve<IConfigValidator>().ValidateDataSourcesAsync(job, logger);
 
             // add job to the first queue
             var sqlJobQueue = this.container.Resolve<IQueueManager>()
@@ -198,7 +201,7 @@ namespace Fabric.Databus.PipelineRunner
 
             logger.Information("Starting pipeline {config} {processors} {TimeoutInMilliseconds}", config, processors, TimeoutInMilliseconds);
 
-            pipelineExecutor.RunPipelineTasks(config, processors, TimeoutInMilliseconds);
+            await pipelineExecutor.RunPipelineTasksAsync(config, processors, TimeoutInMilliseconds);
 
             var stopwatchElapsed = stopwatch.Elapsed;
             stopwatch.Stop();

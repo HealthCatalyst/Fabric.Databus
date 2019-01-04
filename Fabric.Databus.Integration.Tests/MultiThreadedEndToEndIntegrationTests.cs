@@ -54,8 +54,11 @@ namespace Fabric.Databus.Integration.Tests
         /// <summary>
         /// The can run successfully end to end.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         [TestMethod]
-        public void CanRunSingleEntityEndToEnd()
+        public async Task CanRunSingleEntityEndToEnd()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "SingleEntity.xml");
 
@@ -248,7 +251,7 @@ FROM Text
 
                         try
                         {
-                            pipelineRunner.RunPipeline(config);
+                            await pipelineRunner.RunPipelineAsync(config);
                         }
                         catch (AggregateException e)
                         {
@@ -326,7 +329,7 @@ FROM Text
         /// The can run successfully end to end.
         /// </summary>
         [TestMethod]
-        public void CanRunSingleWithIncrementalEndToEnd()
+        public async Task CanRunSingleWithIncrementalEndToEnd()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "SingleEntityIncremental.xml");
             var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "SingleEntityIncremental.sql");
@@ -448,7 +451,7 @@ FROM Text
 
                         try
                         {
-                            pipelineRunner.RunPipeline(config);
+                            await pipelineRunner.RunPipelineAsync(config);
                         }
                         catch (AggregateException e)
                         {
@@ -501,7 +504,7 @@ FROM Text
         /// The can run successfully end to end.
         /// </summary>
         [TestMethod]
-        public void CanRunMultipleEntitiesEndToEnd()
+        public async Task CanRunMultipleEntitiesEndToEnd()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "MultipleEntities.xml");
             var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "MultipleEntities.sql");
@@ -631,7 +634,7 @@ FROM Text
 
                         try
                         {
-                            pipelineRunner.RunPipeline(config);
+                            await pipelineRunner.RunPipelineAsync(config);
                         }
                         catch (AggregateException e)
                         {
@@ -682,7 +685,7 @@ FROM Text
         /// The can run successfully end to end.
         /// </summary>
         [TestMethod]
-        public void CanRunMultipleEntitiesEndToEndWithBatching()
+        public async Task CanRunMultipleEntitiesEndToEndWithBatching()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "MultipleEntitiesWithBatching.xml");
             var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "MultipleEntitiesWithBatching.sql");
@@ -822,11 +825,15 @@ FROM Text
 
                         try
                         {
-                            pipelineRunner.RunPipeline(config);
+                            await pipelineRunner.RunPipelineAsync(config);
                         }
                         catch (AggregateException e)
                         {
-                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
+                            foreach (var inner in e.InnerExceptions)
+                            {
+                                Console.WriteLine(inner);
+                            }
+
                             throw e.Flatten();
                         }
 
@@ -901,7 +908,7 @@ FROM Text
         /// The can run successfully end to end.
         /// </summary>
         [TestMethod]
-        public void CanRunNestedEntitiesEndToEndWithBatching()
+        public async Task CanRunNestedEntitiesEndToEndWithBatching()
         {
             var fileContents = TestFileLoader.GetFileContents("Files", "NestedEntitiesWithBatching.xml");
             var sqlLines = TestFileLoader.GetFileContentsAsList("Files", "NestedEntitiesWithBatching.sql");
@@ -1035,11 +1042,15 @@ FROM Text
 
                         try
                         {
-                            pipelineRunner.RunPipeline(config);
+                            await pipelineRunner.RunPipelineAsync(config);
                         }
                         catch (AggregateException e)
                         {
-                            foreach (var inner in e.InnerExceptions) { Console.WriteLine(inner); }
+                            foreach (var inner in e.InnerExceptions)
+                            {
+                                Console.WriteLine(inner);
+                            }
+
                             throw e.Flatten();
                         }
 

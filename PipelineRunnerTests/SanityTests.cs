@@ -14,6 +14,7 @@ namespace PipelineRunnerTests
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Client;
     using Fabric.Databus.Config;
@@ -31,9 +32,12 @@ namespace PipelineRunnerTests
         /// <summary>
         /// The test simple run.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         [TestMethod]
         [Ignore]
-        public void TestSimpleRun()
+        public async Task TestSimpleRun()
         {
             var localSaveFolder = Path.Combine(Path.GetTempPath(), "databus");
             Directory.Delete(localSaveFolder, true);
@@ -71,7 +75,7 @@ namespace PipelineRunnerTests
 
             var job = new Job { Config = config, Data = jobData };
             var runner = new DatabusRunner();
-            runner.RunRestApiPipeline(new UnityContainer(), job, new CancellationToken());
+            await runner.RunRestApiPipelineAsync(new UnityContainer(), job, new CancellationToken());
 
             Console.WriteLine("Contents of folder after");
 

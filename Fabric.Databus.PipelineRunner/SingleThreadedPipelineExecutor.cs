@@ -12,6 +12,7 @@ namespace Fabric.Databus.PipelineRunner
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Config;
     using Fabric.Databus.Interfaces.Pipeline;
@@ -32,7 +33,10 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public override void RunPipelineTasks(IQueryConfig config, IList<PipelineStepInfo> pipelineSteps, int timeoutInMilliseconds)
+        public override Task RunPipelineTasksAsync(
+            IQueryConfig config,
+            IList<PipelineStepInfo> pipelineSteps,
+            int timeoutInMilliseconds)
         {
             foreach (var processor in pipelineSteps)
             {
@@ -41,13 +45,15 @@ namespace Fabric.Databus.PipelineRunner
                         processor.Type,
                         new ParameterOverride("cancellationToken", this.cancellationTokenSource.Token)));
             }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// The run async.
         /// </summary>
         /// <param name="functionQueueProcessor">
-        /// The fn queue processor.
+        /// The function pipeline step.
         /// </param>
         private void RunSync(Func<IPipelineStep> functionQueueProcessor)
         {

@@ -9,6 +9,8 @@
 
 namespace Fabric.Databus.Domain.Importers
 {
+    using System.Threading.Tasks;
+
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Jobs;
 
@@ -23,7 +25,10 @@ namespace Fabric.Databus.Domain.Importers
         /// <param name="job">
         /// The job.
         /// </param>
-        void RunPipeline(IJob job);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task RunPipelineAsync(IJob job);
 
         /// <summary>
         /// The run pipeline.
@@ -34,6 +39,9 @@ namespace Fabric.Databus.Domain.Importers
         /// <param name="jobStatusTracker">
         /// The job status tracker.
         /// </param>
-        void RunPipeline(IJob job, IJobStatusTracker jobStatusTracker);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task RunPipelineAsync(IJob job, IJobStatusTracker jobStatusTracker);
     }
 }

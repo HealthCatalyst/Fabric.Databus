@@ -46,7 +46,7 @@ namespace Fabric.Databus.PipelineRunner
         }
 
         /// <inheritdoc />
-        public override void RunPipelineTasks(
+        public override async Task RunPipelineTasksAsync(
             IQueryConfig config,
             IList<PipelineStepInfo> pipelineSteps,
             int timeoutInMilliseconds)
@@ -74,7 +74,9 @@ namespace Fabric.Databus.PipelineRunner
                 var thisStepNumber = this.stepNumber;
 
                 // mark a queue as done when all the tasks for that queue are done
+#pragma warning disable 4014
                 Task.WhenAll(tasksForPipelineStep).ContinueWith(
+#pragma warning restore 4014
                     t =>
                         {
                             functionPipelineStep().MarkOutputQueueAsCompleted(thisStepNumber);
@@ -86,7 +88,9 @@ namespace Fabric.Databus.PipelineRunner
                 foreach (var task in tasks)
                 {
                     // do it here so we don't have the original tasks in the list not the continuation ones
+#pragma warning disable 4014
                     task.ContinueWith(
+#pragma warning restore 4014
                         t =>
                             {
                                 if (!this.cancellationTokenSource.IsCancellationRequested)
@@ -101,7 +105,7 @@ namespace Fabric.Databus.PipelineRunner
                 }
 
                 tasks.ForEach(t => t.Start());
-                Task.WaitAll(tasks.ToArray());
+                await Task.WhenAll(tasks.ToArray());
             }
             catch (AggregateException ex)
             {
@@ -114,7 +118,7 @@ namespace Fabric.Databus.PipelineRunner
         /// The run async.
         /// </summary>
         /// <param name="functionPipelineStep">
-        /// The fn queue processor.
+        /// The function that returns a pipeline step.
         /// </param>
         /// <param name="count">
         /// The count.

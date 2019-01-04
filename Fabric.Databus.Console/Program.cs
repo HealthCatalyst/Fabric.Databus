@@ -14,6 +14,7 @@ namespace Fabric.Databus.Console
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Client;
     using Fabric.Databus.Config;
@@ -40,9 +41,13 @@ namespace Fabric.Databus.Console
         /// <param name="args">
         /// The args.
         /// </param>
-        /// <exception cref="Exception">exception thrown
+        /// <exception cref="Exception">
+        /// exception thrown
         /// </exception>
-        public static void Main(string[] args)
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public static async Task Main(string[] args)
         {
             if (args.Any() && args[0] == "-generateschema")
             {
@@ -117,7 +122,7 @@ namespace Fabric.Databus.Console
 
                         var pipelineRunner = new DatabusRunner();
 
-                        pipelineRunner.RunRestApiPipeline(container, config, cancellationTokenSource.Token);
+                        await pipelineRunner.RunRestApiPipelineAsync(container, config, cancellationTokenSource.Token);
                     }
                 }
 
@@ -142,7 +147,10 @@ namespace Fabric.Databus.Console
         /// <summary>
         /// The run databus.
         /// </summary>
-        public static void RunDatabus()
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public static async Task RunDatabus()
         {
             var config = new QueryConfig
             {
@@ -175,7 +183,7 @@ namespace Fabric.Databus.Console
                               };
             var job = new Job { Config = config, Data = jobData };
             var runner = new DatabusRunner();
-            runner.RunRestApiPipeline(new UnityContainer(), job, new CancellationToken());
+            await runner.RunRestApiPipelineAsync(new UnityContainer(), job, new CancellationToken());
         }
     }
 }

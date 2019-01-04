@@ -10,6 +10,7 @@
 namespace Fabric.Databus.API.Wrappers
 {
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Config;
     using Fabric.Databus.Domain.Importers;
@@ -22,20 +23,20 @@ namespace Fabric.Databus.API.Wrappers
     public class MyPipelineRunner : IImportRunner
     {
         /// <inheritdoc />
-        public void RunPipeline(IJob job)
+        public Task RunPipelineAsync(IJob job)
         {
             throw new System.NotImplementedException();
         }
 
         /// <inheritdoc />
-        public void RunPipeline(IJob job, IJobStatusTracker jobStatusTracker)
+        public async Task RunPipelineAsync(IJob job, IJobStatusTracker jobStatusTracker)
         {
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
                 var container = new UnityContainer();
                 var pipelineRunner = new PipelineRunner(container, cancellationTokenSource.Token);
 
-                pipelineRunner.RunPipeline(job);
+                await pipelineRunner.RunPipelineAsync(job);
             }
         }
     }

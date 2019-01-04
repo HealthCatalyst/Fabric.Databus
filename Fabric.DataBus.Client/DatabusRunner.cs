@@ -12,6 +12,7 @@ namespace Fabric.Databus.Client
     using System.Diagnostics;
     using System.IO;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Config;
     using Fabric.Databus.PipelineRunner;
@@ -31,15 +32,18 @@ namespace Fabric.Databus.Client
         /// The run pipeline.
         /// </summary>
         /// <param name="container">
-        ///     The container.
+        /// The container.
         /// </param>
         /// <param name="job">
-        ///     The job.
+        /// The job.
         /// </param>
         /// <param name="cancellationToken">
-        ///     The cancellation token
+        /// The cancellation token
         /// </param>
-        public void RunRestApiPipeline(
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        public async Task RunRestApiPipelineAsync(
             IUnityContainer container,
             IJob job,
             CancellationToken cancellationToken)
@@ -61,7 +65,7 @@ namespace Fabric.Databus.Client
 
             var pipelineRunner = new PipelineRunner(container, cancellationToken);
 
-            pipelineRunner.RunPipeline(job);
+            await pipelineRunner.RunPipelineAsync(job);
 
             stopwatch.Stop();
 
@@ -80,14 +84,14 @@ namespace Fabric.Databus.Client
         {
             if (File.Exists(Path.Combine(System.AppContext.BaseDirectory, "serilog-config.json")))
             {
-                //var configuration = new ConfigurationBuilder()
+                // var configuration = new ConfigurationBuilder()
                 //    .SetBasePath(System.AppContext.BaseDirectory)
                 //    // ReSharper disable once StringLiteralTypo
                 //    .AddJsonFile("serilog-config.json")
-                //    .Build();
+                ////    .Build();
 
                 ILogger logger = new LoggerConfiguration()
-                    // .ReadFrom.Configuration(configuration)
+                    //// .ReadFrom.Configuration(configuration)
                     .CreateLogger();
                 container.RegisterInstance(logger);
 

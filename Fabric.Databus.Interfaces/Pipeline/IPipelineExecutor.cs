@@ -11,6 +11,7 @@ namespace Fabric.Databus.Interfaces.Pipeline
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using Fabric.Databus.Interfaces.Config;
 
@@ -25,15 +26,18 @@ namespace Fabric.Databus.Interfaces.Pipeline
         /// <param name="config">
         /// The config.
         /// </param>
-        /// <param name="pipelineSteps">pipelineSteps to run</param>
+        /// <param name="pipelineSteps">
+        /// pipelineSteps to run
+        /// </param>
         /// <param name="timeoutInMilliseconds">
         /// The timeout in milliseconds.
         /// </param>
-        /// <exception cref="AggregateException">exception thrown
+        /// <exception cref="AggregateException">
+        /// exception thrown
         /// </exception>
-        void RunPipelineTasks(
-            IQueryConfig config,
-            IList<PipelineStepInfo> pipelineSteps,
-            int timeoutInMilliseconds);
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
+        Task RunPipelineTasksAsync(IQueryConfig config, IList<PipelineStepInfo> pipelineSteps, int timeoutInMilliseconds);
     }
 }

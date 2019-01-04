@@ -100,7 +100,7 @@ namespace Fabric.Databus.Domain.Jobs
             var jobStatusTracker = this.jobStatusTrackerFactory.GetTracker(this.jobHistoryStore, jobHistoryItem);
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                Task.Run(() => this.importRunner.RunPipeline(query, jobStatusTracker), cancellationTokenSource.Token);
+                Task.Run(() => this.importRunner.RunPipelineAsync(query, jobStatusTracker), cancellationTokenSource.Token);
             }
             return jobHistoryItem.Id;
         }
